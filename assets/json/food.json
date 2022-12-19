@@ -1,0 +1,645 @@
+[
+  {
+    "id": "1",
+    "name": "Будаа гурил үр тариа",
+    "nameEng": "gurilbudaa",
+    "zurag": "guril.png",
+    "category": [
+      {
+        "id": "100",
+        "cat": "Бантангийн гурил",
+        "catEng": "bantan",
+        "catImg": "/image/amaraa/109.png"
+      },
+      {
+        "id": "101",
+        "cat": "Бүхэл үр, олон үрийн гурил",
+        "catEng": "buhelur",
+        "catImg": "/image/amaraa/1829.png"
+      },
+      {
+        "id": "102",
+        "cat": "Гурвалжин будаа",
+        "catEng": "gurvaljin",
+        "catImg": "/image/amaraa/102.png"
+      },
+      {
+        "id": "103",
+        "cat": "Гурил",
+        "catEng": "guril",
+        "catImg": "/image/amaraa/106.png"
+      },
+      {
+        "id": "104",
+        "cat": "Каш",
+        "catEng": "cash",
+        "catImg": "/image/amaraa/265.png"
+      },
+      {
+        "id": "105",
+        "cat": "Овъёос",
+        "catEng": "obios",
+        "catImg": "/image/amaraa/1803.png"
+      },
+      {
+        "id": "106",
+        "cat": "Хөц будаа",
+        "catEng": "khots",
+        "catImg": "/image/amaraa/530.png"
+      },
+      {
+        "id": "107",
+        "cat": "Цагаан будаа",
+        "catEng": "tsagaan",
+        "catImg": "/image/amaraa/541.png"
+      },
+      {
+        "id": "108",
+        "cat": "Чиа үр, маалингын үр",
+        "catEng": "ur",
+        "catImg": "/image/amaraa/866.png"
+      },
+      {
+        "id": "109",
+        "cat": "Шар будаа",
+        "catEng": "shar",
+        "catImg": "/image/amaraa/663.png"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Талх нарийн боов",
+    "nameEng": "talh",
+    "zurag": "talh.png",
+    "category": [
+      {
+        "id": "200",
+        "cat": "Талх",
+        "catEng": "talh",
+        "catImg": "/image/amaraa/1684.png"
+      },
+      {
+        "id": "201",
+        "cat": "Нарийн боов",
+        "catEng": "nariinboov",
+        "catImg": "/image/amaraa/1688.png"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Сүү сүүн бүтээгдэхүүн",
+    "nameEng": "suun",
+    "zurag": "suu.png",
+    "category": [
+      {
+        "id": "300",
+        "cat": "Сүү",
+        "catEng": "suu",
+        "catImg": "/image/amaraa/1745.png"
+      },
+      {
+        "id": "301",
+        "cat": "Өрөм, зөөхий, ааруул",
+        "catEng": "zoohii",
+        "catImg": "/image/amaraa/813.png"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Гоймон бэлэн хоол пүнтүүз",
+    "nameEng": "goimon",
+    "zurag": "goimon.png",
+    "category": [
+      {
+        "id": "400",
+        "cat": "Гоймон",
+        "catEng": "goimon",
+        "catImg": "/image/amaraa/1795.png"
+      },
+      {
+        "id": "401",
+        "cat": "Шпагетти",
+        "catEng": "shpaget",
+        "catImg": "/image/amaraa/714.png"
+      },
+      {
+        "id": "402",
+        "cat": "Бэлэн гоймон",
+        "catEng": "belen",
+        "catImg": "/image/amaraa/53.png"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Мах махан бүтээгдэхүүн",
+    "nameEng": "mah",
+    "zurag": "hiam.png",
+    "category": [
+      {
+        "id": "500",
+        "cat": "Гахайн мах",
+        "catEng": "gahai",
+        "catImg": "/image/amaraa/789.png"
+      },
+      {
+        "id": "501",
+        "cat": "Савласан махан бүтээгдэхүүн",
+        "catEng": "savlasanmah",
+        "catImg": "/image/amaraa/2870.png"
+      },
+      {
+        "id": "502",
+        "cat": "Тахианы мах",
+        "catEng": "tahia",
+        "catImg": "/image/amaraa/841.png"
+      },
+      {
+        "id": "503",
+        "cat": "Үхрийн мах",
+        "catEng": "uher",
+        "catImg": "/image/amaraa/792.png"
+      },
+      {
+        "id": "504",
+        "cat": "Хиам, зайдас",
+        "catEng": "hiam",
+        "catImg": "/image/amaraa/821.png"
+      },
+      {
+        "id": "505",
+        "cat": "Хонины мах",
+        "catEng": "honi",
+        "catImg": "/image/amaraa/788.png"
+      },
+      {
+        "id": "506",
+        "cat": "Хөлдөөсөн бууз, банш",
+        "catEng": "bansh",
+        "catImg": "/image/amaraa/835.png"
+      },
+      {
+        "id": "507",
+        "cat": "Хөлдөөсөн хуушуур",
+        "catEng": "huushuur",
+        "catImg": "/image/amaraa/793.png"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Өдөр тутмын хүнс",
+    "nameEng": "everyday",
+    "zurag": "everyday.png",
+    "category": [
+      {
+        "id": "600",
+        "cat": "Өндөг",
+        "catEng": "undug",
+        "catImg": "/image/amaraa/780.png"
+      },
+      {
+        "id": "601",
+        "cat": "Сыр, бяслаг",
+        "catEng": "siir",
+        "catImg": "/image/amaraa/11980.png"
+      },
+      {
+        "id": "602",
+        "cat": "Өглөөний хоол",
+        "catEng": "ugluuniitsai",
+        "catImg": "/image/amaraa/354.png"
+      },
+      {
+        "id": "603",
+        "cat": "Элсэн чихэр, ёотон",
+        "catEng": "elsenchiher",
+        "catImg": "/image/amaraa/723.png"
+      },
+      {
+        "id": "604",
+        "cat": "Давс",
+        "catEng": "davs",
+        "catImg": "/image/amaraa/126.png"
+      },
+      {
+        "id": "605",
+        "cat": "Ургамлын тос",
+        "catEng": "tos",
+        "catImg": "/image/amaraa/1757.png"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Ус ундаа жүүс",
+    "nameEng": "undaa",
+    "zurag": "undaa.png",
+    "category": [
+      {
+        "id": "700",
+        "cat": "Жүүс",
+        "catEng": "juus",
+        "catImg": "/image/amaraa/236.png"
+      },
+      {
+        "id": "701",
+        "cat": "Ундаа",
+        "catEng": "undaa",
+        "catImg": "/image/amaraa/409.png"
+      },
+      {
+        "id": "702",
+        "cat": "Ус",
+        "catEng": "us",
+        "catImg": "/image/amaraa/752.png"
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Боловсруулсан хүнс",
+    "nameEng": "bolovsruulsan",
+    "zurag": "bolovsruulsan.png",
+    "category": [
+      {
+        "id": "800",
+        "cat": "Варень",
+        "catEng": "chanamal",
+        "catImg": "/image/amaraa/56.png"
+      },
+      {
+        "id": "801",
+        "cat": "Далайн байцаа",
+        "catEng": "dalain",
+        "catImg": "/image/amaraa/132.png"
+      },
+      {
+        "id": "802",
+        "cat": "Даршилсан ногоо, салат",
+        "catEng": "salat",
+        "catImg": "/image/amaraa/148.png"
+      },
+      {
+        "id": "803",
+        "cat": "Зөгийн бал",
+        "catEng": "zogiinbal",
+        "catImg": "/image/amaraa/802.png"
+      },
+      {
+        "id": "804",
+        "cat": "Исгэгч",
+        "catEng": "isgegch",
+        "catImg": "/image/amaraa/262.png"
+      },
+      {
+        "id": "805",
+        "cat": "Кетчуп",
+        "catEng": "ketchup",
+        "catImg": "/image/amaraa/268.png"
+      },
+      {
+        "id": "806",
+        "cat": "Компот",
+        "catEng": "kompot",
+        "catImg": "/image/amaraa/12430.png"
+      },
+      {
+        "id": "807",
+        "cat": "Майонез",
+        "catEng": "mayonnese",
+        "catImg": "/image/amaraa/327.png"
+      },
+      {
+        "id": "808",
+        "cat": "Молоко",
+        "catEng": "moloco",
+        "catImg": "/image/amaraa/332.png"
+      },
+      {
+        "id": "809",
+        "cat": "Соус, Цуу",
+        "catEng": "sous",
+        "catImg": "/image/amaraa/381.png"
+      },
+      {
+        "id": "810",
+        "cat": "Амтлагч",
+        "catEng": "amtlagch",
+        "catImg": "/image/amaraa/1758.png"
+      },
+      {
+        "id": "811",
+        "cat": "Шоколадны крем",
+        "catEng": "shokkrem",
+        "catImg": "/image/amaraa/713.png"
+      },
+      {
+        "id": "812",
+        "cat": "Эрдэнэшиш, шош, вандуй",
+        "catEng": "vandui",
+        "catImg": "/image/amaraa/737.png"
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Чихэр шоколад",
+    "nameEng": "chiher",
+    "zurag": "chocolate.png",
+    "category": [
+      {
+        "id": "900",
+        "cat": "Чихэр, Амттан",
+        "catEng": "chiher",
+        "catImg": "/image/amaraa/1773.png"
+      },
+      {
+        "id": "901",
+        "cat": "Шагшуурга",
+        "catEng": "shagshuurga",
+        "catImg": "/image/amaraa/649.png"
+      },
+      {
+        "id": "902",
+        "cat": "Шоколад",
+        "catEng": "chocolate",
+        "catImg": "/image/amaraa/682.png"
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Жимс ногоо",
+    "nameEng": "jimsnogoo",
+    "zurag": "nogoo.png",
+    "category": [
+      {
+        "id": "1000",
+        "cat": "Лаазалсан жимс",
+        "catEng": "laazalsan",
+        "catImg": "/image/amaraa/319.png"
+      },
+      {
+        "id": "1001",
+        "cat": "Ногоо",
+        "catEng": "nogoo",
+        "catImg": "/image/amaraa/827.png"
+      },
+      {
+        "id": "1002",
+        "cat": "Хатаасан жимс",
+        "catEng": "khataasanjims",
+        "catImg": "/image/amaraa/1921.png"
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "name": "Цай кофе",
+    "nameEng": "tsaicoffee",
+    "zurag": "coffee.png",
+    "category": [
+      {
+        "id": "1100",
+        "cat": "Кофе",
+        "catEng": "coffee",
+        "catImg": "/image/amaraa/283.png"
+      },
+      {
+        "id": "1101",
+        "cat": "Цай",
+        "catEng": "tsai",
+        "catImg": "/image/amaraa/550.png"
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "name": "Амтат хөнгөн зууш",
+    "nameEng": "hongon",
+    "zurag": "zairmag.png",
+    "category": [
+      {
+        "id": "1201",
+        "cat": "Бохь, гаа",
+        "catEng": "bohi",
+        "catImg": "/image/amaraa/8.png"
+      },
+      {
+        "id": "1202",
+        "cat": "Жигнэмэг, печень, вафль",
+        "catEng": "pechen",
+        "catImg": "/image/amaraa/196.png"
+      },
+      {
+        "id": "1203",
+        "cat": "Чоко пай",
+        "catEng": "chocopai",
+        "catImg": "/image/amaraa/646.png"
+      },
+      {
+        "id": "1204",
+        "cat": "Зайрмаг",
+        "catEng": "zairmag",
+        "catImg": "/image/amaraa/12481.png"
+      },
+      {
+        "id": "1205",
+        "cat": "Попкорн",
+        "catEng": "popcorn",
+        "catImg": "/image/amaraa/363.png"
+      },
+      {
+        "id": "1206",
+        "cat": "Рулет, торт",
+        "catEng": "rulet",
+        "catImg": "/image/amaraa/929.png"
+      },
+      {
+        "id": "1207",
+        "cat": "Самар",
+        "catEng": "samar",
+        "catImg": "/image/amaraa/1827.png"
+      },
+      {
+        "id": "1208",
+        "cat": "Чипс",
+        "catEng": "chips",
+        "catImg": "/image/amaraa/757.png"
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "name": "Ахуйн хэрэглээ",
+    "nameEng": "ahui",
+    "zurag": "shampoo.png",
+    "category": [
+      {
+        "id": "1300",
+        "cat": "Үс арчилгаа",
+        "catEng": "usarchilgaa",
+        "catImg": "/image/tseregee/89.png"
+      },
+      {
+        "id": "1301",
+        "cat": "Бие арчилгаа",
+        "catEng": "biyarchilgaa",
+        "catImg": "/image/amaraa/1816.png"
+      },
+      {
+        "id": "1302",
+        "cat": "Ариун цэврийн хэрэглэл",
+        "catEng": "ariuntsever",
+        "catImg": "/image/tseregee/158.png"
+      },
+      {
+        "id": "1303",
+        "cat": "Ариун цэврийн цаас",
+        "catEng": "ootsaas",
+        "catImg": "/image/tseregee/26.png"
+      },
+      {
+        "id": "1304",
+        "cat": "Ахуйн цэвэрлэгээний бүтээгдэхүүн",
+        "catEng": "tseverlegee",
+        "catImg": "/image/tseregee/17.png"
+      },
+      {
+        "id": "1305",
+        "cat": "Гарын хатуу саван",
+        "catEng": "gariinsavan",
+        "catImg": "/image/tseregee/207.png"
+      },
+      {
+        "id": "1306",
+        "cat": "Гарын шингэн саван",
+        "catEng": "gariinshingensavan",
+        "catImg": "/image/tseregee/821.png"
+      },
+      {
+        "id": "1307",
+        "cat": "Нойтон сальфетка",
+        "catEng": "noitonsalfetka",
+        "catImg": "/image/tseregee/40.png"
+      },
+      {
+        "id": "1308",
+        "cat": "Тос",
+        "catEng": "tos",
+        "catImg": "/image/tseregee/84.png"
+      },
+      {
+        "id": "1309",
+        "cat": "Угаалгын бодис, хуурай",
+        "catEng": "ugaalgiinnuntag",
+        "catImg": "/image/tseregee/304.png"
+      },
+      {
+        "id": "1310",
+        "cat": "Хуурай салфетка",
+        "catEng": "salfetka",
+        "catImg": "/image/tseregee/36.png"
+      },
+      {
+        "id": "1311",
+        "cat": "Шүдний оо",
+        "catEng": "shudoo",
+        "catImg": "/image/amaraa/1501.png"
+      },
+      {
+        "id": "1312",
+        "cat": "Шүдний сойз",
+        "catEng": "shudsoiz",
+        "catImg": "/image/tseregee/599.png"
+      },
+      {
+        "id": "1313",
+        "cat": "Агааржуулагч",
+        "catEng": "agaarjuulagch",
+        "catImg": "/image/tseregee/182.png"
+      },
+      {
+        "id": "1314",
+        "cat": "Аяга таваг угаагч",
+        "catEng": "ayga",
+        "catImg": "/image/tseregee/321.png"
+      },
+      {
+        "id": "1315",
+        "cat": "Гал тогооны цаас",
+        "catEng": "galtsaas",
+        "catImg": "/image/tseregee/33.png"
+      },
+      {
+        "id": "1316",
+        "cat": "Хувцас зайлагч ",
+        "catEng": "huvtsaszailagch",
+        "catImg": "/image/tseregee/318.png"
+      },
+      {
+        "id": "1317",
+        "cat": "Ахуйн бусад хэрэглээ",
+        "catEng": "ahuibusad",
+        "catImg": "/image/amaraa/1344.png"
+      }
+    ]
+  },
+
+  {
+    "id": "14",
+    "name": "Хүүхдийн бүтээгдэхүүн",
+    "nameEng": "huuhdiin",
+    "zurag": "pampers.png",
+    "category": [
+      {
+        "id": "1400",
+        "cat": "Хүүхдийн ам арчилгаа",
+        "catEng": "am",
+        "catImg": "/image/amaraa/1454.png"
+      },
+      {
+        "id": "1401",
+        "cat": "Хүүхдийн живх",
+        "catEng": "pampers",
+        "catImg": "/image/tseregee/147.png"
+      },
+      {
+        "id": "1402",
+        "cat": "Хүүхдийн нухаш",
+        "catEng": "nuhash",
+        "catImg": "/image/amaraa/1585.png"
+      },
+      {
+        "id": "1403",
+        "cat": "Хүүхдийн үс арчилгаа",
+        "catEng": "us",
+        "catImg": "/image/tseregee/72.png"
+      },
+      {
+        "id": "1404",
+        "cat": "Хүүхдийн сальфитка",
+        "catEng": "salfetka",
+        "catImg": "/image/tseregee/609.png"
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "name": "Тэжээвэр амьтны хүнс",
+    "nameEng": "amitan",
+    "zurag": "animal.png",
+    "category": [
+      {
+        "id": "1500",
+        "cat": "Муурын хоол",
+        "catEng": "muur",
+        "catImg": "/image/amaraa/346.png"
+      }
+    ]
+  }
+]
