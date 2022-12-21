@@ -30,6 +30,7 @@ void showLoadingDialog() {
       ));
 }
 
+
 void successOrderModal(context, onTap) {
   // player.play("sounds/success_bell.wav");
   QuickAlert.show(
@@ -228,13 +229,13 @@ void logOutModal(dynamic context, dynamic onTap) {
           const SizedBox(height: 8),
           CustomText(
             textAlign: TextAlign.center,
-            text: "Та системээс гарахдаа итгэлтэй байна уу?",
+            text: "Та аппаас гарахдаа итгэлтэй байна уу?",
             fontSize: 14,
             color: MyColors.gray,
           )
         ],
       ),
-      title: "Системээс гарах уу?",
+      title: "Аппаас гарах уу?",
       confirmBtnColor: MyColors.warning,
       type: QuickAlertType.info,
       showCancelBtn: true,

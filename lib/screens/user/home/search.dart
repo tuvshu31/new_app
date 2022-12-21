@@ -1,8 +1,4 @@
-import 'dart:async';
 import 'dart:convert';
-import 'package:Erdenet24/screens/user/home/qr_scanner.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +8,9 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/screens/user/home/qr_scanner.dart';
 
 class HomeScreen extends StatefulWidget {
   final dynamic leadingOnTap;
@@ -63,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {
             Get.to(() => const QRScanPage());
           },
-          icon: Icon(
+          icon: const Icon(
             IconlyLight.scan,
             color: MyColors.black,
           ),

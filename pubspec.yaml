@@ -76,6 +76,7 @@ dependencies:
   json_serializable: ^6.5.4
   lottie: ^2.0.0
   flutter_slidable: ^2.0.0
+  fluttertoast: ^8.1.2
 
 dev_dependencies:
   flutter_test:
