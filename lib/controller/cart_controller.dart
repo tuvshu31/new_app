@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -18,10 +20,10 @@ class CartController extends GetxController {
     var n = storeList.indexWhere((e) => e == product["store"]);
     if (i > -1) {
       cartList[i]["quantity"] += 1;
-      successSnackBar("Сагсанд нэмэгдлээ", 2, context);
+      successSnackBar("Сагсанд нэмэгдлээ", 3, context);
     } else {
       cartList.add({...product, "quantity": 1});
-      successSnackBar("Сагсанд нэмэгдлээ", 2, context);
+      successSnackBar("Сагсанд нэмэгдлээ", 3, context);
     }
     if (n < 0) {
       storeList.isEmpty
