@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/screens/user/profile/user/address/address.dart';
 import 'package:Erdenet24/screens/user/profile/user/help/help.dart';
 import 'package:Erdenet24/screens/user/profile/user/orders/user_orders.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
@@ -75,14 +76,16 @@ class _UserPageState extends State<UserPage> {
                   ),
                 ),
                 _divider(),
-                _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {}),
+                _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
+                  Get.to(() => const AddressView());
+                }),
                 _listTile(IconlyLight.chart, "Захиалгууд", () {
                   Get.to(() => const UserOrders());
                 }),
                 _divider(),
                 _listTile(IconlyLight.document, "Үйлчилгээний нөхцөл", () {}),
                 _listTile(IconlyLight.info_circle, "Тусламж", () {
-                  Get.to(HelpView());
+                  Get.to(() => const HelpView());
                 }),
                 _listTile(IconlyLight.login, "Аппаас гарах", () {
                   logOutModal(context, () {

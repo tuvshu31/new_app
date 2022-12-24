@@ -2,7 +2,6 @@ import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/user/profile/user/user_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/widgets/header.dart';
 
 class ProfileScreen extends StatefulWidget {

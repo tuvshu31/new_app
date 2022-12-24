@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:math' as math;
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -68,7 +66,7 @@ class _HelpViewState extends State<HelpView> {
           ),
           title: CustomText(
             text: element["question"],
-            fontSize: 14,
+            fontSize: 14.25,
           ),
         ),
         collapsed: Container(),
@@ -76,7 +74,7 @@ class _HelpViewState extends State<HelpView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             for (var _ in Iterable.generate(5))
-              Padding(
+              const Padding(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Text(
                     loremIpsum,

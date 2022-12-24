@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -27,7 +28,7 @@ class _OtpScreenState extends State<OtpScreen> {
   dynamic user = [];
   String loginType = "";
   Timer? countdownTimer;
-  Duration myDuration = const Duration(minutes: 2);
+  Duration myDuration = const Duration(minutes: 1);
   final _loginCtrl = Get.put(LoginController());
   @override
   void initState() {
@@ -53,11 +54,23 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
-  void resetTimer() {
-    setState(() {
-      countdownTimer!.cancel();
-      myDuration = Duration(minutes: 2);
-    });
+  void resetTimer() async {
+    loadingDialog(context);
+    _loginCtrl.verifyCode.value = random6digit();
+    dynamic authCode = await RestApi().sendAuthCode(
+        _loginCtrl.phoneController.text,
+        _loginCtrl.verifyCode.value.toString());
+    Get.back();
+    if (authCode[0]["Result"] == "SUCCESS") {
+      setState(() {
+        countdownTimer!.cancel();
+        myDuration = const Duration(minutes: 1);
+        startTimer();
+      });
+    } else {
+      errorSnackBar(
+          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+    }
   }
 
   void submit() async {

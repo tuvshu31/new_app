@@ -15,10 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(
-        const Duration(seconds: 5),
-        () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const PhoneRegister())));
+    // Timer(
+    //   const Duration(seconds: 5000),
+    //   () => Navigator.pushReplacement(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => const PhoneRegister()),
+    //   ),
+    // );
   }
 
   @override
@@ -37,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 Image(
                   image: const AssetImage("assets/images/png/splash1.png"),
-                  width: _width * .24,
+                  width: _width * .22,
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -53,17 +56,17 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             Column(
               children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: MyColors.primary,
-                    strokeWidth: 2,
-                  ),
-                ),
-                SizedBox(height: 24),
+                // SizedBox(
+                //   width: 20,
+                //   height: 20,
+                //   child: CircularProgressIndicator(
+                //     color: MyColors.primary,
+                //     strokeWidth: 2,
+                //   ),
+                // ),
+                // SizedBox(height: 24),
                 CustomText(
-                  text: "Шинэчлэл шалгаж байна...",
+                  text: "Тун удахгүй",
                   fontSize: 12,
                 ),
                 SizedBox(height: _height * .05)
