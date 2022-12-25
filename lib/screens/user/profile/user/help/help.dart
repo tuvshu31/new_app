@@ -59,8 +59,8 @@ class _HelpViewState extends State<HelpView> {
           contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
           dense: true,
           minLeadingWidth: Get.width * .07,
-          leading: Icon(
-            IconlyLight.info_square,
+          leading: const Icon(
+            IconlyLight.info_circle,
             color: MyColors.black,
             size: 20,
           ),
@@ -75,7 +75,7 @@ class _HelpViewState extends State<HelpView> {
           children: <Widget>[
             for (var _ in Iterable.generate(5))
               const Padding(
-                  padding: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(24),
                   child: Text(
                     loremIpsum,
                     softWrap: true,

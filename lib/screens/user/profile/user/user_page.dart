@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/user/profile/user/address/address.dart';
 import 'package:Erdenet24/screens/user/profile/user/help/help.dart';
 import 'package:Erdenet24/screens/user/profile/user/orders/user_orders.dart';
+import 'package:Erdenet24/screens/user/profile/user/phone/phone.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -67,7 +68,9 @@ class _UserPageState extends State<UserPage> {
                     fontSize: 14,
                   ),
                   trailing: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(() => const PhoneEditView());
+                    },
                     icon: const Icon(
                       IconlyLight.edit_square,
                       size: 16,

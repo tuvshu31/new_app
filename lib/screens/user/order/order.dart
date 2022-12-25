@@ -32,6 +32,25 @@ class _OrderState extends State<Order> {
   TextEditingController phone = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController kod = TextEditingController();
+  dynamic _user = [];
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+  }
+
+  void getUserInfo() async {
+    var query = {"id": RestApiHelper.getUserId()};
+    dynamic res = await RestApi().getUsers(query);
+    dynamic data = Map<String, dynamic>.from(res);
+    _user = data["data"][0];
+    phone.text = _user["deliveryPhone"].toString();
+    address.text = _user["deliveryAddress"];
+    kod.text = _user["deliveryKode"];
+    isPhoneOk = phone.text.isNotEmpty;
+    isAddressOk = address.text.isNotEmpty;
+    setState(() {});
+  }
 
   void createOrder() async {
     loadingDialog(context);
@@ -65,85 +84,87 @@ class _OrderState extends State<Order> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => CustomHeader(
-        customActions: Container(),
-        title: "Захиалгын мэдээлэл",
-        bottomSheet: _bottomSheet(),
-        body: Container(
-          margin: EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(text: "Утасны дугаар"),
-              const SizedBox(height: 12),
-              CustomTextField(
-                hintText: "99352223",
-                controller: phone,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                onChanged: (val) {
-                  setState(() {
-                    isPhoneOk = val.isNotEmpty;
-                  });
-                },
+    return _user.isNotEmpty
+        ? Obx(() => CustomHeader(
+              customActions: Container(),
+              title: "Захиалгын мэдээлэл",
+              bottomSheet: _bottomSheet(),
+              body: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CustomText(text: "Утасны дугаар"),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      hintText: "99352223",
+                      controller: phone,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      onChanged: (val) {
+                        setState(() {
+                          isPhoneOk = val.isNotEmpty;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    const CustomText(text: "Хүргүүлэх хаяг"),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      hintText: "Согоот баг 6-20-31 тоот, 2-р орц, 3 давхарт",
+                      controller: address,
+                      textInputAction: TextInputAction.next,
+                      onChanged: (val) {
+                        setState(() {
+                          isAddressOk = val.isNotEmpty;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: const [
+                        CustomText(text: "Орцны код "),
+                        CustomText(
+                          text: "/Заавал биш/",
+                          fontSize: 12,
+                          color: MyColors.gray,
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      hintText: "#1234",
+                      controller: kod,
+                      textInputAction: TextInputAction.done,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          IconlyLight.info_circle,
+                          color: MyColors.gray,
+                          size: 16,
+                        ),
+                        SizedBox(width: 12),
+                        Flexible(
+                          child: CustomText(
+                              fontSize: 12,
+                              textAlign: TextAlign.justify,
+                              color: MyColors.gray,
+                              text:
+                                  "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              CustomText(text: "Хүргүүлэх хаяг"),
-              const SizedBox(height: 12),
-              CustomTextField(
-                hintText: "Согоот баг 6-20-31 тоот, 2-р орц, 3 давхарт",
-                controller: address,
-                textInputAction: TextInputAction.next,
-                onChanged: (val) {
-                  setState(() {
-                    isAddressOk = val.isNotEmpty;
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  CustomText(text: "Орцны код "),
-                  CustomText(
-                    text: "/Заавал биш/",
-                    fontSize: 12,
-                    color: MyColors.gray,
-                  )
-                ],
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                hintText: "#1234",
-                controller: kod,
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    IconlyLight.info_circle,
-                    color: MyColors.gray,
-                    size: 16,
-                  ),
-                  SizedBox(width: 12),
-                  Flexible(
-                    child: CustomText(
-                        fontSize: 12,
-                        textAlign: TextAlign.justify,
-                        color: MyColors.gray,
-                        text:
-                            "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ))
+        : Material(
+            child: Container(),
+          );
   }
 
   Widget _bottomSheet() {

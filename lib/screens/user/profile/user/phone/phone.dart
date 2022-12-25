@@ -1,31 +1,25 @@
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-class AddressView extends StatefulWidget {
-  const AddressView({super.key});
+class PhoneEditView extends StatefulWidget {
+  const PhoneEditView({super.key});
 
   @override
-  State<AddressView> createState() => _AddressViewState();
+  State<PhoneEditView> createState() => _PhoneEditViewState();
 }
 
-class _AddressViewState extends State<AddressView> {
-  bool _phoneNumberOk = false;
-  bool _addressOk = false;
+class _PhoneEditViewState extends State<PhoneEditView> {
   TextEditingController phoneController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
-  TextEditingController kodeController = TextEditingController();
+  bool phoneIsOk = false;
   dynamic _user = [];
 
   @override
@@ -38,21 +32,16 @@ class _AddressViewState extends State<AddressView> {
     var query = {"id": RestApiHelper.getUserId()};
     dynamic res = await RestApi().getUsers(query);
     dynamic data = Map<String, dynamic>.from(res);
-    log(data.toString());
     setState(() {
       _user = data["data"][0];
     });
-    phoneController.text = _user["deliveryPhone"].toString();
-    addressController.text = _user["deliveryAddress"];
-    kodeController.text = _user["deliveryKode"];
+    phoneController.text = _user["phone"].toString();
   }
 
-  void saveDeliveryInfo() async {
+  void savePhoneNumber() async {
     loadingDialog(context);
     var body = {
-      "deliveryPhone": phoneController.text,
-      "deliveryAddress": addressController.text,
-      "deliveryKode": kodeController.text,
+      "phone": phoneController.text,
     };
     dynamic authCode =
         await RestApi().updateUser(RestApiHelper.getUserId(), body);
@@ -73,7 +62,7 @@ class _AddressViewState extends State<AddressView> {
     return _user.isNotEmpty
         ? CustomHeader(
             customActions: Container(),
-            title: "Хүргэлтийн хаяг",
+            title: "Утасны дугаар өөрчлөх",
             body: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(children: [
@@ -82,14 +71,13 @@ class _AddressViewState extends State<AddressView> {
                     decoration: BoxDecoration(
                         color: MyColors.fadedGrey, shape: BoxShape.circle),
                     child: Image(
-                      image:
-                          const AssetImage("assets/images/png/app/address.png"),
+                      image: const AssetImage("assets/images/png/app/dial.png"),
                       width: Get.width * .1,
                     ),
                   ),
                   SizedBox(height: Get.height * .03),
                   const CustomText(
-                    text: "Хүргэлтийн мэдээллээ хадгалах",
+                    text: "Утасны дугаараа оруулна уу",
                     color: MyColors.gray,
                     textAlign: TextAlign.center,
                   ),
@@ -101,36 +89,17 @@ class _AddressViewState extends State<AddressView> {
                     keyboardType: TextInputType.number,
                     maxLength: 8,
                     controller: phoneController,
-                    onChanged: ((val) {
+                    onChanged: (p0) {
                       setState(() {
-                        _phoneNumberOk = val.length == 8 ? true : false;
+                        phoneIsOk = p0.length == 8;
                       });
-                    }),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  CustomTextField(
-                    hintText: "Хаяг",
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: addressController,
-                    onChanged: ((val) {
-                      setState(() {
-                        _addressOk = val.isNotEmpty;
-                      });
-                    }),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  CustomTextField(
-                    textInputAction: TextInputAction.done,
-                    hintText: "Орцны код - (Заавал биш)",
-                    keyboardType: TextInputType.text,
-                    controller: kodeController,
+                    },
                   ),
                   SizedBox(height: Get.height * .03),
                   CustomButton(
-                    text: "Хадгалах",
-                    isActive: _phoneNumberOk && _addressOk,
-                    onPressed: saveDeliveryInfo,
+                    text: "Өөрчлөх",
+                    isActive: phoneIsOk,
+                    onPressed: savePhoneNumber,
                   ),
                 ])))
         : Material(
