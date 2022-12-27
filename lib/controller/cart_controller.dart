@@ -4,8 +4,6 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -37,22 +35,32 @@ class CartController extends GetxController {
   }
 
   void saveProduct(product, context) async {
-    var i = savedList.indexWhere((e) => e == product["id"]);
-    if (i > -1) {
-      savedList.remove(product["id"]);
-    } else {
-      loadingDialog(context);
-      savedList.add(product["id"]);
-      dynamic response = await RestApi().saveUserProduct(
-          {"userId": RestApiHelper.getUserId(), "productId": product["id"]});
+    loadingDialog(context);
+    var body = {
+      "userId": RestApiHelper.getUserId(),
+      "productId": product["id"]
+    };
+    if (savedList.contains(product["id"])) {
+      dynamic response = await RestApi().deleteUserProduct(body);
+      dynamic res = Map<String, dynamic>.from(response);
       Get.back();
-      if (response["success"]) {
+      if (res["success"]) {
+        savedList.remove(product["id"]);
+      } else {
+        errorSnackBar("Алдаа гарлаа", 2, context);
+      }
+    } else {
+      dynamic response = await RestApi().saveUserProduct(body);
+      dynamic res = Map<String, dynamic>.from(response);
+      Get.back();
+      if (res["success"]) {
+        savedList.add(product["id"]);
+
         successSnackBar("Амжилттай хадгалагдлаа", 2, context);
       } else {
         errorSnackBar("Алдаа гарлаа", 2, context);
       }
     }
-    savedList.refresh();
   }
 
   void removeProduct(product, context) {

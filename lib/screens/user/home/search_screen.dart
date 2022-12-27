@@ -1,4 +1,5 @@
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/loading.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -50,8 +51,8 @@ class _SearchScreenMainState extends State<SearchScreenMain> {
     return Obx(
       () => CustomHeader(
         isMainPage: false,
-        customActions: Container(
-          child: CustomText(text: "${_prodCtrl.search.toString()}"),
+        customActions: SizedBox(
+          child: CustomText(text: _prodCtrl.search.toString()),
         ),
         customTitle: CustomSearchBar(
           controller: _searchController,
@@ -62,35 +63,10 @@ class _SearchScreenMainState extends State<SearchScreenMain> {
         ),
         body: _notChanged
             ? Container()
-            : _prodCtrl.data.length == 0
-                ? _emptyResult()
+            : _prodCtrl.data.isEmpty
+                ? const CustomLoadingIndicator(text: "Хайлтын илэрц олдсонгүй")
                 : const CustomData(),
       ),
     );
   }
-}
-
-Widget _emptyResult() {
-  return SizedBox(
-    width: double.infinity,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: Get.height * .2,
-        ),
-        Image(
-          image: const AssetImage("assets/images/png/app/search.png"),
-          width: Get.width * .3,
-        ),
-        SizedBox(
-          height: Get.height * .04,
-        ),
-        const CustomText(
-          text: "Хайлтын илэрц олдсонгүй",
-          color: MyColors.gray,
-        )
-      ],
-    ),
-  );
 }

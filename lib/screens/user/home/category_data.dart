@@ -1,6 +1,8 @@
-import 'dart:async';
+import 'dart:developer';
+
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
@@ -33,7 +35,9 @@ class _CategoryDataState extends State<CategoryData> {
     super.initState();
     callCategories();
     _prodCtrl.data.clear();
+    _prodCtrl.onScrollShowHide.value = false;
     _prodCtrl.page.value = 1;
+    _prodCtrl.typeId.value = int.parse(_incoming["parentId"]);
     _prodCtrl.categoryId.value = 0;
     _prodCtrl.search.value = 0;
     _prodCtrl.storeId.value = 0;
@@ -79,7 +83,8 @@ class _CategoryDataState extends State<CategoryData> {
             },
           ),
           title: _incoming["name"],
-          subtitle: "${_prodCtrl.total.value} бараа",
+          subtitle:
+              subtitle(_prodCtrl.loading.value, _prodCtrl.total.value, "бараа"),
           tabBar: !_prodCtrl.onScrollShowHide.value
               ? PreferredSize(
                   preferredSize: const Size(double.infinity, kToolbarHeight),
@@ -92,7 +97,8 @@ class _CategoryDataState extends State<CategoryData> {
                     ),
                     child: TabBar(
                       onTap: (index) {
-                        _prodCtrl.changeTab(index);
+                        _prodCtrl.changeTab(_tabItems[index]["id"] ?? 0);
+                        log(_tabItems[index].toString());
                       },
                       isScrollable: true,
                       indicator: BoxDecoration(

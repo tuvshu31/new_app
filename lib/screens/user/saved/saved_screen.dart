@@ -2,18 +2,21 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/products.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:http/http.dart';
 import 'package:iconly/iconly.dart';
 
 class SavedScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _SavedScreenState extends State<SavedScreen> {
   dynamic saved = [];
   bool hasMore = true;
   final _cartCtrl = Get.put(CartController());
+  final _prodCtrl = Get.put(ProductController());
 
   void getUserProducts() async {
     loading = true;
@@ -53,6 +57,7 @@ class _SavedScreenState extends State<SavedScreen> {
       if (delete["success"]) {
         setState(() {
           saved.remove(data);
+          _cartCtrl.savedList.remove(data["id"]);
         });
       } else {
         errorSnackBar("Барааг устгахад алдаа гарлаа", 2, context);
@@ -72,7 +77,7 @@ class _SavedScreenState extends State<SavedScreen> {
         isMainPage: true,
         title: "Таны хадгалсан",
         customActions: Container(),
-        subtitle: "${saved.length} бараа",
+        subtitle: subtitle(loading, saved.length, "бараа"),
         body: !loading && saved.isEmpty
             ? const CustomLoadingIndicator(
                 text: "Хадгалсан бараа байхгүй байна")

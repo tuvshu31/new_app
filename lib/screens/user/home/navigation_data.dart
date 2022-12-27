@@ -41,7 +41,8 @@ class _NavigationDataState extends State<NavigationData> {
       () => CustomHeader(
         customActions: Container(),
         title: _incoming["name"],
-        subtitle: "${_prodCtrl.total} бараа",
+        subtitle:
+            subtitle(_prodCtrl.loading.value, _prodCtrl.total.value, "бараа"),
         body: const CustomData(),
       ),
     );

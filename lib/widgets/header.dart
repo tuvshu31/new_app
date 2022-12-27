@@ -16,7 +16,7 @@ class CustomHeader extends StatefulWidget {
   final bool withTabBar;
   final dynamic onChanged;
   final bool withSearchBar;
-  final String subtitle;
+  final dynamic subtitle;
   final dynamic totalAmount;
   final int? cartLength;
   final dynamic bottomSheet;
@@ -40,7 +40,7 @@ class CustomHeader extends StatefulWidget {
     this.isScrollable = false,
     this.floatingActionButton,
     this.actionIcon = IconlyLight.buy,
-    this.subtitle = '',
+    this.subtitle,
     this.customLeading,
     this.onChanged,
     this.totalAmount,
@@ -142,27 +142,17 @@ Widget _leading(dynamic customLeading, bool mainPage, dynamic controller) {
       );
 }
 
-Widget _title(dynamic customTitle, String title, String subtitle) {
+Widget _title(dynamic customTitle, String title, dynamic subtitle) {
   return customTitle ??
-      (subtitle != ""
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomText(
-                  text: title,
-                  fontSize: 16,
-                  color: MyColors.black,
-                ),
-                CustomText(
-                  text: subtitle,
-                  fontSize: MyFontSizes.small,
-                  color: MyColors.gray,
-                ),
-              ],
-            )
-          : CustomText(
-              text: title,
-              fontSize: MyFontSizes.large,
-              color: MyColors.black,
-            ));
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomText(
+            text: title,
+            fontSize: 16,
+            color: MyColors.black,
+          ),
+          subtitle ?? Container()
+        ],
+      );
 }

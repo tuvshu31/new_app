@@ -30,7 +30,7 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
     super.initState();
     setState(() {
       _data = _incoming["data"];
-      // _isSaved = _cartCtrl.savedList.contains(_data["id"]);
+      _isSaved = _cartCtrl.savedList.contains(_data["id"]);
     });
   }
 
@@ -112,7 +112,7 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                     _isSaved = !_isSaved;
                     setState(() {});
                   },
-                  text: "Хадгалах",
+                  text: _isSaved ? "Хадгалсан" : "Хадгалах",
                   textColor: MyColors.primary,
                   cornerRadius: 25,
                   elevation: 0,

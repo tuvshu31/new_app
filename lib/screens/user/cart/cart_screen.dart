@@ -1,11 +1,8 @@
 import 'dart:developer';
-
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/order/order.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -26,13 +23,10 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   int userId = RestApiHelper.getUserId();
-  dynamic savedData = [];
   final _cartCtrl = Get.put(CartController());
-  final _navCtrl = Get.put(NavigationController());
   @override
   void initState() {
     super.initState();
-    savedData = _cartCtrl.savedList;
   }
 
   @override
@@ -42,7 +36,11 @@ class _CartScreenState extends State<CartScreen> {
         customActions: Container(),
         isMainPage: true,
         title: "Таны сагсанд",
-        subtitle: "${_cartCtrl.cartList.length} бараа",
+        subtitle: CustomText(
+          text: "${_cartCtrl.cartList.length} бараа",
+          fontSize: MyFontSizes.small,
+          color: MyColors.gray,
+        ),
         bottomSheet: _cartCtrl.cartList.isNotEmpty ? _bottomSheet() : null,
         body: _cartCtrl.cartList.isEmpty
             ? const CustomLoadingIndicator(text: "Таны сагс хоосон байна")
@@ -112,66 +110,82 @@ class _CartScreenState extends State<CartScreen> {
                                             width: double.infinity,
                                             color: MyColors.background,
                                           ),
-                                          Row(
-                                            children: [
-                                              TextButton.icon(
-                                                style: TextButton.styleFrom(
-                                                    splashFactory:
-                                                        NoSplash.splashFactory,
-                                                    foregroundColor:
-                                                        MyColors.black,
-                                                    padding: EdgeInsets.zero,
-                                                    tapTargetSize:
-                                                        MaterialTapTargetSize
-                                                            .shrinkWrap,
-                                                    alignment:
-                                                        Alignment.centerLeft),
-                                                onPressed: () {
-                                                  _cartCtrl.saveProduct(
-                                                      data, context);
-                                                },
-                                                icon: const Icon(
-                                                  IconlyLight.star,
-                                                  size: 16,
+                                          Obx(
+                                            () => Row(
+                                              children: [
+                                                TextButton.icon(
+                                                  style: TextButton.styleFrom(
+                                                      splashFactory: NoSplash
+                                                          .splashFactory,
+                                                      foregroundColor:
+                                                          MyColors.black,
+                                                      padding: EdgeInsets.zero,
+                                                      tapTargetSize:
+                                                          MaterialTapTargetSize
+                                                              .shrinkWrap,
+                                                      alignment:
+                                                          Alignment.centerLeft),
+                                                  onPressed: () {
+                                                    _cartCtrl.saveProduct(
+                                                        data, context);
+                                                  },
+                                                  icon: _cartCtrl.savedList
+                                                          .contains(data["id"])
+                                                      ? const Icon(
+                                                          IconlyBold.star,
+                                                          size: 16,
+                                                          color:
+                                                              MyColors.warning,
+                                                        )
+                                                      : const Icon(
+                                                          IconlyLight.star,
+                                                          size: 16,
+                                                        ),
+                                                  label: CustomText(
+                                                    text: _cartCtrl.savedList
+                                                            .contains(
+                                                                data["id"])
+                                                        ? "Хадгалсан"
+                                                        : "Хадгалах",
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
-                                                label: const CustomText(
-                                                  text: "Хадгалах",
-                                                  fontSize: 12,
+                                                SizedBox(
+                                                    width: Get.width * .03),
+                                                Container(
+                                                  width: 1,
+                                                  height: 16,
+                                                  color: MyColors.black,
                                                 ),
-                                              ),
-                                              SizedBox(width: Get.width * .03),
-                                              Container(
-                                                width: 1,
-                                                height: 16,
-                                                color: MyColors.black,
-                                              ),
-                                              SizedBox(width: Get.width * .03),
-                                              TextButton.icon(
-                                                style: TextButton.styleFrom(
-                                                    splashFactory:
-                                                        NoSplash.splashFactory,
-                                                    foregroundColor:
-                                                        MyColors.black,
-                                                    padding: EdgeInsets.zero,
-                                                    tapTargetSize:
-                                                        MaterialTapTargetSize
-                                                            .shrinkWrap,
-                                                    alignment:
-                                                        Alignment.centerLeft),
-                                                onPressed: () {
-                                                  _cartCtrl.removeProduct(
-                                                      data, context);
-                                                },
-                                                icon: const Icon(
-                                                  IconlyLight.delete,
-                                                  size: 16,
+                                                SizedBox(
+                                                    width: Get.width * .03),
+                                                TextButton.icon(
+                                                  style: TextButton.styleFrom(
+                                                      splashFactory: NoSplash
+                                                          .splashFactory,
+                                                      foregroundColor:
+                                                          MyColors.black,
+                                                      padding: EdgeInsets.zero,
+                                                      tapTargetSize:
+                                                          MaterialTapTargetSize
+                                                              .shrinkWrap,
+                                                      alignment:
+                                                          Alignment.centerLeft),
+                                                  onPressed: () {
+                                                    _cartCtrl.removeProduct(
+                                                        data, context);
+                                                  },
+                                                  icon: const Icon(
+                                                    IconlyLight.delete,
+                                                    size: 16,
+                                                  ),
+                                                  label: const CustomText(
+                                                    text: "Устгах",
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
-                                                label: const CustomText(
-                                                  text: "Устгах",
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       )
@@ -190,13 +204,21 @@ class _CartScreenState extends State<CartScreen> {
                                         child: IconButton(
                                             splashColor: Colors.transparent,
                                             onPressed: () {
-                                              _cartCtrl.increaseQuantity(
-                                                  data, context);
+                                              data["quantity"] ==
+                                                      int.parse(
+                                                          data["available"])
+                                                  ? null
+                                                  : _cartCtrl.increaseQuantity(
+                                                      data, context);
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.add,
                                               size: 16,
-                                              color: MyColors.black,
+                                              color: data["quantity"] ==
+                                                      int.parse(
+                                                          data["available"])
+                                                  ? MyColors.gray
+                                                  : MyColors.black,
                                             )),
                                       ),
                                       CustomText(
@@ -206,12 +228,17 @@ class _CartScreenState extends State<CartScreen> {
                                         child: IconButton(
                                             splashColor: Colors.transparent,
                                             onPressed: (() {
-                                              _cartCtrl.decreaseQuantity(data);
+                                              data["quantity"] == 1
+                                                  ? null
+                                                  : _cartCtrl
+                                                      .decreaseQuantity(data);
                                             }),
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.remove,
                                               size: 16,
-                                              color: MyColors.black,
+                                              color: data["quantity"] == 1
+                                                  ? MyColors.grey
+                                                  : MyColors.black,
                                             )),
                                       ),
                                     ],

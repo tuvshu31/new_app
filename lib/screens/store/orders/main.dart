@@ -29,7 +29,6 @@ class _StoreOrdersState extends State<StoreOrders> {
   void initState() {
     super.initState();
     getOrders();
-    print(_prodCtrl.orders);
   }
 
   PageController pageController = PageController();

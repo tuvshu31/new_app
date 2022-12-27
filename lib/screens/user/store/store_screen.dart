@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/products.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,7 @@ class _StoreScreenState extends State<StoreScreen> {
   bool loading = false;
   dynamic storeList = [];
   int categoryId = 0;
+  final _prodCtrl = Get.put(ProductController());
   @override
   void initState() {
     super.initState();
@@ -47,10 +50,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   void getStores() async {
     loading = true;
-    var query = {
-      "role": "store",
-      "category": categoryId,
-    };
+    var query = {"role": "store", "category": categoryId, "isOpen": "1"};
     query.removeWhere((key, value) => value == 0);
     dynamic response = await RestApi().getUsers(query);
     dynamic d = Map<String, dynamic>.from(response);
@@ -80,7 +80,7 @@ class _StoreScreenState extends State<StoreScreen> {
         isMainPage: true,
         title: "Дэлгүүр",
         customActions: Container(),
-        subtitle: "Нийт ${storeList.length} дэлгүүр",
+        subtitle: subtitle(loading, storeList.length, "дэлгүүр"),
         tabBar: PreferredSize(
           preferredSize: const Size(double.infinity, kToolbarHeight),
           child: Container(
