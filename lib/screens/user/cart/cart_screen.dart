@@ -81,8 +81,8 @@ class _CartScreenState extends State<CartScreen> {
                                         text: data["name"],
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      const CustomText(
-                                        text: "Баялаг ресторан",
+                                      CustomText(
+                                        text: data["storeName"],
                                         fontSize: 12,
                                         color: MyColors.gray,
                                       ),

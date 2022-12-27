@@ -61,8 +61,8 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     return _user.isNotEmpty
         ? CustomHeader(
-            customLeading: Padding(
-              padding: const EdgeInsets.all(12.0),
+            customLeading: const Padding(
+              padding: EdgeInsets.all(12.0),
               child: CircleAvatar(
                 backgroundImage: NetworkImage(
                     'https://www.woolha.com/media/2020/03/eevee.png'),

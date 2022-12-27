@@ -152,7 +152,14 @@ class _CustomDataState extends State<CustomData> {
                                         text: data['name'],
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 2),
+                                      CustomText(
+                                        text: data['storeName'],
+                                        overflow: TextOverflow.ellipsis,
+                                        color: MyColors.gray,
+                                        fontSize: 12,
+                                      ),
+                                      const SizedBox(height: 4),
                                       CustomText(
                                         text: convertToCurrencyFormat(
                                             double.parse(data['price']),

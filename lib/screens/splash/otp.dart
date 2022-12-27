@@ -81,6 +81,7 @@ class _OtpScreenState extends State<OtpScreen> {
       dynamic data = Map<String, dynamic>.from(response);
       if (data["success"]) {
         if (data["user"].isNotEmpty) {
+          //Хоосон биш байвал логин хийх
           Get.back();
           setState(() {
             user = data["user"];
@@ -99,6 +100,7 @@ class _OtpScreenState extends State<OtpScreen> {
             Get.offAll(const MainScreen());
           }
         } else {
+          //Хоосон байвал бүртгэх
           var body = {
             "phone": _loginCtrl.phoneController.text,
             "role": "user",

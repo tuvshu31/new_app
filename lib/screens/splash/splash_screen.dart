@@ -25,7 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
