@@ -98,7 +98,7 @@ class _UserPageState extends State<UserPage> {
               ],
             ),
           )
-        : MyShimmers().profile();
+        : MyShimmers().userPage();
   }
 
   Widget _divider() {

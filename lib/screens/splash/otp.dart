@@ -15,6 +15,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -34,10 +35,6 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     super.initState();
     startTimer();
-  }
-
-  int userID() {
-    return user.where((el) => el['role'] == loginType).toList()[0]["id"];
   }
 
   void startTimer() {
@@ -73,6 +70,32 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
+  void putUserIntoBox(int id, String type) {
+    RestApiHelper.saveUserId(id);
+    RestApiHelper.saveUserRole(type);
+  }
+
+  void handleUser(dynamic data) {
+    for (dynamic i in data) {
+      if (i["role"] == "store") {
+        loginTypeBottomSheet(data);
+        break;
+      } else if (i["role"] == "admin") {
+        log("admin");
+        putUserIntoBox(i["id"], "admin");
+        break;
+      } else if (i["role"] == "manager") {
+        log("manager");
+        putUserIntoBox(i["id"], "manager");
+        break;
+      } else {
+        log("user");
+        putUserIntoBox(i["id"], "user");
+        Get.offAll(const MainScreen());
+      }
+    }
+  }
+
   void submit() async {
     loadingDialog(context);
     if (_loginCtrl.verifyCode.value == int.parse(pinCode)) {
@@ -83,22 +106,7 @@ class _OtpScreenState extends State<OtpScreen> {
         if (data["user"].isNotEmpty) {
           //Хоосон биш байвал логин хийх
           Get.back();
-          setState(() {
-            user = data["user"];
-          });
-          if (data["role"] == "store") {
-            loginTypeBottomSheet();
-          } else if (data["role"] == "admin") {
-            loginType = "admin";
-            setState(() {});
-            RestApiHelper.saveUserId(userID());
-            errorSnackBar("Энэ хэсгийг хийгээгүй байгаа", 2, context);
-          } else {
-            loginType = "user";
-            setState(() {});
-            RestApiHelper.saveUserId(userID());
-            Get.offAll(const MainScreen());
-          }
+          handleUser(data["user"]);
         } else {
           //Хоосон байвал бүртгэх
           var body = {
@@ -118,9 +126,12 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
-  void storeSubmit() {
-    RestApiHelper.saveUserId(userID());
-    log(RestApiHelper.getUserId().toString());
+  void storeSubmit(data) {
+    for (dynamic i in data) {
+      if (i["role"] == loginType) {
+        putUserIntoBox(i["id"], loginType);
+      }
+    }
     if (loginType == "user") {
       Get.offAll(() => const MainScreen());
     } else if (loginType == "store") {
@@ -187,7 +198,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  void loginTypeBottomSheet() {
+  void loginTypeBottomSheet(dynamic data) {
     setState(() {
       countdownTimer!.cancel();
       loginType = "";
@@ -249,7 +260,9 @@ class _OtpScreenState extends State<OtpScreen> {
                 margin: EdgeInsets.symmetric(horizontal: Get.width * .2),
                 child: CustomButton(
                   isActive: loginType.isNotEmpty,
-                  onPressed: storeSubmit,
+                  onPressed: (() {
+                    storeSubmit(data);
+                  }),
                   text: "Нэвтрэх",
                 ),
               )

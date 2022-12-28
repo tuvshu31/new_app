@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/cart/cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/navigation_drawer.dart';
@@ -21,11 +22,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final _navCtrl = Get.put(NavigationController());
+  final _cartCtrl = Get.put(CartController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   void initState() {
     super.initState();
-
+    _cartCtrl.getUserProducts();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
   }
 

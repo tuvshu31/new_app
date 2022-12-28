@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/splash/phone_register.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
@@ -21,8 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(seconds: 5),
       () => Navigator.pushReplacement(
         context,
-        // MaterialPageRoute(builder: (context) => const PhoneRegister()),
-        MaterialPageRoute(builder: (context) => const MainScreen()),
+        MaterialPageRoute(builder: (context) => const PhoneRegister()),
       ),
     );
   }

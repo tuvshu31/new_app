@@ -9,6 +9,7 @@ class LoginController extends GetxController {
   //Хэрэглэгч системээс гарах
   void logout() async {
     RestApiHelper.saveUserId(0);
+    RestApiHelper.saveUserRole("");
     Get.offAll(() => const PhoneRegister());
   }
 }

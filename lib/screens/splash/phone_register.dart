@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/splash/otp.dart';

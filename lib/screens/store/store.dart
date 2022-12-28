@@ -59,27 +59,27 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return _user.isNotEmpty
-        ? CustomHeader(
-            customLeading: const Padding(
-              padding: EdgeInsets.all(12.0),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://www.woolha.com/media/2020/03/eevee.png'),
-                radius: 36,
-              ),
-            ),
-            title: _user["name"],
-            subtitle: "+976-${_user["phone"]}",
-            customActions: IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  IconlyLight.edit,
-                  size: 18,
-                  color: MyColors.black,
-                )),
-            body: Column(
+    return Scaffold(
+      body: _user.isNotEmpty
+          ? Column(
               children: [
+                SizedBox(height: Get.height * .075),
+                CircleAvatar(
+                  backgroundImage: const NetworkImage(
+                      'https://www.woolha.com/media/2020/03/eevee.png'),
+                  radius: Get.width * .1,
+                ),
+                const SizedBox(height: 8),
+                CustomText(
+                  text: _user["name"],
+                  fontSize: 16,
+                ),
+                const SizedBox(height: 4),
+                CustomText(
+                  text: _user["phone"],
+                  fontSize: 12,
+                  color: MyColors.gray,
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
@@ -98,10 +98,9 @@ class _StorePageState extends State<StorePage> {
                         _listTile(IconlyLight.setting, "Тохиргоо", () {}),
                         _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),
                         _divider(),
-                        _listTile(IconlyLight.info_circle, "Тусламж", () {}),
-                        _listTile(
-                            IconlyLight.document, "Үйлчилгээний нөхцөл", () {}),
-                        _listTile(IconlyLight.login, "Системээс гарах", () {
+                        _listTile(IconlyLight.info_circle,
+                            "Үйлчилгээний нөхцөл", () {}),
+                        _listTile(IconlyLight.login, "Аппаас гарах", () {
                           logOutModal(context, () {
                             _loginCtrl.logout();
                           });
@@ -111,9 +110,9 @@ class _StorePageState extends State<StorePage> {
                   ),
                 ),
               ],
-            ),
-          )
-        : Material(child: MyShimmers().listView());
+            )
+          : MyShimmers().storePage(),
+    );
   }
 
   Widget _divider() {
@@ -135,17 +134,13 @@ class _StorePageState extends State<StorePage> {
       borderRadius: BorderRadius.zero,
       onTap: onTap,
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
         dense: true,
-        leading: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: MyColors.black,
-              size: 20,
-            ),
-          ],
+        minLeadingWidth: Get.width * .07,
+        leading: Icon(
+          icon,
+          color: MyColors.black,
+          size: 20,
         ),
         title: CustomText(
           text: title,
@@ -157,8 +152,9 @@ class _StorePageState extends State<StorePage> {
 
   Widget _switchListTile() {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+      contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
       dense: true,
+      minLeadingWidth: Get.width * .07,
       leading: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -34,6 +34,15 @@ class CartController extends GetxController {
     cartList.refresh();
   }
 
+  void getUserProducts() async {
+    dynamic response =
+        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
+    dynamic d = Map<String, dynamic>.from(response);
+    for (dynamic i in d["data"]) {
+      savedList.add(i["id"]);
+    }
+  }
+
   void saveProduct(product, context) async {
     loadingDialog(context);
     var body = {

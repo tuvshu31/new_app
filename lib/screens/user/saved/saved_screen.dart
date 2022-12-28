@@ -26,7 +26,6 @@ class SavedScreen extends StatefulWidget {
 class _SavedScreenState extends State<SavedScreen> {
   bool loading = false;
   int page = 1;
-  int userId = RestApiHelper.getUserId();
   dynamic saved = [];
   bool hasMore = true;
   final _cartCtrl = Get.put(CartController());
@@ -34,7 +33,8 @@ class _SavedScreenState extends State<SavedScreen> {
 
   void getUserProducts() async {
     loading = true;
-    dynamic response = await RestApi().getUserProducts(userId, {"page": 1});
+    dynamic response =
+        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
     dynamic d = Map<String, dynamic>.from(response);
     saved = saved + d['data'];
     if (d["data"].length < d["pagination"]["limit"]) {
@@ -46,8 +46,8 @@ class _SavedScreenState extends State<SavedScreen> {
 
   void deleteProduct(dynamic data, context) async {
     loadingDialog(context);
-    dynamic res = await RestApi()
-        .deleteUserProduct({"userId": userId, "productId": data['id']});
+    dynamic res = await RestApi().deleteUserProduct(
+        {"userId": RestApiHelper.getUserId(), "productId": data['id']});
     Get.back();
     if (res != null) {
       dynamic delete = Map<String, dynamic>.from(res);
@@ -65,7 +65,7 @@ class _SavedScreenState extends State<SavedScreen> {
   @override
   void initState() {
     super.initState();
-    userId != 0 ? getUserProducts() : null;
+    getUserProducts();
   }
 
   @override

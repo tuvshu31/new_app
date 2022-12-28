@@ -135,25 +135,87 @@ class MyShimmers {
           ],
         ));
   }
-  Widget profile(){
-    return ListView.separated(
-      separatorBuilder: (context, index) {
-        return Container(height: 8,);
-      },
-                        physics: const BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: 6,
-                        itemBuilder: (context, index) {
-                      
-                          return ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
-        dense: true,
-        minLeadingWidth: Get.width * .07,
-        leading: const CustomShimmer(width: 40, height: 40, isCircle: true,),
-        title: CustomShimmer(width: Get.width * .65, height: 14, isRoundedCircle: true,),
-      );});
-    
-    
 
+  Widget userPage() {
+    return ListView.separated(
+        separatorBuilder: (context, index) {
+          return Container(
+            height: 8,
+          );
+        },
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
+            dense: true,
+            minLeadingWidth: Get.width * .07,
+            leading: const CustomShimmer(
+              width: 40,
+              height: 40,
+              isCircle: true,
+            ),
+            title: CustomShimmer(
+              width: Get.width * .65,
+              height: 14,
+              isRoundedCircle: true,
+            ),
+          );
+        });
+  }
+
+  Widget storePage() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: Get.height * .075),
+          CustomShimmer(
+            width: Get.width * .2,
+            height: Get.width * .2,
+            isCircle: true,
+          ),
+          const SizedBox(height: 8),
+          CustomShimmer(
+            width: Get.width * .3,
+            height: 14,
+            isRoundedCircle: true,
+          ),
+          const SizedBox(height: 8),
+          CustomShimmer(
+            width: Get.width * .25,
+            height: 14,
+            isRoundedCircle: true,
+          ),
+          ListView.separated(
+              separatorBuilder: (context, index) {
+                return Container(
+                  height: 8,
+                );
+              },
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 6,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: Get.width * .075),
+                  dense: true,
+                  minLeadingWidth: Get.width * .07,
+                  leading: const CustomShimmer(
+                    width: 40,
+                    height: 40,
+                    isCircle: true,
+                  ),
+                  title: CustomShimmer(
+                    width: Get.width * .65,
+                    height: 14,
+                    isRoundedCircle: true,
+                  ),
+                );
+              }),
+        ],
+      ),
+    );
   }
 }

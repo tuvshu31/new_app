@@ -3,6 +3,7 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/splash/splash_screen.dart';
+import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/cart/cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/category_data.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
@@ -11,6 +12,7 @@ import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/home/search_screen.dart';
 import 'package:Erdenet24/screens/user/order/order.dart';
 import 'package:Erdenet24/screens/user/profile/user/user_settings.dart';
+import 'package:Erdenet24/screens/user/store/store_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -72,8 +74,13 @@ class _MyAppState extends State<MyApp> {
       getPages: [
         GetPage(
             name: "/",
-            page: () =>
-                RestApiHelper.getUserId() == 0 ? SplashScreen() : MainScreen()),
+            page: () => RestApiHelper.getUserId() == 0
+                ? const SplashScreen()
+                : RestApiHelper.getUserRole() == "store"
+                    ? const StorePage()
+                    : RestApiHelper.getUserRole() == "user"
+                        ? const MainScreen()
+                        : const SplashScreen()),
         // GetPage(name: "/", page: () => const MainScreen()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
         GetPage(name: "/CartRoute", page: () => const CartScreen()),
