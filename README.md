@@ -1,4 +1,4 @@
-# new_app
+# Erdenet24
 
 A new Flutter project.
 

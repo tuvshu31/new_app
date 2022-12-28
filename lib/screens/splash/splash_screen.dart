@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:Erdenet24/screens/splash/phone_register.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/user/home/home.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -15,11 +16,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    RestApiHelper.saveUserId(6);
     Timer(
       const Duration(seconds: 5),
       () => Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PhoneRegister()),
+        // MaterialPageRoute(builder: (context) => const PhoneRegister()),
+        MaterialPageRoute(builder: (context) => const MainScreen()),
       ),
     );
   }
@@ -37,9 +40,14 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(),
             Column(
               children: [
-                Image(
-                  image: const AssetImage("assets/images/png/splash1.png"),
-                  width: _width * .22,
+                Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(18)),
+                  child: Image(
+                    image: const AssetImage("assets/images/png/android.png"),
+                    width: _width * .22,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 const Text(
