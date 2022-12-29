@@ -81,7 +81,6 @@ class _MyAppState extends State<MyApp> {
                     : RestApiHelper.getUserRole() == "user"
                         ? const MainScreen()
                         : const SplashScreen()),
-        // GetPage(name: "/", page: () => const MainScreen()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
         GetPage(name: "/CartRoute", page: () => const CartScreen()),
         GetPage(name: "/CategoryRoute", page: () => const CategoryData()),

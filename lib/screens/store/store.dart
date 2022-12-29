@@ -1,8 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
 import 'package:Erdenet24/screens/store/orders/main.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:get/get.dart';
@@ -94,12 +92,14 @@ class _StorePageState extends State<StorePage> {
                         _listTile(IconlyLight.chart, "Захиалгууд", () {
                           Get.to(() => StoreOrders());
                         }),
+                        // _divider(),
+                        // _listTile(IconlyLight.setting, "Тохиргоо", () {}),
+                        // _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),
+                        // _divider(),
+                        // _listTile(IconlyLight.info_circle,
+                        //     "Үйлчилгээний нөхцөл", () {}),
                         _divider(),
-                        _listTile(IconlyLight.setting, "Тохиргоо", () {}),
-                        _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),
-                        _divider(),
-                        _listTile(IconlyLight.info_circle,
-                            "Үйлчилгээний нөхцөл", () {}),
+                        _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                         _listTile(IconlyLight.login, "Аппаас гарах", () {
                           logOutModal(context, () {
                             _loginCtrl.logout();
@@ -111,7 +111,32 @@ class _StorePageState extends State<StorePage> {
                 ),
               ],
             )
-          : MyShimmers().storePage(),
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(18)),
+                    child: Image(
+                      image: const AssetImage("assets/images/png/android.png"),
+                      width: Get.width * .22,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    "ERDENET24",
+                    softWrap: true,
+                    style: TextStyle(
+                      fontFamily: "Exo",
+                      fontSize: 22,
+                      color: MyColors.black,
+                    ),
+                  )
+                ],
+              ),
+            ),
     );
   }
 

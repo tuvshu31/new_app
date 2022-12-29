@@ -58,6 +58,9 @@ class _CreateProductState extends State<CreateProduct> {
 
   void submit() async {
     loadingDialog(context);
+    var query = {"id": RestApiHelper.getUserId()};
+    dynamic produc = await RestApi().getUsers(query);
+    dynamic res = Map<String, dynamic>.from(produc);
     var body = {
       "name": _productName.text,
       "price": _productPrice.text,
@@ -66,6 +69,7 @@ class _CreateProductState extends State<CreateProduct> {
       "typeId": typeId,
       "categoryId": _helpCtrl.chosenCategory["id"],
       "store": RestApiHelper.getUserId(),
+      "storeName": res["data"][0]["name"]
     };
     dynamic product = await RestApi().createProduct(body);
     dynamic data = Map<String, dynamic>.from(product);

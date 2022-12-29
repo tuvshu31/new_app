@@ -86,7 +86,7 @@ class _UserPageState extends State<UserPage> {
                   Get.to(() => const UserOrders());
                 }),
                 _divider(),
-                _listTile(IconlyLight.document, "Үйлчилгээний нөхцөл", () {}),
+                // _listTile(IconlyLight.document, "Үйлчилгээний нөхцөл", () {}),
                 _listTile(IconlyLight.info_circle, "Тусламж", () {
                   Get.to(() => const HelpView());
                 }),

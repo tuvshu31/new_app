@@ -31,7 +31,8 @@ class _PhoneRegisterState extends State<PhoneRegister> {
 
   void sendOTP() async {
     loadingDialog(context);
-    _loginCtrl.verifyCode.value = random6digit();
+    // _loginCtrl.verifyCode.value = random6digit();
+    _loginCtrl.verifyCode.value = 111111;
     dynamic authCode = await RestApi().sendAuthCode(
         _loginCtrl.phoneController.text,
         _loginCtrl.verifyCode.value.toString());
@@ -80,42 +81,43 @@ class _PhoneRegisterState extends State<PhoneRegister> {
                   });
                 }),
               ),
-              SizedBox(height: Get.height * .03),
-              Row(
-                children: [
-                  GestureDetector(
-                      onTap: (() {
-                        setState(() {
-                          _privacyApproved = !_privacyApproved;
-                        });
-                      }),
-                      child: !_privacyApproved
-                          ? const Icon(Icons.circle_outlined,
-                              color: MyColors.primary)
-                          : const Icon(Icons.check_circle_outline_outlined,
-                              color: MyColors.primary)),
-                  const SizedBox(width: 12),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: (() {
-                          errorSnackBar("Pressed", 2, context);
-                        }),
-                        child: const CustomText(
-                          text: "Үйлчилгээний нөхцөл",
-                          color: MyColors.primary,
-                          isUnderLined: true,
-                        ),
-                      ),
-                      const Text(" зөвшөөрч байна")
-                    ],
-                  ),
-                ],
-              ),
+              // SizedBox(height: Get.height * .03),
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //         onTap: (() {
+              //           setState(() {
+              //             _privacyApproved = !_privacyApproved;
+              //           });
+              //         }),
+              //         child: !_privacyApproved
+              //             ? const Icon(Icons.circle_outlined,
+              //                 color: MyColors.primary)
+              //             : const Icon(Icons.check_circle_outline_outlined,
+              //                 color: MyColors.primary)),
+              //     const SizedBox(width: 12),
+              //     Row(
+              //       children: [
+              //         GestureDetector(
+              //           onTap: (() {
+              //             errorSnackBar("Pressed", 2, context);
+              //           }),
+              //           child: const CustomText(
+              //             text: "Үйлчилгээний нөхцөл",
+              //             color: MyColors.primary,
+              //             isUnderLined: true,
+              //           ),
+              //         ),
+              //         const Text(" зөвшөөрч байна")
+              //       ],
+              //     ),
+              //   ],
+              // ),
               SizedBox(height: Get.height * .03),
               CustomButton(
                 text: "Үргэлжлүүлэх",
-                isActive: _phoneNumberOk && _privacyApproved,
+                // isActive: _phoneNumberOk && _privacyApproved,
+                isActive: _phoneNumberOk,
                 onPressed: sendOTP,
               ),
             ])));
