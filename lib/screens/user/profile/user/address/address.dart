@@ -70,71 +70,70 @@ class _AddressViewState extends State<AddressView> {
 
   @override
   Widget build(BuildContext context) {
-    return _user.isNotEmpty
-        ? CustomHeader(
-            customActions: Container(),
-            title: "Хүргэлтийн хаяг",
-            body: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                        color: MyColors.fadedGrey, shape: BoxShape.circle),
-                    child: Image(
-                      image:
-                          const AssetImage("assets/images/png/app/address.png"),
-                      width: Get.width * .1,
-                    ),
+    return CustomHeader(
+      customActions: Container(),
+      title: "Хүргэлтийн хаяг",
+      body: _user.isNotEmpty
+          ? Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                      color: MyColors.fadedGrey, shape: BoxShape.circle),
+                  child: Image(
+                    image:
+                        const AssetImage("assets/images/png/app/address.png"),
+                    width: Get.width * .1,
                   ),
-                  SizedBox(height: Get.height * .03),
-                  const CustomText(
-                    text: "Хүргэлтийн мэдээллээ хадгалах",
-                    color: MyColors.gray,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  CustomTextField(
-                    autoFocus: true,
-                    hintText: "Утасны дугаар",
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    maxLength: 8,
-                    controller: phoneController,
-                    onChanged: ((val) {
-                      setState(() {
-                        _phoneNumberOk = val.length == 8 ? true : false;
-                      });
-                    }),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  CustomTextField(
-                    hintText: "Хаяг",
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: addressController,
-                    onChanged: ((val) {
-                      setState(() {
-                        _addressOk = val.isNotEmpty;
-                      });
-                    }),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  CustomTextField(
-                    textInputAction: TextInputAction.done,
-                    hintText: "Орцны код - (Заавал биш)",
-                    keyboardType: TextInputType.text,
-                    controller: kodeController,
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  CustomButton(
-                    text: "Хадгалах",
-                    isActive: _phoneNumberOk && _addressOk,
-                    onPressed: saveDeliveryInfo,
-                  ),
-                ])))
-        : Material(
-            child: Container(),
-          );
+                ),
+                SizedBox(height: Get.height * .03),
+                const CustomText(
+                  text: "Хүргэлтийн мэдээллээ хадгалах",
+                  color: MyColors.gray,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: Get.height * .03),
+                CustomTextField(
+                  autoFocus: true,
+                  hintText: "Утасны дугаар",
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.number,
+                  maxLength: 8,
+                  controller: phoneController,
+                  onChanged: ((val) {
+                    setState(() {
+                      _phoneNumberOk = val.length == 8 ? true : false;
+                    });
+                  }),
+                ),
+                SizedBox(height: Get.height * .02),
+                CustomTextField(
+                  hintText: "Хаяг",
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  controller: addressController,
+                  onChanged: ((val) {
+                    setState(() {
+                      _addressOk = val.isNotEmpty;
+                    });
+                  }),
+                ),
+                SizedBox(height: Get.height * .02),
+                CustomTextField(
+                  textInputAction: TextInputAction.done,
+                  hintText: "Орцны код - (Заавал биш)",
+                  keyboardType: TextInputType.text,
+                  controller: kodeController,
+                ),
+                SizedBox(height: Get.height * .03),
+                CustomButton(
+                  text: "Хадгалах",
+                  isActive: _phoneNumberOk && _addressOk,
+                  onPressed: saveDeliveryInfo,
+                ),
+              ]))
+          : MyShimmers().userPage(),
+    );
   }
 }

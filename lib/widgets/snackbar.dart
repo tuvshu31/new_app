@@ -8,20 +8,22 @@ String message = "Hello";
 late AnimationController localAnimationController;
 
 void successSnackBar(String text, int duration, dynamic context) {
-  showToast(text,
-      context: context,
-      backgroundColor: MyColors.fadedGreen,
-      shapeBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25),
-      ),
-      textStyle: const TextStyle(color: MyColors.green),
-      animation: StyledToastAnimation.scale,
-      reverseAnimation: StyledToastAnimation.fade,
-      position: const StyledToastPosition(align: Alignment.center),
-      duration: Duration(seconds: duration),
-      animDuration: const Duration(seconds: 1),
-      curve: Curves.fastLinearToSlowEaseIn,
-      reverseCurve: Curves.fastOutSlowIn);
+  showToast(
+    text,
+    context: context,
+    backgroundColor: MyColors.fadedGreen,
+    shapeBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(25),
+    ),
+    textStyle: const TextStyle(color: MyColors.green),
+    animation: StyledToastAnimation.slideFromTop,
+    reverseAnimation: StyledToastAnimation.fade,
+    position: const StyledToastPosition(align: Alignment.center),
+    duration: Duration(seconds: duration),
+    animDuration: const Duration(seconds: 1),
+    curve: Curves.fastLinearToSlowEaseIn,
+    reverseCurve: Curves.fastOutSlowIn,
+  );
 }
 
 void errorSnackBar(String text, int duration, dynamic context) {

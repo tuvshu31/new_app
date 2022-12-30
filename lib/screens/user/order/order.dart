@@ -44,9 +44,10 @@ class _OrderState extends State<Order> {
     dynamic res = await RestApi().getUsers(query);
     dynamic data = Map<String, dynamic>.from(res);
     _user = data["data"][0];
-    phone.text = _user["deliveryPhone"].toString();
-    address.text = _user["deliveryAddress"];
-    kod.text = _user["deliveryKode"];
+    phone.text =
+        _user["deliveryPhone"] != null ? _user["deliveryPhone"].toString() : "";
+    address.text = _user["deliveryAddress"] ?? "";
+    kod.text = _user["deliveryKode"] ?? "";
     isPhoneOk = phone.text.isNotEmpty;
     isAddressOk = address.text.isNotEmpty;
     setState(() {});
@@ -162,9 +163,7 @@ class _OrderState extends State<Order> {
                 ),
               ),
             ))
-        : Material(
-            child: Container(),
-          );
+        : Material(child: Center(child: CircularProgressIndicator()));
   }
 
   Widget _bottomSheet() {

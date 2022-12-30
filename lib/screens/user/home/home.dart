@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/cart/cart_screen.dart';
@@ -30,6 +33,17 @@ class _MainScreenState extends State<MainScreen> {
     _cartCtrl.getUserProducts();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
   }
+
+  // void getUserInfo() async {
+  //   loadingDialog(context);
+  //   var query = {"id": RestApiHelper.getUserId()};
+  //   dynamic res = await RestApi().getUsers(query);
+  //   dynamic data = Map<String, dynamic>.from(res);
+  //   log(data.toString());
+  //   // setState(() {
+  //   //   _user = data["data"][0];
+  //   // });
+  // }
 
   @override
   Widget build(BuildContext context) {

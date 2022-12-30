@@ -120,31 +120,36 @@ class _CustomDataState extends State<CustomData> {
                                             "data": data,
                                           },
                                         ),
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              "${URL.AWS}/products/${data["id"]}.png",
-                                          imageBuilder:
-                                              (context, imageProvider) =>
-                                                  Container(
-                                            width: Get.width * .5,
-                                            height: Get.width * .5,
-                                            decoration: BoxDecoration(
-                                              // borderRadius: BorderRadius.circular(8),
-                                              image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.cover),
+                                        child: Hero(
+                                          transitionOnUserGestures: true,
+                                          tag: data,
+                                          child: CachedNetworkImage(
+                                            imageUrl:
+                                                "${URL.AWS}/products/${data["id"]}.png",
+                                            imageBuilder:
+                                                (context, imageProvider) =>
+                                                    Container(
+                                              width: Get.width * .5,
+                                              height: Get.width * .5,
+                                              decoration: BoxDecoration(
+                                                // borderRadius: BorderRadius.circular(8),
+                                                image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover),
+                                              ),
                                             ),
+                                            progressIndicatorBuilder: (context,
+                                                    url, downloadProgress) =>
+                                                CustomShimmer(
+                                              width: Get.width * .5,
+                                              height: Get.width * .5,
+                                            ),
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                const Image(
+                                                    image: AssetImage(
+                                                        "assets/images/png/no_image.png")),
                                           ),
-                                          progressIndicatorBuilder: (context,
-                                                  url, downloadProgress) =>
-                                              CustomShimmer(
-                                            width: Get.width * .5,
-                                            height: Get.width * .5,
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              const Image(
-                                                  image: AssetImage(
-                                                      "assets/images/png/no_image.png")),
                                         ),
                                       ),
                                       const SizedBox(height: 8),

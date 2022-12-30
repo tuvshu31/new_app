@@ -93,14 +93,26 @@ class _SavedScreenState extends State<SavedScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: Get.width * .25,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: CachedImage(
-                                image:
-                                    "${URL.AWS}/products/${saved[index]["id"]}.png"),
+                          GestureDetector(
+                            onTap: () => Get.toNamed(
+                              '/ProductsRoute',
+                              arguments: {
+                                "data": saved[index],
+                              },
+                            ),
+                            child: Hero(
+                              tag: saved[index],
+                              transitionOnUserGestures: true,
+                              child: Container(
+                                width: Get.width * .25,
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: CachedImage(
+                                    image:
+                                        "${URL.AWS}/products/${saved[index]["id"]}.png"),
+                              ),
+                            ),
                           ),
                           SizedBox(width: Get.width * .045),
                           Expanded(

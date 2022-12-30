@@ -67,12 +67,14 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Stack(children: [
-                  CachedImage(
+                Hero(
+                  transitionOnUserGestures: true,
+                  tag: _data,
+                  child: CachedImage(
                     image: "${URL.AWS}/products/${_data["id"]}.png",
                     width: Get.width * .1,
                   ),
-                ]),
+                ),
                 CustomText(
                   text: "${_data["name"]}",
                   fontSize: 16,

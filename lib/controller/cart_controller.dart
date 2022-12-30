@@ -43,6 +43,8 @@ class CartController extends GetxController {
     }
   }
 
+  void getUserInfo() async {}
+
   void saveProduct(product, context) async {
     loadingDialog(context);
     var body = {

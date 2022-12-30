@@ -1,8 +1,6 @@
 import 'dart:developer';
-
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';

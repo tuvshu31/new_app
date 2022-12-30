@@ -1,5 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -59,11 +60,11 @@ class _PhoneEditViewState extends State<PhoneEditView> {
 
   @override
   Widget build(BuildContext context) {
-    return _user.isNotEmpty
-        ? CustomHeader(
-            customActions: Container(),
-            title: "Утасны дугаар өөрчлөх",
-            body: Container(
+    return CustomHeader(
+        customActions: Container(),
+        title: "Утасны дугаар өөрчлөх",
+        body: _user.isNotEmpty
+            ? Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(children: [
                   Container(
@@ -101,9 +102,7 @@ class _PhoneEditViewState extends State<PhoneEditView> {
                     isActive: phoneIsOk,
                     onPressed: savePhoneNumber,
                   ),
-                ])))
-        : Material(
-            child: Container(),
-          );
+                ]))
+            : MyShimmers().userPage());
   }
 }
