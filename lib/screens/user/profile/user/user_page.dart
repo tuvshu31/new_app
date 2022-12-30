@@ -5,6 +5,8 @@ import 'package:Erdenet24/screens/user/profile/user/help/help.dart';
 import 'package:Erdenet24/screens/user/profile/user/orders/user_orders.dart';
 import 'package:Erdenet24/screens/user/profile/user/phone/phone.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/custom_dialogs.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -86,9 +88,25 @@ class _UserPageState extends State<UserPage> {
                   Get.to(() => const UserOrders());
                 }),
                 _divider(),
-                // _listTile(IconlyLight.document, "Үйлчилгээний нөхцөл", () {}),
                 _listTile(IconlyLight.info_circle, "Тусламж", () {
                   Get.to(() => const HelpView());
+                }),
+                _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
+                  accountDeleteModal(context, () async {
+                    loadingDialog(context);
+                    dynamic response =
+                        await RestApi().deleteUser(RestApiHelper.getUserId());
+                    dynamic d = Map<String, dynamic>.from(response);
+                    Get.back();
+                    if (d["success"]) {
+                      _loginCtrl.logout();
+                    } else {
+                      errorSnackBar(
+                          "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
+                          3,
+                          context);
+                    }
+                  });
                 }),
                 _listTile(IconlyLight.login, "Аппаас гарах", () {
                   logOutModal(context, () {

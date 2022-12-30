@@ -30,7 +30,6 @@ void showLoadingDialog() {
       ));
 }
 
-
 void successOrderModal(context, onTap) {
   // player.play("sounds/success_bell.wav");
   QuickAlert.show(
@@ -460,6 +459,43 @@ void delvieryCostWarningModal(dynamic context, dynamic onTap) {
       cancelBtnText: "Болих",
       onConfirmBtnTap: onTap,
       confirmBtnText: "Okey",
+      cancelBtnTextStyle: TextStyle(
+        fontSize: 14,
+        color: MyColors.gray,
+        fontWeight: FontWeight.bold,
+      ),
+      confirmBtnTextStyle: TextStyle(
+        color: MyColors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ));
+}
+
+void accountDeleteModal(dynamic context, dynamic onTap) {
+  QuickAlert.show(
+      context: context,
+      animType: QuickAlertAnimType.slideInDown,
+      widget: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          SizedBox(height: 8),
+          CustomText(
+            textAlign: TextAlign.center,
+            text:
+                "Бүртгэлээ устгаснаар таны бүх мэдээлэл апликейшн дээрээс устгагдахыг анхаарна уу",
+            fontSize: 14,
+            color: MyColors.gray,
+          )
+        ],
+      ),
+      title: "Бүртгэлээ устгах уу?",
+      confirmBtnColor: MyColors.warning,
+      type: QuickAlertType.info,
+      showCancelBtn: true,
+      onCancelBtnTap: Get.back,
+      cancelBtnText: "Болих",
+      onConfirmBtnTap: onTap,
+      confirmBtnText: "Устгах",
       cancelBtnTextStyle: TextStyle(
         fontSize: 14,
         color: MyColors.gray,

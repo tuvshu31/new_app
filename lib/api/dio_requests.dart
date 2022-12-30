@@ -61,6 +61,11 @@ class RestApi {
     return DioClient().sendRequest('products/$id', Method.delete, [], {});
   }
 
+  //Хэрэглэгч бүртгэлээ устгах
+  Future deleteUser(int id) async {
+    return DioClient().sendRequest('users/$id', Method.delete, [], {});
+  }
+
   //Хэрэглэгч бараа хадгалах
   Future saveUserProduct(dynamic body) async {
     return DioClient().sendRequest('saved-products', Method.post, body, {});
