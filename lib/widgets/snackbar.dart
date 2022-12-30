@@ -18,7 +18,7 @@ void successSnackBar(String text, int duration, dynamic context) {
     textStyle: const TextStyle(color: MyColors.green),
     animation: StyledToastAnimation.slideFromTop,
     reverseAnimation: StyledToastAnimation.fade,
-    position: const StyledToastPosition(align: Alignment.center),
+    position: const StyledToastPosition(align: Alignment.topCenter, offset: 20),
     duration: Duration(seconds: duration),
     animDuration: const Duration(seconds: 1),
     curve: Curves.fastLinearToSlowEaseIn,

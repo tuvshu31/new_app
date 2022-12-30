@@ -106,6 +106,7 @@ flutter:
   assets:
     - assets/images/png/categories/
     - assets/images/png/app/
+    - assets/images/png/bank/
     - assets/images/png/
     - assets/images/svg/
     - assets/sounds/

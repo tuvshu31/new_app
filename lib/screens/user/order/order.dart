@@ -3,10 +3,13 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/user/order/payment.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/bottom_sheet.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/custom_dialogs.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -85,85 +88,85 @@ class _OrderState extends State<Order> {
 
   @override
   Widget build(BuildContext context) {
-    return _user.isNotEmpty
-        ? Obx(() => CustomHeader(
-              customActions: Container(),
-              title: "Захиалгын мэдээлэл",
-              bottomSheet: _bottomSheet(),
-              body: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CustomText(text: "Утасны дугаар"),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "99352223",
-                      controller: phone,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (val) {
-                        setState(() {
-                          isPhoneOk = val.isNotEmpty;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    const CustomText(text: "Хүргүүлэх хаяг"),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "Согоот баг 6-20-31 тоот, 2-р орц, 3 давхарт",
-                      controller: address,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (val) {
-                        setState(() {
-                          isAddressOk = val.isNotEmpty;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: const [
-                        CustomText(text: "Орцны код "),
-                        CustomText(
-                          text: "/Заавал биш/",
-                          fontSize: 12,
-                          color: MyColors.gray,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "#1234",
-                      controller: kod,
-                      textInputAction: TextInputAction.done,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          IconlyLight.info_circle,
-                          color: MyColors.gray,
-                          size: 16,
-                        ),
-                        SizedBox(width: 12),
-                        Flexible(
-                          child: CustomText(
-                              fontSize: 12,
-                              textAlign: TextAlign.justify,
-                              color: MyColors.gray,
-                              text:
-                                  "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ))
-        : Material(child: Center(child: CircularProgressIndicator()));
+    return Obx(() => CustomHeader(
+          customActions: Container(),
+          title: "Захиалгын мэдээлэл",
+          bottomSheet: _bottomSheet(),
+          body: _user.isNotEmpty
+              ? Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CustomText(text: "Утасны дугаар"),
+                      const SizedBox(height: 12),
+                      CustomTextField(
+                        hintText: "99352223",
+                        controller: phone,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (val) {
+                          setState(() {
+                            isPhoneOk = val.isNotEmpty;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      const CustomText(text: "Хүргүүлэх хаяг"),
+                      const SizedBox(height: 12),
+                      CustomTextField(
+                        hintText: "Согоот баг 6-20-31 тоот, 2-р орц, 3 давхарт",
+                        controller: address,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (val) {
+                          setState(() {
+                            isAddressOk = val.isNotEmpty;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: const [
+                          CustomText(text: "Орцны код "),
+                          CustomText(
+                            text: "/Заавал биш/",
+                            fontSize: 12,
+                            color: MyColors.gray,
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      CustomTextField(
+                        hintText: "#1234",
+                        controller: kod,
+                        textInputAction: TextInputAction.done,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            IconlyLight.info_circle,
+                            color: MyColors.gray,
+                            size: 16,
+                          ),
+                          SizedBox(width: 12),
+                          Flexible(
+                            child: CustomText(
+                                fontSize: 12,
+                                textAlign: TextAlign.justify,
+                                color: MyColors.gray,
+                                text:
+                                    "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : MyShimmers().userPage(),
+        ));
   }
 
   Widget _bottomSheet() {
@@ -226,7 +229,8 @@ class _OrderState extends State<Order> {
                   createOrder();
                 }
               ];
-              paymentBottomSheet(onTap);
+              // paymentBottomSheet(onTap);
+              Get.to(() => const OrderPaymentView());
             },
           )
         ],

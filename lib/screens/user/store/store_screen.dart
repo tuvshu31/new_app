@@ -138,7 +138,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                     borderRadius: BorderRadius.circular(12)),
                                 child: CachedImage(
                                     image:
-                                        "${URL.AWS}/store/${data["id"]}.png")),
+                                        "${URL.AWS}/users/${data["id"]}.png")),
                             SizedBox(width: Get.width * .045),
                             Expanded(
                               child: SizedBox(
@@ -150,9 +150,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                       text: data["name"],
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 8),
+                                    const SizedBox(height: 8),
                                     CustomText(
-                                      text: "Баялаг ресторан",
+                                      text:
+                                          "Нийт ${data["product_count"]} бараа",
                                       fontSize: 12,
                                       color: MyColors.gray,
                                     ),
