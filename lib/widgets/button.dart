@@ -21,27 +21,27 @@ class CustomButton extends StatefulWidget {
   final FontWeight textFontWeight;
   final bool hasBorder;
 
-  const CustomButton(
-      {Key? key,
-      this.text,
-      this.prefix,
-      this.suffix,
-      this.borderColor = MyColors.primary,
-      this.onPressed,
-      this.elevation = 0,
-      this.height = 36,
-      this.isLoading = false,
-      this.hasBorder = false,
-      this.isActive = true,
-      this.textFontSize = MyFontSizes.normal,
-      this.cornerRadius = 25,
-      this.isFullWidth = true,
-      this.textColor = Colors.white,
-      this.bgColor = MyColors.primary,
-      this.disabledTextColor = Colors.white,
-      this.textFontWeight = FontWeight.normal,
-      this.inActiveBtnColor = MyColors.grey})
-      : super(key: key);
+  const CustomButton({
+    Key? key,
+    this.text,
+    this.prefix,
+    this.suffix,
+    this.borderColor = MyColors.primary,
+    this.onPressed,
+    this.elevation = 0,
+    this.height = 36,
+    this.isLoading = false,
+    this.hasBorder = false,
+    this.isActive = true,
+    this.textFontSize = MyFontSizes.normal,
+    this.cornerRadius = 25,
+    this.isFullWidth = true,
+    this.textColor = Colors.white,
+    this.bgColor = MyColors.primary,
+    this.disabledTextColor = MyColors.white,
+    this.textFontWeight = FontWeight.normal,
+    this.inActiveBtnColor = MyColors.background,
+  }) : super(key: key);
 
   @override
   _CustomButtonState createState() => _CustomButtonState();

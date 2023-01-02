@@ -21,8 +21,6 @@ class AddressView extends StatefulWidget {
 }
 
 class _AddressViewState extends State<AddressView> {
-  bool _phoneNumberOk = false;
-  bool _addressOk = false;
   TextEditingController phoneController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController kodeController = TextEditingController();
@@ -38,13 +36,18 @@ class _AddressViewState extends State<AddressView> {
     var query = {"id": RestApiHelper.getUserId()};
     dynamic res = await RestApi().getUsers(query);
     dynamic data = Map<String, dynamic>.from(res);
-    log(data.toString());
-    setState(() {
-      _user = data["data"][0];
-    });
-    phoneController.text = _user["deliveryPhone"].toString();
-    addressController.text = _user["deliveryAddress"];
-    kodeController.text = _user["deliveryKode"];
+    _user = data["data"][0];
+    if (_user["deliveryPhone"] != 0 && _user["deliveryPhone"] != null) {
+      phoneController.text = _user["deliveryPhone"].toString();
+    }
+    if (_user["deliveryAddress"] != null &&
+        _user["deliveryAddress"].isNotEmpty) {
+      addressController.text = _user["deliveryAddress"];
+    }
+    if (_user["deliveryAddress"] != null && _user["deliveryKode"].isNotEmpty) {
+      kodeController.text = _user["deliveryKode"];
+    }
+    setState(() {});
   }
 
   void saveDeliveryInfo() async {
@@ -101,11 +104,7 @@ class _AddressViewState extends State<AddressView> {
                   keyboardType: TextInputType.number,
                   maxLength: 8,
                   controller: phoneController,
-                  onChanged: ((val) {
-                    setState(() {
-                      _phoneNumberOk = val.length == 8 ? true : false;
-                    });
-                  }),
+                  onChanged: ((val) {}),
                 ),
                 SizedBox(height: Get.height * .02),
                 CustomTextField(
@@ -113,11 +112,7 @@ class _AddressViewState extends State<AddressView> {
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
                   controller: addressController,
-                  onChanged: ((val) {
-                    setState(() {
-                      _addressOk = val.isNotEmpty;
-                    });
-                  }),
+                  onChanged: ((val) {}),
                 ),
                 SizedBox(height: Get.height * .02),
                 CustomTextField(
@@ -129,7 +124,6 @@ class _AddressViewState extends State<AddressView> {
                 SizedBox(height: Get.height * .03),
                 CustomButton(
                   text: "Хадгалах",
-                  isActive: _phoneNumberOk && _addressOk,
                   onPressed: saveDeliveryInfo,
                 ),
               ]))

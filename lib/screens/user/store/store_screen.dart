@@ -50,7 +50,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   void getStores() async {
     loading = true;
-    var query = {"role": "store", "category": categoryId, "isOpen": "1"};
+    var query = {"role": "store", "category": categoryId, "isOpen": 1};
     query.removeWhere((key, value) => value == 0);
     dynamic response = await RestApi().getUsers(query);
     dynamic d = Map<String, dynamic>.from(response);
@@ -151,12 +151,12 @@ class _StoreScreenState extends State<StoreScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 8),
-                                    CustomText(
-                                      text:
-                                          "Нийт ${data["product_count"]} бараа",
-                                      fontSize: 12,
-                                      color: MyColors.gray,
-                                    ),
+                                    // CustomText(
+                                    //   text:
+                                    //       "Нийт ${data["product_count"]} бараа",
+                                    //   fontSize: 12,
+                                    //   color: MyColors.gray,
+                                    // ),
                                   ],
                                 ),
                               ),

@@ -12,7 +12,6 @@ import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/home/search_screen.dart';
 import 'package:Erdenet24/screens/user/order/order.dart';
 import 'package:Erdenet24/screens/user/profile/user/user_settings.dart';
-import 'package:Erdenet24/screens/user/store/store_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';

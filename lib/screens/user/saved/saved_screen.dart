@@ -107,7 +107,8 @@ class _SavedScreenState extends State<SavedScreen> {
                                 width: Get.width * .25,
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12)),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                                 child: CachedImage(
                                     image:
                                         "${URL.AWS}/products/${saved[index]["id"]}.png"),

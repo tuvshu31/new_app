@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -61,42 +63,37 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
         title: "Бүтээгдэхүүн",
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Hero(
-                  transitionOnUserGestures: true,
-                  tag: _data,
-                  child: CachedImage(
-                    image: "${URL.AWS}/products/${_data["id"]}.png",
-                    width: Get.width * .1,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                transitionOnUserGestures: true,
+                tag: _data,
+                child: CachedImage(
+                  image: "${URL.AWS}/products/${_data["id"]}.png",
                 ),
-                CustomText(
-                  text: "${_data["name"]}",
-                  fontSize: 16,
+              ),
+              Container(
+                margin: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomText(
+                      text: "${_data["name"]}",
+                    ),
+                    const SizedBox(height: 8),
+                    CustomText(
+                      text: convertToCurrencyFormat(
+                          double.parse("${_data["price"]}"),
+                          toInt: true,
+                          locatedAtTheEnd: true),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                CustomText(
-                  text: convertToCurrencyFormat(
-                      double.parse("${_data["price"]}"),
-                      toInt: true,
-                      locatedAtTheEnd: true),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                const SizedBox(height: 8),
-                const CustomText(
-                  text: "Дэлгэрэнгүй мэдээлэл:",
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                SizedBox(height: Get.height * .05)
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         bottomSheet: Container(
