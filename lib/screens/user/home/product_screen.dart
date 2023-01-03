@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/widgets/separator.dart';
 import 'package:badges/badges.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:shimmer/shimmer.dart';
@@ -25,6 +27,8 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
   final _incoming = Get.arguments;
   dynamic _data = [];
   bool _isSaved = false;
+  int scrollIndex = 1;
+  List<int> list = [1, 2, 3, 4, 5];
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   @override
@@ -66,12 +70,49 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Hero(
-                transitionOnUserGestures: true,
-                tag: _data,
-                child: CachedImage(
-                  image: "${URL.AWS}/products/${_data["id"]}.png",
-                ),
+              Stack(
+                children: [
+                  Hero(
+                    transitionOnUserGestures: true,
+                    tag: _data,
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        enableInfiniteScroll: false,
+                        initialPage: 0,
+                        aspectRatio: 1,
+                        viewportFraction: 1,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            scrollIndex = index + 1;
+                          });
+                        },
+                      ),
+                      items: list
+                          .map(
+                            (item) => CachedImage(
+                              image: "${URL.AWS}/products/$item.png",
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 12,
+                    right: 24,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: MyColors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(4)),
+                      child: CustomText(
+                        text: "$scrollIndex/${list.length}",
+                        color: MyColors.white,
+                      ),
+                    ),
+                  )
+                ],
               ),
               Container(
                 margin: const EdgeInsets.all(24),
@@ -90,6 +131,12 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
+                    const SizedBox(height: 24),
+                    const MySeparator(color: MyColors.grey),
+                    const SizedBox(height: 24),
+                    CustomText(text: "Порц:"),
+                    SizedBox(height: 12),
+                    CustomText(text: "Орц:")
                   ],
                 ),
               ),
@@ -113,7 +160,6 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                   },
                   text: _isSaved ? "Хадгалсан" : "Хадгалах",
                   textColor: MyColors.primary,
-                  cornerRadius: 25,
                   elevation: 0,
                   bgColor: MyColors.fadedGrey,
                 ),
@@ -126,7 +172,6 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                   },
                   text: "Сагсанд нэмэх",
                   textColor: MyColors.white,
-                  cornerRadius: 25,
                   elevation: 0,
                 ),
               ),

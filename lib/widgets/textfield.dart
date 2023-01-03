@@ -156,7 +156,7 @@ class CustomTextField extends StatefulWidget {
       this.suffixButton,
       this.keyboardType = TextInputType.text,
       this.textInputAction,
-      this.height = 40,
+      this.height = 42,
       this.onChanged,
       this.borderRadius = 50,
       this.controller,

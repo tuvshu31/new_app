@@ -2,6 +2,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/splash/otp.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -11,6 +12,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class PhoneRegister extends StatefulWidget {
   const PhoneRegister({super.key});
@@ -22,10 +24,21 @@ class PhoneRegister extends StatefulWidget {
 class _PhoneRegisterState extends State<PhoneRegister> {
   bool _phoneNumberOk = false;
   bool _privacyApproved = false;
+  String _agreementText = "";
+
+  void loadAgreement() async {
+    dynamic agreement =
+        await rootBundle.loadString('assets/json/agreement.txt');
+    setState(() {
+      _agreementText = agreement;
+    });
+  }
+
   final _loginCtrl = Get.put(LoginController());
   @override
   void initState() {
     super.initState();
+    loadAgreement();
     _loginCtrl.phoneController.clear();
   }
 
@@ -43,6 +56,54 @@ class _PhoneRegisterState extends State<PhoneRegister> {
       errorSnackBar(
           "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
     }
+  }
+
+  void showPrivacy() {
+    Get.bottomSheet(
+      SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Container(
+            color: MyColors.white,
+            padding: EdgeInsets.symmetric(
+                horizontal: Get.width * .06, vertical: Get.width * .06),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const CustomText(
+                  text: "Үйлчилгээний нөхцөл",
+                  fontSize: 14,
+                  isUpperCase: true,
+                ),
+                const SizedBox(height: 24),
+                _agreementText.isNotEmpty
+                    ? CustomText(
+                        text: _agreementText,
+                        textAlign: TextAlign.justify,
+                        height: 1.8,
+                      )
+                    : MyShimmers().userPage(),
+                const SizedBox(height: 24),
+                CustomButton(
+                  isActive: true,
+                  onPressed: (() {
+                    setState(() {
+                      if (!_privacyApproved) {
+                        _privacyApproved = true;
+                      }
+                      Get.back();
+                    });
+                  }),
+                  text: "Зөвшөөрөх",
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+      ignoreSafeArea: false,
+    );
   }
 
   @override
@@ -100,7 +161,7 @@ class _PhoneRegisterState extends State<PhoneRegister> {
                     children: [
                       GestureDetector(
                         onTap: (() {
-                          errorSnackBar("Pressed", 2, context);
+                          showPrivacy();
                         }),
                         child: const CustomText(
                           text: "Үйлчилгээний нөхцөл",

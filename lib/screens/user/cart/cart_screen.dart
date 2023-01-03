@@ -305,7 +305,6 @@ class _CartScreenState extends State<CartScreen> {
               isFullWidth: false,
               text: "Төлбөр төлөх",
               textColor: MyColors.white,
-              cornerRadius: 25,
               elevation: 0,
             ),
           ),
