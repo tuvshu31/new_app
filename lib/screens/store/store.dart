@@ -35,12 +35,11 @@ class _StorePageState extends State<StorePage> {
   }
 
   void getStoreInfo() async {
-    var query = {"id": RestApiHelper.getUserId()};
-    dynamic res = await RestApi().getUsers(query);
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
     dynamic data = Map<String, dynamic>.from(res);
     setState(() {
-      _user = data["data"][0];
-      isOpen = data["data"][0]["isOpen"];
+      _user = data["data"];
+      isOpen = data["data"]["isOpen"];
     });
   }
 

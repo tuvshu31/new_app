@@ -61,6 +61,11 @@ class RestApi {
     return DioClient().sendRequest('products/$id', Method.delete, [], {});
   }
 
+  //Барааны зурагнуудын тоог авах
+  Future getProductImgCount(int id) async {
+    return DioClient().sendRequest('products/$id/count', Method.get, [], {});
+  }
+
   //Хэрэглэгч бүртгэлээ устгах
   Future deleteUser(int id) async {
     return DioClient().sendRequest('users/$id', Method.delete, [], {});
@@ -85,6 +90,11 @@ class RestApi {
   //Бүх хэрэглэгчийн мэдээллийг авах
   Future getUsers(dynamic query) async {
     return DioClient().sendRequest('users', Method.get, [], query);
+  }
+
+  //Нэг хэрэглэгчийн мэдээллийг авах
+  Future getUser(int id) async {
+    return DioClient().sendRequest('users/$id', Method.get, [], {});
   }
 
   //Тухайн хэрэглэгчийн мэдээллийг засах

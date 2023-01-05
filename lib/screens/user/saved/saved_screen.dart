@@ -66,6 +66,8 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     super.initState();
     getUserProducts();
+    print(Get.width);
+    print(Get.height);
   }
 
   @override
@@ -109,9 +111,8 @@ class _SavedScreenState extends State<SavedScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: CachedImage(
-                                    image:
-                                        "${URL.AWS}/products/${saved[index]["id"]}.png"),
+                                child: Image.network(
+                                    "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
                               ),
                             ),
                           ),

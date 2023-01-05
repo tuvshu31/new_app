@@ -30,11 +30,10 @@ class _PhoneEditViewState extends State<PhoneEditView> {
   }
 
   void getUserInfo() async {
-    var query = {"id": RestApiHelper.getUserId()};
-    dynamic res = await RestApi().getUsers(query);
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
     dynamic data = Map<String, dynamic>.from(res);
     setState(() {
-      _user = data["data"][0];
+      _user = data["data"];
     });
     phoneController.text = _user["phone"].toString();
   }

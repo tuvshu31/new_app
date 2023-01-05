@@ -8,6 +8,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class CustomData extends StatefulWidget {
   const CustomData({Key? key}) : super(key: key);
@@ -96,7 +97,7 @@ class _CustomDataState extends State<CustomData> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
                         if (index < _prodCtrl.data.length) {
@@ -125,14 +126,13 @@ class _CustomDataState extends State<CustomData> {
                                           tag: data,
                                           child: CachedNetworkImage(
                                             imageUrl:
-                                                "${URL.AWS}/products/${data["id"]}.png",
+                                                "${URL.AWS}/products/${data["id"]}/large/1.png",
                                             imageBuilder:
                                                 (context, imageProvider) =>
                                                     Container(
-                                              width: Get.width * .5,
-                                              height: Get.width * .5,
+                                              width: Get.width * .4,
+                                              height: Get.width * .4,
                                               decoration: BoxDecoration(
-                                                // borderRadius: BorderRadius.circular(8),
                                                 image: DecorationImage(
                                                     image: imageProvider,
                                                     fit: BoxFit.cover),
@@ -141,8 +141,8 @@ class _CustomDataState extends State<CustomData> {
                                             progressIndicatorBuilder: (context,
                                                     url, downloadProgress) =>
                                                 CustomShimmer(
-                                              width: Get.width * .5,
-                                              height: Get.width * .5,
+                                              width: Get.width * .4,
+                                              height: Get.width * .4,
                                             ),
                                             errorWidget: (context, url,
                                                     error) =>
@@ -263,8 +263,8 @@ Widget _loadingCard() {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomShimmer(
-            width: Get.width * .5,
-            height: Get.width * .5,
+            width: Get.width * .4,
+            height: Get.width * .4,
           ),
           const SizedBox(height: 8),
           CustomShimmer(

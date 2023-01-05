@@ -33,10 +33,9 @@ class _AddressViewState extends State<AddressView> {
   }
 
   void getUserInfo() async {
-    var query = {"id": RestApiHelper.getUserId()};
-    dynamic res = await RestApi().getUsers(query);
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
     dynamic data = Map<String, dynamic>.from(res);
-    _user = data["data"][0];
+    _user = data["data"];
     if (_user["deliveryPhone"] != 0 && _user["deliveryPhone"] != null) {
       phoneController.text = _user["deliveryPhone"].toString();
     }

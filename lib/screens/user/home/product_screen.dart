@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:badges/badges.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -15,6 +17,7 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class ProductScreenNew extends StatefulWidget {
   const ProductScreenNew({Key? key}) : super(key: key);
@@ -28,7 +31,7 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
   dynamic _data = [];
   bool _isSaved = false;
   int scrollIndex = 1;
-  List<int> list = [1, 2, 3, 4, 5];
+  List<int> list = [1];
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   @override
@@ -37,6 +40,15 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
     setState(() {
       _data = _incoming["data"];
       _isSaved = _cartCtrl.savedList.contains(_data["id"]);
+    });
+    imgCount();
+  }
+
+  void imgCount() async {
+    dynamic response = await RestApi().getProductImgCount(_data["id"]);
+    dynamic d = Map<String, dynamic>.from(response);
+    setState(() {
+      list = List<int>.generate(d["data"], (i) => i + 1);
     });
   }
 
@@ -76,42 +88,44 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                     transitionOnUserGestures: true,
                     tag: _data,
                     child: CarouselSlider(
-                      options: CarouselOptions(
-                        enableInfiniteScroll: false,
-                        initialPage: 0,
-                        aspectRatio: 1,
-                        viewportFraction: 1,
-                        scrollPhysics: const BouncingScrollPhysics(),
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            scrollIndex = index + 1;
-                          });
-                        },
-                      ),
-                      items: list
-                          .map(
-                            (item) => CachedImage(
-                              image: "${URL.AWS}/products/$item.png",
-                            ),
-                          )
-                          .toList(),
-                    ),
+                        options: CarouselOptions(
+                          enableInfiniteScroll: false,
+                          initialPage: 0,
+                          aspectRatio: 1,
+                          viewportFraction: 1,
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              scrollIndex = index + 1;
+                            });
+                          },
+                        ),
+                        items: list
+                            .map((item) => FadeInImage.memoryNetwork(
+                                placeholder: kTransparentImage,
+                                fadeInDuration:
+                                    const Duration(milliseconds: 500),
+                                image:
+                                    "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
+                            .toList()),
                   ),
-                  Positioned(
-                    bottom: 12,
-                    right: 24,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: MyColors.black.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(4)),
-                      child: CustomText(
-                        text: "$scrollIndex/${list.length}",
-                        color: MyColors.white,
-                      ),
-                    ),
-                  )
+                  list.length > 1
+                      ? Positioned(
+                          bottom: 12,
+                          right: 24,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: MyColors.black.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(4)),
+                            child: CustomText(
+                              text: "$scrollIndex/${list.length}",
+                              color: MyColors.white,
+                            ),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
               Container(

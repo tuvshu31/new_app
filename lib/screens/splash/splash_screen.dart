@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/splash/phone_register.dart';
-import 'package:Erdenet24/screens/user/home/home.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';

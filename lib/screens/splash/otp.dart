@@ -76,23 +76,17 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void handleUser(dynamic data) {
-    for (dynamic i in data) {
-      if (i["role"] == "store") {
-        loginTypeBottomSheet(data);
-        break;
-      } else if (i["role"] == "admin") {
-        log("admin");
-        putUserIntoBox(i["id"], "admin");
-        break;
-      } else if (i["role"] == "manager") {
-        log("manager");
-        putUserIntoBox(i["id"], "manager");
-        break;
-      } else {
-        log("user");
-        putUserIntoBox(i["id"], "user");
-        Get.offAll(const MainScreen());
-      }
+    int id(String type) {
+      dynamic item = data.firstWhere((el) => el["role"] == type);
+      return item["id"];
+    }
+
+    if (data.length == 2) {
+      putUserIntoBox(id("store"), "store");
+      loginTypeBottomSheet(data);
+    } else {
+      putUserIntoBox(id("user"), "user");
+      Get.offAll(const MainScreen());
     }
   }
 
