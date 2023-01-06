@@ -8,6 +8,7 @@ import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/products.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -144,19 +145,27 @@ class _StoreScreenState extends State<StoreScreen> {
                               child: SizedBox(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
+                                    const SizedBox(height: 4),
                                     CustomText(
                                       text: data["name"],
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 8),
-                                    // CustomText(
-                                    //   text:
-                                    //       "Нийт ${data["product_count"]} бараа",
-                                    //   fontSize: 12,
-                                    //   color: MyColors.gray,
-                                    // ),
+                                    CustomText(
+                                      text: "Бүх төрлийн Монгол хоол",
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 12,
+                                      color: MyColors.gray,
+                                    ),
+                                    CustomText(
+                                      text:
+                                          "${data["registered_date"]} - с хойш",
+                                      fontSize: 12,
+                                      color: MyColors.gray,
+                                    ),
+                                    const SizedBox(height: 4),
                                   ],
                                 ),
                               ),
