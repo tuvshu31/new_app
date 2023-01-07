@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -145,9 +147,40 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                     const SizedBox(height: 24),
                     const MySeparator(color: MyColors.grey),
                     const SizedBox(height: 24),
-                    CustomText(text: "Порц:"),
+                    _data["otherInfo"] != null
+                        ? Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const CustomText(text: "Порц:"),
+                                  CustomText(
+                                      text: "${_data["otherInfo"][0]} хүн"),
+                                ],
+                              ),
+                              SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const CustomText(text: "Орц:"),
+                                  CustomText(text: _data["otherInfo"][1]),
+                                ],
+                              ),
+                            ],
+                          )
+                        : Container(),
                     SizedBox(height: 12),
-                    CustomText(text: "Орц:")
+                    _data["description"] != null
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(text: "Нэмэлт мэдээлэл:"),
+                              CustomText(text: _data["description"]),
+                            ],
+                          )
+                        : Container(),
                   ],
                 ),
               ),

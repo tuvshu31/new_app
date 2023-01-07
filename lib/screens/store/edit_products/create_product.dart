@@ -33,6 +33,8 @@ class _CreateProductState extends State<CreateProduct> {
   final TextEditingController _productPrice = TextEditingController();
   final TextEditingController _productSpecs = TextEditingController();
   final TextEditingController _productCount = TextEditingController();
+  final TextEditingController ports = TextEditingController();
+  final TextEditingController orts = TextEditingController();
   final _loginCtrl = Get.put(LoginController());
   final _helpCtrl = Get.put(HelpController());
   @override
@@ -69,23 +71,25 @@ class _CreateProductState extends State<CreateProduct> {
       "typeId": typeId,
       "categoryId": _helpCtrl.chosenCategory["id"],
       "store": RestApiHelper.getUserId(),
-      "storeName": res["data"][0]["name"]
+      "storeName": res["data"][0]["name"],
+      "description": _productSpecs.text,
+      "otherInfo": [ports.text, orts.text]
     };
-    _helpCtrl.chosenImage.forEach((element) {
-      print(element);
-    });
-    // dynamic product = await RestApi().createProduct(body);
-    // dynamic data = Map<String, dynamic>.from(product);
-    // _helpCtrl.chosenImage.map((element) async => await RestApi()
-    //     .uploadImage("products", data["data"]["id"], File(element)));
+    // log(body.toString());
+    dynamic product = await RestApi().createProduct(body);
+    dynamic data = Map<String, dynamic>.from(product);
 
+    for (var element in _helpCtrl.chosenImage) {
+      await RestApi()
+          .uploadImage("products", data["data"]["id"], File(element));
+    }
     Get.back();
     Get.back();
-    // if (data["success"]) {
-    //   successSnackBar("Амжилттай хадгалагдлаа", 2, context);
-    // } else {
-    //   errorSnackBar("Алдаа гарлаа", 2, context);
-    // }
+    if (data["success"]) {
+      successSnackBar("Амжилттай хадгалагдлаа", 2, context);
+    } else {
+      errorSnackBar("Алдаа гарлаа", 2, context);
+    }
   }
 
   @override
@@ -163,11 +167,25 @@ class _CreateProductState extends State<CreateProduct> {
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 12),
+              // CustomTextField(
+              //   maxLength: 8,
+              //   hintText: "Тоо ширхэг",
+              //   controller: _productCount,
+              //   keyboardType: TextInputType.number,
+              //   textInputAction: TextInputAction.done,
+              // ),
               CustomTextField(
-                maxLength: 8,
-                hintText: "Тоо ширхэг",
-                controller: _productCount,
+                hintText: "Порц",
+                maxLength: 2,
+                controller: ports,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                hintText: "Орц",
+                controller: orts,
+                keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
               ),
               const SizedBox(height: 12),

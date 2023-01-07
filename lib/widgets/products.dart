@@ -104,7 +104,7 @@ class _CustomDataState extends State<CustomData> {
                         : products.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.8,
+                  childAspectRatio: 0.77,
                 ),
                 itemBuilder: (context, index) {
                   if (index < products.length) {

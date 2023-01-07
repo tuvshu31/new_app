@@ -50,7 +50,7 @@ class DioClient {
 
   Future<dynamic> sendFile(
     String path,
-    Method _method,
+    Method method,
     File imageFile,
   ) async {
     try {
@@ -58,17 +58,17 @@ class DioClient {
         'file':
             await MultipartFile.fromFile(imageFile.path, filename: 'image.png')
       });
-      Response<String> _response = await dio.request(
+      Response<String> response = await dio.request(
         path,
         data: formData,
-        options: Options(method: _getMethodName(_method)),
+        options: Options(method: _getMethodName(method)),
       );
-      dynamic _responseJson = json.decode(_response.data!);
+      dynamic responseJson = json.decode(response.data!);
 
-      if (_responseJson['success'] == true) {
-        return _responseJson;
+      if (responseJson['success'] == true) {
+        return responseJson;
       } else {
-        print(_responseJson);
+        print(responseJson);
       }
     } catch (e) {
       if (e is DioError) {
