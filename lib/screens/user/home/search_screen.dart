@@ -50,23 +50,24 @@ class _SearchScreenMainState extends State<SearchScreenMain> {
   Widget build(BuildContext context) {
     return Obx(
       () => CustomHeader(
-        isMainPage: false,
-        customActions: SizedBox(
-          child: CustomText(text: _prodCtrl.search.toString()),
-        ),
-        customTitle: CustomSearchBar(
-          controller: _searchController,
-          onSubmitted: onSubmitted,
-          hintText: 'Бараа хайх...',
-          autoFocus: true,
-          onChanged: onChanged,
-        ),
-        body: _notChanged
-            ? Container()
-            : _prodCtrl.data.isEmpty
-                ? const CustomLoadingIndicator(text: "Хайлтын илэрц олдсонгүй")
-                : const CustomData(),
-      ),
+          isMainPage: false,
+          customActions: SizedBox(
+            child: CustomText(text: _prodCtrl.search.toString()),
+          ),
+          customTitle: CustomSearchBar(
+            controller: _searchController,
+            onSubmitted: onSubmitted,
+            hintText: 'Бараа хайх...',
+            autoFocus: true,
+            onChanged: onChanged,
+          ),
+          body: _notChanged
+              ? Container()
+              : _prodCtrl.data.isEmpty
+                  ? const CustomLoadingIndicator(
+                      text: "Хайлтын илэрц олдсонгүй")
+                  // : const CustomData(),
+                  : Container()),
     );
   }
 }

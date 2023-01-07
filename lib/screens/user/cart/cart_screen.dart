@@ -77,8 +77,9 @@ class _CartScreenState extends State<CartScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: Image.network(
-                                          "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                                      child: CachedImage(
+                                          image:
+                                              "${URL.AWS}/products/${data["id"]}/small/1.png"),
                                     ),
                                   ),
                                 ),

@@ -92,6 +92,11 @@ class RestApi {
     return DioClient().sendRequest('users', Method.get, [], query);
   }
 
+  //Тухайн дэлгүүрийн ангиллуудыг авах
+  Future getStoreCategories(int id) async {
+    return DioClient().sendRequest('users/$id/store', Method.get, [], {});
+  }
+
   //Нэг хэрэглэгчийн мэдээллийг авах
   Future getUser(int id) async {
     return DioClient().sendRequest('users/$id', Method.get, [], {});

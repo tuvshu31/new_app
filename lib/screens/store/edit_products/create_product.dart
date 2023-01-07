@@ -71,17 +71,21 @@ class _CreateProductState extends State<CreateProduct> {
       "store": RestApiHelper.getUserId(),
       "storeName": res["data"][0]["name"]
     };
-    dynamic product = await RestApi().createProduct(body);
-    dynamic data = Map<String, dynamic>.from(product);
-    await RestApi().uploadImage(
-        "products", data["data"]["id"], File(_helpCtrl.chosenImage.value));
+    _helpCtrl.chosenImage.forEach((element) {
+      print(element);
+    });
+    // dynamic product = await RestApi().createProduct(body);
+    // dynamic data = Map<String, dynamic>.from(product);
+    // _helpCtrl.chosenImage.map((element) async => await RestApi()
+    //     .uploadImage("products", data["data"]["id"], File(element)));
+
     Get.back();
     Get.back();
-    if (data["success"]) {
-      successSnackBar("Амжилттай хадгалагдлаа", 2, context);
-    } else {
-      errorSnackBar("Алдаа гарлаа", 2, context);
-    }
+    // if (data["success"]) {
+    //   successSnackBar("Амжилттай хадгалагдлаа", 2, context);
+    // } else {
+    //   errorSnackBar("Алдаа гарлаа", 2, context);
+    // }
   }
 
   @override

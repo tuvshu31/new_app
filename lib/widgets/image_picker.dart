@@ -72,7 +72,7 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
       setState(() {
         imageList.add(croppedFile.path);
       });
-      _helpCtrl.chosenImage.value = imageList[0] ?? "";
+      _helpCtrl.chosenImage.value = imageList;
     }
   }
 

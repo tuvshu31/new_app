@@ -111,8 +111,9 @@ class _SavedScreenState extends State<SavedScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Image.network(
-                                    "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
+                                child: CachedImage(
+                                    image:
+                                        "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
                               ),
                             ),
                           ),

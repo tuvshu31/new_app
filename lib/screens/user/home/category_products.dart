@@ -12,16 +12,16 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:iconly/iconly.dart';
 
-class CategoryData extends StatefulWidget {
-  const CategoryData({
+class CategoryProducts extends StatefulWidget {
+  const CategoryProducts({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<CategoryData> createState() => _CategoryDataState();
+  State<CategoryProducts> createState() => _CategoryProductsState();
 }
 
-class _CategoryDataState extends State<CategoryData> {
+class _CategoryProductsState extends State<CategoryProducts> {
   final _prodCtrl = Get.put(ProductController());
   final _cartCtrl = Get.put(CartController());
   final _incoming = Get.arguments;

@@ -101,10 +101,7 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                           },
                         ),
                         items: list
-                            .map((item) => FadeInImage.memoryNetwork(
-                                placeholder: kTransparentImage,
-                                fadeInDuration:
-                                    const Duration(milliseconds: 500),
+                            .map((item) => CachedImage(
                                 image:
                                     "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
                             .toList()),
