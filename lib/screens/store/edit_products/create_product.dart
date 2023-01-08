@@ -165,7 +165,8 @@ class _CreateProductState extends State<CreateProduct> {
                 ),
               ),
               const SizedBox(height: 12),
-              _helpCtrl.chosenCategory.isNotEmpty
+              _helpCtrl.chosenCategory.isNotEmpty &&
+                      _helpCtrl.chosenCategory["descriptions"] != null
                   ? Descriptions(controllerList: controllerList)
                   : Container(),
               SizedBox(height: Get.height * .05),
@@ -215,16 +216,18 @@ class Descriptions extends StatefulWidget {
 class _DescriptionsState extends State<Descriptions> {
   final _helpCtrl = Get.put(HelpController());
   dynamic descriptions = [];
+
   @override
   void initState() {
     super.initState();
-
     setState(() {
       descriptions = _helpCtrl.chosenCategory["descriptions"];
-      for (dynamic a in descriptions) {
-        var controller = TextEditingController();
-        widget.controllerList.add(controller);
-      }
+      widget.controllerList.isEmpty
+          ? descriptions.forEach((el) {
+              var controller = TextEditingController();
+              widget.controllerList.add(controller);
+            })
+          : null;
     });
   }
 

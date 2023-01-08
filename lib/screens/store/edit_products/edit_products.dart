@@ -80,142 +80,307 @@ class _EditProductsState extends State<EditProducts> {
 
   @override
   Widget build(BuildContext context) {
-    return !loading && _products.length == 0
-        ? const CustomLoadingIndicator(text: "Бараа байхгүй байна")
-        : Column(
-            children: [
-              const SizedBox(height: 8),
-              ListView.separated(
-                separatorBuilder: (context, index) {
-                  return Container(height: 8);
+    return !loading && _products.isEmpty
+        ? const CustomLoadingIndicator(text: "Хадгалсан бараа байхгүй байна")
+        : ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: _products.isEmpty ? 8 : _products.length,
+            itemBuilder: (context, index) {
+              var data = _products[index];
+              List ontap = [
+                () {},
+                () {
+                  Get.back();
+                  setState(() {
+                    data["visibility"] = !data["visibility"];
+                  });
+                  productUpdateHelper(
+                      {...data, "visibility": !data["visibility"]});
                 },
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: _products.length == 0 ? 8 : _products.length,
-                itemBuilder: (context, index) {
-                  if (_products.length == 0) {
-                    return MyShimmers().listView();
-                  } else {
-                    var data = _products[index];
-                    List ontap = [
-                      () {},
-                      () {
-                        Get.back();
-                        setState(() {
-                          _products[index]["visibility"] =
-                              !_products[index]["visibility"];
-                        });
-                        productUpdateHelper({
-                          ..._products[index],
-                          "visibility": !_products[index]["visibility"]
-                        });
-                      },
-                      () {
-                        Get.back();
-                        changeLeftOverCount(
-                            context, _products[index], leftOverController, () {
-                          loadingDialog(context);
-                          if (leftOverController.text.isEmpty) {
-                            Get.back();
-                          } else {
-                            Get.back();
-                            Get.back();
-                            setState(() {
-                              _products[index]["available"] =
-                                  leftOverController.text;
-                            });
-                            productUpdateHelper({
-                              ..._products[index],
-                              "available": leftOverController.text
-                            });
-                          }
-                        });
-                      },
-                      () {
-                        Get.back();
-                        deleteProduct(context, data, () {
-                          Get.back();
-                          productDeleteHelper(_products[index]);
-                          setState(() {
-                            _products.remove(_products[index]);
-                          });
-                        });
-                      }
-                    ];
-                    return CustomInkWell(
-                      borderRadius: BorderRadius.zero,
-                      onTap: () {
-                        editProductBottomSheet(ontap, data["visibility"]);
-                      },
-                      child: ListTile(
-                        leading: Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: _products[index]["visibility"]
-                                ? CachedImage(
-                                    image:
-                                        "${URL.AWS}/products/${data["id"]}.png")
-                                : Stack(
-                                    children: [
-                                      CachedImage(
-                                          image:
-                                              "${URL.AWS}/products/${data["id"]}.png"),
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              color: MyColors.black
-                                                  .withOpacity(0.5)),
-                                          child: Icon(
-                                            IconlyLight.hide,
-                                            size: Get.width * .1,
-                                            color:
-                                                MyColors.white.withOpacity(0.5),
-                                          ),
-                                        ),
+                () {
+                  Get.back();
+                  changeLeftOverCount(
+                      context, _products[index], leftOverController, () {
+                    loadingDialog(context);
+                    if (leftOverController.text.isEmpty) {
+                      Get.back();
+                    } else {
+                      Get.back();
+                      Get.back();
+                      setState(() {
+                        _products[index]["available"] = leftOverController.text;
+                      });
+                      productUpdateHelper({
+                        ..._products[index],
+                        "available": leftOverController.text
+                      });
+                    }
+                  });
+                },
+                () {
+                  Get.back();
+                  deleteProduct(context, data, () {
+                    Get.back();
+                    productDeleteHelper(_products[index]);
+                    setState(() {
+                      _products.remove(_products[index]);
+                    });
+                  });
+                }
+              ];
+              if (_products.isEmpty) {
+                return MyShimmers().listView();
+              } else {
+                return Container(
+                  margin: EdgeInsets.all(Get.width * .03),
+                  height: Get.height * .13,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //         child: ListTile(
+                      //           leading: Container(
+                      //               clipBehavior: Clip.hardEdge,
+                      //               decoration: BoxDecoration(
+                      //                   borderRadius: BorderRadius.circular(12)),
+                      //               child: _products[index]["visibility"]
+                      //                   ? CachedImage(
+                      //                       image:
+                      //                           "${URL.AWS}/products/${data["id"]}.png")
+                      //                   : Stack(
+                      //                       children: [
+                      //                         CachedImage(
+                      //                             image:
+                      //                                 "${URL.AWS}/products/${data["id"]}.png"),
+                      //                         Positioned.fill(
+                      //                           child: Container(
+                      //                             decoration: BoxDecoration(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(12),
+                      //                                 color: MyColors.black
+                      //                                     .withOpacity(0.5)),
+                      //                             child: Icon(
+                      //                               IconlyLight.hide,
+                      //                               size: Get.width * .1,
+                      //                               color:
+                      //                                   MyColors.white.withOpacity(0.5),
+                      //                             ),
+                      //                           ),
+                      //                         ),
+                      //                       ],
+                      //                     )),
+                      Container(
+                        width: Get.width * .25,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: _products[index]["visibility"]
+                            ? CachedImage(
+                                image:
+                                    "${URL.AWS}/products/${data["id"]}/small/1.png")
+                            : Stack(
+                                children: [
+                                  CachedImage(
+                                      image:
+                                          "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                                  Positioned.fill(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color:
+                                              MyColors.black.withOpacity(0.5)),
+                                      child: Icon(
+                                        IconlyLight.hide,
+                                        size: Get.width * .1,
+                                        color: MyColors.white.withOpacity(0.5),
                                       ),
-                                    ],
-                                  )),
-                        title: CustomText(
-                          text: data["name"] ?? "",
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: 14,
-                        ),
-                        subtitle: Column(
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                      SizedBox(width: Get.width * .045),
+                      Expanded(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             CustomText(
-                              text: convertToCurrencyFormat(
-                                double.parse(data["price"]),
-                                toInt: true,
-                                locatedAtTheEnd: true,
-                              ),
+                              text: data["name"],
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            Row(
-                              children: [
-                                const CustomText(
-                                  text: "Үлдэгдэл:",
-                                  fontSize: 12,
-                                ),
-                                const SizedBox(width: 8),
-                                CustomText(text: data["available"])
-                              ],
-                            )
+                            CustomText(
+                                fontSize: 12,
+                                text: "Үнэ: ${convertToCurrencyFormat(
+                                  double.parse(data["price"]),
+                                  toInt: true,
+                                  locatedAtTheEnd: true,
+                                )}"),
+                            CustomText(
+                                fontSize: 12,
+                                text: "Үлдэгдэл: ${data["available"]}")
                           ],
                         ),
-                        trailing: Icon(
-                          IconlyLight.edit,
-                          size: 16,
-                          color: MyColors.black,
-                        ),
                       ),
-                    );
-                  }
-                },
-              ),
-            ],
-          );
+                      SizedBox(
+                        width: Get.width * .15,
+                        child: Center(
+                            child: CustomInkWell(
+                          onTap: (() {
+                            editProductBottomSheet(ontap, data["visibility"]);
+                          }),
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: MyColors.fadedGrey,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              IconlyLight.edit,
+                              size: 18,
+                            ),
+                          ),
+                        )),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            });
   }
 }
+
+
+   // ListView.separated(
+              //   separatorBuilder: (context, index) {
+              //     return Container(height: 8);
+              //   },
+              //   physics: const BouncingScrollPhysics(),
+              //   shrinkWrap: true,
+              //   itemCount: _products.length == 0 ? 8 : _products.length,
+              //   itemBuilder: (context, index) {
+              //     if (_products.length == 0) {
+              //       return MyShimmers().listView();
+              //     } else {
+              //       var data = _products[index];
+              //       List ontap = [
+              //         () {},
+              //         () {
+              //           Get.back();
+              //           setState(() {
+              //             _products[index]["visibility"] =
+              //                 !_products[index]["visibility"];
+              //           });
+              //           productUpdateHelper({
+              //             ..._products[index],
+              //             "visibility": !_products[index]["visibility"]
+              //           });
+              //         },
+              //         () {
+              //           Get.back();
+              //           changeLeftOverCount(
+              //               context, _products[index], leftOverController, () {
+              //             loadingDialog(context);
+              //             if (leftOverController.text.isEmpty) {
+              //               Get.back();
+              //             } else {
+              //               Get.back();
+              //               Get.back();
+              //               setState(() {
+              //                 _products[index]["available"] =
+              //                     leftOverController.text;
+              //               });
+              //               productUpdateHelper({
+              //                 ..._products[index],
+              //                 "available": leftOverController.text
+              //               });
+              //             }
+              //           });
+              //         },
+              //         () {
+              //           Get.back();
+              //           deleteProduct(context, data, () {
+              //             Get.back();
+              //             productDeleteHelper(_products[index]);
+              //             setState(() {
+              //               _products.remove(_products[index]);
+              //             });
+              //           });
+              //         }
+              //       ];
+              //       return CustomInkWell(
+              //         borderRadius: BorderRadius.zero,
+              //         onTap: () {
+              //           editProductBottomSheet(ontap, data["visibility"]);
+              //         },
+              //         child: ListTile(
+              //           leading: Container(
+              //               clipBehavior: Clip.hardEdge,
+              //               decoration: BoxDecoration(
+              //                   borderRadius: BorderRadius.circular(12)),
+              //               child: _products[index]["visibility"]
+              //                   ? CachedImage(
+              //                       image:
+              //                           "${URL.AWS}/products/${data["id"]}.png")
+              //                   : Stack(
+              //                       children: [
+              //                         CachedImage(
+              //                             image:
+              //                                 "${URL.AWS}/products/${data["id"]}.png"),
+              //                         Positioned.fill(
+              //                           child: Container(
+              //                             decoration: BoxDecoration(
+              //                                 borderRadius:
+              //                                     BorderRadius.circular(12),
+              //                                 color: MyColors.black
+              //                                     .withOpacity(0.5)),
+              //                             child: Icon(
+              //                               IconlyLight.hide,
+              //                               size: Get.width * .1,
+              //                               color:
+              //                                   MyColors.white.withOpacity(0.5),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     )),
+              //           title: CustomText(
+              //             text: data["name"] ?? "",
+              //             overflow: TextOverflow.ellipsis,
+              //             fontSize: 14,
+              //           ),
+              //           subtitle: Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               CustomText(
+              //                 text: convertToCurrencyFormat(
+              //                   double.parse(data["price"]),
+              //                   toInt: true,
+              //                   locatedAtTheEnd: true,
+              //                 ),
+              //               ),
+              //               Row(
+              //                 children: [
+              //                   const CustomText(
+              //                     text: "Үлдэгдэл:",
+              //                     fontSize: 12,
+              //                   ),
+              //                   const SizedBox(width: 8),
+              //                   CustomText(text: data["available"])
+              //                 ],
+              //               )
+              //             ],
+              //           ),
+              //           trailing: Icon(
+              //             IconlyLight.edit,
+              //             size: 16,
+              //             color: MyColors.black,
+              //           ),
+              //         ),
+              //       );
+              //     }
+              //   },
+              // ),

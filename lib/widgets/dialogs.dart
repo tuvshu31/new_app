@@ -321,8 +321,8 @@ void changeLeftOverCount(
               clipBehavior: Clip.hardEdge,
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(12)),
-              child:
-                  CachedImage(image: "${URL.AWS}/products/${data["id"]}.png")),
+              child: CachedImage(
+                  image: "${URL.AWS}/products/${data["id"]}/small/1.png")),
           title: CustomText(text: data["name"]),
           subtitle: Row(
             children: [
