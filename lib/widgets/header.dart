@@ -78,7 +78,7 @@ class _CustomHeaderState extends State<CustomHeader>
         child: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
           child: Scaffold(
-            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: true,
             backgroundColor: MyColors.white,
             appBar: AppBar(
               leadingWidth: widget.leadingWidth.toDouble(),

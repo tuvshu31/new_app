@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ffi';
-
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:badges/badges.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -147,40 +144,35 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                     const SizedBox(height: 24),
                     const MySeparator(color: MyColors.grey),
                     const SizedBox(height: 24),
-                    _data["otherInfo"] != null
-                        ? Column(
-                            children: [
-                              Row(
+                    _data["otherInfo"].isNotEmpty
+                        ? ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(height: 12);
+                            },
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _data["otherInfo"].length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var data = Map<String, dynamic>.from(
+                                  _data["otherInfo"][index]);
+                              var key = removeBracket(data.keys.toString());
+                              var value = removeBracket(data.values.toString());
+                              return Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const CustomText(text: "Порц:"),
-                                  CustomText(
-                                      text: "${_data["otherInfo"][0]} хүн"),
+                                  Expanded(child: CustomText(text: "$key:")),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                      child: CustomText(
+                                    text: value,
+                                  ))
                                 ],
-                              ),
-                              SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const CustomText(text: "Орц:"),
-                                  CustomText(text: _data["otherInfo"][1]),
-                                ],
-                              ),
-                            ],
+                              );
+                            },
                           )
                         : Container(),
-                    SizedBox(height: 12),
-                    _data["description"] != null
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CustomText(text: "Нэмэлт мэдээлэл:"),
-                              CustomText(text: _data["description"]),
-                            ],
-                          )
-                        : Container(),
+                    SizedBox(height: Get.height * .1)
                   ],
                 ),
               ),

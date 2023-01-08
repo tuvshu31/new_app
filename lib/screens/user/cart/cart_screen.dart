@@ -27,7 +27,6 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    log(userId.toString());
   }
 
   @override

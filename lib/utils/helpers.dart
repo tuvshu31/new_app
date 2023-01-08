@@ -11,6 +11,10 @@ int random6digit() {
   return next.toInt();
 }
 
+String removeBracket(String num) {
+  return num.replaceAll(RegExp(r"\p{P}", unicode: true), "");
+}
+
 String convertToCurrencyFormat(
   num? number, {
   bool toInt = false,

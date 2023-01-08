@@ -213,7 +213,7 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
         widget.imageLimit > 1 && imageList.length != widget.imageLimit
             ? CustomText(
                 text:
-                    "*Дээд тал нь ${widget.imageLimit} зураг оруулах боломжтой",
+                    "*Хамгийн ихдээ ${widget.imageLimit} ширхэг зураг оруулах боломжтой",
                 fontSize: 12,
                 color: MyColors.gray,
               )

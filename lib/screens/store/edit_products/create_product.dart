@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -29,14 +28,13 @@ class _CreateProductState extends State<CreateProduct> {
   bool _productNameOk = false;
   bool _productPriceOk = false;
   bool _productCountOk = false;
+  final _helpCtrl = Get.put(HelpController());
+  var controllerList = <TextEditingController>[];
   final TextEditingController _productName = TextEditingController();
   final TextEditingController _productPrice = TextEditingController();
   final TextEditingController _productSpecs = TextEditingController();
   final TextEditingController _productCount = TextEditingController();
-  final TextEditingController ports = TextEditingController();
-  final TextEditingController orts = TextEditingController();
-  final _loginCtrl = Get.put(LoginController());
-  final _helpCtrl = Get.put(HelpController());
+
   @override
   void initState() {
     super.initState();
@@ -61,8 +59,15 @@ class _CreateProductState extends State<CreateProduct> {
   void submit() async {
     loadingDialog(context);
     var query = {"id": RestApiHelper.getUserId()};
-    dynamic produc = await RestApi().getUsers(query);
-    dynamic res = Map<String, dynamic>.from(produc);
+    dynamic userInfo = await RestApi().getUsers(query);
+    dynamic res = Map<String, dynamic>.from(userInfo);
+    var result = [];
+    for (int i = 0; i < _helpCtrl.chosenCategory["descriptions"].length; i++) {
+      var item = {
+        _helpCtrl.chosenCategory["descriptions"][i]: controllerList[i].text
+      };
+      result.add(item);
+    }
     var body = {
       "name": _productName.text,
       "price": _productPrice.text,
@@ -73,9 +78,8 @@ class _CreateProductState extends State<CreateProduct> {
       "store": RestApiHelper.getUserId(),
       "storeName": res["data"][0]["name"],
       "description": _productSpecs.text,
-      "otherInfo": [ports.text, orts.text]
+      "otherInfo": result
     };
-    // log(body.toString());
     dynamic product = await RestApi().createProduct(body);
     dynamic data = Map<String, dynamic>.from(product);
 
@@ -96,6 +100,7 @@ class _CreateProductState extends State<CreateProduct> {
   Widget build(BuildContext context) {
     return Obx(
       () => SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
@@ -160,35 +165,9 @@ class _CreateProductState extends State<CreateProduct> {
                 ),
               ),
               const SizedBox(height: 12),
-              CustomTextField(
-                hintText: "Дэлгэрэнгүй мэдээлэл",
-                controller: _productSpecs,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: 12),
-              // CustomTextField(
-              //   maxLength: 8,
-              //   hintText: "Тоо ширхэг",
-              //   controller: _productCount,
-              //   keyboardType: TextInputType.number,
-              //   textInputAction: TextInputAction.done,
-              // ),
-              CustomTextField(
-                hintText: "Порц",
-                maxLength: 2,
-                controller: ports,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                hintText: "Орц",
-                controller: orts,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 12),
+              _helpCtrl.chosenCategory.isNotEmpty
+                  ? Descriptions(controllerList: controllerList)
+                  : Container(),
               SizedBox(height: Get.height * .05),
               Row(
                 children: [
@@ -214,10 +193,58 @@ class _CreateProductState extends State<CreateProduct> {
                 ],
               ),
               const SizedBox(height: 24),
+              SizedBox(
+                height: MediaQuery.of(context).viewInsets.bottom,
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class Descriptions extends StatefulWidget {
+  dynamic controllerList;
+  Descriptions({super.key, this.controllerList});
+
+  @override
+  State<Descriptions> createState() => _DescriptionsState();
+}
+
+class _DescriptionsState extends State<Descriptions> {
+  final _helpCtrl = Get.put(HelpController());
+  dynamic descriptions = [];
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      descriptions = _helpCtrl.chosenCategory["descriptions"];
+      for (dynamic a in descriptions) {
+        var controller = TextEditingController();
+        widget.controllerList.add(controller);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      separatorBuilder: (context, index) {
+        return const SizedBox(height: 12);
+      },
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: widget.controllerList.length,
+      itemBuilder: (BuildContext context, int index) {
+        return CustomTextField(
+          hintText: descriptions[index],
+          controller: widget.controllerList[index],
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.done,
+        );
+      },
     );
   }
 }
