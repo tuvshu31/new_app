@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
+import 'package:Erdenet24/screens/store/edit_products/preview.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -25,11 +26,13 @@ class CreateProduct extends StatefulWidget {
 class _CreateProductState extends State<CreateProduct> {
   dynamic _category = [];
   int typeId = 0;
+  var otherInfo = [];
   bool _productNameOk = false;
   bool _productPriceOk = false;
   bool _productCountOk = false;
   final _helpCtrl = Get.put(HelpController());
   var controllerList = <TextEditingController>[];
+
   final TextEditingController _productName = TextEditingController();
   final TextEditingController _productPrice = TextEditingController();
   final TextEditingController _productSpecs = TextEditingController();
@@ -61,12 +64,13 @@ class _CreateProductState extends State<CreateProduct> {
     var query = {"id": RestApiHelper.getUserId()};
     dynamic userInfo = await RestApi().getUsers(query);
     dynamic res = Map<String, dynamic>.from(userInfo);
-    var result = [];
+
     for (int i = 0; i < _helpCtrl.chosenCategory["descriptions"].length; i++) {
       var item = {
         _helpCtrl.chosenCategory["descriptions"][i]: controllerList[i].text
       };
-      result.add(item);
+      otherInfo.add(item);
+      setState(() {});
     }
     var body = {
       "name": _productName.text,
@@ -78,7 +82,7 @@ class _CreateProductState extends State<CreateProduct> {
       "store": RestApiHelper.getUserId(),
       "storeName": res["data"][0]["name"],
       "description": _productSpecs.text,
-      "otherInfo": result
+      "otherInfo": otherInfo
     };
     dynamic product = await RestApi().createProduct(body);
     dynamic data = Map<String, dynamic>.from(product);
@@ -174,13 +178,22 @@ class _CreateProductState extends State<CreateProduct> {
                 children: [
                   Expanded(
                     child: CustomButton(
+                        elevation: 0,
                         isFullWidth: false,
                         hasBorder: false,
-                        bgColor: MyColors.white,
+                        bgColor: MyColors.fadedGrey,
                         textColor: MyColors.primary,
-                        isActive: false,
+                        isActive: true,
                         text: "Урьдчилж харах",
-                        onPressed: () {}),
+                        onPressed: () {
+                          Get.to(() => const ProductPreviewScreen(),
+                              arguments: {
+                                "image": _helpCtrl.chosenImage,
+                                "name": _productName.text,
+                                "price": _productPrice.text,
+                                "otherInfo": otherInfo
+                              });
+                        }),
                   ),
                   SizedBox(width: Get.width * .03),
                   Expanded(

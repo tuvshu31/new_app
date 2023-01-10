@@ -71,6 +71,11 @@ class RestApi {
     return DioClient().sendRequest('users/$id', Method.delete, [], {});
   }
 
+  //Хэрэглэгчийн нэвтрэх эрхийг шалгах
+  Future checkUser(String phone) async {
+    return DioClient().sendRequest('users/$phone/check', Method.get, [], {});
+  }
+
   //Хэрэглэгч бараа хадгалах
   Future saveUserProduct(dynamic body) async {
     return DioClient().sendRequest('saved-products', Method.post, body, {});

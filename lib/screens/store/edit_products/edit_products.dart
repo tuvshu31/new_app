@@ -96,7 +96,7 @@ class _EditProductsState extends State<EditProducts> {
                     data["visibility"] = !data["visibility"];
                   });
                   productUpdateHelper(
-                      {...data, "visibility": !data["visibility"]});
+                      {...data, "visibility": data["visibility"]});
                 },
                 () {
                   Get.back();

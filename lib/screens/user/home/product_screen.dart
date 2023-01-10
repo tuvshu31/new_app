@@ -40,6 +40,7 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
       _data = _incoming["data"];
       _isSaved = _cartCtrl.savedList.contains(_data["id"]);
     });
+    print(_data["otherInfo"].length);
     imgCount();
   }
 

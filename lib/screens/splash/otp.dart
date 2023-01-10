@@ -75,61 +75,46 @@ class _OtpScreenState extends State<OtpScreen> {
     RestApiHelper.saveUserRole(type);
   }
 
-  void handleUser(dynamic data) {
-    int id(String type) {
-      dynamic item = data.firstWhere((el) => el["role"] == type);
-      return item["id"];
-    }
-
-    if (data.length == 2) {
-      putUserIntoBox(id("store"), "store");
-      loginTypeBottomSheet(data);
-    } else {
-      putUserIntoBox(id("user"), "user");
-      Get.offAll(const MainScreen());
-    }
-  }
-
   void submit() async {
     loadingDialog(context);
     if (_loginCtrl.verifyCode.value == int.parse(pinCode)) {
-      var body = {"phone": _loginCtrl.phoneController.text};
-      dynamic response = await RestApi().loginUser(body);
+      dynamic response =
+          await RestApi().checkUser(_loginCtrl.phoneController.text);
       dynamic data = Map<String, dynamic>.from(response);
       if (data["success"]) {
-        if (data["user"].isNotEmpty) {
-          //Хоосон биш байвал логин хийх
-          Get.back();
-          handleUser(data["user"]);
+        Get.back();
+        if (data.length > 1) {
+          switch (data["role"]) {
+            case "admin":
+              putUserIntoBox(data["id"], "admin");
+              break;
+            case "manager":
+              putUserIntoBox(data["id"], "manager");
+              break;
+            case "store":
+              loginTypeBottomSheet(data["id"]);
+              break;
+            case "user":
+              putUserIntoBox(data["id"], "user");
+              Get.offAll(const MainScreen());
+              break;
+          }
         } else {
-          //Хоосон байвал бүртгэх
           var body = {
             "phone": _loginCtrl.phoneController.text,
             "role": "user",
           };
           dynamic response = await RestApi().registerUser(body);
           dynamic data = Map<String, dynamic>.from(response);
-          RestApiHelper.saveUserId(data["data"]["id"]);
+          putUserIntoBox(data["data"]["id"], "user");
           Get.offAll(const MainScreen());
-          Get.back();
         }
+      } else {
+        errorSnackBar("Алдаа гарлаа", 2, context);
       }
     } else {
       Get.back();
       errorSnackBar("Баталгаажуулах код буруу байна", 2, context);
-    }
-  }
-
-  void storeSubmit(data) {
-    for (dynamic i in data) {
-      if (i["role"] == loginType) {
-        putUserIntoBox(i["id"], loginType);
-      }
-    }
-    if (loginType == "user") {
-      Get.offAll(() => const MainScreen());
-    } else if (loginType == "store") {
-      Get.offAll(() => const StorePage());
     }
   }
 
@@ -192,7 +177,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  void loginTypeBottomSheet(dynamic data) {
+  void loginTypeBottomSheet(int id) {
     setState(() {
       countdownTimer!.cancel();
       loginType = "";
@@ -255,7 +240,13 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: CustomButton(
                   isActive: loginType.isNotEmpty,
                   onPressed: (() {
-                    storeSubmit(data);
+                    if (loginType == "user") {
+                      putUserIntoBox(id, "user");
+                      Get.offAll(() => const MainScreen());
+                    } else if (loginType == "store") {
+                      putUserIntoBox(id, "store");
+                      Get.offAll(() => const StorePage());
+                    }
                   }),
                   text: "Нэвтрэх",
                 ),
