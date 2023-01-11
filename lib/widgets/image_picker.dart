@@ -21,7 +21,6 @@ class CustomImagePicker extends StatefulWidget {
 }
 
 class _CustomImagePickerState extends State<CustomImagePicker> {
-  dynamic imageList = [];
   final _helpCtrl = Get.put(HelpController());
   void uploadImage(ImageSource source) async {
     Get.back();
@@ -69,10 +68,7 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
       ],
     );
     if (croppedFile != null) {
-      setState(() {
-        imageList.add(croppedFile.path);
-      });
-      _helpCtrl.chosenImage.value = imageList;
+      _helpCtrl.chosenImage.add(croppedFile.path);
     }
   }
 
@@ -143,82 +139,86 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        GridView.builder(
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemCount: imageList.length < widget.imageLimit
-                ? imageList.length + 1
-                : imageList.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 1,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-            ),
-            itemBuilder: (context, index) {
-              if (index < imageList.length) {
-                return Stack(
-                  children: [
-                    Container(
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Image.file(
-                        File(imageList[index]),
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
-                    Positioned(
-                      right: 5,
-                      top: 5,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            imageList.remove(imageList[index]);
-                          });
-                        },
-                        child: Icon(
-                          Icons.cancel_rounded,
-                          size: 28,
-                          color: MyColors.primary.withOpacity(0.4),
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          GridView.builder(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _helpCtrl.chosenImage.length < widget.imageLimit
+                  ? _helpCtrl.chosenImage.length + 1
+                  : _helpCtrl.chosenImage.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+              ),
+              itemBuilder: (context, index) {
+                if (index < _helpCtrl.chosenImage.length) {
+                  return Stack(
+                    children: [
+                      Container(
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Image.file(
+                          File(_helpCtrl.chosenImage[index]),
+                          width: double.infinity,
+                          height: double.infinity,
                         ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                return GestureDetector(
-                    onTap: showImagePicker,
-                    child: DottedBorder(
-                      borderType: BorderType.RRect,
-                      radius: Radius.circular(20),
-                      dashPattern: [10, 10],
-                      color: MyColors.black,
-                      strokeWidth: 0.2,
-                      child: const Center(
-                        child: Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 28,
-                          color: MyColors.black,
+                      Positioned(
+                        right: 5,
+                        top: 5,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _helpCtrl.chosenImage
+                                  .remove(_helpCtrl.chosenImage[index]);
+                            });
+                          },
+                          child: Icon(
+                            Icons.cancel_rounded,
+                            size: 28,
+                            color: MyColors.primary.withOpacity(0.4),
+                          ),
                         ),
                       ),
-                    ));
-              }
-            }),
-        const SizedBox(height: 12),
-        widget.imageLimit > 1 && imageList.length != widget.imageLimit
-            ? CustomText(
-                text:
-                    "*Хамгийн ихдээ ${widget.imageLimit} ширхэг зураг оруулах боломжтой",
-                fontSize: 12,
-                color: MyColors.gray,
-              )
-            : Container()
-      ],
+                    ],
+                  );
+                } else {
+                  return GestureDetector(
+                      onTap: showImagePicker,
+                      child: DottedBorder(
+                        borderType: BorderType.RRect,
+                        radius: Radius.circular(20),
+                        dashPattern: [10, 10],
+                        color: MyColors.black,
+                        strokeWidth: 0.2,
+                        child: const Center(
+                          child: Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 28,
+                            color: MyColors.black,
+                          ),
+                        ),
+                      ));
+                }
+              }),
+          const SizedBox(height: 12),
+          widget.imageLimit > 1 &&
+                  _helpCtrl.chosenImage.length != widget.imageLimit
+              ? CustomText(
+                  text:
+                      "*Хамгийн ихдээ ${widget.imageLimit} ширхэг зураг оруулах боломжтой",
+                  fontSize: 12,
+                  color: MyColors.gray,
+                )
+              : Container()
+        ],
+      ),
     );
   }
 }

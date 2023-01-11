@@ -59,12 +59,8 @@ class _CreateProductState extends State<CreateProduct> {
     } else {}
   }
 
-  void submit() async {
-    loadingDialog(context);
-    var query = {"id": RestApiHelper.getUserId()};
-    dynamic userInfo = await RestApi().getUsers(query);
-    dynamic res = Map<String, dynamic>.from(userInfo);
-
+  void generateOtherInfo() {
+    otherInfo.clear();
     for (int i = 0; i < _helpCtrl.chosenCategory["descriptions"].length; i++) {
       var item = {
         _helpCtrl.chosenCategory["descriptions"][i]: controllerList[i].text
@@ -72,6 +68,24 @@ class _CreateProductState extends State<CreateProduct> {
       otherInfo.add(item);
       setState(() {});
     }
+  }
+
+  void refreshPage() {
+    _helpCtrl.chosenImage.clear();
+    _productName.clear();
+    _productPrice.clear();
+    _helpCtrl.chosenCategory.clear();
+    otherInfo.clear();
+    controllerList.clear();
+    getCategoryList();
+  }
+
+  void submit() async {
+    loadingDialog(context);
+    var query = {"id": RestApiHelper.getUserId()};
+    dynamic userInfo = await RestApi().getUsers(query);
+    dynamic res = Map<String, dynamic>.from(userInfo);
+    generateOtherInfo();
     var body = {
       "name": _productName.text,
       "price": _productPrice.text,
@@ -91,7 +105,7 @@ class _CreateProductState extends State<CreateProduct> {
       await RestApi()
           .uploadImage("products", data["data"]["id"], File(element));
     }
-    Get.back();
+    refreshPage();
     Get.back();
     if (data["success"]) {
       successSnackBar("Амжилттай хадгалагдлаа", 2, context);
@@ -183,15 +197,19 @@ class _CreateProductState extends State<CreateProduct> {
                         hasBorder: false,
                         bgColor: MyColors.fadedGrey,
                         textColor: MyColors.primary,
-                        isActive: true,
+                        isActive: _helpCtrl.chosenImage.isNotEmpty &&
+                            _productName.text.isNotEmpty &&
+                            _productPrice.text.isNotEmpty &&
+                            _helpCtrl.chosenCategory.isNotEmpty,
                         text: "Урьдчилж харах",
                         onPressed: () {
+                          generateOtherInfo();
                           Get.to(() => const ProductPreviewScreen(),
                               arguments: {
                                 "image": _helpCtrl.chosenImage,
                                 "name": _productName.text,
                                 "price": _productPrice.text,
-                                "otherInfo": otherInfo
+                                "otherInfo": otherInfo,
                               });
                         }),
                   ),
