@@ -154,7 +154,7 @@ class _OrderPaymentViewState extends State<OrderPaymentView> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        createOrder();
+                        // createOrder();
                       }),
                       child: Center(
                         child: Column(

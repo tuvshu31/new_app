@@ -77,41 +77,45 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void submit() async {
     loadingDialog(context);
-    if (_loginCtrl.verifyCode.value == int.parse(pinCode)) {
-      dynamic response =
-          await RestApi().checkUser(_loginCtrl.phoneController.text);
-      dynamic data = Map<String, dynamic>.from(response);
-      if (data["success"]) {
-        Get.back();
-        if (data.length > 1) {
-          switch (data["role"]) {
-            case "admin":
-              putUserIntoBox(data["id"], "admin");
-              break;
-            case "manager":
-              putUserIntoBox(data["id"], "manager");
-              break;
-            case "store":
-              loginTypeBottomSheet(data["id"]);
-              break;
-            case "user":
-              putUserIntoBox(data["id"], "user");
-              Get.offAll(const MainScreen());
-              break;
-          }
-        } else {
-          var body = {
-            "phone": _loginCtrl.phoneController.text,
-            "role": "user",
-          };
-          dynamic response = await RestApi().registerUser(body);
-          dynamic data = Map<String, dynamic>.from(response);
-          putUserIntoBox(data["data"]["id"], "user");
-          Get.offAll(const MainScreen());
+    dynamic response =
+        await RestApi().checkUser(_loginCtrl.phoneController.text);
+    dynamic data = Map<String, dynamic>.from(response);
+    if (data["success"] &&
+        data["role"] != "test" &&
+        _loginCtrl.verifyCode.value == int.parse(pinCode)) {
+      Get.back();
+      if (data.length > 1) {
+        switch (data["role"]) {
+          case "admin":
+            putUserIntoBox(data["adminId"], "admin");
+            break;
+          case "manager":
+            putUserIntoBox(data["managerId"], "manager");
+            break;
+          case "store":
+            loginTypeBottomSheet(data["userId"], data["storeId"]);
+            break;
+          case "user":
+            putUserIntoBox(data["userId"], "user");
+            Get.offAll(const MainScreen());
+            break;
         }
       } else {
-        errorSnackBar("Алдаа гарлаа", 2, context);
+        var body = {
+          "phone": _loginCtrl.phoneController.text,
+          "role": "user",
+        };
+        dynamic response = await RestApi().registerUser(body);
+        dynamic data = Map<String, dynamic>.from(response);
+        putUserIntoBox(data["data"]["id"], "user");
+        Get.offAll(const MainScreen());
       }
+    } else if (data["success"] &&
+        data["role"] == "test" &&
+        int.parse(pinCode) == 111111) {
+      Get.back();
+      putUserIntoBox(data["testId"], "test");
+      Get.offAll(const MainScreen());
     } else {
       Get.back();
       errorSnackBar("Баталгаажуулах код буруу байна", 2, context);
@@ -177,7 +181,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  void loginTypeBottomSheet(int id) {
+  void loginTypeBottomSheet(int userId, int storeId) {
     setState(() {
       countdownTimer!.cancel();
       loginType = "";
@@ -241,10 +245,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   isActive: loginType.isNotEmpty,
                   onPressed: (() {
                     if (loginType == "user") {
-                      putUserIntoBox(id, "user");
+                      putUserIntoBox(userId, "user");
                       Get.offAll(() => const MainScreen());
                     } else if (loginType == "store") {
-                      putUserIntoBox(id, "store");
+                      putUserIntoBox(storeId, "store");
                       Get.offAll(() => const StorePage());
                     }
                   }),
