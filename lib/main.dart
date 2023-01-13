@@ -12,14 +12,19 @@ import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/home/search_screen.dart';
 import 'package:Erdenet24/screens/user/order/order.dart';
 import 'package:Erdenet24/screens/user/profile/user/user_settings.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:new_version_plus/new_version_plus.dart';
+import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  // Only call clearSavedSettings() during testing to reset internal values.
+  await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
   runApp(const MyApp());
@@ -33,6 +38,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  AppUpdateInfo? _updateInfo;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   //Huudas shiljiheer ondelete hiigdeed bga blhoor eniig duudaj bga. Ustgaj bolohgui
   final cartCtrl = Get.put(CartController(), permanent: true);
@@ -41,27 +47,54 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    checkForUpdate();
-  }
-
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      info.updateAvailability == UpdateAvailability.updateAvailable
-          ? InAppUpdate.performImmediateUpdate().catchError((e) {
-              showSnack(e.toString());
-            })
-          : null;
-    }).catchError((e) {
-      showSnack(e.toString());
-    });
-  }
-
-  void showSnack(String text) {
-    if (_scaffoldKey.currentContext != null) {
-      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-          .showSnackBar(SnackBar(content: Text(text)));
+    final newVersionPlus = NewVersionPlus(
+      iOSId: 'mn.et24',
+      androidId: 'mn.et24',
+    );
+    advancedStatusCheck(NewVersionPlus newVersion) async {
+      print("Checking");
+      final status = await newVersion.getVersionStatus();
+      newVersionPlus.showUpdateDialog(
+        context: context,
+        versionStatus: status!,
+        dialogTitle: 'Шинэчлэл хийнэ үү',
+        dialogText:
+            'Таны одоогийн хувилбар хуучирсан хувилбар тул шинэчлэл хийсний дараа ашиглах боломжтой.',
+        updateButtonText: 'Шинэчлэл татах',
+        dismissButtonText: 'Болих',
+        allowDismissal: false,
+      );
     }
   }
+
+  // Future<void> checkForUpdate() async {
+  //   _updateInfo?.updateAvailability == UpdateAvailability.updateAvailable
+  //       ? () {
+  //           InAppUpdate.performImmediateUpdate()
+  //               .catchError((e) => showSnack(e.toString()));
+  //         }
+  //       : print("Updating");
+  // }
+  // Future<void> checkForUpdate() async {
+  //   InAppUpdate.checkForUpdate().then((info) {
+  //     info.updateAvailability == UpdateAvailability.updateAvailable
+  //         ? InAppUpdate.performImmediateUpdate().catchError((e) {
+  //             showSnack(e.toString());
+  //           })
+  //         : null;
+  //   }).catchError((e) {
+  //     showSnack(e.toString());
+  //   });
+  // }
+
+  // void showSnack(String text) {
+  //   if (_scaffoldKey.currentContext != null) {
+  //     ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
+  //       dismissDirection: DismissDirection.none,
+  //       content: CustomText(text: text),
+  //     ));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

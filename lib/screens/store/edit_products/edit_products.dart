@@ -1,5 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/store/edit_products/edit_product_info.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
@@ -45,8 +46,6 @@ class _EditProductsState extends State<EditProducts> {
     setState(() {});
   }
 
-  TextEditingController availableController = TextEditingController();
-
   void productUpdateHelper(dynamic body) async {
     loadingDialog(context);
     dynamic product = await RestApi().updateProduct(body["id"], body);
@@ -89,7 +88,10 @@ class _EditProductsState extends State<EditProducts> {
             itemBuilder: (context, index) {
               var data = _products[index];
               List ontap = [
-                () {},
+                () {
+                  Get.back();
+                  Get.to(() => const EditProductInfo(), arguments: data);
+                },
                 () {
                   Get.back();
                   setState(() {
@@ -139,37 +141,6 @@ class _EditProductsState extends State<EditProducts> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      //         child: ListTile(
-                      //           leading: Container(
-                      //               clipBehavior: Clip.hardEdge,
-                      //               decoration: BoxDecoration(
-                      //                   borderRadius: BorderRadius.circular(12)),
-                      //               child: _products[index]["visibility"]
-                      //                   ? CachedImage(
-                      //                       image:
-                      //                           "${URL.AWS}/products/${data["id"]}.png")
-                      //                   : Stack(
-                      //                       children: [
-                      //                         CachedImage(
-                      //                             image:
-                      //                                 "${URL.AWS}/products/${data["id"]}.png"),
-                      //                         Positioned.fill(
-                      //                           child: Container(
-                      //                             decoration: BoxDecoration(
-                      //                                 borderRadius:
-                      //                                     BorderRadius.circular(12),
-                      //                                 color: MyColors.black
-                      //                                     .withOpacity(0.5)),
-                      //                             child: Icon(
-                      //                               IconlyLight.hide,
-                      //                               size: Get.width * .1,
-                      //                               color:
-                      //                                   MyColors.white.withOpacity(0.5),
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ],
-                      //                     )),
                       Container(
                         width: Get.width * .25,
                         clipBehavior: Clip.hardEdge,
@@ -252,135 +223,3 @@ class _EditProductsState extends State<EditProducts> {
             });
   }
 }
-
-
-   // ListView.separated(
-              //   separatorBuilder: (context, index) {
-              //     return Container(height: 8);
-              //   },
-              //   physics: const BouncingScrollPhysics(),
-              //   shrinkWrap: true,
-              //   itemCount: _products.length == 0 ? 8 : _products.length,
-              //   itemBuilder: (context, index) {
-              //     if (_products.length == 0) {
-              //       return MyShimmers().listView();
-              //     } else {
-              //       var data = _products[index];
-              //       List ontap = [
-              //         () {},
-              //         () {
-              //           Get.back();
-              //           setState(() {
-              //             _products[index]["visibility"] =
-              //                 !_products[index]["visibility"];
-              //           });
-              //           productUpdateHelper({
-              //             ..._products[index],
-              //             "visibility": !_products[index]["visibility"]
-              //           });
-              //         },
-              //         () {
-              //           Get.back();
-              //           changeLeftOverCount(
-              //               context, _products[index], leftOverController, () {
-              //             loadingDialog(context);
-              //             if (leftOverController.text.isEmpty) {
-              //               Get.back();
-              //             } else {
-              //               Get.back();
-              //               Get.back();
-              //               setState(() {
-              //                 _products[index]["available"] =
-              //                     leftOverController.text;
-              //               });
-              //               productUpdateHelper({
-              //                 ..._products[index],
-              //                 "available": leftOverController.text
-              //               });
-              //             }
-              //           });
-              //         },
-              //         () {
-              //           Get.back();
-              //           deleteProduct(context, data, () {
-              //             Get.back();
-              //             productDeleteHelper(_products[index]);
-              //             setState(() {
-              //               _products.remove(_products[index]);
-              //             });
-              //           });
-              //         }
-              //       ];
-              //       return CustomInkWell(
-              //         borderRadius: BorderRadius.zero,
-              //         onTap: () {
-              //           editProductBottomSheet(ontap, data["visibility"]);
-              //         },
-              //         child: ListTile(
-              //           leading: Container(
-              //               clipBehavior: Clip.hardEdge,
-              //               decoration: BoxDecoration(
-              //                   borderRadius: BorderRadius.circular(12)),
-              //               child: _products[index]["visibility"]
-              //                   ? CachedImage(
-              //                       image:
-              //                           "${URL.AWS}/products/${data["id"]}.png")
-              //                   : Stack(
-              //                       children: [
-              //                         CachedImage(
-              //                             image:
-              //                                 "${URL.AWS}/products/${data["id"]}.png"),
-              //                         Positioned.fill(
-              //                           child: Container(
-              //                             decoration: BoxDecoration(
-              //                                 borderRadius:
-              //                                     BorderRadius.circular(12),
-              //                                 color: MyColors.black
-              //                                     .withOpacity(0.5)),
-              //                             child: Icon(
-              //                               IconlyLight.hide,
-              //                               size: Get.width * .1,
-              //                               color:
-              //                                   MyColors.white.withOpacity(0.5),
-              //                             ),
-              //                           ),
-              //                         ),
-              //                       ],
-              //                     )),
-              //           title: CustomText(
-              //             text: data["name"] ?? "",
-              //             overflow: TextOverflow.ellipsis,
-              //             fontSize: 14,
-              //           ),
-              //           subtitle: Column(
-              //             crossAxisAlignment: CrossAxisAlignment.start,
-              //             children: [
-              //               CustomText(
-              //                 text: convertToCurrencyFormat(
-              //                   double.parse(data["price"]),
-              //                   toInt: true,
-              //                   locatedAtTheEnd: true,
-              //                 ),
-              //               ),
-              //               Row(
-              //                 children: [
-              //                   const CustomText(
-              //                     text: "Үлдэгдэл:",
-              //                     fontSize: 12,
-              //                   ),
-              //                   const SizedBox(width: 8),
-              //                   CustomText(text: data["available"])
-              //                 ],
-              //               )
-              //             ],
-              //           ),
-              //           trailing: Icon(
-              //             IconlyLight.edit,
-              //             size: 16,
-              //             color: MyColors.black,
-              //           ),
-              //         ),
-              //       );
-              //     }
-              //   },
-              // ),

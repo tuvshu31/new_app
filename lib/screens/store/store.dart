@@ -92,12 +92,12 @@ class _StorePageState extends State<StorePage> {
                           Get.to(() => StoreOrders());
                         }),
                         // _divider(),
-                        // _listTile(IconlyLight.setting, "Тохиргоо", () {}),
                         // _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),
                         // _divider(),
                         // _listTile(IconlyLight.info_circle,
                         //     "Үйлчилгээний нөхцөл", () {}),
                         _divider(),
+                        _listTile(IconlyLight.setting, "Тохиргоо", () {}),
                         _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                         _listTile(IconlyLight.login, "Аппаас гарах", () {
                           logOutModal(context, () {

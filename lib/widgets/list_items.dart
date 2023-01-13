@@ -1,5 +1,8 @@
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
@@ -8,10 +11,10 @@ import 'package:iconly/iconly.dart';
 import '../utils/styles.dart';
 
 class CustomListItems extends StatefulWidget {
-  final dynamic list;
+  final int parentId;
 
   CustomListItems({
-    required this.list,
+    required this.parentId,
     super.key,
   });
 
@@ -21,6 +24,28 @@ class CustomListItems extends StatefulWidget {
 
 class _CustomListItemsState extends State<CustomListItems> {
   final _helpCtrl = Get.put(HelpController());
+  dynamic categoryList = [];
+  bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+    fetchCategory();
+  }
+
+  void fetchCategory() async {
+    loading = true;
+    dynamic categories =
+        await RestApi().getCategories({"parentId": widget.parentId});
+    dynamic response = Map<String, dynamic>.from(categories);
+    if (response["success"]) {
+      setState(() {
+        categoryList = response["data"];
+      });
+    }
+    loading = false;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
@@ -43,28 +68,39 @@ class _CustomListItemsState extends State<CustomListItems> {
                 ),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: widget.list.length,
+                itemCount: loading ? 6 : categoryList.length,
                 itemBuilder: (context, index) {
-                  return CustomInkWell(
-                    onTap: () {
-                      _helpCtrl.chosenCategory.value = widget.list[index];
-                      Get.back();
-                    },
-                    borderRadius: BorderRadius.circular(0),
-                    child: Container(
-                      padding: EdgeInsets.all(Get.width * .04),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(text: widget.list[index]["name"]),
-                          const Icon(
-                            IconlyLight.arrow_right_2,
-                            size: 18,
-                          )
-                        ],
+                  if (loading) {
+                    return Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: CustomShimmer(
+                        width: double.infinity,
+                        height: Get.height * .03,
+                        isRoundedCircle: true,
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    return CustomInkWell(
+                      onTap: () {
+                        _helpCtrl.chosenCategory.value = categoryList[index];
+                        Get.back();
+                      },
+                      borderRadius: BorderRadius.circular(0),
+                      child: Container(
+                        padding: EdgeInsets.all(Get.width * .04),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText(text: categoryList[index]["name"]),
+                            const Icon(
+                              IconlyLight.arrow_right_2,
+                              size: 18,
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                 },
               ),
               SizedBox(height: Get.height * .05)

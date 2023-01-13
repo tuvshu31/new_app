@@ -41,6 +41,8 @@ class _CreateProductState extends State<CreateProduct> {
   @override
   void initState() {
     super.initState();
+    _helpCtrl.chosenImage.clear();
+    _helpCtrl.chosenCategory.clear();
     getCategoryList();
   }
 
@@ -50,13 +52,6 @@ class _CreateProductState extends State<CreateProduct> {
     setState(() {
       typeId = userData["data"][0]["category"];
     });
-    if (userData["success"]) {
-      dynamic res = await RestApi().getCategories({"parentId": typeId});
-      dynamic data = Map<String, dynamic>.from(res);
-      setState(() {
-        _category = data["data"];
-      });
-    } else {}
   }
 
   void generateOtherInfo() {
@@ -148,7 +143,7 @@ class _CreateProductState extends State<CreateProduct> {
               GestureDetector(
                 onTap: () {
                   Get.to(CustomListItems(
-                    list: _category,
+                    parentId: typeId,
                   ));
                 },
                 child: Container(

@@ -136,6 +136,27 @@ class MyShimmers {
         ));
   }
 
+  Widget imagePickerShimmer() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const BouncingScrollPhysics(),
+      itemCount: 6,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+      ),
+      itemBuilder: (context, index) {
+        return const CustomShimmer(
+          width: double.infinity,
+          height: double.infinity,
+          isRoundedCircle: true,
+        );
+      },
+    );
+  }
+
   Widget userPage() {
     return ListView.separated(
         separatorBuilder: (context, index) {
