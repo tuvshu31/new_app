@@ -1,6 +1,7 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
 import 'package:Erdenet24/screens/store/orders/main.dart';
+import 'package:Erdenet24/screens/store/settings/settings.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:get/get.dart';
@@ -97,7 +98,9 @@ class _StorePageState extends State<StorePage> {
                         // _listTile(IconlyLight.info_circle,
                         //     "Үйлчилгээний нөхцөл", () {}),
                         _divider(),
-                        _listTile(IconlyLight.setting, "Тохиргоо", () {}),
+                        _listTile(IconlyLight.setting, "Тохиргоо", () {
+                          Get.to(() => const StoreSettingsView());
+                        }),
                         _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                         _listTile(IconlyLight.login, "Аппаас гарах", () {
                           logOutModal(context, () {

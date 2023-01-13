@@ -1,7 +1,7 @@
+import 'dart:io';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
-import 'package:Erdenet24/screens/store/edit_products/create_product.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -11,17 +11,10 @@ import 'package:Erdenet24/widgets/image_picker.dart';
 import 'package:Erdenet24/widgets/list_items.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/rendering.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
-import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:iconly/iconly.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class EditProductInfo extends StatefulWidget {
   const EditProductInfo({super.key});
@@ -38,6 +31,7 @@ class _EditProductInfoState extends State<EditProductInfo> {
   TextEditingController productCount = TextEditingController();
   var controllerList = <TextEditingController>[];
   dynamic otherInfo = [];
+
   bool loading = false;
   @override
   void initState() {
@@ -82,16 +76,31 @@ class _EditProductInfoState extends State<EditProductInfo> {
     setState(() {});
   }
 
-  // void generateOtherInfo() {
-  //   otherInfo.clear();
-  //   for (int i = 0; i < _helpCtrl.chosenCategory["descriptions"].length; i++) {
-  //     var item = {
-  //       _helpCtrl.chosenCategory["descriptions"][i]: controllerList[i].text
-  //     };
-  //     otherInfo.add(item);
-  //     setState(() {});
-  //   }
-  // }
+  void submit() async {
+    // for (var element in _helpCtrl.chosenImage) {
+    //   await RestApi().uploadImage("products", _incoming["id"], File(element));
+    // }
+    generateOtherInfo();
+    var body = {
+      "name": productName.text,
+      "price": productPrice.text,
+      "available": productCount.text,
+      "categoryId": _helpCtrl.chosenCategory["id"],
+      "otherInfo": otherInfo
+    };
+    print(body);
+  }
+
+  void generateOtherInfo() {
+    otherInfo.clear();
+    for (int i = 0; i < _helpCtrl.chosenCategory["descriptions"].length; i++) {
+      var item = {
+        _helpCtrl.chosenCategory["descriptions"][i]: controllerList[i].text
+      };
+      otherInfo.add(item);
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +158,7 @@ class _EditProductInfoState extends State<EditProductInfo> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CustomText(
-                          text: _helpCtrl.chosenCategory["name"],
+                          text: _helpCtrl.chosenCategory["name"] ?? "Ангилал",
                         ),
                         const Icon(
                           IconlyLight.arrow_right_2,
@@ -189,7 +198,7 @@ class _EditProductInfoState extends State<EditProductInfo> {
                 CustomButton(
                   isActive: true,
                   text: "Хадгалах",
-                  onPressed: () {},
+                  onPressed: submit,
                 ),
               ],
             ),
