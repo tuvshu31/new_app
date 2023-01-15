@@ -1,14 +1,15 @@
 import 'dart:io';
-
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image_picker.dart';
 import 'package:Erdenet24/widgets/list_items.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import "package:flutter/material.dart";
@@ -31,11 +32,15 @@ class _EditProductInfoState extends State<EditProductInfo> {
   TextEditingController productCount = TextEditingController();
   var controllerList = <TextEditingController>[];
   dynamic otherInfo = [];
+  String imageListBefore = "";
 
   bool loading = false;
   @override
   void initState() {
     super.initState();
+    DefaultCacheManager().emptyCache();
+    _helpCtrl.chosenImage.clear();
+    _helpCtrl.chosenCategory.clear();
     prepareScreen();
     _incoming["otherInfo"].isNotEmpty
         ? _incoming["otherInfo"].forEach((el) {
@@ -59,7 +64,6 @@ class _EditProductInfoState extends State<EditProductInfo> {
         var file = await DefaultCacheManager().getSingleFile(
             "${URL.AWS}/products/${_incoming["id"]}/small/$element.png");
         _helpCtrl.chosenImage.add(file.path);
-        DefaultCacheManager().removeFile(file.path);
       }
     }
     dynamic res =
@@ -68,27 +72,59 @@ class _EditProductInfoState extends State<EditProductInfo> {
     if (data["success"]) {
       setState(() {
         _helpCtrl.chosenCategory.value = data["data"];
-        print(_helpCtrl.chosenCategory);
       });
     }
-
+    imageListBefore = _helpCtrl.chosenImage.toString();
     loading = false;
     setState(() {});
   }
 
   void submit() async {
-    // for (var element in _helpCtrl.chosenImage) {
-    //   await RestApi().uploadImage("products", _incoming["id"], File(element));
-    // }
-    generateOtherInfo();
-    var body = {
-      "name": productName.text,
-      "price": productPrice.text,
-      "available": productCount.text,
-      "categoryId": _helpCtrl.chosenCategory["id"],
-      "otherInfo": otherInfo
-    };
-    print(body);
+    loadingDialog(context);
+    if (imageListBefore != _helpCtrl.chosenImage.toString()) {
+      if (imageListBefore != [].toString()) {
+        await RestApi().deleteImage("products", _incoming["id"]);
+      }
+      generateOtherInfo();
+      var body = {
+        "id": _incoming["id"],
+        "name": productName.text,
+        "price": productPrice.text,
+        "available": productCount.text,
+        "categoryId": _helpCtrl.chosenCategory["id"],
+        "otherInfo": otherInfo
+      };
+      dynamic product = await RestApi().updateProduct(body["id"], body);
+      dynamic data = Map<String, dynamic>.from(product);
+      for (var element in _helpCtrl.chosenImage) {
+        await RestApi().uploadImage("products", _incoming["id"], File(element));
+      }
+      if (data["success"]) {
+        Get.back();
+        successSnackBar("Амжилттай засагдлаа", 2, context);
+      } else {
+        errorSnackBar("Алдаа гарлаа", 2, context);
+      }
+    } else {
+      generateOtherInfo();
+      var body = {
+        "id": _incoming["id"],
+        "name": productName.text,
+        "price": productPrice.text,
+        "available": productCount.text,
+        "categoryId": _helpCtrl.chosenCategory["id"],
+        "otherInfo": otherInfo
+      };
+      dynamic product = await RestApi().updateProduct(body["id"], body);
+      dynamic data = Map<String, dynamic>.from(product);
+      if (data["success"]) {
+        Get.back();
+        successSnackBar("Амжилттай засагдлаа", 2, context);
+      } else {
+        errorSnackBar("Алдаа гарлаа", 2, context);
+      }
+    }
+    Get.back();
   }
 
   void generateOtherInfo() {
@@ -117,8 +153,8 @@ class _EditProductInfoState extends State<EditProductInfo> {
               children: [
                 SizedBox(height: Get.height * .02),
                 loading
-                    ? MyShimmers().imagePickerShimmer()
-                    : CustomImagePicker(imageLimit: 6),
+                    ? MyShimmers().imagePickerShimmer(6)
+                    : const CustomImagePicker(imageLimit: 6),
                 _title("Барааны нэр"),
                 CustomTextField(
                   controller: productName,
@@ -200,6 +236,7 @@ class _EditProductInfoState extends State<EditProductInfo> {
                   text: "Хадгалах",
                   onPressed: submit,
                 ),
+                SizedBox(height: Get.height * .05),
               ],
             ),
           ),

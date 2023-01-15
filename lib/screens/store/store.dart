@@ -63,8 +63,8 @@ class _StorePageState extends State<StorePage> {
               children: [
                 SizedBox(height: Get.height * .075),
                 CircleAvatar(
-                  backgroundImage: const NetworkImage(
-                      'https://www.woolha.com/media/2020/03/eevee.png'),
+                  backgroundImage: NetworkImage(
+                      "${URL.AWS}/users/${_user["id"]}/small/1.png"),
                   radius: Get.width * .1,
                 ),
                 const SizedBox(height: 8),

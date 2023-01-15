@@ -140,7 +140,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                     borderRadius: BorderRadius.circular(12)),
                                 child: CachedImage(
                                     image:
-                                        "${URL.AWS}/users/${data["id"]}.png")),
+                                        "${URL.AWS}/users/${data["id"]}/small/1.png")),
                             SizedBox(width: Get.width * .045),
                             Expanded(
                               child: SizedBox(
@@ -155,7 +155,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     CustomText(
-                                      text: "Бүх төрлийн Монгол хоол",
+                                      text: data["description"] ?? data["name"],
                                       overflow: TextOverflow.ellipsis,
                                       fontSize: 12,
                                       color: MyColors.gray,

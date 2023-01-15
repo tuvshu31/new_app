@@ -136,11 +136,11 @@ class MyShimmers {
         ));
   }
 
-  Widget imagePickerShimmer() {
+  Widget imagePickerShimmer(int length) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
-      itemCount: 6,
+      itemCount: length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 1,

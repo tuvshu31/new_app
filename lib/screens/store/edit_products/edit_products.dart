@@ -1,7 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/store/edit_products/edit_product_info.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -24,7 +23,6 @@ class EditProducts extends StatefulWidget {
 
 class _EditProductsState extends State<EditProducts> {
   dynamic _products = {};
-  dynamic _selected = {};
   bool loading = false;
   TextEditingController leftOverController = TextEditingController();
 
@@ -147,14 +145,20 @@ class _EditProductsState extends State<EditProducts> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12)),
                         child: _products[index]["visibility"]
-                            ? CachedImage(
-                                image:
-                                    "${URL.AWS}/products/${data["id"]}/small/1.png")
+                            ? Image.network(
+                                "${URL.AWS}/products/${data["id"]}/small/1.png")
+
+                            // CachedImage(
+                            //     image:
+                            //         "${URL.AWS}/products/${data["id"]}/small/1.png")
                             : Stack(
                                 children: [
-                                  CachedImage(
-                                      image:
-                                          "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                                  Image.network(errorBuilder:
+                                      (context, error, stackTrace) {
+                                    return const Image(
+                                        image: AssetImage(
+                                            "assets/images/png/no_image.png"));
+                                  }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
                                   Positioned.fill(
                                     child: Container(
                                       decoration: BoxDecoration(

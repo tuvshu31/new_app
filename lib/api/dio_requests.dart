@@ -163,7 +163,13 @@ class RestApi {
 
   //Зураг оруулах
   Future uploadImage(String type, int id, dynamic body) async {
-    return DioClient().sendFile("$type/$id/photo", Method.put, body);
+    return DioClient().sendFile("$type/$id/uploadphoto", Method.post, body);
+  }
+
+  //Зураг устгах
+  Future deleteImage(String type, int id) async {
+    return DioClient()
+        .sendRequest("$type/$id/deletephoto", Method.delete, [], {});
   }
 
   Future sendAuthCode(String phone, String code) async {

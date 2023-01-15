@@ -3,6 +3,7 @@ import 'package:Erdenet24/screens/store/edit_products/edit_products.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class AddProducts extends StatefulWidget {
   const AddProducts({Key? key}) : super(key: key);
@@ -12,6 +13,11 @@ class AddProducts extends StatefulWidget {
 }
 
 class _AddProductsState extends State<AddProducts> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   PageController pageController = PageController(initialPage: 0);
 
   @override

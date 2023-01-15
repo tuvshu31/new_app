@@ -177,6 +177,7 @@ class _CustomImagePickerState extends State<CustomImagePicker> {
                             setState(() {
                               _helpCtrl.chosenImage
                                   .remove(_helpCtrl.chosenImage[index]);
+                              print(_helpCtrl.chosenImage);
                             });
                           },
                           child: Icon(
