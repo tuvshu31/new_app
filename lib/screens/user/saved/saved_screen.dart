@@ -28,8 +28,8 @@ class _SavedScreenState extends State<SavedScreen> {
   int page = 1;
   dynamic saved = [];
   bool hasMore = true;
+  dynamic closedStoreList = [];
   final _cartCtrl = Get.put(CartController());
-  final _prodCtrl = Get.put(ProductController());
 
   void getUserProducts() async {
     loading = true;
@@ -37,6 +37,7 @@ class _SavedScreenState extends State<SavedScreen> {
         await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
     dynamic d = Map<String, dynamic>.from(response);
     saved = saved + d['data'];
+    closedStoreList = d["closedStoreList"];
     if (d["data"].length < d["pagination"]["limit"]) {
       hasMore = false;
     }
@@ -66,8 +67,6 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     super.initState();
     getUserProducts();
-    print(Get.width);
-    print(Get.height);
   }
 
   @override
@@ -88,6 +87,9 @@ class _SavedScreenState extends State<SavedScreen> {
                   if (saved.length == 0) {
                     return MyShimmers().listView();
                   } else {
+                    bool storeClosed = closedStoreList
+                        .any((el) => el == int.parse(saved[index]["store"]));
+                    bool notVisible = !saved[index]["visibility"];
                     return Container(
                       margin: EdgeInsets.all(Get.width * .03),
                       height: Get.height * .13,
@@ -96,12 +98,16 @@ class _SavedScreenState extends State<SavedScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           GestureDetector(
-                            onTap: () => Get.toNamed(
-                              '/ProductsRoute',
-                              arguments: {
-                                "data": saved[index],
-                              },
-                            ),
+                            onTap: () {
+                              storeClosed || notVisible
+                                  ? null
+                                  : Get.toNamed(
+                                      '/ProductsRoute',
+                                      arguments: {
+                                        "data": saved[index],
+                                      },
+                                    );
+                            },
                             child: Hero(
                               tag: saved[index],
                               transitionOnUserGestures: true,
@@ -111,9 +117,11 @@ class _SavedScreenState extends State<SavedScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: CachedImage(
-                                    image:
-                                        "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
+                                child: _imageHandler(storeClosed, notVisible,
+                                    saved[index]["id"]),
+                                // child: CachedImage(
+                                //     image:
+                                //         "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
                               ),
                             ),
                           ),
@@ -126,7 +134,9 @@ class _SavedScreenState extends State<SavedScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText(
-                                    text: saved[index]["name"],
+                                    text: storeClosed
+                                        ? "Store closed"
+                                        : saved[index]["name"],
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   CustomText(
@@ -170,16 +180,24 @@ class _SavedScreenState extends State<SavedScreen> {
                                                 alignment:
                                                     Alignment.centerLeft),
                                             onPressed: () {
-                                              _cartCtrl.addProduct(
-                                                  saved[index], context);
+                                              storeClosed || notVisible
+                                                  ? null
+                                                  : _cartCtrl.addProduct(
+                                                      saved[index], context);
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               IconlyLight.buy,
                                               size: 16,
+                                              color: storeClosed || notVisible
+                                                  ? MyColors.gray
+                                                  : MyColors.black,
                                             ),
-                                            label: const CustomText(
+                                            label: CustomText(
                                               text: "Сагслах",
                                               fontSize: 12,
+                                              color: storeClosed || notVisible
+                                                  ? MyColors.gray
+                                                  : MyColors.black,
                                             ),
                                           ),
                                           SizedBox(width: Get.width * .03),
@@ -227,5 +245,59 @@ class _SavedScreenState extends State<SavedScreen> {
                     );
                   }
                 }));
+  }
+
+  Widget _imageHandler(bool storeClosed, bool notVisible, int id) {
+    if (storeClosed) {
+      return Stack(
+        children: [
+          Image.network(errorBuilder: (context, error, stackTrace) {
+            return const Image(
+                image: AssetImage("assets/images/png/no_image.png"));
+          }, "${URL.AWS}/products/$id/small/1.png"),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: MyColors.black.withOpacity(0.5)),
+              child: Center(
+                  child: CustomText(
+                text: "Дэлгүүр хаасан",
+                textAlign: TextAlign.center,
+                color: MyColors.white,
+                fontSize: 14,
+              )),
+            ),
+          ),
+        ],
+      );
+    } else if (notVisible) {
+      return Stack(
+        children: [
+          Image.network(errorBuilder: (context, error, stackTrace) {
+            return const Image(
+                image: AssetImage("assets/images/png/no_image.png"));
+          }, "${URL.AWS}/products/$id/small/1.png"),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: MyColors.black.withOpacity(0.5)),
+              child: Center(
+                  child: CustomText(
+                text: "Дууссан",
+                textAlign: TextAlign.center,
+                color: MyColors.white,
+                fontSize: 14,
+              )),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Image.network(errorBuilder: (context, error, stackTrace) {
+        return const Image(image: AssetImage("assets/images/png/no_image.png"));
+      }, "${URL.AWS}/products/$id/small/1.png");
+    }
   }
 }

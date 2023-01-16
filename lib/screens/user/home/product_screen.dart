@@ -114,8 +114,8 @@ class _ProductScreenNewState extends State<ProductScreenNew> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
-                                color: MyColors.black.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(4)),
+                                color: MyColors.black.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(25)),
                             child: CustomText(
                               text: "$scrollIndex/${list.length}",
                               color: MyColors.white,

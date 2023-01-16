@@ -1,10 +1,13 @@
 import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/order/order.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/separator.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +26,41 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   int userId = RestApiHelper.getUserId();
+  dynamic closedStoreList = [];
+  bool productsAreOk = true;
   final _cartCtrl = Get.put(CartController());
   @override
   void initState() {
     super.initState();
+  }
+
+  bool storeClosed(storeId) {
+    return closedStoreList.any((el) => el == int.parse(storeId));
+  }
+
+  void getUserProducts() async {
+    loadingDialog(context);
+    dynamic response =
+        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"]) {
+      closedStoreList = d["closedStoreList"];
+      for (var element in _cartCtrl.cartList) {
+        closedStoreList.any((e) => e == int.parse(element["store"]))
+            ? element["storeOpen"] = false
+            : null;
+      }
+      productsAreOk = !_cartCtrl.cartList.any((element) =>
+          element["storeOpen"] == false || element["visibility"] == false);
+      setState(() {});
+      if (productsAreOk) {
+        Get.to(() => const Order());
+      } else {
+        errorSnackBar("Худалдан авах боломжгүй бараанууд байна", 4, context);
+      }
+    }
+
+    Get.back();
   }
 
   @override
@@ -76,9 +110,8 @@ class _CartScreenState extends State<CartScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: CachedImage(
-                                          image:
-                                              "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                                      child: _imageHandler(!data["storeOpen"],
+                                          !data["visibility"], data["id"]),
                                     ),
                                   ),
                                 ),
@@ -300,7 +333,7 @@ class _CartScreenState extends State<CartScreen> {
           Expanded(
             child: CustomButton(
               onPressed: () {
-                Get.to(() => Order());
+                getUserProducts();
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",
@@ -369,5 +402,59 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
     ));
+  }
+
+  Widget _imageHandler(bool storeClosed, bool notVisible, int id) {
+    if (storeClosed) {
+      return Stack(
+        children: [
+          Image.network(errorBuilder: (context, error, stackTrace) {
+            return const Image(
+                image: AssetImage("assets/images/png/no_image.png"));
+          }, "${URL.AWS}/products/$id/small/1.png"),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: MyColors.black.withOpacity(0.5)),
+              child: Center(
+                  child: CustomText(
+                text: "Дэлгүүр хаасан",
+                textAlign: TextAlign.center,
+                color: MyColors.white,
+                fontSize: 14,
+              )),
+            ),
+          ),
+        ],
+      );
+    } else if (notVisible) {
+      return Stack(
+        children: [
+          Image.network(errorBuilder: (context, error, stackTrace) {
+            return const Image(
+                image: AssetImage("assets/images/png/no_image.png"));
+          }, "${URL.AWS}/products/$id/small/1.png"),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: MyColors.black.withOpacity(0.5)),
+              child: Center(
+                  child: CustomText(
+                text: "Дууссан",
+                textAlign: TextAlign.center,
+                color: MyColors.white,
+                fontSize: 14,
+              )),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Image.network(errorBuilder: (context, error, stackTrace) {
+        return const Image(image: AssetImage("assets/images/png/no_image.png"));
+      }, "${URL.AWS}/products/$id/small/1.png");
+    }
   }
 }

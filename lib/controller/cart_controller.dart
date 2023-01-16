@@ -12,6 +12,7 @@ class CartController extends GetxController {
   var cartList = [].obs;
   var storeList = [].obs;
   var savedList = [].obs;
+  var closedStoreList = [].obs;
 
   void addProduct(product, context) {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
@@ -38,9 +39,9 @@ class CartController extends GetxController {
     dynamic response =
         await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
     dynamic d = Map<String, dynamic>.from(response);
-    for (dynamic i in d["data"]) {
-      savedList.add(i["id"]);
-    }
+    savedList.value = d["savedProductsIdList"];
+    closedStoreList.value = d["closedStoreList"];
+    print(d);
   }
 
   void getUserInfo() async {}
