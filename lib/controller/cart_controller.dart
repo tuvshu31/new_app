@@ -17,6 +17,7 @@ class CartController extends GetxController {
   void addProduct(product, context) {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
     var n = storeList.indexWhere((e) => e == product["store"]);
+    product["storeClosed"] = false;
     if (i > -1) {
       cartList[i]["quantity"] += 1;
       successSnackBar("Сагсанд нэмэгдлээ", 3, context);
