@@ -29,10 +29,6 @@ class _CartScreenState extends State<CartScreen> {
   dynamic closedStoreList = [];
   bool productsAreOk = true;
   final _cartCtrl = Get.put(CartController());
-  @override
-  void initState() {
-    super.initState();
-  }
 
   void getUserProducts() async {
     loadingDialog(context);
@@ -40,22 +36,27 @@ class _CartScreenState extends State<CartScreen> {
         await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
-      closedStoreList = d["closedStoreList"];
-      for (var element in _cartCtrl.cartList) {
-        closedStoreList.any((e) => e == int.parse(element["store"]))
-            ? element["storeOpen"] = false
-            : null;
+      setState(() {
+        closedStoreList = d["closedStoreList"];
+      });
+      if (closedStoreList.isNotEmpty) {
+        for (var element in _cartCtrl.cartList) {
+          closedStoreList.any((e) => e == int.parse(element["store"]))
+              ? element["storeClosed"] = true
+              : element["storeClosed"] = false;
+        }
       }
       // productsAreOk = !_cartCtrl.cartList.any((element) =>
       //     element["storeOpen"] == false || element["visibility"] == false);
-      setState(() {});
-      if (productsAreOk) {
-        Get.to(() => const Order());
-      } else {
-        errorSnackBar("Худалдан авах боломжгүй бараанууд байна", 4, context);
-      }
+      // if (productsAreOk) {
+      //   Get.to(() => const Order());
+      // } else {
+      //   errorSnackBar("Худалдан авах боломжгүй бараанууд байна", 4, context);
+      // }
     }
-
+    var query = {"id": []};
+    dynamic products = await RestApi().getProducts(query);
+    dynamic productResponse = Map<String, dynamic>.from(products);
     Get.back();
   }
 
@@ -106,8 +107,7 @@ class _CartScreenState extends State<CartScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: _imageHandler(!data["visibility"],
-                                          !data["visibility"], data["id"]),
+                                      child: _imageHandler(data),
                                     ),
                                   ),
                                 ),
@@ -400,20 +400,20 @@ class _CartScreenState extends State<CartScreen> {
     ));
   }
 
-  Widget _imageHandler(bool storeClosed, bool notVisible, int id) {
-    if (storeClosed) {
+  Widget _imageHandler(data) {
+    if (data["storeClosed"]) {
       return Stack(
         children: [
           Image.network(errorBuilder: (context, error, stackTrace) {
             return const Image(
                 image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/$id/small/1.png"),
+          }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: MyColors.black.withOpacity(0.5)),
-              child: Center(
+              child: const Center(
                   child: CustomText(
                 text: "Дэлгүүр хаасан",
                 textAlign: TextAlign.center,
@@ -424,13 +424,13 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       );
-    } else if (notVisible) {
+    } else if (!data["visible"]) {
       return Stack(
         children: [
           Image.network(errorBuilder: (context, error, stackTrace) {
             return const Image(
                 image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/$id/small/1.png"),
+          }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -450,7 +450,7 @@ class _CartScreenState extends State<CartScreen> {
     } else {
       return Image.network(errorBuilder: (context, error, stackTrace) {
         return const Image(image: AssetImage("assets/images/png/no_image.png"));
-      }, "${URL.AWS}/products/$id/small/1.png");
+      }, "${URL.AWS}/products/${data["id"]}/small/1.png");
     }
   }
 }
