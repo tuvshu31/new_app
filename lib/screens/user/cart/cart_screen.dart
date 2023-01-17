@@ -34,10 +34,6 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
   }
 
-  bool storeClosed(storeId) {
-    return closedStoreList.any((el) => el == int.parse(storeId));
-  }
-
   void getUserProducts() async {
     loadingDialog(context);
     dynamic response =
@@ -50,8 +46,8 @@ class _CartScreenState extends State<CartScreen> {
             ? element["storeOpen"] = false
             : null;
       }
-      productsAreOk = !_cartCtrl.cartList.any((element) =>
-          element["storeOpen"] == false || element["visibility"] == false);
+      // productsAreOk = !_cartCtrl.cartList.any((element) =>
+      //     element["storeOpen"] == false || element["visibility"] == false);
       setState(() {});
       if (productsAreOk) {
         Get.to(() => const Order());
@@ -110,7 +106,7 @@ class _CartScreenState extends State<CartScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: _imageHandler(!data["storeOpen"],
+                                      child: _imageHandler(!data["visibility"],
                                           !data["visibility"], data["id"]),
                                     ),
                                   ),
