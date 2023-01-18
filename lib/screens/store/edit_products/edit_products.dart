@@ -35,7 +35,7 @@ class _EditProductsState extends State<EditProducts> {
   Future<void> getUserProducts() async {
     loading = true;
     var query = {"store": RestApiHelper.getUserId()};
-    dynamic products = await RestApi().getProducts(query);
+    dynamic products = await RestApi().getStoreProducts(query);
     dynamic data = Map<String, dynamic>.from(products);
     loading = false;
     if (data["success"]) {

@@ -36,9 +36,14 @@ class RestApi {
     return DioClient().sendRequest('categories/$id', Method.delete, [], {});
   }
 
-  //Бүх бараануудыг авах
+  //Хэрэглэгч бүх бараануудыг авах
   Future getProducts(dynamic query) async {
     return DioClient().sendRequest('products', Method.get, [], query);
+  }
+
+  //Дэлгүүр бүх бараануудыг авах
+  Future getStoreProducts(dynamic query) async {
+    return DioClient().sendRequest('products/store', Method.get, [], query);
   }
 
   //Бараа үүсгэх

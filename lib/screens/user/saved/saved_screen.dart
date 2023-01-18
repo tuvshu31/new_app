@@ -262,7 +262,7 @@ class _SavedScreenState extends State<SavedScreen> {
                   color: MyColors.black.withOpacity(0.5)),
               child: Center(
                   child: CustomText(
-                text: "Дэлгүүр хаасан",
+                text: "Дэлгүүр \ хаасан",
                 textAlign: TextAlign.center,
                 color: MyColors.white,
                 fontSize: 14,
