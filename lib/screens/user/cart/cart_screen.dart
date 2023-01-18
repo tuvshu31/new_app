@@ -107,7 +107,13 @@ class _CartScreenState extends State<CartScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: _imageHandler(data),
+                                      // child: _imageHandler(data),
+                                      child: Image.network(errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Image(
+                                            image: AssetImage(
+                                                "assets/images/png/no_image.png"));
+                                      }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
                                     ),
                                   ),
                                 ),
@@ -329,7 +335,8 @@ class _CartScreenState extends State<CartScreen> {
           Expanded(
             child: CustomButton(
               onPressed: () {
-                getUserProducts();
+                // getUserProducts();
+                Get.to(() => const Order());
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",
