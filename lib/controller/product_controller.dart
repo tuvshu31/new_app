@@ -44,4 +44,23 @@ class ProductController extends GetxController {
     categoryId.value = index;
     callProducts();
   }
+
+  // static Future<CardItem> getRecentCreatedCard() async {
+  //   var res = await RestApi().getCards({
+  //     'order': 'most_recent',
+  //     'order_up': 1,
+  //     'filter': "",
+  //     'filter_type': 'all',
+  //     'more': false,
+  //     'page': 1,
+  //     'page_size': 1,
+  //     'folder_type': false,
+  //     'folder_id': false,
+  //   });
+  //   dynamic data = Map<String, dynamic>.from(json.decode(res.data));
+  //   if (data['cards'] == null) {
+  //     return CardItem();
+  //   }
+  //   return CardItem.fromJson(data['cards'][0]);
+  // }
 }

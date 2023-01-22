@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/screens/driver/driver_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import 'package:Erdenet24/utils/helpers.dart';
@@ -80,6 +81,7 @@ class _OtpScreenState extends State<OtpScreen> {
     dynamic response =
         await RestApi().checkUser(_loginCtrl.phoneController.text);
     dynamic data = Map<String, dynamic>.from(response);
+    log(data.toString());
     if (data["success"] &&
         data["role"] != "test" &&
         _loginCtrl.verifyCode.value == int.parse(pinCode)) {
@@ -98,6 +100,10 @@ class _OtpScreenState extends State<OtpScreen> {
           case "user":
             putUserIntoBox(data["userId"], "user");
             Get.offAll(const MainScreen());
+            break;
+          case "driver":
+            putUserIntoBox(data["driverId"], "driver");
+            Get.offAll(const DriverScreen());
             break;
         }
       } else {

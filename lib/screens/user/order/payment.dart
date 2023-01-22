@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/user/order/notification.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -11,6 +12,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -25,6 +27,8 @@ class _OrderPaymentViewState extends State<OrderPaymentView> {
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   final _incoming = Get.arguments;
+
+  final _notifications = FlutterLocalNotificationsPlugin();
 
   PageController pageController = PageController(initialPage: 0);
   List bankList = [
@@ -154,7 +158,8 @@ class _OrderPaymentViewState extends State<OrderPaymentView> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        createOrder();
+                        // createOrder();
+                        Get.to(Notifications());
                       }),
                       child: Center(
                         child: Column(
