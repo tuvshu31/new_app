@@ -18,14 +18,16 @@ import 'package:iconly/iconly.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-class StoreAddScreen extends StatefulWidget {
-  const StoreAddScreen({Key? key}) : super(key: key);
+class UserProfileAdminStoreScreen extends StatefulWidget {
+  const UserProfileAdminStoreScreen({Key? key}) : super(key: key);
 
   @override
-  State<StoreAddScreen> createState() => _StoreAddScreenState();
+  State<UserProfileAdminStoreScreen> createState() =>
+      _UserProfileAdminStoreScreenState();
 }
 
-class _StoreAddScreenState extends State<StoreAddScreen> {
+class _UserProfileAdminStoreScreenState
+    extends State<UserProfileAdminStoreScreen> {
   XFile? _pickedFile;
   CroppedFile? _croppedFile;
   final Widget _divider = const Divider(height: 0.7, color: MyColors.grey);

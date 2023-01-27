@@ -2,7 +2,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/order/payment.dart';
+import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -15,14 +15,14 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-class Order extends StatefulWidget {
-  const Order({super.key});
+class UserOrderMainScreen extends StatefulWidget {
+  const UserOrderMainScreen({super.key});
 
   @override
-  State<Order> createState() => _OrderState();
+  State<UserOrderMainScreen> createState() => _UserOrderMainScreenState();
 }
 
-class _OrderState extends State<Order> {
+class _UserOrderMainScreenState extends State<UserOrderMainScreen> {
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   bool isPhoneOk = false;
@@ -196,7 +196,7 @@ class _OrderState extends State<Order> {
             text: "Төлбөр төлөх",
             isActive: isPhoneOk && isAddressOk,
             onPressed: () {
-              Get.to(() => const OrderPaymentView(), arguments: {
+              Get.to(() => const UserOrderPaymentScreen(), arguments: {
                 "phone": phone.text,
                 "address": address.text,
                 "kode": kod.text

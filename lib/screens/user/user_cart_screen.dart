@@ -1,13 +1,10 @@
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
-import 'package:Erdenet24/screens/user/order/order.dart';
+import 'package:Erdenet24/screens/user/user_order_main_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/separator.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -17,14 +14,14 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:iconly/iconly.dart';
 
-class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+class UserCartScreen extends StatefulWidget {
+  const UserCartScreen({Key? key}) : super(key: key);
 
   @override
-  State<CartScreen> createState() => _CartScreenState();
+  State<UserCartScreen> createState() => _UserCartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _UserCartScreenState extends State<UserCartScreen> {
   int userId = RestApiHelper.getUserId();
   dynamic closedStoreList = [];
   bool productsAreOk = true;
@@ -336,7 +333,7 @@ class _CartScreenState extends State<CartScreen> {
             child: CustomButton(
               onPressed: () {
                 // getUserProducts();
-                Get.to(() => const Order());
+                Get.to(() => const UserOrderMainScreen());
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",

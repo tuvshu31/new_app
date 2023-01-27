@@ -1,14 +1,16 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-class Notifications extends StatefulWidget {
-  const Notifications({super.key});
+class UserOrderNotificationScreen extends StatefulWidget {
+  const UserOrderNotificationScreen({super.key});
 
   @override
-  State<Notifications> createState() => _NotificationsState();
+  State<UserOrderNotificationScreen> createState() =>
+      _UserOrderNotificationScreenState();
 }
 
-class _NotificationsState extends State<Notifications> {
+class _UserOrderNotificationScreenState
+    extends State<UserOrderNotificationScreen> {
   String messageTitle = "Empty";
   String notificationAlert = "alert";
 
@@ -17,7 +19,7 @@ class _NotificationsState extends State<Notifications> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notifications"),
+        title: Text("Notification"),
       ),
       body: Center(
         child: Column(

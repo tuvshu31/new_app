@@ -1,5 +1,5 @@
-import 'package:Erdenet24/screens/user/profile/user/orders/going_orders.dart';
-import 'package:Erdenet24/screens/user/profile/user/orders/order_history.dart';
+import 'package:Erdenet24/screens/profile/user/orders/going_orders.dart';
+import 'package:Erdenet24/screens/profile/user/orders/order_history.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';

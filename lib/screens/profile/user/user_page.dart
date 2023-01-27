@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/screens/user/profile/user/address/address.dart';
-import 'package:Erdenet24/screens/user/profile/user/help/help.dart';
-import 'package:Erdenet24/screens/user/profile/user/orders/user_orders.dart';
-import 'package:Erdenet24/screens/user/profile/user/phone/phone.dart';
+import 'package:Erdenet24/screens/profile/user/address/address.dart';
+import 'package:Erdenet24/screens/profile/user/help/help.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_orders.dart';
+import 'package:Erdenet24/screens/profile/user/phone/phone.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';

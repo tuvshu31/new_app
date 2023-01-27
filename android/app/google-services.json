@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "1061559486432",
-    "project_id": "notify-4164b",
-    "storage_bucket": "notify-4164b.appspot.com"
+    "project_number": "728639701348",
+    "project_id": "notifications-779ae",
+    "storage_bucket": "notifications-779ae.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1061559486432:android:b99d527743a6d0e42e0d85",
+        "mobilesdk_app_id": "1:728639701348:android:0efab1df78cdc1c65e3a71",
         "android_client_info": {
           "package_name": "mn.et24"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1061559486432-beolr4g2lmts9pgmrvd60goc8o6ebgin.apps.googleusercontent.com",
+          "client_id": "728639701348-h13hj7vjk76nf4sduf0njnf1mmectkp3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDLgEs6E9NaPtNanOXz9B59IrjOUAMnMKM"
+          "current_key": "AIzaSyAUFtZ6RitkRhZtLw9hiQZVDozt52ZZ-7g"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1061559486432-beolr4g2lmts9pgmrvd60goc8o6ebgin.apps.googleusercontent.com",
+              "client_id": "728639701348-h13hj7vjk76nf4sduf0njnf1mmectkp3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

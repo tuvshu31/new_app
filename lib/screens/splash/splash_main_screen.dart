@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/splash/phone_register.dart';
+import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+class SplashMainScreen extends StatefulWidget {
+  const SplashMainScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<SplashMainScreen> createState() => _SplashMainScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashMainScreenState extends State<SplashMainScreen> {
   @override
   void initState() {
     super.initState();
@@ -21,7 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(seconds: 5),
       () => Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PhoneRegister()),
+        MaterialPageRoute(
+            builder: (context) => const SplashPhoneRegisterScreen()),
       ),
     );
   }

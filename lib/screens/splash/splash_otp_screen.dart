@@ -18,14 +18,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+class SplashOtpScreen extends StatefulWidget {
+  const SplashOtpScreen({super.key});
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  State<SplashOtpScreen> createState() => _SplashOtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _SplashOtpScreenState extends State<SplashOtpScreen> {
   var pinCode = "";
   dynamic user = [];
   String loginType = "";

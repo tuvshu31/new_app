@@ -1,4 +1,4 @@
-package com.example.Erdenet24
+package mn.et24
 
 import io.flutter.embedding.android.FlutterActivity
 

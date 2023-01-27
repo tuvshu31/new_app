@@ -16,14 +16,15 @@ import 'package:iconly/iconly.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-class CreateCategory extends StatefulWidget {
-  const CreateCategory({Key? key}) : super(key: key);
+class AdminCreateCategoryScreen extends StatefulWidget {
+  const AdminCreateCategoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<CreateCategory> createState() => _CreateCategoryState();
+  State<AdminCreateCategoryScreen> createState() =>
+      _AdminCreateCategoryScreenState();
 }
 
-class _CreateCategoryState extends State<CreateCategory> {
+class _AdminCreateCategoryScreenState extends State<AdminCreateCategoryScreen> {
   XFile? _pickedFile;
   CroppedFile? _croppedFile;
   dynamic _category = [];
@@ -53,13 +54,13 @@ class _CreateCategoryState extends State<CreateCategory> {
       "name": _catName.text,
       "parentId": _pickedData["parentId"],
     };
-    dynamic response = await RestApi().createCategory(_body);
-    dynamic data = Map<String, dynamic>.from(response);
+    // dynamic response = await RestApi().AdminCreateCategoryScreen(_body);
+    // dynamic data = Map<String, dynamic>.from(response);
 
-    if (data["success"] && _croppedFile != null) {
-      await RestApi().uploadImage(
-          "categories", data["data"]["id"], File(_croppedFile!.path));
-    }
+    // if (data["success"] && _croppedFile != null) {
+    //   await RestApi().uploadImage(
+    //       "categories", data["data"]["id"], File(_croppedFile!.path));
+    // }
 
     _loading = false;
     setState(() {});

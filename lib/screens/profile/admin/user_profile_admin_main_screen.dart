@@ -1,6 +1,5 @@
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/user/profile/admin/create_category.dart';
-import 'package:Erdenet24/screens/user/profile/admin/store_screen.dart';
+import 'package:Erdenet24/screens/admin/admin_create_category_screen.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
@@ -12,14 +11,16 @@ import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 
-class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+class UserProfileAdminMainScreen extends StatefulWidget {
+  const UserProfileAdminMainScreen({Key? key}) : super(key: key);
 
   @override
-  State<AdminPage> createState() => _AdminPageState();
+  State<UserProfileAdminMainScreen> createState() =>
+      _UserProfileAdminMainScreenState();
 }
 
-class _AdminPageState extends State<AdminPage> {
+class _UserProfileAdminMainScreenState
+    extends State<UserProfileAdminMainScreen> {
   int _userId = 0;
   final TextEditingController _phone = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -99,13 +100,13 @@ class _AdminPageState extends State<AdminPage> {
                   IconlyLight.add_user,
                   "Дэлгүүр үүсгэх",
                   "Шинээр дэлгүүр нэмэх",
-                  () => Get.to(() => const StoreAddScreen())),
+                  () => Get.to(() {})),
               _divider,
               _listItem(IconlyLight.calendar, "Захиалгууд харах",
                   "Бүх захиалгууд харах", () => Get.to(() {})),
               _divider,
               _listItem(IconlyLight.plus, "Ангилал нэмэх", "Шинэ ангилал нэмэх",
-                  () => Get.to(() => const CreateCategory())),
+                  () => Get.to(() => const AdminCreateCategoryScreen())),
               _divider,
               // _listItem(IconlyLight.setting, "Ангилал засах", "Засах, устгах",
               //     () => Get.to("")),

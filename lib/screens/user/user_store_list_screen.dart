@@ -17,14 +17,14 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:iconly/iconly.dart';
 
-class StoreScreen extends StatefulWidget {
-  const StoreScreen({Key? key}) : super(key: key);
+class UserStoreListScreen extends StatefulWidget {
+  const UserStoreListScreen({Key? key}) : super(key: key);
 
   @override
-  State<StoreScreen> createState() => _StoreScreenState();
+  State<UserStoreListScreen> createState() => _UserStoreListScreenState();
 }
 
-class _StoreScreenState extends State<StoreScreen> {
+class _UserStoreListScreenState extends State<UserStoreListScreen> {
   dynamic _tabItems = [];
   bool loading = false;
   dynamic storeList = [];

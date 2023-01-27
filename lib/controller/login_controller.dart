@@ -2,7 +2,7 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:get/get.dart';
 import '../api/restapi_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:Erdenet24/screens/splash/phone_register.dart';
+import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
   final _cartCtrl = Get.put(CartController());
@@ -13,6 +13,6 @@ class LoginController extends GetxController {
     RestApiHelper.saveUserId(0);
     RestApiHelper.saveUserRole("");
     _cartCtrl.savedList.clear();
-    Get.offAll(() => const PhoneRegister());
+    Get.offAll(() => const SplashPhoneRegisterScreen());
   }
 }

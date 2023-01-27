@@ -16,14 +16,14 @@ import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:iconly/iconly.dart';
 
-class SavedScreen extends StatefulWidget {
-  const SavedScreen({Key? key}) : super(key: key);
+class UserSavedScreen extends StatefulWidget {
+  const UserSavedScreen({Key? key}) : super(key: key);
 
   @override
-  State<SavedScreen> createState() => _SavedScreenState();
+  State<UserSavedScreen> createState() => _UserSavedScreenState();
 }
 
-class _SavedScreenState extends State<SavedScreen> {
+class _UserSavedScreenState extends State<UserSavedScreen> {
   bool loading = false;
   int page = 1;
   dynamic saved = [];

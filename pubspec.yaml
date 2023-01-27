@@ -84,6 +84,7 @@ dependencies:
   firebase_core: ^2.4.1
   firebase_messaging: ^14.2.1
   google_maps_flutter: ^2.2.3
+  geolocator: ^9.0.2
 
 dev_dependencies:
   flutter_test:
@@ -101,7 +102,9 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/icon/android.png"
+  image_path: "assets/images/icon/icon.png"
+  adaptive_icon_background: "#ff0002"
+  adaptive_icon_foreground: "assets/images/icon/icon_foreground.png"
 
 # The following section is specific to Flutter packages.
 flutter:

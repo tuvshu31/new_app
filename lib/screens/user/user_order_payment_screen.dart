@@ -3,7 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/order/notification.dart';
+import 'package:Erdenet24/screens/user/user_order_notification_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -16,14 +16,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class OrderPaymentView extends StatefulWidget {
-  const OrderPaymentView({Key? key}) : super(key: key);
+class UserOrderPaymentScreen extends StatefulWidget {
+  const UserOrderPaymentScreen({Key? key}) : super(key: key);
 
   @override
-  State<OrderPaymentView> createState() => _OrderPaymentViewState();
+  State<UserOrderPaymentScreen> createState() => _UserOrderPaymentScreenState();
 }
 
-class _OrderPaymentViewState extends State<OrderPaymentView> {
+class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   final _incoming = Get.arguments;
@@ -159,7 +159,7 @@ class _OrderPaymentViewState extends State<OrderPaymentView> {
                     child: CustomInkWell(
                       onTap: (() {
                         // createOrder();
-                        Get.to(Notifications());
+                        Get.to(const UserOrderNotificationScreen());
                       }),
                       child: Center(
                         child: Column(

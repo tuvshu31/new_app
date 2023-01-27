@@ -1,33 +1,56 @@
+import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_screen.dart';
-import 'package:Erdenet24/screens/splash/splash_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
-import 'package:Erdenet24/screens/user/cart/cart_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/category_products.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import 'package:Erdenet24/screens/user/home/subcategory_products.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/screens/user/home/search_screen.dart';
-import 'package:Erdenet24/screens/user/order/order.dart';
-import 'package:Erdenet24/screens/user/profile/user/user_settings.dart';
-import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/screens/profile/user/user_settings.dart';
+import 'package:Erdenet24/screens/user/user_order_main_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
+  if (Platform.isAndroid) {
+    GeolocatorAndroid.registerWith();
+  } else if (Platform.isIOS) {
+    // GeolocatorApple.registerWith();
+  }
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  print('User granted permission: ${settings.authorizationStatus}');
   runApp(const MyApp());
 }
 
@@ -108,23 +131,23 @@ class _MyAppState extends State<MyApp> {
         GetPage(
             name: "/",
             page: () => RestApiHelper.getUserId() == 0
-                ? const SplashScreen()
+                ? const SplashMainScreen()
                 : RestApiHelper.getUserRole() == "store"
                     ? const StorePage()
                     : RestApiHelper.getUserRole() == "user"
                         ? const MainScreen()
                         : RestApiHelper.getUserRole() == "driver"
                             ? const DriverScreen()
-                            : const SplashScreen()),
+                            : const SplashMainScreen()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
-        GetPage(name: "/CartRoute", page: () => const CartScreen()),
+        GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
         GetPage(name: "/CategoryRoute", page: () => const CategoryProducts()),
         GetPage(name: "/MainScreen", page: () => const MainScreen()),
         GetPage(
             name: "/CategoryNoTabbar", page: () => const SubCategoryProducts()),
         GetPage(name: "/ProductsRoute", page: () => const ProductScreenNew()),
         GetPage(name: "/SearchRoute", page: () => const SearchScreenMain()),
-        GetPage(name: "/OrdersRoute", page: () => const Order()),
+        GetPage(name: "/OrdersRoute", page: () => const UserOrderMainScreen()),
       ],
     );
   }

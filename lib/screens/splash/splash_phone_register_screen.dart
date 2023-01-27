@@ -1,6 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/splash/otp.dart';
+import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -14,14 +14,15 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-class PhoneRegister extends StatefulWidget {
-  const PhoneRegister({super.key});
+class SplashPhoneRegisterScreen extends StatefulWidget {
+  const SplashPhoneRegisterScreen({super.key});
 
   @override
-  State<PhoneRegister> createState() => _PhoneRegisterState();
+  State<SplashPhoneRegisterScreen> createState() =>
+      _SplashPhoneRegisterScreenState();
 }
 
-class _PhoneRegisterState extends State<PhoneRegister> {
+class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
   bool _phoneNumberOk = false;
   bool _privacyApproved = false;
   String _agreementText = "";
@@ -51,7 +52,7 @@ class _PhoneRegisterState extends State<PhoneRegister> {
         _loginCtrl.verifyCode.value.toString());
     Get.back();
     if (authCode[0]["Result"] == "SUCCESS") {
-      Get.to(() => const OtpScreen());
+      Get.to(() => const SplashOtpScreen());
     } else {
       errorSnackBar(
           "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);

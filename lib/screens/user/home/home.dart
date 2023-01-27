@@ -4,12 +4,12 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/cart/cart_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/navigation_drawer.dart';
 import 'package:Erdenet24/screens/user/home/search.dart';
-import 'package:Erdenet24/screens/user/profile/profile.dart';
-import 'package:Erdenet24/screens/user/saved/saved_screen.dart';
-import 'package:Erdenet24/screens/user/store/store_screen.dart';
+import 'package:Erdenet24/screens/profile/profile.dart';
+import 'package:Erdenet24/screens/user/user_saved_screen.dart';
+import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -49,9 +49,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final List<Widget> _body = [
       HomeScreen(leadingOnTap: _scaffoldKey),
-      const StoreScreen(),
-      const CartScreen(),
-      const SavedScreen(),
+      const UserStoreListScreen(),
+      const UserCartScreen(),
+      const UserSavedScreen(),
       const ProfileScreen()
     ];
 
