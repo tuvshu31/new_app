@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
@@ -23,13 +21,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:upgrader/upgrader.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();
@@ -39,18 +34,7 @@ void main() async {
   } else if (Platform.isIOS) {
     // GeolocatorApple.registerWith();
   }
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
 
-  print('User granted permission: ${settings.authorizationStatus}');
   runApp(const MyApp());
 }
 
@@ -128,17 +112,18 @@ class _MyAppState extends State<MyApp> {
       // defaultTransition: Transition.,
       theme: ThemeData(fontFamily: 'Nunito'),
       getPages: [
-        GetPage(
-            name: "/",
-            page: () => RestApiHelper.getUserId() == 0
-                ? const SplashMainScreen()
-                : RestApiHelper.getUserRole() == "store"
-                    ? const StorePage()
-                    : RestApiHelper.getUserRole() == "user"
-                        ? const MainScreen()
-                        : RestApiHelper.getUserRole() == "driver"
-                            ? const DriverScreen()
-                            : const SplashMainScreen()),
+        // GetPage(
+        //     name: "/",
+        //     page: () => RestApiHelper.getUserId() == 0
+        //         ? const SplashMainScreen()
+        //         : RestApiHelper.getUserRole() == "store"
+        //             ? const StorePage()
+        //             : RestApiHelper.getUserRole() == "user"
+        //                 ? const MainScreen()
+        //                 : RestApiHelper.getUserRole() == "driver"
+        //                     ? HomePage()
+        //                     : const SplashMainScreen()),
+        GetPage(name: "/", page: () => DriverScreen()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
         GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
         GetPage(name: "/CategoryRoute", page: () => const CategoryProducts()),

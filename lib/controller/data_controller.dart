@@ -1,5 +1,5 @@
 import 'package:Erdenet24/widgets/custom_dialogs.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
@@ -54,7 +54,7 @@ class DataController extends GetxController {
       loading.value = false;
       // CustomDialogs.showSuccessDialog(true,
       //     "Захиалгын мэдээллийг амжилттай хүлээн авлаа. Төлбөр төлөгдсөний дараа хүргэлт хийгдэхийг анхаарна уу");
-      final player = AudioCache();
+      // final player = AudioCache();
       // player.play("sounds/success_bell.wav");
     } on DioError {
       // CustomDialogs.showSuccessDialog(false,

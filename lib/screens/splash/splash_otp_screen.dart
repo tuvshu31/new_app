@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import 'package:Erdenet24/utils/helpers.dart';

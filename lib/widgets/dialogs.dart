@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/widgets/text.dart';
 
-final player = AudioCache();
+// final player = AudioCache();
 String message = "Hello";
 late AnimationController localAnimationController;
 void showLoadingDialog() {

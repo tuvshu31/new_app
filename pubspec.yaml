@@ -49,11 +49,9 @@ dependencies:
   flutter_spinkit:
   curved_navigation_bar:
   rename:
-  audioplayers:
   new_version:
   in_app_update:
   top_snackbar_flutter:
-  flutter_feather_icons:
   iconly:
   carousel_slider:
   flutter_easyloading:
@@ -81,10 +79,11 @@ dependencies:
   new_version_plus: ^0.0.3
   flutter_cache_manager: ^3.3.0
   flutter_local_notifications: ^13.0.0
-  firebase_core: ^2.4.1
-  firebase_messaging: ^14.2.1
   google_maps_flutter: ^2.2.3
   geolocator: ^9.0.2
+  audioplayers: ^3.0.0
+  swipebuttonflutter: ^1.0.0
+  flutter_animarker: ^3.2.0
 
 dev_dependencies:
   flutter_test:

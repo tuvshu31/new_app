@@ -61,8 +61,8 @@ class _StoreProductsState extends State<StoreProducts> {
         child: CustomHeader(
           customActions: IconButton(
             icon: Badge(
-              animationType: BadgeAnimationType.scale,
-              position: const BadgePosition(top: -12, end: -8),
+              badgeAnimation: BadgeAnimation.scale(),
+              position: BadgePosition.custom(top: -12, end: -8),
               badgeContent: CustomText(
                 text: _cartCtrl.cartList.length.toString(),
                 color: MyColors.white,

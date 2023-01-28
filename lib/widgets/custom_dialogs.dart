@@ -1,6 +1,6 @@
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,7 +29,7 @@ class CustomDialogs {
   }
 
   static Future<dynamic> showSuccessDialog(bool isSuccess, String middleText) {
-    final player = AudioCache();
+    // final player = AudioCache();
     // player
     //     .play(isSuccess ? "sounds/success_bell.wav" : "sounds/error_bell.wav");
     return Get.dialog(successdDialogBody(isSuccess, middleText),
