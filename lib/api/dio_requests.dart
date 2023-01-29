@@ -182,4 +182,3 @@ class RestApi {
         .sendMessage("send", phone, "Erdenet24 nevtrekh kod: $code");
   }
 }
-// ("users", data["data"]["id"], File(_croppedFile!.path));

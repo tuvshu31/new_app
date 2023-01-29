@@ -84,6 +84,7 @@ dependencies:
   audioplayers: ^3.0.0
   swipebuttonflutter: ^1.0.0
   flutter_animarker: ^3.2.0
+  flutter_polyline_points: ^1.0.0
 
 dev_dependencies:
   flutter_test:

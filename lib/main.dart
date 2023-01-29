@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Erdenet24/screens/driver/map_screen.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -123,7 +124,8 @@ class _MyAppState extends State<MyApp> {
         //                 : RestApiHelper.getUserRole() == "driver"
         //                     ? HomePage()
         //                     : const SplashMainScreen()),
-        GetPage(name: "/", page: () => DriverScreen()),
+        // GetPage(name: "/", page: () => DriverScreen()),
+        GetPage(name: "/", page: () => const MapSample()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
         GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
         GetPage(name: "/CategoryRoute", page: () => const CategoryProducts()),
