@@ -6,6 +6,7 @@ import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -16,12 +17,14 @@ import '../screens/driver/driver_screen_bottomsheet_views.dart';
 class DriverController extends GetxController {
   RxBool distanceCalculated = false.obs;
   RxBool acceptedTheDelivery = false.obs;
+  RxInt deliverySteps = 0.obs;
   RxString distance = "".obs;
   RxString duration = "".obs;
   RxList polylinePoints = [].obs;
   Rx<LatLng> origin = LatLng(49.028494366069474, 104.04692604155208).obs;
-  Rx<LatLng> destination = LatLng(47.80950865994985, 106.81740772677611).obs;
+  Rx<LatLng> destination = LatLng(49.02646128988077, 104.0399308405171).obs;
   RxBool isDriverActive = false.obs;
+  Rx<PageController> pageController = PageController().obs;
   int waitingSeconds = 30;
   Timer? countdownTimer;
   Duration myDuration = const Duration(hours: 3);
@@ -92,7 +95,7 @@ class DriverController extends GetxController {
     if (serviceEnabled) {
       var position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best);
-      // origin.value = LatLng(position.latitude, position.longitude);
+      origin.value = LatLng(position.latitude, position.longitude);
       final GoogleMapController controller =
           await googleMapController.value.future;
       controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -117,11 +120,26 @@ class DriverController extends GetxController {
     Get.back();
     distanceCalculated.value = false;
     countDownController.value.pause();
+    stopSound();
   }
 
-  void acceptDeliveryRequest() {
+  void acceptDeliveryRequest() async {
+    stopSound();
     Get.back();
+    distanceCalculated.value = false;
     acceptedTheDelivery.value = true;
-    arrivedAtRestaurant();
+    final GoogleMapController controller =
+        await googleMapController.value.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        bearing: -120, target: origin.value, zoom: 16, tilt: 32)));
+    trackDriversLocation();
+  }
+
+  void changePage(int value) {
+    pageController.value.animateToPage(
+      value,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.bounceInOut,
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
@@ -25,6 +26,7 @@ void stopSound() async {
 
 void incomingNewOrder() {
   playSound("incoming");
+  _driverCtx.countDownController.value.start();
   Get.bottomSheet(
     barrierColor: Colors.white.withOpacity(0.1),
     isDismissible: false,
@@ -40,6 +42,7 @@ void incomingNewOrder() {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CustomText(
+                    fontWeight: FontWeight.bold,
                     text:
                         "${_driverCtx.distance.value} km, ${_driverCtx.duration.value}"),
                 ListTile(
@@ -148,6 +151,7 @@ void incomingNewOrder() {
                   height: 50,
                   onSwipeCallback: () {
                     _driverCtx.acceptDeliveryRequest();
+                    _driverCtx.changePage(1);
                   },
                 ),
                 SizedBox(height: 24),
@@ -180,280 +184,271 @@ void incomingNewOrder() {
   );
 }
 
-void arrivedAtRestaurant() {
-  Get.bottomSheet(
-    barrierColor: Colors.white.withOpacity(0.1),
-    isDismissible: false,
-    SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.width * .06, vertical: Get.width * .06),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: CircleAvatar(
-                  backgroundImage: const NetworkImage(
-                      scale: 2,
-                      "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
-                ),
-                title: CustomText(
-                  text: "Modern Nomads restaurant",
-                  fontSize: 14,
-                ),
-                subtitle: CustomText(
-                  text: "Утас: +976-99921312",
-                  fontSize: 12,
-                ),
-                trailing: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image(
-                      image:
-                          AssetImage("assets/images/png/app/phone-call.png")),
-                ),
+Widget arrivedAtRestaurant() {
+  return Align(
+    alignment: Alignment.bottomCenter,
+    child: SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        color: MyColors.white,
+        padding: EdgeInsets.symmetric(
+            horizontal: Get.width * .06, vertical: Get.width * .06),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                backgroundImage: const NetworkImage(
+                    scale: 2,
+                    "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
               ),
-              const SizedBox(height: 24),
-              MySeparator(
-                color: MyColors.gray,
+              title: CustomText(
+                text: "Modern Nomads restaurant",
+                fontSize: 14,
               ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Ирлээ",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
-                ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                  receivedFromRestaurant();
-                },
-              ),
-              SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
-    ),
-    isScrollControlled: true,
-    ignoreSafeArea: false,
-  );
-}
-
-void receivedFromRestaurant() {
-  Get.bottomSheet(
-    barrierColor: Colors.white.withOpacity(0.1),
-    isDismissible: false,
-    SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.width * .06, vertical: Get.width * .06),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const CustomText(
-                text: "Баталгаажуулах код:",
-                color: MyColors.gray,
+              subtitle: CustomText(
+                text: "Утас: +976-99921312",
                 fontSize: 12,
               ),
-              const SizedBox(height: 8),
-              const CustomText(
-                text: "3728",
-                fontSize: 28,
+              trailing: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image(
+                    image: AssetImage("assets/images/png/app/phone-call.png")),
               ),
-              const SizedBox(height: 12),
-              const CustomText(
-                text: "15:00:00",
-                color: MyColors.success,
+            ),
+            const SizedBox(height: 24),
+            MySeparator(
+              color: MyColors.gray,
+            ),
+            const SizedBox(height: 24),
+            SwipingButton(
+              text: "Ирлээ",
+              buttonTextStyle: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.normal,
+                color: MyColors.white,
+                fontSize: 14,
               ),
-              const SizedBox(height: 24),
-              MySeparator(
-                color: MyColors.gray,
-              ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Хүлээн авсан",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
-                ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                  arrivedAtReceiver();
-                },
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+              swipeButtonColor: MyColors.primary,
+              height: 50,
+              onSwipeCallback: () {
+                _driverCtx.changePage(2);
+              },
+            ),
+            SizedBox(height: 24),
+          ],
         ),
       ),
     ),
-    isScrollControlled: true,
-    ignoreSafeArea: false,
   );
 }
 
-void arrivedAtReceiver() {
-  Get.bottomSheet(
-    barrierColor: Colors.white.withOpacity(0.1),
-    isDismissible: false,
-    SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.width * .06, vertical: Get.width * .06),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: MyColors.background,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        IconlyLight.user,
-                        size: 18,
-                      ),
+Widget receivedFromRestaurant() {
+  return Align(
+    alignment: Alignment.bottomCenter,
+    child: SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        color: MyColors.white,
+        padding: EdgeInsets.symmetric(
+            horizontal: Get.width * .06, vertical: Get.width * .06),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const CustomText(
+              text: "Баталгаажуулах код:",
+              color: MyColors.gray,
+              fontSize: 12,
+            ),
+            const SizedBox(height: 8),
+            const CustomText(
+              text: "3728",
+              fontSize: 28,
+            ),
+            const SizedBox(height: 12),
+            const CustomText(
+              text: "15:00:00",
+              color: MyColors.success,
+            ),
+            const SizedBox(height: 24),
+            MySeparator(
+              color: MyColors.gray,
+            ),
+            const SizedBox(height: 24),
+            SwipingButton(
+              text: "Хүлээн авсан",
+              buttonTextStyle: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.normal,
+                color: MyColors.white,
+                fontSize: 14,
+              ),
+              swipeButtonColor: MyColors.primary,
+              height: 50,
+              onSwipeCallback: () {
+                _driverCtx.changePage(3);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget arrivedAtReceiver() {
+  return Align(
+    alignment: Alignment.bottomCenter,
+    child: SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        color: MyColors.white,
+        padding: EdgeInsets.symmetric(
+            horizontal: Get.width * .06, vertical: Get.width * .06),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: MyColors.background,
+                      shape: BoxShape.circle,
                     ),
-                  ],
-                ),
-                title: CustomText(
-                  text: "Хүлээн авагч:",
-                  fontSize: 14,
-                ),
-                subtitle: CustomText(
-                  text: "4-р микр 24-р байр 31 тоот",
-                  fontSize: 12,
-                ),
-                trailing: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image(
-                      image:
-                          AssetImage("assets/images/png/app/phone-call.png")),
-                ),
+                    child: Icon(
+                      IconlyLight.user,
+                      size: 18,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              MySeparator(
-                color: MyColors.gray,
+              title: CustomText(
+                text: "Хүлээн авагч:",
+                fontSize: 14,
               ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Хүлээлгэн өгсөн",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
-                ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                  deliverySucceeded();
-                },
+              subtitle: CustomText(
+                text: "4-р микр 24-р байр 31 тоот",
+                fontSize: 12,
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+              trailing: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image(
+                    image: AssetImage("assets/images/png/app/phone-call.png")),
+              ),
+            ),
+            const SizedBox(height: 24),
+            MySeparator(
+              color: MyColors.gray,
+            ),
+            const SizedBox(height: 24),
+            SwipingButton(
+              text: "Хүлээлгэн өгсөн",
+              buttonTextStyle: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.normal,
+                color: MyColors.white,
+                fontSize: 14,
+              ),
+              swipeButtonColor: MyColors.primary,
+              height: 50,
+              onSwipeCallback: () {
+                _driverCtx.changePage(4);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     ),
-    isScrollControlled: true,
-    ignoreSafeArea: false,
   );
 }
 
-void deliverySucceeded() {
-  playSound("success_bell");
-  Get.bottomSheet(
-    barrierColor: Colors.white.withOpacity(0.1),
-    isDismissible: false,
-    SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.width * .06, vertical: Get.width * .06),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CustomText(text: "Хүргэлт амжилттай"),
-              SizedBox(height: 8),
-              CustomText(
-                fontSize: 28,
-                text: convertToCurrencyFormat(
-                  double.parse("3000"),
-                  toInt: true,
-                  locatedAtTheEnd: true,
+Widget deliverySucceeded() {
+  return Align(
+    alignment: Alignment.bottomCenter,
+    child: SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        color: MyColors.white,
+        padding: EdgeInsets.symmetric(
+            horizontal: Get.width * .06, vertical: Get.width * .06),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CustomText(text: "Хүргэлт амжилттай"),
+            SizedBox(height: 8),
+            CustomText(
+              fontSize: 28,
+              text: convertToCurrencyFormat(
+                double.parse("3000"),
+                toInt: true,
+                locatedAtTheEnd: true,
+              ),
+            ),
+            SizedBox(height: 8),
+            CustomText(text: "Орлого нэмэгдлээ"),
+            const SizedBox(height: 24),
+            MySeparator(
+              color: MyColors.gray,
+            ),
+            const SizedBox(height: 24),
+            SwipingButton(
+              text: "Үргэлжлүүлэх",
+              buttonTextStyle: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.normal,
+                color: MyColors.white,
+                fontSize: 14,
+              ),
+              swipeButtonColor: MyColors.primary,
+              height: 50,
+              onSwipeCallback: () {
+                _driverCtx.changePage(5);
+              },
+            ),
+            const SizedBox(height: 24),
+            CustomButton(
+              elevation: 0,
+              isFullWidth: false,
+              bgColor: MyColors.white,
+              text: "Дуусгах",
+              textFontWeight: FontWeight.bold,
+              textColor: MyColors.black,
+              onPressed: () {
+                _driverCtx.changePage(5);
+              },
+              prefix: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Icon(
+                  FontAwesomeIcons.close,
+                  size: 18,
                 ),
               ),
-              SizedBox(height: 8),
-              CustomText(text: "Орлого нэмэгдлээ"),
-              const SizedBox(height: 24),
-              MySeparator(
-                color: MyColors.gray,
-              ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Үргэлжлүүлэх",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
-                ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                },
-              ),
-              const SizedBox(height: 24),
-              CustomButton(
-                elevation: 0,
-                isFullWidth: false,
-                bgColor: MyColors.white,
-                text: "Дуусгах",
-                textFontWeight: FontWeight.bold,
-                textColor: MyColors.black,
-                onPressed: Get.back,
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Icon(
-                    FontAwesomeIcons.close,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     ),
-    isScrollControlled: true,
-    ignoreSafeArea: false,
+  );
+}
+
+Widget testButton(context) {
+  return Container(
+    height: 48,
+    margin: const EdgeInsets.all(12),
+    child: CustomButton(
+      text: "Show New Order",
+      onPressed: () {
+        if (_driverCtx.isDriverActive.value) {
+          _driverCtx.calculateDistance(context);
+        }
+      },
+    ),
   );
 }

@@ -32,26 +32,28 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
               _driverCtx.googleMapController.value.complete(controller);
             },
             polylines: {
-              // Polyline(
-              //     polylineId: const PolylineId("poliline_overview"),
-              //     color: MyColors.primary,
-              //     width: 7,
-              //     points: _driverCtx.polylinePoints
-              //         .map((element) =>
-              //             LatLng(element.latitude, element.longitude))
-              //         .toList())
+              _driverCtx.acceptedTheDelivery.value
+                  ? Polyline(
+                      polylineId: const PolylineId("poliline_overview"),
+                      color: MyColors.primary,
+                      width: 7,
+                      points: _driverCtx.polylinePoints
+                          .map((element) =>
+                              LatLng(element.latitude, element.longitude))
+                          .toList())
+                  : Polyline(polylineId: PolylineId(""))
             },
             markers: {
               Marker(
-                markerId: MarkerId("origin"),
-                position: _driverCtx.origin.value,
+                  markerId: MarkerId("origin"),
+                  position: _driverCtx.origin.value,
+                  draggable: false,
+                  rotation: 32),
+              Marker(
+                markerId: MarkerId("destination"),
+                position: _driverCtx.destination.value,
                 draggable: false,
-              ),
-              // Marker(
-              //   markerId: MarkerId("destination"),
-              //   position: _driverCtx.destination.value,
-              //   draggable: false,
-              // ),
+              )
             },
           ),
         ],
