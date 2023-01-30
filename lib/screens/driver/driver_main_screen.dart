@@ -128,51 +128,53 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   }
 
   Widget countDownTimer() {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        margin: EdgeInsets.only(top: Get.height * .1),
-        child: CircularCountDownTimer(
-          duration: 30,
-          initialDuration: 0,
-          controller: _driverCtx.countDownController.value,
-          width: Get.width / 4,
-          height: Get.width / 4,
-          ringColor: MyColors.black,
-          ringGradient: null,
-          fillColor: MyColors.primary,
-          fillGradient: null,
-          backgroundColor: MyColors.white,
-          backgroundGradient: null,
-          strokeWidth: 20.0,
-          strokeCap: StrokeCap.round,
-          textStyle: TextStyle(
-              fontSize: 24.0,
-              color: MyColors.primary,
-              fontWeight: FontWeight.bold),
-          textFormat: CountdownTextFormat.MM_SS,
-          isReverse: true,
-          isReverseAnimation: false,
-          isTimerTextShown: true,
-          autoStart: false,
-          onStart: () {
-            print("Starting");
-          },
-          onComplete: () {
-            debugPrint('Countdown Ended');
-          },
-          onChange: (String timeStamp) {
-            debugPrint('Countdown Changed $timeStamp');
-          },
-          timeFormatterFunction: (defaultFormatterFunction, duration) {
-            if (duration.inSeconds == 0) {
-              return "Start";
-            } else {
-              return Function.apply(defaultFormatterFunction, [duration]);
-            }
-          },
-        ),
-      ),
-    );
+    return _driverCtx.distanceCalculated.value
+        ? Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: EdgeInsets.only(top: Get.height * .1),
+              child: CircularCountDownTimer(
+                duration: 30,
+                initialDuration: 0,
+                controller: _driverCtx.countDownController.value,
+                width: Get.width / 4,
+                height: Get.width / 4,
+                ringColor: MyColors.black,
+                ringGradient: null,
+                fillColor: MyColors.primary,
+                fillGradient: null,
+                backgroundColor: MyColors.white,
+                backgroundGradient: null,
+                strokeWidth: 20.0,
+                strokeCap: StrokeCap.round,
+                textStyle: TextStyle(
+                    fontSize: 24.0,
+                    color: MyColors.primary,
+                    fontWeight: FontWeight.bold),
+                textFormat: CountdownTextFormat.MM_SS,
+                isReverse: true,
+                isReverseAnimation: false,
+                isTimerTextShown: true,
+                autoStart: false,
+                onStart: () {
+                  print("Starting");
+                },
+                onComplete: () {
+                  debugPrint('Countdown Ended');
+                },
+                onChange: (String timeStamp) {
+                  debugPrint('Countdown Changed $timeStamp');
+                },
+                timeFormatterFunction: (defaultFormatterFunction, duration) {
+                  if (duration.inSeconds == 0) {
+                    return "Start";
+                  } else {
+                    return Function.apply(defaultFormatterFunction, [duration]);
+                  }
+                },
+              ),
+            ),
+          )
+        : Container();
   }
 }

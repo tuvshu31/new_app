@@ -4,6 +4,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,18 @@ import 'package:iconly/iconly.dart';
 import 'package:swipebuttonflutter/swipebuttonflutter.dart';
 
 final _driverCtx = Get.put(DriverController());
+final player = AudioPlayer();
+
+void playSound(type) async {
+  player.play(AssetSource("sounds/$type.wav"));
+}
+
+void stopSound() async {
+  player.stop();
+}
+
 void incomingNewOrder() {
+  playSound("incoming");
   Get.bottomSheet(
     barrierColor: Colors.white.withOpacity(0.1),
     isDismissible: false,
@@ -135,8 +147,7 @@ void incomingNewOrder() {
                   swipeButtonColor: MyColors.primary,
                   height: 50,
                   onSwipeCallback: () {
-                    Get.back();
-                    arrivedAtRestaurant();
+                    _driverCtx.acceptDeliveryRequest();
                   },
                 ),
                 SizedBox(height: 24),
@@ -147,7 +158,9 @@ void incomingNewOrder() {
                   text: "Татгалзах",
                   textFontWeight: FontWeight.bold,
                   textColor: MyColors.black,
-                  onPressed: Get.back,
+                  onPressed: () {
+                    _driverCtx.declineDeliveryRequest();
+                  },
                   prefix: Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: Icon(
@@ -373,7 +386,7 @@ void arrivedAtReceiver() {
 }
 
 void deliverySucceeded() {
-  _driverCtx.playSound("success_bell");
+  playSound("success_bell");
   Get.bottomSheet(
     barrierColor: Colors.white.withOpacity(0.1),
     isDismissible: false,

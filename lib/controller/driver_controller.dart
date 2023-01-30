@@ -14,6 +14,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../screens/driver/driver_screen_bottomsheet_views.dart';
 
 class DriverController extends GetxController {
+  RxBool distanceCalculated = false.obs;
+  RxBool acceptedTheDelivery = false.obs;
   RxString distance = "".obs;
   RxString duration = "".obs;
   RxList polylinePoints = [].obs;
@@ -26,16 +28,6 @@ class DriverController extends GetxController {
   final Rx<Completer<GoogleMapController>> googleMapController =
       Completer<GoogleMapController>().obs;
   final Rx<CountDownController> countDownController = CountDownController().obs;
-
-  final player = AudioPlayer();
-
-  void playSound(type) async {
-    player.play(AssetSource("sounds/$type.wav"));
-  }
-
-  void stopSound() async {
-    player.stop();
-  }
 
   void turnedOnApp(value) {
     isDriverActive.value = value;
@@ -86,6 +78,8 @@ class DriverController extends GetxController {
 
     Get.back();
     incomingNewOrder();
+    distanceCalculated.value = true;
+    countDownController.value.start();
   }
 
   void determineUsersPosition() async {
@@ -105,16 +99,29 @@ class DriverController extends GetxController {
           CameraPosition(target: origin.value, zoom: 19, tilt: 59)));
     }
   }
+
+  void trackDriversLocation() {
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 50,
+    );
+    Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position? info) {
+      if (info != null) {
+        origin.value = LatLng(info.latitude, info.longitude);
+      }
+    });
+  }
+
+  void declineDeliveryRequest() {
+    Get.back();
+    distanceCalculated.value = false;
+    countDownController.value.pause();
+  }
+
+  void acceptDeliveryRequest() {
+    Get.back();
+    acceptedTheDelivery.value = true;
+    arrivedAtRestaurant();
+  }
 }
-
-
-  // LocationSettings locationSettings = const LocationSettings(
-  //     accuracy: LocationAccuracy.high,
-  //     distanceFilter: 50,
-  //   );
-     // Geolocator.getPositionStream(locationSettings: locationSettings)
-      //     .listen((Position? info) {
-      //   if (info != null) {
-      //     origin.value = LatLng(info.latitude, info.longitude);
-      //   }
-      // });
