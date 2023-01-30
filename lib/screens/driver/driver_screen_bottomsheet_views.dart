@@ -12,147 +12,152 @@ import 'package:iconly/iconly.dart';
 import 'package:swipebuttonflutter/swipebuttonflutter.dart';
 
 final _driverCtx = Get.put(DriverController());
-void gotNewOrder() {
+void incomingNewOrder() {
   Get.bottomSheet(
     barrierColor: Colors.white.withOpacity(0.1),
     isDismissible: false,
-    SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.width * .06, vertical: Get.width * .06),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: const NetworkImage(
-                      "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+    Obx(
+      () => SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Container(
+            color: MyColors.white,
+            padding: EdgeInsets.symmetric(
+                horizontal: Get.width * .06, vertical: Get.width * .06),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CustomText(
+                    text:
+                        "${_driverCtx.distance.value} km, ${_driverCtx.duration.value}"),
+                ListTile(
+                  leading: const CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(
+                        "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+                  ),
+                  title: const CustomText(
+                    text: "Modern Nomads restaurant",
+                    fontSize: 14,
+                  ),
+                  subtitle: const CustomText(
+                    text: "5-р микр 8-р байр",
+                    fontSize: 12,
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CustomText(
+                        text: "Төлбөр:",
+                        fontSize: 10,
+                        color: MyColors.gray,
+                      ),
+                      const SizedBox(height: 4),
+                      CustomText(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        text: convertToCurrencyFormat(double.parse("3000"),
+                            toInt: true, locatedAtTheEnd: true),
+                      ),
+                    ],
+                  ),
                 ),
-                title: CustomText(
-                  text: "Modern Nomads restaurant",
-                  fontSize: 14,
+                const SizedBox(height: 12),
+                const MySeparator(
+                  color: MyColors.gray,
                 ),
-                subtitle: CustomText(
-                  text: "Утас: +976-99921312",
-                  fontSize: 12,
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                const SizedBox(height: 24),
+                Row(
                   children: [
-                    CustomText(
-                      text: "Төлбөр:",
-                      fontSize: 10,
-                      color: MyColors.gray,
+                    SizedBox(
+                      width: Get.width * .1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 18,
+                            color: MyColors.primary,
+                          ),
+                          SizedBox(height: Get.height * .01),
+                          Container(
+                            height: Get.height * .05,
+                            width: 1,
+                            color: MyColors.grey,
+                          ),
+                          SizedBox(height: Get.height * .01),
+                          Icon(
+                            Icons.circle,
+                            size: 18,
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 4),
-                    CustomText(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      text: convertToCurrencyFormat(double.parse("3000"),
-                          toInt: true, locatedAtTheEnd: true),
+                    SizedBox(
+                      width: Get.width * .75,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            title: CustomText(
+                              text: "Modern Nomads restaurant",
+                              fontSize: 14,
+                            ),
+                            subtitle: CustomText(
+                              text: "5-р микр 8-р байр",
+                              fontSize: 12,
+                            ),
+                          ),
+                          ListTile(
+                            title: CustomText(
+                              text: "6-р микр 20-р байр, 31 тоот",
+                              fontSize: 14,
+                            ),
+                            subtitle: CustomText(
+                              text: "5-р микр 8-р байр",
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
-              MySeparator(
-                color: MyColors.gray,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  SizedBox(
-                    width: Get.width * .1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 18,
-                          color: MyColors.primary,
-                        ),
-                        SizedBox(height: Get.height * .01),
-                        Container(
-                          height: Get.height * .05,
-                          width: 1,
-                          color: MyColors.grey,
-                        ),
-                        SizedBox(height: Get.height * .01),
-                        Icon(
-                          Icons.circle,
-                          size: 18,
-                        ),
-                      ],
+                const SizedBox(height: 24),
+                SwipingButton(
+                  text: "Зөвшөөрөх",
+                  buttonTextStyle: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.normal,
+                    color: MyColors.white,
+                    fontSize: 14,
+                  ),
+                  swipeButtonColor: MyColors.primary,
+                  height: 50,
+                  onSwipeCallback: () {
+                    Get.back();
+                    arrivedAtRestaurant();
+                  },
+                ),
+                SizedBox(height: 24),
+                CustomButton(
+                  elevation: 0,
+                  isFullWidth: false,
+                  bgColor: MyColors.white,
+                  text: "Татгалзах",
+                  textFontWeight: FontWeight.bold,
+                  textColor: MyColors.black,
+                  onPressed: Get.back,
+                  prefix: Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      FontAwesomeIcons.close,
+                      size: 18,
                     ),
                   ),
-                  SizedBox(
-                    width: Get.width * .75,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: CustomText(
-                            text: "Modern Nomads restaurant",
-                            fontSize: 14,
-                          ),
-                          subtitle: CustomText(
-                            text: "5-р микр 8-р байр",
-                            fontSize: 12,
-                          ),
-                        ),
-                        ListTile(
-                          title: CustomText(
-                            text: "6-р микр 20-р байр, 31 тоот",
-                            fontSize: 14,
-                          ),
-                          subtitle: CustomText(
-                            text: "5-р микр 8-р байр",
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Зөвшөөрөх",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
                 ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                  arrivedAtRestaurant();
-                },
-              ),
-              SizedBox(height: 24),
-              CustomButton(
-                elevation: 0,
-                isFullWidth: false,
-                bgColor: MyColors.white,
-                text: "Татгалзах",
-                textFontWeight: FontWeight.bold,
-                textColor: MyColors.black,
-                onPressed: Get.back,
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Icon(
-                    FontAwesomeIcons.close,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

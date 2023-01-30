@@ -1,99 +1,53 @@
 import 'dart:async';
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_screen_bottomsheet_views.dart';
 import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class DriverScreen extends StatefulWidget {
-  const DriverScreen({super.key});
+class DriverMainScreen extends StatefulWidget {
+  const DriverMainScreen({super.key});
 
   @override
-  State<DriverScreen> createState() => _DriverScreenState();
+  State<DriverMainScreen> createState() => _DriverMainScreenState();
 }
 
-class _DriverScreenState extends State<DriverScreen> {
-  bool isDriverActive = false;
-  double sourceLat = 49.02818;
-  double sourceLng = 104.04740;
-  double desticationLat = 49.02818;
-  double desticationLng = 104.04740;
-  int waitingSeconds = 30;
-  Timer? countdownTimer;
-  Duration myDuration = const Duration(hours: 3);
-
-  BitmapDescriptor sourceMarker = BitmapDescriptor.defaultMarker;
-
+class _DriverMainScreenState extends State<DriverMainScreen> {
+  final _driverCtx = Get.put(DriverController());
   final CountDownController _countDownController = CountDownController();
-  final Completer<GoogleMapController> _googleMapController =
-      Completer<GoogleMapController>();
-
   @override
   void initState() {
     super.initState();
-    addCustomIcon();
-  }
-
-  // void _goToTheLake() async {
-  //   final GoogleMapController controller = await _googleMapController.future;
-  //   controller.animateCamera(
-  //       CameraUpdate.newCameraPosition(_camera(sourceLat, sourceLng, true)));
-  // }
-
-  void turnOn(value) {
-    isDriverActive = !isDriverActive;
-    startTimer();
-    // _goToTheLake();
-    setState(() {});
-  }
-
-  void startTimer() {
-    myDuration = const Duration(hours: 3);
-    countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      const reduceSecondsBy = 1;
-      final seconds = myDuration.inSeconds - reduceSecondsBy;
-      setState(() {
-        if (seconds < 0) {
-          countdownTimer!.cancel();
-        } else {
-          myDuration = Duration(seconds: seconds);
-        }
-      });
-    });
+    // _driverCtx.determineUsersPosition();
   }
 
   void showPrivacy() async {
     // playSound("incoming");
+    loadingDialog(context);
     _countDownController.start();
-  }
-
-  void addCustomIcon() {
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(size: Size(12, 12)),
-      "assets/images/png/app/pin-map.png",
-    ).then(
-      (icon) {
-        setState(() {
-          sourceMarker = icon;
-        });
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: MyColors.white,
-          drawer: driverDrawer(),
-          appBar: appBar(isDriverActive, turnOn),
-          body: _body(),
+    return Obx(
+      () => SafeArea(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: MyColors.white,
+            drawer: driverDrawer(),
+            appBar: _appBar(),
+            body: _body(),
+          ),
         ),
       ),
     );
@@ -102,24 +56,123 @@ class _DriverScreenState extends State<DriverScreen> {
   Widget _body() {
     return Stack(
       children: [
-        googleMap(
-            _googleMapController, 49.02818, 104.04740, 49.02818, 104.04740),
-        timer(isDriverActive, myDuration),
-        // countDownTimer(_countDownController),
+        const DriverScreenMapView(),
+        countDownTimer(),
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            margin: EdgeInsets.all(12),
+            margin: const EdgeInsets.all(12),
             child: CustomButton(
               text: "Show New Order",
               onPressed: () {
-                // showPrivacy();
-                gotNewOrder();
+                _driverCtx.calculateDistance(context);
               },
             ),
           ),
         ),
       ],
+    );
+  }
+
+  PreferredSize _appBar() {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(54.0),
+      child: AppBar(
+        iconTheme: const IconThemeData(color: MyColors.primary),
+        backgroundColor: MyColors.white,
+        elevation: 0,
+        centerTitle: true,
+        titleSpacing: 0,
+        title: CustomText(
+          text: _driverCtx.isDriverActive.value ? "Online" : "Offline",
+          color: MyColors.black,
+          fontSize: 16,
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: CupertinoSwitch(
+              value: _driverCtx.isDriverActive.value,
+              thumbColor: _driverCtx.isDriverActive.value
+                  ? MyColors.primary
+                  : MyColors.gray,
+              trackColor: MyColors.background,
+              activeColor: MyColors.black,
+              onChanged: (value) => _driverCtx.turnedOnApp(value),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget activeTimerCountDown() {
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = strDigits(_driverCtx.myDuration.inHours.remainder(60));
+    final minutes = strDigits(_driverCtx.myDuration.inMinutes.remainder(60));
+    final seconds = strDigits(_driverCtx.myDuration.inSeconds.remainder(60));
+    return _driverCtx.isDriverActive.value
+        ? Positioned(
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: const BoxDecoration(color: MyColors.white),
+              child: CustomText(
+                text: "$hours:$minutes:$seconds",
+                color: MyColors.primary,
+                fontSize: 12,
+              ),
+            ),
+          )
+        : Container();
+  }
+
+  Widget countDownTimer() {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        margin: EdgeInsets.only(top: Get.height * .1),
+        child: CircularCountDownTimer(
+          duration: 30,
+          initialDuration: 0,
+          controller: _driverCtx.countDownController.value,
+          width: Get.width / 4,
+          height: Get.width / 4,
+          ringColor: MyColors.black,
+          ringGradient: null,
+          fillColor: MyColors.primary,
+          fillGradient: null,
+          backgroundColor: MyColors.white,
+          backgroundGradient: null,
+          strokeWidth: 20.0,
+          strokeCap: StrokeCap.round,
+          textStyle: TextStyle(
+              fontSize: 24.0,
+              color: MyColors.primary,
+              fontWeight: FontWeight.bold),
+          textFormat: CountdownTextFormat.MM_SS,
+          isReverse: true,
+          isReverseAnimation: false,
+          isTimerTextShown: true,
+          autoStart: false,
+          onStart: () {
+            print("Starting");
+          },
+          onComplete: () {
+            debugPrint('Countdown Ended');
+          },
+          onChange: (String timeStamp) {
+            debugPrint('Countdown Changed $timeStamp');
+          },
+          timeFormatterFunction: (defaultFormatterFunction, duration) {
+            if (duration.inSeconds == 0) {
+              return "Start";
+            } else {
+              return Function.apply(defaultFormatterFunction, [duration]);
+            }
+          },
+        ),
+      ),
     );
   }
 }
