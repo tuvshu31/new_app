@@ -137,53 +137,47 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     return Obx(
       () => Align(
           alignment: Alignment.topCenter,
-          child: _driverCtx.distanceCalculated.value
-              ? Container(
-                  margin: EdgeInsets.only(top: Get.height * .05),
-                  child: CircularCountDownTimer(
-                    duration: 30,
-                    initialDuration: 0,
-                    controller: _driverCtx.countDownController.value,
-                    width: Get.width / 4,
-                    height: Get.width / 4,
-                    ringColor: MyColors.black,
-                    ringGradient: null,
-                    fillColor: MyColors.primary,
-                    fillGradient: null,
-                    backgroundColor: MyColors.white,
-                    backgroundGradient: null,
-                    strokeWidth: 20.0,
-                    strokeCap: StrokeCap.round,
-                    textStyle: TextStyle(
-                        fontSize: 24.0,
-                        color: MyColors.primary,
-                        fontWeight: FontWeight.bold),
-                    textFormat: CountdownTextFormat.MM_SS,
-                    isReverse: true,
-                    isReverseAnimation: false,
-                    isTimerTextShown: true,
-                    autoStart: false,
-                    onStart: () {
-                      print("Starting");
-                    },
-                    onComplete: () {
-                      _driverCtx.distanceCalculated.value = false;
-                    },
-                    onChange: (String timeStamp) {
-                      debugPrint('Countdown Changed $timeStamp');
-                    },
-                    timeFormatterFunction:
-                        (defaultFormatterFunction, duration) {
-                      if (duration.inSeconds == 0) {
-                        return "Start";
-                      } else {
-                        return Function.apply(
-                            defaultFormatterFunction, [duration]);
-                      }
-                    },
-                  ),
-                )
-              : Container()),
+          child: Container(
+            margin: EdgeInsets.only(top: Get.height * .05),
+            child: CircularCountDownTimer(
+              duration: 30,
+              initialDuration: 0,
+              controller: _driverCtx.countDownController.value,
+              width: Get.width / 4,
+              height: Get.width / 4,
+              ringColor: MyColors.black,
+              ringGradient: null,
+              fillColor: MyColors.primary,
+              fillGradient: null,
+              backgroundColor: MyColors.white,
+              backgroundGradient: null,
+              strokeWidth: 20.0,
+              strokeCap: StrokeCap.round,
+              textStyle: TextStyle(
+                  fontSize: 24.0,
+                  color: MyColors.primary,
+                  fontWeight: FontWeight.bold),
+              textFormat: CountdownTextFormat.MM_SS,
+              isReverse: true,
+              isReverseAnimation: false,
+              isTimerTextShown: true,
+              autoStart: false,
+              onStart: () {
+                print("Starting");
+              },
+              onComplete: () {},
+              onChange: (String timeStamp) {
+                debugPrint('Countdown Changed $timeStamp');
+              },
+              timeFormatterFunction: (defaultFormatterFunction, duration) {
+                if (duration.inSeconds == 0) {
+                  return "Start";
+                } else {
+                  return Function.apply(defaultFormatterFunction, [duration]);
+                }
+              },
+            ),
+          )),
     );
   }
 }

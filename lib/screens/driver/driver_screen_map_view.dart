@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

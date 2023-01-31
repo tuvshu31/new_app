@@ -3,11 +3,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,12 +13,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../screens/driver/driver_screen_bottomsheet_views.dart';
 
 class DriverController extends GetxController {
-  RxBool distanceCalculated = false.obs;
-  RxBool acceptedTheDelivery = false.obs;
   RxInt deliverySteps = 0.obs;
   RxString distance = "".obs;
   RxString duration = "".obs;
-  RxList polylinePoints = [].obs;
+
   Rx<LatLng> origin = LatLng(49.028494366069474, 104.04692604155208).obs;
   Rx<LatLng> destination = LatLng(49.02646128988077, 104.0399308405171).obs;
   RxBool isDriverActive = false.obs;
@@ -66,8 +62,6 @@ class DriverController extends GetxController {
 
     String distanceText = parsed["routes"][0]["legs"][0]["distance"]["text"];
     String durationText = parsed["routes"][0]["legs"][0]["duration"]["text"];
-    dynamic polyline = PolylinePoints()
-        .decodePolyline(parsed["routes"][0]["overview_polyline"]["points"]);
 
     if (distanceText.isNotEmpty) {
       distanceText = distanceText.substring(0, distanceText.length - 3);
@@ -77,11 +71,10 @@ class DriverController extends GetxController {
 
     distance.value = distanceKm.toStringAsFixed(3);
     duration.value = durationText;
-    polylinePoints.value = polyline;
 
     Get.back();
     incomingNewOrder();
-    distanceCalculated.value = true;
+
     countDownController.value.start();
   }
 
@@ -118,7 +111,7 @@ class DriverController extends GetxController {
 
   void declineDeliveryRequest() {
     Get.back();
-    distanceCalculated.value = false;
+
     countDownController.value.pause();
     stopSound();
   }
@@ -126,8 +119,7 @@ class DriverController extends GetxController {
   void acceptDeliveryRequest() async {
     stopSound();
     Get.back();
-    distanceCalculated.value = false;
-    acceptedTheDelivery.value = true;
+
     final GoogleMapController controller =
         await googleMapController.value.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
