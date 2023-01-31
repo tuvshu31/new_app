@@ -15,6 +15,24 @@ class DriverScreenMapView extends StatefulWidget {
 
 class DriverScreenMapViewState extends State<DriverScreenMapView> {
   final _driverCtx = Get.put(DriverController());
+  @override
+  void initState() {
+    super.initState();
+    addMarker();
+  }
+
+  Set<Marker> markers = Set();
+  void addMarker() async {
+    BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      "assets/images/png/app/address.png",
+    );
+    markers.add(Marker(
+      markerId: MarkerId("origin"),
+      position: _driverCtx.origin.value,
+      icon: markerbitmap, //Icon for Marker
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,30 +49,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
             onMapCreated: (GoogleMapController controller) {
               _driverCtx.googleMapController.value.complete(controller);
             },
-            polylines: {
-              _driverCtx.acceptedTheDelivery.value
-                  ? Polyline(
-                      polylineId: const PolylineId("poliline_overview"),
-                      color: MyColors.primary,
-                      width: 7,
-                      points: _driverCtx.polylinePoints
-                          .map((element) =>
-                              LatLng(element.latitude, element.longitude))
-                          .toList())
-                  : Polyline(polylineId: PolylineId(""))
-            },
-            markers: {
-              Marker(
-                  markerId: MarkerId("origin"),
-                  position: _driverCtx.origin.value,
-                  draggable: false,
-                  rotation: 32),
-              Marker(
-                markerId: MarkerId("destination"),
-                position: _driverCtx.destination.value,
-                draggable: false,
-              )
-            },
+            markers: markers,
           ),
         ],
       )),
