@@ -27,7 +27,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
     );
     markers.add(Marker(
       markerId: MarkerId("origin"),
-      position: _driverCtx.origin.value,
+      // position: _driverCtx.origin.value,
       icon: markerbitmap, //Icon for Marker
     ));
   }
@@ -41,7 +41,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
           GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: CameraPosition(
-              target: _driverCtx.origin.value,
+              // target: _driverCtx.origin.value,
               zoom: 14,
             ),
             onMapCreated: (GoogleMapController controller) {

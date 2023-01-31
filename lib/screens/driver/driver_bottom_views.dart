@@ -446,7 +446,7 @@ Widget testButton(context) {
       text: "Show New Order",
       onPressed: () {
         if (_driverCtx.isDriverActive.value) {
-          _driverCtx.calculateDistance(context);
+          // _driverCtx.calculateDistance(context);
         }
       },
     ),

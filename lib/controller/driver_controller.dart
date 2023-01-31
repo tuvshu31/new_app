@@ -10,108 +10,106 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../screens/driver/driver_screen_bottomsheet_views.dart';
+import '../screens/driver/driver_bottom_views.dart';
 
 class DriverController extends GetxController {
+  RxBool isDriverActive = false.obs;
+  RxDouble driverLat = 49.02821126030273.obs;
+  RxDouble driverLng = 104.04634376483777.obs;
+  RxDouble storeLat = 49.02646128988077.obs;
+  RxDouble storeLng = 104.0399308405171.obs;
+
+  RxBool gotDeliveryRequest = false.obs;
+
+  RxBool distanceCalculated = false.obs;
+  RxBool acceptedTheDelivery = false.obs;
   RxInt deliverySteps = 0.obs;
   RxString distance = "".obs;
   RxString duration = "".obs;
 
-  Rx<LatLng> origin = LatLng(49.028494366069474, 104.04692604155208).obs;
-  Rx<LatLng> destination = LatLng(49.02646128988077, 104.0399308405171).obs;
-  RxBool isDriverActive = false.obs;
   Rx<PageController> pageController = PageController().obs;
   int waitingSeconds = 30;
   Timer? countdownTimer;
   Duration myDuration = const Duration(hours: 3);
-  final Rx<Completer<GoogleMapController>> googleMapController =
+  Rx<Completer<GoogleMapController>> googleMapController =
       Completer<GoogleMapController>().obs;
-  final Rx<CountDownController> countDownController = CountDownController().obs;
+  Rx<CountDownController> countDownController = CountDownController().obs;
 
-  void turnedOnApp(value) {
+  void turnedOnApp(value) async {
     isDriverActive.value = value;
-    // startTimer();
-    determineUsersPosition();
+    bool serviceEnabled;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (serviceEnabled) {
+      LocationSettings locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 50,
+      );
+      var info = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      // driverLat.value = info.latitude;
+      // driverLng.value = info.longitude;
+      // log(driverLat.value.toString());
+      // log(driverLng.value.toString());
+      Geolocator.getPositionStream(locationSettings: locationSettings)
+          .listen((Position? info) {
+        if (info != null) {
+          driverLat.value = info.latitude;
+          driverLng.value = info.longitude;
+        }
+      });
+      final GoogleMapController controller =
+          await googleMapController.value.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(driverLat.value, driverLng.value),
+          zoom: 19,
+          tilt: 59)));
+    }
   }
 
-  void startTimer() {
-    myDuration = const Duration(hours: 3);
-    countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      const reduceSecondsBy = 1;
-      final seconds = myDuration.inSeconds - reduceSecondsBy;
-      if (seconds < 0) {
-        countdownTimer!.cancel();
-      } else {
-        myDuration = Duration(seconds: seconds);
-      }
-    });
-  }
-
-  void calculateDistance(context) async {
+  void deliveryRequestArrived(context) async {
     loadingDialog(context);
+    gotDeliveryRequest.value = true;
     const String baseUrl =
         'https://maps.googleapis.com/maps/api/directions/json?';
     final respose = await Dio().get(baseUrl, queryParameters: {
-      "origin": "${origin.value.latitude}, ${origin.value.longitude}",
-      "destination":
-          "${destination.value.latitude}, ${destination.value.longitude}",
+      "origin": "${driverLat.value}, ${driverLng.value}",
+      "destination": "${storeLat.value}, ${storeLng.value}",
       "key": "AIzaSyAHTYs2cMm87YH3wppr6wTtKRZxfyXjvB4"
     });
-
+    log(respose.toString());
     final Map parsed = json.decode(respose.toString());
 
-    String distanceText = parsed["routes"][0]["legs"][0]["distance"]["text"];
-    String durationText = parsed["routes"][0]["legs"][0]["duration"]["text"];
+    if (parsed.isNotEmpty) {
+      // String distanceText = parsed["routes"][0]["legs"][0]["distance"]["text"];
+      // String durationText = parsed["routes"][0]["legs"][0]["duration"]["text"];
+      // distanceText = distanceText.substring(0, distanceText.length - 3);
+      // double distanceMile = double.parse(distanceText);
+      // double distanceKm = (distanceMile * 1.609);
 
-    if (distanceText.isNotEmpty) {
-      distanceText = distanceText.substring(0, distanceText.length - 3);
+      // distance.value = distanceKm.toStringAsFixed(3);
+      // duration.value = durationText;
     }
-    double distanceMile = double.parse(distanceText);
-    double distanceKm = (distanceMile * 1.609);
-
-    distance.value = distanceKm.toStringAsFixed(3);
-    duration.value = durationText;
-
     Get.back();
     incomingNewOrder();
-
     countDownController.value.start();
   }
 
-  void determineUsersPosition() async {
-    bool serviceEnabled;
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 50,
-    );
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (serviceEnabled) {
-      var position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
-      origin.value = LatLng(position.latitude, position.longitude);
-      final GoogleMapController controller =
-          await googleMapController.value.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: origin.value, zoom: 19, tilt: 59)));
-    }
-  }
-
-  void trackDriversLocation() {
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 50,
-    );
-    Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position? info) {
-      if (info != null) {
-        origin.value = LatLng(info.latitude, info.longitude);
-      }
-    });
-  }
+  // void startTimer() {
+  //   myDuration = const Duration(hours: 3);
+  //   countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+  //     const reduceSecondsBy = 1;
+  //     final seconds = myDuration.inSeconds - reduceSecondsBy;
+  //     if (seconds < 0) {
+  //       countdownTimer!.cancel();
+  //     } else {
+  //       myDuration = Duration(seconds: seconds);
+  //     }
+  //   });
+  // }
 
   void declineDeliveryRequest() {
     Get.back();
-
+    distanceCalculated.value = false;
     countDownController.value.pause();
     stopSound();
   }
@@ -119,12 +117,13 @@ class DriverController extends GetxController {
   void acceptDeliveryRequest() async {
     stopSound();
     Get.back();
-
-    final GoogleMapController controller =
-        await googleMapController.value.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        bearing: -120, target: origin.value, zoom: 16, tilt: 32)));
-    trackDriversLocation();
+    distanceCalculated.value = false;
+    acceptedTheDelivery.value = true;
+    // final GoogleMapController controller =
+    //     await googleMapController.value.future;
+    // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+    //     bearing: -120, target: origin.value, zoom: 16, tilt: 32)));
+    // trackDriversLocation();
   }
 
   void changePage(int value) {

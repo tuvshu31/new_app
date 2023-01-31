@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
-import 'package:Erdenet24/screens/driver/driver_screen_bottomsheet_views.dart';
+import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/text.dart';
