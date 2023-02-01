@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "692294147031",
-    "project_id": "notify-15424",
-    "storage_bucket": "notify-15424.appspot.com"
+    "project_number": "210886616950",
+    "project_id": "notification-4389e",
+    "storage_bucket": "notification-4389e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:692294147031:android:a03bae72c267daade04992",
+        "mobilesdk_app_id": "1:210886616950:android:0a38714b4463617d3a3c57",
         "android_client_info": {
           "package_name": "mn.et24"
         }
       },
       "oauth_client": [
         {
-          "client_id": "692294147031-p7rgapktg4kjbcuj0lipptrcloejv8e4.apps.googleusercontent.com",
+          "client_id": "210886616950-s18abqhfqrjaokh6goh2s4tejlcvnaj4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBk5kD5SMDnVFyAsTtcPuDV-hfi1G3mb5w"
+          "current_key": "AIzaSyB-tZ49D3yhxAX1J3vABazuiv-1xa-AtCw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "692294147031-p7rgapktg4kjbcuj0lipptrcloejv8e4.apps.googleusercontent.com",
+              "client_id": "210886616950-s18abqhfqrjaokh6goh2s4tejlcvnaj4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
