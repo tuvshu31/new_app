@@ -40,7 +40,9 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
         children: [
           GoogleMap(
             mapType: MapType.normal,
-            initialCameraPosition: LatLng(latitude, longitude)
+            initialCameraPosition: CameraPosition(
+                target: LatLng(
+                    _driverCtx.driverLat.value, _driverCtx.driverLng.value)),
             onMapCreated: (GoogleMapController controller) {
               _driverCtx.googleMapController.value.complete(controller);
             },

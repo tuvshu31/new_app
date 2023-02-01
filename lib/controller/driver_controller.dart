@@ -46,10 +46,9 @@ class DriverController extends GetxController {
       );
       var info = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best);
-      // driverLat.value = info.latitude;
-      // driverLng.value = info.longitude;
-      // log(driverLat.value.toString());
-      // log(driverLng.value.toString());
+      driverLat.value = info.latitude;
+      driverLng.value = info.longitude;
+
       Geolocator.getPositionStream(locationSettings: locationSettings)
           .listen((Position? info) {
         if (info != null) {

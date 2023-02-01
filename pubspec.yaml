@@ -83,6 +83,8 @@ dependencies:
   geolocator: ^9.0.2
   audioplayers: ^3.0.0
   swipebuttonflutter: ^1.0.0
+  firebase_core: ^2.4.1
+  firebase_messaging: ^14.2.1
 
 dev_dependencies:
   flutter_test:

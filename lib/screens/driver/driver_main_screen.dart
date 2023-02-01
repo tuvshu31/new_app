@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
@@ -7,6 +8,7 @@ import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/utils/styles.dart';
@@ -27,6 +29,9 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     // _driverCtx.determineUsersPosition();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log("Firebase.s foreground message irj bn ;)");
+    });
   }
 
   void showPrivacy() async {
