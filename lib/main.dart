@@ -1,5 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -26,11 +28,13 @@ import 'package:upgrader/upgrader.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+final _driverCtx = Get.put(DriverController());
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   // await Firebase.initializeApp();
+  _driverCtx.deliveryRequestArrived();
   print("Handling a background message: ${message.messageId}");
 }
 
@@ -53,7 +57,10 @@ void main() async {
 
   log('User granted permission: ${settings.authorizationStatus}');
   final fcmToken = await FirebaseMessaging.instance.getToken();
-
+  if (fcmToken != "") {
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(53, body);
+  }
   log(fcmToken.toString());
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

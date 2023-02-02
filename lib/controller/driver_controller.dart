@@ -61,8 +61,7 @@ class DriverController extends GetxController {
     }
   }
 
-  void deliveryRequestArrived(context) async {
-    loadingDialog(context);
+  void deliveryRequestArrived() async {
     const String baseUrl =
         'https://maps.googleapis.com/maps/api/directions/json?';
     final respose = await Dio().get(baseUrl, queryParameters: {
@@ -81,7 +80,7 @@ class DriverController extends GetxController {
       distance.value = distanceKm.toStringAsFixed(3);
       duration.value = durationText;
     }
-    Get.back();
+
     incomingNewOrder();
     countDownController.value.start();
   }

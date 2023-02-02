@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
@@ -29,7 +31,8 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     // _driverCtx.determineUsersPosition();
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      _driverCtx.deliveryRequestArrived();
       log("Firebase.s foreground message irj bn ;)");
     });
   }
@@ -66,7 +69,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
             ? Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: Get.height * .35,
+                  height: Get.height * .4,
                   color: MyColors.white,
                   padding: EdgeInsets.symmetric(
                       horizontal: Get.width * .06, vertical: Get.width * .06),
@@ -115,7 +118,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                   : MyColors.gray,
               trackColor: MyColors.background,
               activeColor: MyColors.black,
-              onChanged: (value) => _driverCtx.deliveryRequestArrived(context),
+              onChanged: (value) => _driverCtx.turnedOnApp(value),
             ),
           ),
         ],

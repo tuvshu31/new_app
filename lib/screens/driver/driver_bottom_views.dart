@@ -27,19 +27,22 @@ void stopSound() async {
 }
 
 void incomingNewOrder() {
-  // playSound("incoming");
-  // _driverCtx.countDownController.value.start();
+  playSound("incoming");
+  _driverCtx.countDownController.value.start();
   Get.dialog(
+    barrierDismissible: false,
     barrierColor: Colors.white.withOpacity(0.1),
     useSafeArea: true,
     Obx(
       () => Material(
         child: Container(
           color: MyColors.white,
+          padding: EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
+              Spacer(),
               Container(
                 margin: EdgeInsets.only(top: Get.height * .05),
                 child: CircularCountDownTimer(
@@ -198,7 +201,7 @@ void incomingNewOrder() {
                   _driverCtx.acceptedTheDelivery.value = true;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
               CustomButton(
                 elevation: 0,
                 isFullWidth: false,
@@ -217,6 +220,7 @@ void incomingNewOrder() {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -252,11 +256,11 @@ Widget arrivedAtRestaurant() {
               Image(image: AssetImage("assets/images/png/app/phone-call.png")),
         ),
       ),
-      const SizedBox(height: 24),
+      Spacer(),
       MySeparator(
         color: MyColors.gray,
       ),
-      const SizedBox(height: 24),
+      Spacer(),
       SwipingButton(
         text: "Ирлээ",
         buttonTextStyle: TextStyle(
@@ -268,10 +272,10 @@ Widget arrivedAtRestaurant() {
         swipeButtonColor: MyColors.primary,
         height: 50,
         onSwipeCallback: () {
-          _driverCtx.changePage(2);
+          _driverCtx.changePage(1);
         },
       ),
-      SizedBox(height: 24),
+      SizedBox(height: 40),
     ],
   );
 }
@@ -299,7 +303,7 @@ Widget receivedFromRestaurant() {
       MySeparator(
         color: MyColors.gray,
       ),
-      const SizedBox(height: 24),
+      Spacer(),
       SwipingButton(
         text: "Хүлээн авсан",
         buttonTextStyle: TextStyle(
@@ -314,7 +318,7 @@ Widget receivedFromRestaurant() {
           _driverCtx.changePage(3);
         },
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: 40),
     ],
   );
 }
@@ -359,7 +363,7 @@ Widget arrivedAtReceiver() {
       MySeparator(
         color: MyColors.gray,
       ),
-      const SizedBox(height: 24),
+      Spacer(),
       SwipingButton(
         text: "Хүлээлгэн өгсөн",
         buttonTextStyle: TextStyle(
@@ -374,7 +378,7 @@ Widget arrivedAtReceiver() {
           _driverCtx.changePage(4);
         },
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: 40),
     ],
   );
 }
@@ -397,10 +401,10 @@ Widget deliverySucceeded() {
       const CustomText(text: "Орлого нэмэгдлээ"),
       const SizedBox(height: 24),
       const MySeparator(color: MyColors.gray),
-      const SizedBox(height: 24),
+      Spacer(),
       SwipingButton(
-        text: "Үргэлжлүүлэх",
-        buttonTextStyle: const TextStyle(
+        text: "Дуусгах",
+        buttonTextStyle: TextStyle(
           fontFamily: 'Nunito',
           fontWeight: FontWeight.normal,
           color: MyColors.white,
@@ -413,26 +417,7 @@ Widget deliverySucceeded() {
           _driverCtx.acceptedTheDelivery.value = false;
         },
       ),
-      const SizedBox(height: 24),
-      CustomButton(
-        elevation: 0,
-        isFullWidth: false,
-        bgColor: MyColors.white,
-        text: "Дуусгах",
-        textFontWeight: FontWeight.bold,
-        textColor: MyColors.black,
-        onPressed: () {
-          _driverCtx.changePage(5);
-          _driverCtx.acceptedTheDelivery.value = false;
-        },
-        prefix: const Padding(
-          padding: EdgeInsets.only(right: 8),
-          child: Icon(
-            FontAwesomeIcons.xmark,
-            size: 18,
-          ),
-        ),
-      ),
+      SizedBox(height: 40),
     ],
   );
 }
