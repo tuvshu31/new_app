@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'dart:developer';
+import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import '../screens/driver/driver_bottom_views.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 class DriverController extends GetxController {
   RxBool isDriverActive = false.obs;
@@ -19,9 +17,11 @@ class DriverController extends GetxController {
   RxDouble storeLat = 49.02646128988077.obs;
   RxDouble storeLng = 104.0399308405171.obs;
   RxBool acceptedTheDelivery = false.obs;
-
+  RxBool deliveryRequest = false.obs;
   RxString distance = "".obs;
   RxString duration = "".obs;
+  RxInt step = 0.obs;
+  RxMap remoteMessageData = {}.obs;
 
   Rx<PageController> pageController = PageController().obs;
 
@@ -32,6 +32,7 @@ class DriverController extends GetxController {
   Rx<CountDownController> countDownController = CountDownController().obs;
 
   void turnedOnApp(value) async {
+    log(remoteMessageData["latitude"].toString());
     isDriverActive.value = value;
     bool serviceEnabled;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -40,11 +41,6 @@ class DriverController extends GetxController {
         accuracy: LocationAccuracy.best,
         distanceFilter: 50,
       );
-      var info = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
-      driverLat.value = info.latitude;
-      driverLng.value = info.longitude;
-
       Geolocator.getPositionStream(locationSettings: locationSettings)
           .listen((Position? info) {
         if (info != null) {
@@ -54,10 +50,14 @@ class DriverController extends GetxController {
       });
       final GoogleMapController controller =
           await googleMapController.value.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-          target: LatLng(driverLat.value, driverLng.value),
-          zoom: 19,
-          tilt: 59)));
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(driverLat.value, driverLng.value),
+              zoom: 16,
+              tilt: 59),
+        ),
+      );
     }
   }
 
@@ -80,9 +80,9 @@ class DriverController extends GetxController {
       distance.value = distanceKm.toStringAsFixed(3);
       duration.value = durationText;
     }
-
-    incomingNewOrder();
     countDownController.value.start();
+    playSound("incoming");
+    deliveryRequest.value = true;
   }
 
   // void startTimer() {

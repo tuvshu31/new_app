@@ -26,214 +26,38 @@ void stopSound() async {
   player.stop();
 }
 
-void incomingNewOrder() {
-  playSound("incoming");
-  _driverCtx.countDownController.value.start();
-  Get.dialog(
-    barrierDismissible: false,
-    barrierColor: Colors.white.withOpacity(0.1),
-    useSafeArea: true,
-    Obx(
-      () => Material(
-        child: Container(
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Spacer(),
-              Container(
-                margin: EdgeInsets.only(top: Get.height * .05),
-                child: CircularCountDownTimer(
-                  duration: 30,
-                  initialDuration: 0,
-                  controller: _driverCtx.countDownController.value,
-                  width: Get.width / 4,
-                  height: Get.width / 4,
-                  ringColor: MyColors.black,
-                  ringGradient: null,
-                  fillColor: MyColors.primary,
-                  fillGradient: null,
-                  backgroundColor: MyColors.white,
-                  backgroundGradient: null,
-                  strokeWidth: 20.0,
-                  strokeCap: StrokeCap.round,
-                  textStyle: TextStyle(
-                      fontSize: 24.0,
-                      color: MyColors.primary,
-                      fontWeight: FontWeight.bold),
-                  textFormat: CountdownTextFormat.MM_SS,
-                  isReverse: true,
-                  isReverseAnimation: false,
-                  isTimerTextShown: true,
-                  autoStart: false,
-                  onStart: () {
-                    print("Starting");
-                  },
-                  onComplete: () {},
-                  onChange: (String timeStamp) {
-                    debugPrint('Countdown Changed $timeStamp');
-                  },
-                  timeFormatterFunction: (defaultFormatterFunction, duration) {
-                    if (duration.inSeconds == 0) {
-                      return "Start";
-                    } else {
-                      return Function.apply(
-                          defaultFormatterFunction, [duration]);
-                    }
-                  },
-                ),
-              ),
-              SizedBox(
-                height: Get.height * .1,
-              ),
-              CustomText(
-                  fontWeight: FontWeight.bold,
-                  text:
-                      "${_driverCtx.distance.value} km, ${_driverCtx.duration.value}"),
-              ListTile(
-                leading: const CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                      "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
-                ),
-                title: const CustomText(
-                  text: "Modern Nomads restaurant",
-                  fontSize: 14,
-                ),
-                subtitle: const CustomText(
-                  text: "5-р микр 8-р байр",
-                  fontSize: 12,
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CustomText(
-                      text: "Төлбөр:",
-                      fontSize: 10,
-                      color: MyColors.gray,
-                    ),
-                    const SizedBox(height: 4),
-                    CustomText(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      text: convertToCurrencyFormat(double.parse("3000"),
-                          toInt: true, locatedAtTheEnd: true),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              const MySeparator(
-                color: MyColors.gray,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  SizedBox(
-                    width: Get.width * .1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 18,
-                          color: MyColors.primary,
-                        ),
-                        SizedBox(height: Get.height * .01),
-                        Container(
-                          height: Get.height * .05,
-                          width: 1,
-                          color: MyColors.grey,
-                        ),
-                        SizedBox(height: Get.height * .01),
-                        Icon(
-                          Icons.circle,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: Get.width * .75,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: CustomText(
-                            text: "Modern Nomads restaurant",
-                            fontSize: 14,
-                          ),
-                          subtitle: CustomText(
-                            text: "5-р микр 8-р байр",
-                            fontSize: 12,
-                          ),
-                        ),
-                        ListTile(
-                          title: CustomText(
-                            text: "6-р микр 20-р байр, 31 тоот",
-                            fontSize: 14,
-                          ),
-                          subtitle: CustomText(
-                            text: "5-р микр 8-р байр",
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SwipingButton(
-                text: "Зөвшөөрөх",
-                buttonTextStyle: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.normal,
-                  color: MyColors.white,
-                  fontSize: 14,
-                ),
-                swipeButtonColor: MyColors.primary,
-                height: 50,
-                onSwipeCallback: () {
-                  Get.back();
-                  _driverCtx.acceptedTheDelivery.value = true;
-                },
-              ),
-              const SizedBox(height: 12),
-              CustomButton(
-                elevation: 0,
-                isFullWidth: false,
-                bgColor: MyColors.white,
-                text: "Татгалзах",
-                textFontWeight: FontWeight.bold,
-                textColor: MyColors.black,
-                onPressed: () {
-                  Get.back();
-                },
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Icon(
-                    FontAwesomeIcons.close,
-                    size: 18,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
+Widget bottomSheets(int step) {
+  switch (step) {
+    case 0:
+      return _deliveryInfo();
+    case 1:
+      return _arrivedAtRestaurant();
+    case 2:
+      return _receivedFromRestaurant();
+    case 3:
+      return _arrivedAtReceiver();
+    case 4:
+      return _arrivedAtReceiver();
+  }
+  return Container();
+}
+
+Widget incomingNewOrder() {
+  return Obx(
+    () => Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        color: MyColors.white,
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+        child: bottomSheets(_driverCtx.step.value),
       ),
     ),
   );
 }
 
-Widget arrivedAtRestaurant() {
+Widget _arrivedAtRestaurant() {
   return Column(
-    // crossAxisAlignment: CrossAxisAlignment.center,
-    // mainAxisSize: MainAxisSize.min,
-    // mainAxisAlignment: MainAxisAlignment.end,
+    mainAxisSize: MainAxisSize.min,
     children: [
       ListTile(
         contentPadding: EdgeInsets.zero,
@@ -256,31 +80,14 @@ Widget arrivedAtRestaurant() {
               Image(image: AssetImage("assets/images/png/app/phone-call.png")),
         ),
       ),
-      Spacer(),
-      MySeparator(
-        color: MyColors.gray,
-      ),
-      Spacer(),
-      SwipingButton(
-        text: "Ирлээ",
-        buttonTextStyle: TextStyle(
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.normal,
-          color: MyColors.white,
-          fontSize: 14,
-        ),
-        swipeButtonColor: MyColors.primary,
-        height: 50,
-        onSwipeCallback: () {
-          _driverCtx.changePage(1);
-        },
-      ),
-      SizedBox(height: 40),
+      swipingButton("Ирлээ", () {
+        _driverCtx.step.value = 2;
+      })
     ],
   );
 }
 
-Widget receivedFromRestaurant() {
+Widget _receivedFromRestaurant() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
@@ -300,30 +107,14 @@ Widget receivedFromRestaurant() {
         color: MyColors.success,
       ),
       const SizedBox(height: 24),
-      MySeparator(
-        color: MyColors.gray,
-      ),
-      Spacer(),
-      SwipingButton(
-        text: "Хүлээн авсан",
-        buttonTextStyle: TextStyle(
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.normal,
-          color: MyColors.white,
-          fontSize: 14,
-        ),
-        swipeButtonColor: MyColors.primary,
-        height: 50,
-        onSwipeCallback: () {
-          _driverCtx.changePage(3);
-        },
-      ),
-      SizedBox(height: 40),
+      swipingButton("Хүлээн авсан", () {
+        _driverCtx.step.value = 3;
+      })
     ],
   );
 }
 
-Widget arrivedAtReceiver() {
+Widget _arrivedAtReceiver() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
@@ -363,22 +154,9 @@ Widget arrivedAtReceiver() {
       MySeparator(
         color: MyColors.gray,
       ),
-      Spacer(),
-      SwipingButton(
-        text: "Хүлээлгэн өгсөн",
-        buttonTextStyle: TextStyle(
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.normal,
-          color: MyColors.white,
-          fontSize: 14,
-        ),
-        swipeButtonColor: MyColors.primary,
-        height: 50,
-        onSwipeCallback: () {
-          _driverCtx.changePage(4);
-        },
-      ),
-      SizedBox(height: 40),
+      swipingButton("Хүлээлгэн өгсөн", () {
+        _driverCtx.step.value = 4;
+      })
     ],
   );
 }
@@ -420,4 +198,214 @@ Widget deliverySucceeded() {
       SizedBox(height: 40),
     ],
   );
+}
+
+Widget swipingButton(String text, dynamic callBack) {
+  return Column(
+    children: [
+      const SizedBox(height: 24),
+      SwipingButton(
+        text: text,
+        buttonTextStyle: const TextStyle(
+          fontFamily: 'Nunito',
+          fontWeight: FontWeight.normal,
+          color: MyColors.white,
+          fontSize: 14,
+        ),
+        swipeButtonColor: MyColors.primary,
+        height: 50,
+        onSwipeCallback: callBack,
+      ),
+      const SizedBox(height: 24),
+    ],
+  );
+}
+
+Widget countDownTimer() {
+  return Obx(
+    () => Container(
+      margin: EdgeInsets.only(top: Get.height * .05),
+      child: CircularCountDownTimer(
+        duration: 30,
+        initialDuration: 0,
+        controller: _driverCtx.countDownController.value,
+        width: Get.width / 4,
+        height: Get.width / 4,
+        ringColor: MyColors.black,
+        ringGradient: null,
+        fillColor: MyColors.primary,
+        fillGradient: null,
+        backgroundColor: MyColors.white,
+        backgroundGradient: null,
+        strokeWidth: 20.0,
+        strokeCap: StrokeCap.round,
+        textStyle: TextStyle(
+            fontSize: 24.0,
+            color: MyColors.primary,
+            fontWeight: FontWeight.bold),
+        textFormat: CountdownTextFormat.MM_SS,
+        isReverse: true,
+        isReverseAnimation: false,
+        isTimerTextShown: true,
+        autoStart: false,
+        onStart: () {
+          print("Starting");
+        },
+        onComplete: () {
+          stopSound();
+          _driverCtx.deliveryRequest.value = false;
+        },
+        onChange: (String timeStamp) {
+          debugPrint('Countdown Changed $timeStamp');
+        },
+        timeFormatterFunction: (defaultFormatterFunction, duration) {
+          if (duration.inSeconds == 0) {
+            return "Start";
+          } else {
+            return Function.apply(defaultFormatterFunction, [duration]);
+          }
+        },
+      ),
+    ),
+  );
+}
+
+Widget _deliveryInfo() {
+  return Column(mainAxisSize: MainAxisSize.min, children: [
+    Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          highlightColor: MyColors.black,
+          splashColor: MyColors.black,
+          hoverColor: MyColors.black,
+          onPressed: () {
+            stopSound();
+            _driverCtx.deliveryRequest.value = false;
+          },
+          icon: const Icon(FontAwesomeIcons.xmark),
+        ),
+        // CustomButton(
+        //   height: 24,
+        //   elevation: 0,
+        //   isFullWidth: false,
+        //   bgColor: MyColors.white,
+        //   text: "Татгалзах",
+        //   textFontWeight: FontWeight.bold,
+        //   textColor: MyColors.black,
+        //   onPressed: () {
+        //     Get.back();
+        //   },
+        //   prefix: const Padding(
+        //     padding: EdgeInsets.only(right: 8),
+        //     child: Icon(
+        //       FontAwesomeIcons.xmark,
+        //       size: 18,
+        //     ),
+        //   ),
+        // ),
+      ],
+    ),
+    CustomText(
+        fontWeight: FontWeight.bold,
+        text: "${_driverCtx.distance.value} km, ${_driverCtx.duration.value}"),
+    const SizedBox(height: 24),
+    ListTile(
+      leading: const CircleAvatar(
+        radius: 30,
+        backgroundImage: NetworkImage(
+            "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+      ),
+      title: const CustomText(
+        text: "Modern Nomads restaurant",
+        fontSize: 14,
+      ),
+      subtitle: const CustomText(
+        text: "5-р микр 8-р байр",
+        fontSize: 12,
+      ),
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CustomText(
+            text: "Төлбөр:",
+            fontSize: 10,
+            color: MyColors.gray,
+          ),
+          const SizedBox(height: 4),
+          CustomText(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            text: convertToCurrencyFormat(double.parse("3000"),
+                toInt: true, locatedAtTheEnd: true),
+          ),
+        ],
+      ),
+    ),
+    const SizedBox(height: 12),
+    const MySeparator(
+      color: MyColors.gray,
+    ),
+    const SizedBox(height: 24),
+    Row(
+      children: [
+        SizedBox(
+          width: Get.width * .1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(
+                Icons.circle,
+                size: 18,
+                color: MyColors.primary,
+              ),
+              SizedBox(height: Get.height * .01),
+              Container(
+                height: Get.height * .05,
+                width: 1,
+                color: MyColors.grey,
+              ),
+              SizedBox(height: Get.height * .01),
+              Icon(
+                Icons.circle,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: Get.width * .75,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: CustomText(
+                  text: "Modern Nomads restaurant",
+                  fontSize: 14,
+                ),
+                subtitle: CustomText(
+                  text: "5-р микр 8-р байр",
+                  fontSize: 12,
+                ),
+              ),
+              ListTile(
+                title: CustomText(
+                  text: "6-р микр 20-р байр, 31 тоот",
+                  fontSize: 14,
+                ),
+                subtitle: CustomText(
+                  text: "5-р микр 8-р байр",
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+    swipingButton("Зөвшөөрөх", () {
+      stopSound();
+      _driverCtx.step.value = 1;
+    })
+  ]);
 }

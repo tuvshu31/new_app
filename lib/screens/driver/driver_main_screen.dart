@@ -6,6 +6,7 @@ import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
+import 'package:Erdenet24/screens/store/orders/order_details.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -32,6 +33,9 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     super.initState();
     // _driverCtx.determineUsersPosition();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      _driverCtx.deliveryRequest.value = true;
+      _driverCtx.storeLat.value = double.parse(message.data["latitude"]);
+      _driverCtx.storeLng.value = double.parse(message.data["longitude"]);
       _driverCtx.deliveryRequestArrived();
       log("Firebase.s foreground message irj bn ;)");
     });
@@ -65,29 +69,14 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     return Obx(
       () => Stack(children: [
         const DriverScreenMapView(),
-        _driverCtx.acceptedTheDelivery.value
-            ? Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: Get.height * .4,
-                  color: MyColors.white,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: Get.width * .06, vertical: Get.width * .06),
-                  child: PageView(
-                    allowImplicitScrolling: false,
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: _driverCtx.pageController.value,
-                    onPageChanged: (value) {
-                      // _driverCtx.changePage(value);
-                    },
-                    children: [
-                      arrivedAtRestaurant(),
-                      receivedFromRestaurant(),
-                      arrivedAtReceiver(),
-                      deliverySucceeded(),
-                    ],
-                  ),
-                ),
+        _driverCtx.deliveryRequest.value
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _driverCtx.step.value == 0 ? countDownTimer() : Container(),
+                  SizedBox(height: Get.height * .1),
+                  incomingNewOrder()
+                ],
               )
             : Container(),
       ]),
