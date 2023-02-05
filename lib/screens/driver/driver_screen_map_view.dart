@@ -1,6 +1,4 @@
 import 'dart:developer';
-
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
@@ -14,14 +12,12 @@ class DriverScreenMapView extends StatefulWidget {
 }
 
 class DriverScreenMapViewState extends State<DriverScreenMapView> {
-  Set<Marker> markers = {};
   final _driverCtx = Get.put(DriverController());
 
   @override
   void initState() {
     super.initState();
     _driverCtx.getCurrentLocation();
-    _driverCtx.setMarker(_driverCtx.driverLocation.value, markers, "driver");
   }
 
   @override
@@ -34,7 +30,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
         onMapCreated: (GoogleMapController controller) {
           _driverCtx.googleMapController.value.complete(controller);
         },
-        markers: markers,
+        markers: Set<Marker>.of(_driverCtx.markers.values),
       ),
     );
   }

@@ -2,6 +2,15 @@ import 'dart:math';
 
 import 'package:intl/intl.dart';
 
+int random4digit() {
+  var rnd = Random();
+  var next = rnd.nextDouble() * 10000;
+  while (next < 1000) {
+    next *= 10;
+  }
+  return next.toInt();
+}
+
 int random6digit() {
   var rnd = Random();
   var next = rnd.nextDouble() * 1000000;

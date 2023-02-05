@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
 import 'package:slide_to_act/slide_to_act.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
@@ -15,7 +15,6 @@ import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
 
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});
@@ -47,13 +46,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    // _driverCtx.determineUsersPosition();
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      // _driverCtx.storeLat.value = double.parse(message.data["latitude"]);
-      // _driverCtx.storeLng.value = double.parse(message.data["longitude"]);
-      // _driverCtx.deliveryRequestArrived();
-      log("Firebase.s foreground message irj bn ;)");
-    });
+    _driverCtx.firebaseMessagingForegroundHandler();
   }
 
   @override
@@ -78,12 +71,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CustomButton(
-                      text: "Press me",
-                      onPressed: (() {
-                        _driverCtx.getNewDelivery();
-                      }),
-                    ),
                     countDownTimer(),
                     bottomSheets(),
                   ],
@@ -121,7 +108,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                 trackColor: MyColors.background,
                 activeColor: MyColors.black,
                 onChanged: (value) {
-                  _driverCtx.turnedOnApp(value);
+                  _driverCtx.turnOnOff(value);
                 }),
           ),
         ],
@@ -134,41 +121,18 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
       () => _driverCtx.step.value == 1
           ? Container(
               margin: EdgeInsets.only(bottom: Get.height * .03),
-              child: CircularCountDownTimer(
-                duration: 30,
-                initialDuration: 0,
-                controller: _driverCtx.countDownController.value,
-                width: Get.width / 4,
-                height: Get.width / 4,
-                ringColor: MyColors.black,
-                ringGradient: null,
-                fillColor: MyColors.primary,
-                fillGradient: null,
-                backgroundColor: MyColors.white,
-                backgroundGradient: null,
-                strokeWidth: 20.0,
-                strokeCap: StrokeCap.round,
+              child: TimeCircularCountdown(
+                countdownRemainingColor: MyColors.primary,
+                unit: CountdownUnit.second,
                 textStyle: const TextStyle(
-                    fontSize: 24.0,
-                    color: MyColors.primary,
-                    fontWeight: FontWeight.bold),
-                textFormat: CountdownTextFormat.MM_SS,
-                isReverse: true,
-                isReverseAnimation: false,
-                isTimerTextShown: true,
-                autoStart: false,
-                onStart: () {},
-                onComplete: () {
-                  stopSound();
-                  _driverCtx.step.value = 0;
-                },
-                onChange: (String timeStamp) {},
-                timeFormatterFunction: (defaultFormatterFunction, duration) {
-                  if (duration.inSeconds == 0) {
-                    return "Start";
-                  } else {
-                    return Function.apply(defaultFormatterFunction, [duration]);
-                  }
+                  color: MyColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+                countdownTotal: 30,
+                onUpdated: (unit, remainingTime) {},
+                onFinished: () {
+                  _driverCtx.cancelNewDelivery();
                 },
               ),
             )
@@ -205,14 +169,14 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                             color: MyColors.white,
                           ),
                           onSubmit: () {
-                            Future.delayed(const Duration(milliseconds: 500),
+                            Future.delayed(const Duration(milliseconds: 300),
                                 () {
                               key.currentState!.reset();
                               if (_driverCtx.step.value == 5) {
-                                _driverCtx.step.value = 0;
+                                _driverCtx.finishDelivery();
                               } else {
-                                _driverCtx.step.value += 1;
                                 stopSound();
+                                _driverCtx.step.value += 1;
                               }
                             });
                           },
@@ -222,9 +186,10 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                             color: MyColors.white,
                           ),
                           child: Text(
-                            texts[_driverCtx.step.value],
+                            texts[_driverCtx.step.value].toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
+                              fontSize: 14,
                             ),
                           ),
                         ),

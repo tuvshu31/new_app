@@ -29,16 +29,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 final _driverCtx = Get.put(DriverController());
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  // await Firebase.initializeApp();
-  // _driverCtx.storeLat.value = message.data["latitude"];
-  // _driverCtx.storeLng = message.data["longitude"];
-  // _driverCtx.deliveryRequestArrived();
-  print("Handling a background message: ${message.messageId}");
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,7 +55,8 @@ void main() async {
   }
   log(fcmToken.toString());
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(
+      _driverCtx.firebaseMessagingBackgroundHandler);
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();

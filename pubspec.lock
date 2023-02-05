@@ -204,13 +204,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  circular_countdown_timer:
+  circular_countdown:
     dependency: "direct main"
     description:
-      name: circular_countdown_timer
+      name: circular_countdown
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.3"
+    version: "2.1.0"
   cli_util:
     dependency: transitive
     description:
@@ -281,6 +281,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  custom_timer:
+    dependency: "direct main"
+    description:
+      name: custom_timer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   dart_style:
     dependency: transitive
     description:
@@ -1195,6 +1202,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  slide_countdown:
+    dependency: "direct main"
+    description:
+      name: slide_countdown
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.1"
   slide_to_act:
     dependency: "direct main"
     description:
@@ -1251,6 +1265,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  stream_duration:
+    dependency: transitive
+    description:
+      name: stream_duration
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   stream_transform:
     dependency: transitive
     description:
@@ -1448,5 +1469,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.2 <3.0.0"
+  dart: ">=2.18.1 <3.0.0"
   flutter: ">=3.3.0"

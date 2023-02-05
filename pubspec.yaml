@@ -65,7 +65,6 @@ dependencies:
   path_provider:
   qr_flutter:
   qr_code_scanner:
-  circular_countdown_timer:
   flutter_launcher_icons:
   quickalert:
   json_serializable:
@@ -84,6 +83,9 @@ dependencies:
   firebase_core:
   firebase_messaging:
   slide_to_act: ^2.0.1
+  circular_countdown: ^2.1.0
+  custom_timer: ^0.2.3
+  slide_countdown: ^0.4.1
 
 dev_dependencies:
   flutter_test:
