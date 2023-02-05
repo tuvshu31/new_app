@@ -13,7 +13,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:iconly/iconly.dart';
-import 'package:swipebuttonflutter/swipebuttonflutter.dart';
 
 final _driverCtx = Get.put(DriverController());
 final player = AudioPlayer();
@@ -26,145 +25,193 @@ void stopSound() async {
   player.stop();
 }
 
-Widget bottomSheets(int step) {
-  switch (step) {
-    case 0:
-      return _deliveryInfo();
-    case 1:
-      return _arrivedAtRestaurant();
-    case 2:
-      return _receivedFromRestaurant();
-    case 3:
-      return _arrivedAtReceiver();
-    case 4:
-      return _arrivedAtReceiver();
-  }
-  return Container();
-}
-
-Widget incomingNewOrder() {
-  return Obx(
-    () => Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        color: MyColors.white,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-        child: bottomSheets(_driverCtx.step.value),
-      ),
-    ),
-  );
-}
-
-Widget _arrivedAtRestaurant() {
+Widget step1() {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: CircleAvatar(
-          backgroundImage: const NetworkImage(
-              scale: 2,
-              "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
-        ),
-        title: CustomText(
-          text: "Modern Nomads restaurant",
-          fontSize: 14,
-        ),
-        subtitle: CustomText(
-          text: "Утас: +976-99921312",
-          fontSize: 12,
-        ),
-        trailing: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child:
-              Image(image: AssetImage("assets/images/png/app/phone-call.png")),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CustomText(
+                    text: convertToCurrencyFormat(
+                      3000,
+                      toInt: true,
+                      locatedAtTheEnd: true,
+                    ),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  SizedBox(height: 4),
+                  CustomText(
+                    text: "2.5 km, 4 минут",
+                    color: MyColors.gray,
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _driverCtx.step.value = 0;
+                stopSound();
+              },
+              child: Icon(
+                Icons.close,
+                size: 28,
+              ),
+            ),
+          ],
         ),
       ),
-      swipingButton("Ирлээ", () {
-        _driverCtx.step.value = 2;
-      })
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(
+                "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+          ),
+          title: const CustomText(
+            text: "Modern Nomads restaurant",
+            fontSize: 14,
+          ),
+          subtitle: const CustomText(
+            text: "5-р микр 8-р байр",
+            fontSize: 12,
+          ),
+        ),
+      ),
+      const MySeparator(color: MyColors.grey),
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: const ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: MyColors.white,
+            radius: 30,
+            child: Image(
+              width: 32,
+              image: AssetImage(
+                "assets/images/png/app/home.png",
+              ),
+            ),
+          ),
+          title: CustomText(
+            text: "6-20-31 тоот",
+            fontSize: 14,
+          ),
+          subtitle: CustomText(
+            text: "99921312",
+            fontSize: 12,
+          ),
+        ),
+      ),
     ],
   );
 }
 
-Widget _receivedFromRestaurant() {
+Widget step2() {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundImage: const NetworkImage(
+                scale: 2,
+                "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+          ),
+          title: CustomText(
+            text: "Modern Nomads restaurant",
+            fontSize: 14,
+          ),
+          trailing: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image(
+                image: AssetImage("assets/images/png/app/phone-call.png")),
+          ),
+        ),
+      ),
+      SizedBox(height: 12)
+    ],
+  );
+}
+
+Widget step3() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       const CustomText(
         text: "Баталгаажуулах код:",
         color: MyColors.gray,
-        fontSize: 12,
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: 12),
       const CustomText(
         text: "3728",
         fontSize: 28,
       ),
       const SizedBox(height: 12),
       const CustomText(
-        text: "15:00:00",
+        text: "15:00",
         color: MyColors.success,
       ),
       const SizedBox(height: 24),
-      swipingButton("Хүлээн авсан", () {
-        _driverCtx.step.value = 3;
-      })
     ],
   );
 }
 
-Widget _arrivedAtReceiver() {
+Widget step4() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-      ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: MyColors.background,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                IconlyLight.user,
-                size: 18,
+      Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            backgroundColor: MyColors.white,
+            radius: 20,
+            child: Image(
+              width: 32,
+              image: AssetImage(
+                "assets/images/png/app/home.png",
               ),
             ),
-          ],
-        ),
-        title: CustomText(
-          text: "Хүлээн авагч:",
-          fontSize: 14,
-        ),
-        subtitle: CustomText(
-          text: "4-р микр 24-р байр 31 тоот",
-          fontSize: 12,
-        ),
-        trailing: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child:
-              Image(image: AssetImage("assets/images/png/app/phone-call.png")),
+          ),
+          title: CustomText(
+            text: "4-р микр 24-р байр 31 тоот",
+          ),
+          trailing: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image(
+                image: AssetImage("assets/images/png/app/phone-call.png")),
+          ),
         ),
       ),
-      const SizedBox(height: 24),
-      MySeparator(
-        color: MyColors.gray,
-      ),
-      swipingButton("Хүлээлгэн өгсөн", () {
-        _driverCtx.step.value = 4;
-      })
+      const SizedBox(height: 12),
     ],
   );
 }
 
-Widget deliverySucceeded() {
+Widget step5() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
+      Image(
+        image: AssetImage("assets/images/png/app/yes.png"),
+        width: Get.width * .3,
+      ),
+      const SizedBox(height: 24),
       const CustomText(text: "Хүргэлт амжилттай"),
       const SizedBox(height: 8),
       CustomText(
@@ -176,236 +223,11 @@ Widget deliverySucceeded() {
         ),
       ),
       const SizedBox(height: 8),
-      const CustomText(text: "Орлого нэмэгдлээ"),
-      const SizedBox(height: 24),
-      const MySeparator(color: MyColors.gray),
-      Spacer(),
-      SwipingButton(
-        text: "Дуусгах",
-        buttonTextStyle: TextStyle(
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.normal,
-          color: MyColors.white,
-          fontSize: 14,
-        ),
-        swipeButtonColor: MyColors.primary,
-        height: 50,
-        onSwipeCallback: () {
-          _driverCtx.changePage(5);
-          _driverCtx.acceptedTheDelivery.value = false;
-        },
-      ),
-      SizedBox(height: 40),
-    ],
-  );
-}
-
-Widget swipingButton(String text, dynamic callBack) {
-  return Column(
-    children: [
-      const SizedBox(height: 24),
-      SwipingButton(
-        text: text,
-        buttonTextStyle: const TextStyle(
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.normal,
-          color: MyColors.white,
-          fontSize: 14,
-        ),
-        swipeButtonColor: MyColors.primary,
-        height: 50,
-        onSwipeCallback: callBack,
-      ),
-      const SizedBox(height: 24),
-    ],
-  );
-}
-
-Widget countDownTimer() {
-  return Obx(
-    () => Container(
-      margin: EdgeInsets.only(top: Get.height * .05),
-      child: CircularCountDownTimer(
-        duration: 30,
-        initialDuration: 0,
-        controller: _driverCtx.countDownController.value,
-        width: Get.width / 4,
-        height: Get.width / 4,
-        ringColor: MyColors.black,
-        ringGradient: null,
-        fillColor: MyColors.primary,
-        fillGradient: null,
-        backgroundColor: MyColors.white,
-        backgroundGradient: null,
-        strokeWidth: 20.0,
-        strokeCap: StrokeCap.round,
-        textStyle: TextStyle(
-            fontSize: 24.0,
-            color: MyColors.primary,
-            fontWeight: FontWeight.bold),
-        textFormat: CountdownTextFormat.MM_SS,
-        isReverse: true,
-        isReverseAnimation: false,
-        isTimerTextShown: true,
-        autoStart: false,
-        onStart: () {
-          print("Starting");
-        },
-        onComplete: () {
-          stopSound();
-          _driverCtx.deliveryRequest.value = false;
-        },
-        onChange: (String timeStamp) {
-          debugPrint('Countdown Changed $timeStamp');
-        },
-        timeFormatterFunction: (defaultFormatterFunction, duration) {
-          if (duration.inSeconds == 0) {
-            return "Start";
-          } else {
-            return Function.apply(defaultFormatterFunction, [duration]);
-          }
-        },
-      ),
-    ),
-  );
-}
-
-Widget _deliveryInfo() {
-  return Column(mainAxisSize: MainAxisSize.min, children: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          highlightColor: MyColors.black,
-          splashColor: MyColors.black,
-          hoverColor: MyColors.black,
-          onPressed: () {
-            stopSound();
-            _driverCtx.deliveryRequest.value = false;
-          },
-          icon: const Icon(FontAwesomeIcons.xmark),
-        ),
-        // CustomButton(
-        //   height: 24,
-        //   elevation: 0,
-        //   isFullWidth: false,
-        //   bgColor: MyColors.white,
-        //   text: "Татгалзах",
-        //   textFontWeight: FontWeight.bold,
-        //   textColor: MyColors.black,
-        //   onPressed: () {
-        //     Get.back();
-        //   },
-        //   prefix: const Padding(
-        //     padding: EdgeInsets.only(right: 8),
-        //     child: Icon(
-        //       FontAwesomeIcons.xmark,
-        //       size: 18,
-        //     ),
-        //   ),
-        // ),
-      ],
-    ),
-    CustomText(
-        fontWeight: FontWeight.bold,
-        text: "${_driverCtx.distance.value} km, ${_driverCtx.duration.value}"),
-    const SizedBox(height: 24),
-    ListTile(
-      leading: const CircleAvatar(
-        radius: 30,
-        backgroundImage: NetworkImage(
-            "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
-      ),
-      title: const CustomText(
-        text: "Modern Nomads restaurant",
-        fontSize: 14,
-      ),
-      subtitle: const CustomText(
-        text: "5-р микр 8-р байр",
+      const CustomText(
+        text: "Орлого нэмэгдлээ",
         fontSize: 12,
       ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CustomText(
-            text: "Төлбөр:",
-            fontSize: 10,
-            color: MyColors.gray,
-          ),
-          const SizedBox(height: 4),
-          CustomText(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            text: convertToCurrencyFormat(double.parse("3000"),
-                toInt: true, locatedAtTheEnd: true),
-          ),
-        ],
-      ),
-    ),
-    const SizedBox(height: 12),
-    const MySeparator(
-      color: MyColors.gray,
-    ),
-    const SizedBox(height: 24),
-    Row(
-      children: [
-        SizedBox(
-          width: Get.width * .1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(
-                Icons.circle,
-                size: 18,
-                color: MyColors.primary,
-              ),
-              SizedBox(height: Get.height * .01),
-              Container(
-                height: Get.height * .05,
-                width: 1,
-                color: MyColors.grey,
-              ),
-              SizedBox(height: Get.height * .01),
-              Icon(
-                Icons.circle,
-                size: 18,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: Get.width * .75,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: CustomText(
-                  text: "Modern Nomads restaurant",
-                  fontSize: 14,
-                ),
-                subtitle: CustomText(
-                  text: "5-р микр 8-р байр",
-                  fontSize: 12,
-                ),
-              ),
-              ListTile(
-                title: CustomText(
-                  text: "6-р микр 20-р байр, 31 тоот",
-                  fontSize: 14,
-                ),
-                subtitle: CustomText(
-                  text: "5-р микр 8-р байр",
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-    swipingButton("Зөвшөөрөх", () {
-      stopSound();
-      _driverCtx.step.value = 1;
-    })
-  ]);
+      const SizedBox(height: 12),
+    ],
+  );
 }

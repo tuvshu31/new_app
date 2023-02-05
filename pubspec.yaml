@@ -81,9 +81,9 @@ dependencies:
   google_maps_flutter:
   geolocator:
   audioplayers:
-  swipebuttonflutter:
   firebase_core:
   firebase_messaging:
+  slide_to_act: ^2.0.1
 
 dev_dependencies:
   flutter_test:
