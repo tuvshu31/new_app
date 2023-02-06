@@ -58,7 +58,7 @@ Widget step1() {
                 onTap: () {
                   _driverCtx.cancelNewDelivery();
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.close,
                   size: 28,
                 ),
@@ -226,7 +226,7 @@ Widget step5() {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Image(
-        image: AssetImage("assets/images/png/app/yes.png"),
+        image: const AssetImage("assets/images/png/app/yes.png"),
         width: Get.width * .3,
       ),
       const SizedBox(height: 24),

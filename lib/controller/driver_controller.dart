@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'package:custom_timer/custom_timer.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../screens/driver/driver_bottom_views.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../screens/driver/driver_bottom_views.dart';
 
 class DriverController extends GetxController {
   //General values
@@ -204,24 +204,3 @@ class DriverController extends GetxController {
     }
   }
 }
-
-// Widget activeTimerCountDown() {
-//   String strDigits(int n) => n.toString().padLeft(2, '0');
-//   final hours = strDigits(_driverCtx.myDuration.inHours.remainder(60));
-//   final minutes = strDigits(_driverCtx.myDuration.inMinutes.remainder(60));
-//   final seconds = strDigits(_driverCtx.myDuration.inSeconds.remainder(60));
-//   return _driverCtx.isDriverActive.value
-//       ? Positioned(
-//           right: 0,
-//           child: Container(
-//             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//             decoration: const BoxDecoration(color: MyColors.white),
-//             child: CustomText(
-//               text: "$hours:$minutes:$seconds",
-//               color: MyColors.primary,
-//               fontSize: 12,
-//             ),
-//           ),
-//         )
-//       : Container();
-// }
