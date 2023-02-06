@@ -9,8 +9,6 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
-import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
-import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/category_products.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';

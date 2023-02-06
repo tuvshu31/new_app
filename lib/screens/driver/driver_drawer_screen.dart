@@ -1,3 +1,6 @@
+import 'package:Erdenet24/screens/driver/driver_deliver_list_page.dart';
+import 'package:Erdenet24/screens/driver/driver_payments_page.dart';
+import 'package:Erdenet24/screens/driver/driver_settings_page.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -13,10 +16,12 @@ Widget driverDrawer() {
         DrawerHeader(
             decoration: BoxDecoration(color: Colors.red),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  width: 90,
-                  height: 90,
+                  width: 75,
+                  height: 75,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: MyColors.white,
@@ -27,21 +32,25 @@ Widget driverDrawer() {
                     color: MyColors.grey,
                   ),
                 ),
-                SizedBox(height: 14),
                 CustomText(
-                  text: "+976-99921312",
+                  text: "Э.Түвшинбаяр",
                   color: MyColors.white,
                 )
               ],
             )),
-        _listTile(IconlyLight.user, "Тохиргоо", () {}),
-        _listTile(IconlyLight.location, "Хүргэлтүүд", () {}),
-        _listTile(IconlyLight.wallet, "Төлбөр", () {}),
+        _listTile(IconlyLight.user, "Тохиргоо", () {
+          Get.to(DriverSettingsPage());
+        }),
+        _listTile(IconlyLight.location, "Хүргэлтүүд", () {
+          Get.to(DriverDeliverListPage());
+        }),
+        _listTile(IconlyLight.wallet, "Төлбөр", () {
+          Get.to(DriverPaymentsPage());
+        }),
         SizedBox(height: Get.height * .45),
-        CustomText(
-          text: "Холбоо барих:",
-          textAlign: TextAlign.center,
-        ),
+        _listTile(IconlyLight.logout, "Аппаас гарах", () {
+          // Get.to(DriverPaymentsPage());
+        }),
         SizedBox(height: 18),
       ],
     ),

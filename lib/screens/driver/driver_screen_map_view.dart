@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
@@ -13,6 +14,7 @@ class DriverScreenMapView extends StatefulWidget {
 
 class DriverScreenMapViewState extends State<DriverScreenMapView> {
   final _driverCtx = Get.put(DriverController());
+  dynamic bearing;
 
   @override
   void initState() {
@@ -24,6 +26,12 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
   Widget build(BuildContext context) {
     return Obx(
       () => GoogleMap(
+        onCameraMove: (position) {
+          _driverCtx.driverBearing.value = position.bearing;
+
+          setState(() {});
+        },
+        compassEnabled: true,
         mapType: MapType.normal,
         initialCameraPosition:
             CameraPosition(target: _driverCtx.driverLocation.value),
@@ -31,6 +39,16 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
           _driverCtx.googleMapController.value.complete(controller);
         },
         markers: Set<Marker>.of(_driverCtx.markers.values),
+        circles: {
+          Circle(
+            fillColor: MyColors.primary,
+            strokeColor: MyColors.primary.withOpacity(0.3),
+            strokeWidth: 20,
+            circleId: const CircleId("origin"),
+            center: _driverCtx.driverLocation.value,
+            radius: 5,
+          )
+        },
       ),
     );
   }

@@ -17,8 +17,8 @@ class DriverController extends GetxController {
   RxInt step = 0.obs;
   RxBool isActive = false.obs;
   RxMap remoteMessageData = {}.obs;
-  RxDouble driverHeading = 0.0.obs;
   RxMap deliveryInfo = {}.obs;
+  RxDouble driverBearing = 0.0.obs;
   //Location-tai holbootoi values
   RxString distanceAndDuration = "".obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
@@ -29,12 +29,12 @@ class DriverController extends GetxController {
 
   void turnOnOff(value) async {
     isActive.value = value;
-    if (value && await isLocationServiceEnabled()) {
+    if (value) {
+      checkPermission();
       getCurrentLocation();
       positionStreamForMap();
-      positionStreamForServer();
+      // positionStreamForServer();
       moveCamera(driverLocation.value, 18);
-      addMarker("driver", driverLocation.value);
     }
   }
 
@@ -61,21 +61,16 @@ class DriverController extends GetxController {
   }
 
   //Controller-d hereglej bga helper.uud:
-  Future<bool> isLocationServiceEnabled() async {
-    bool enabled = await Geolocator.isLocationServiceEnabled();
-    return enabled;
-  }
 
   void getCurrentLocation() async {
     var info = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
+        desiredAccuracy: LocationAccuracy.high);
     driverLocation.value = LatLng(info.latitude, info.longitude);
-    driverHeading.value = info.heading;
   }
 
   void positionStreamForMap() {
     LocationSettings locationSettingsForMap = const LocationSettings(
-      accuracy: LocationAccuracy.bestForNavigation,
+      accuracy: LocationAccuracy.best,
       distanceFilter: 3,
     );
     Geolocator.getPositionStream(locationSettings: locationSettingsForMap)
@@ -87,7 +82,7 @@ class DriverController extends GetxController {
 
   void positionStreamForServer() {
     LocationSettings locationSettingsForServer = const LocationSettings(
-      accuracy: LocationAccuracy.bestForNavigation,
+      accuracy: LocationAccuracy.best,
       distanceFilter: 200,
     );
     Geolocator.getPositionStream(locationSettings: locationSettingsForServer)
@@ -102,8 +97,7 @@ class DriverController extends GetxController {
         CameraPosition(
           target: latLng,
           zoom: zoom,
-          bearing: driverHeading.value,
-          tilt: 59,
+          bearing: driverBearing.value,
         ),
       ),
     );
@@ -155,6 +149,11 @@ class DriverController extends GetxController {
         double.parse(message.data["latitude"]),
         double.parse(message.data["longitude"]),
       );
+      deliveryInfo.value = message.data;
+      storeLocation.value = LatLng(
+        double.parse(deliveryInfo["latitude"]),
+        double.parse(deliveryInfo["longitude"]),
+      );
       getNewDelivery();
       log("Firebase.s foreground message irj bn $message");
     });
@@ -183,26 +182,46 @@ class DriverController extends GetxController {
     );
     await launchUrl(launchUri);
   }
+
+  void checkPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+  }
 }
 
-
-  // Widget activeTimerCountDown() {
-  //   String strDigits(int n) => n.toString().padLeft(2, '0');
-  //   final hours = strDigits(_driverCtx.myDuration.inHours.remainder(60));
-  //   final minutes = strDigits(_driverCtx.myDuration.inMinutes.remainder(60));
-  //   final seconds = strDigits(_driverCtx.myDuration.inSeconds.remainder(60));
-  //   return _driverCtx.isDriverActive.value
-  //       ? Positioned(
-  //           right: 0,
-  //           child: Container(
-  //             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-  //             decoration: const BoxDecoration(color: MyColors.white),
-  //             child: CustomText(
-  //               text: "$hours:$minutes:$seconds",
-  //               color: MyColors.primary,
-  //               fontSize: 12,
-  //             ),
-  //           ),
-  //         )
-  //       : Container();
-  // }
+// Widget activeTimerCountDown() {
+//   String strDigits(int n) => n.toString().padLeft(2, '0');
+//   final hours = strDigits(_driverCtx.myDuration.inHours.remainder(60));
+//   final minutes = strDigits(_driverCtx.myDuration.inMinutes.remainder(60));
+//   final seconds = strDigits(_driverCtx.myDuration.inSeconds.remainder(60));
+//   return _driverCtx.isDriverActive.value
+//       ? Positioned(
+//           right: 0,
+//           child: Container(
+//             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+//             decoration: const BoxDecoration(color: MyColors.white),
+//             child: CustomText(
+//               text: "$hours:$minutes:$seconds",
+//               color: MyColors.primary,
+//               fontSize: 12,
+//             ),
+//           ),
+//         )
+//       : Container();
+// }
