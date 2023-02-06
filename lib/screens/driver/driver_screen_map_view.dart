@@ -28,7 +28,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
       () => GoogleMap(
         onCameraMove: (position) {
           _driverCtx.driverBearing.value = position.bearing;
-
+          _driverCtx.driverTarget.value = position.target;
           setState(() {});
         },
         compassEnabled: true,
@@ -41,12 +41,13 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
         markers: Set<Marker>.of(_driverCtx.markers.values),
         circles: {
           Circle(
+            zIndex: 5,
             fillColor: MyColors.primary,
             strokeColor: MyColors.primary.withOpacity(0.3),
-            strokeWidth: 20,
+            strokeWidth: 24,
             circleId: const CircleId("origin"),
             center: _driverCtx.driverLocation.value,
-            radius: 5,
+            radius: 7,
           )
         },
       ),

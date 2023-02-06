@@ -19,6 +19,7 @@ import 'package:Erdenet24/screens/profile/user/user_settings.dart';
 import 'package:Erdenet24/screens/user/user_order_main_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:new_version_plus/new_version_plus.dart';
@@ -27,6 +28,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 final _driverCtx = Get.put(DriverController());
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  _driverCtx.deliveryInfo.value = message.data;
+  _driverCtx.getNewDelivery();
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,9 +63,8 @@ void main() async {
     await RestApi().updateUser(53, body);
   }
   log(fcmToken.toString());
-
-  FirebaseMessaging.onBackgroundMessage(
-      _driverCtx.firebaseMessagingBackgroundHandler);
+  _driverCtx.checkPermission();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();

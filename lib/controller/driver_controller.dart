@@ -19,6 +19,7 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxDouble driverBearing = 0.0.obs;
+  Rx<LatLng> driverTarget = LatLng(49.02821126030273, 104.04634376483777).obs;
   //Location-tai holbootoi values
   RxString distanceAndDuration = "".obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
@@ -28,17 +29,22 @@ class DriverController extends GetxController {
       Completer<GoogleMapController>().obs;
 
   void turnOnOff(value) async {
-    isActive.value = value;
-    if (value) {
-      checkPermission();
-      getCurrentLocation();
-      positionStreamForMap();
-      // positionStreamForServer();
-      moveCamera(driverLocation.value, 18);
+    if (step.value == 0) {
+      isActive.value = value;
+      if (value) {
+        getCurrentLocation();
+        positionStreamForMap();
+        // positionStreamForServer();
+        moveCamera(driverLocation.value, 18);
+      }
     }
   }
 
   void getNewDelivery() async {
+    storeLocation.value = LatLng(
+      double.parse(deliveryInfo["latitude"]),
+      double.parse(deliveryInfo["longitude"]),
+    );
     getDistance(driverLocation.value, storeLocation.value);
     addMarker("store", storeLocation.value);
     moveCamera(storeLocation.value, 12);
@@ -139,24 +145,6 @@ class DriverController extends GetxController {
     markers.removeWhere(
       (key, value) => value.markerId == MarkerId(type),
     );
-  }
-
-  @pragma('vm:entry-point')
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      storeLocation.value = LatLng(
-        double.parse(message.data["latitude"]),
-        double.parse(message.data["longitude"]),
-      );
-      deliveryInfo.value = message.data;
-      storeLocation.value = LatLng(
-        double.parse(deliveryInfo["latitude"]),
-        double.parse(deliveryInfo["longitude"]),
-      );
-      getNewDelivery();
-      log("Firebase.s foreground message irj bn $message");
-    });
   }
 
   void firebaseMessagingForegroundHandler() async {
