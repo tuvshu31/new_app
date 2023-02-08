@@ -38,18 +38,8 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
         onMapCreated: (GoogleMapController controller) {
           _driverCtx.googleMapController.value.complete(controller);
         },
-        markers: Set<Marker>.of(_driverCtx.markers.values),
-        circles: {
-          Circle(
-            zIndex: 5,
-            fillColor: MyColors.primary,
-            strokeColor: MyColors.primary.withOpacity(0.3),
-            strokeWidth: 24,
-            circleId: const CircleId("origin"),
-            center: _driverCtx.driverLocation.value,
-            radius: 7,
-          )
-        },
+        // markers: Set<Marker>.of(_driverCtx.markers.values),
+        circles: _driverCtx.circles.value,
       ),
     );
   }

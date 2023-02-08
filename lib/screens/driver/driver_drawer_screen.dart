@@ -19,17 +19,22 @@ Widget driverDrawer() {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Container(
-                  width: 75,
-                  height: 75,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: MyColors.white,
-                  ),
-                  child: Icon(
-                    FontAwesomeIcons.user,
-                    size: 40,
-                    color: MyColors.grey,
+                GestureDetector(
+                  onTap: () {
+                    Get.to(const DriverSettingsPage());
+                  },
+                  child: Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.white,
+                    ),
+                    child: Icon(
+                      FontAwesomeIcons.user,
+                      size: 40,
+                      color: MyColors.grey,
+                    ),
                   ),
                 ),
                 CustomText(
@@ -47,11 +52,10 @@ Widget driverDrawer() {
         _listTile(IconlyLight.wallet, "Төлбөр", () {
           Get.to(DriverPaymentsPage());
         }),
-        SizedBox(height: Get.height * .45),
         _listTile(IconlyLight.logout, "Аппаас гарах", () {
           // Get.to(DriverPaymentsPage());
         }),
-        SizedBox(height: 18),
+        const SizedBox(height: 18),
       ],
     ),
   );

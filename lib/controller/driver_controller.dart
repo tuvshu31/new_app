@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxDouble driverBearing = 0.0.obs;
+  Rx<HashSet<Circle>> circles = HashSet<Circle>().obs;
   Rx<LatLng> driverTarget = LatLng(49.02821126030273, 104.04634376483777).obs;
   //Location-tai holbootoi values
   RxString distanceAndDuration = "".obs;
@@ -36,6 +39,7 @@ class DriverController extends GetxController {
         positionStreamForMap();
         // positionStreamForServer();
         moveCamera(driverLocation.value, 18);
+        addCircles("driver", driverLocation.value);
       }
     }
   }
@@ -46,8 +50,8 @@ class DriverController extends GetxController {
       double.parse(deliveryInfo["longitude"]),
     );
     getDistance(driverLocation.value, storeLocation.value);
-    addMarker("store", storeLocation.value);
-    moveCamera(storeLocation.value, 12);
+    addCircles("store", storeLocation.value);
+    moveCamera(storeLocation.value, 14);
     step.value = 1;
     playSound("incoming");
   }
@@ -139,6 +143,38 @@ class DriverController extends GetxController {
       icon: iconBitmap,
     );
     markers[markerId] = marker;
+  }
+
+  void addCircles(String type, LatLng point) {
+    String circleId = "origin";
+    double radius = 5;
+    int strokeWidth = 24;
+    Color fillColor = MyColors.white;
+    Color strokeColor = MyColors.white;
+    if (type == "driver") {
+      circleId = "driver";
+      fillColor = MyColors.primary;
+      strokeColor = MyColors.primary.withOpacity(0.3);
+    } else if (type == "store") {
+      circleId = "store";
+      radius = 15;
+      fillColor = MyColors.white;
+      strokeColor = MyColors.green;
+      strokeWidth = 40;
+    }
+
+    circles.value.add(Circle(
+      circleId: CircleId(circleId),
+      center: point,
+      radius: radius,
+      fillColor: fillColor,
+      strokeWidth: strokeWidth,
+      strokeColor: strokeColor,
+    ));
+  }
+
+  void removeCircles(String type) {
+    circles.value.removeWhere((element) => element.circleId == type);
   }
 
   void removeMarker(String type) {
