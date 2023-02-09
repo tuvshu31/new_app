@@ -105,7 +105,6 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");
-            _driverCtx.fetchDriverInfo(data["driverId"]);
             Get.offAll(const DriverMainScreen());
             break;
         }

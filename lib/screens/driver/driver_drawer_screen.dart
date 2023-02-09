@@ -1,15 +1,20 @@
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_page.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_page.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_page.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:iconly/iconly.dart';
 
-Widget driverDrawer() {
+final _loginCtx = Get.put(LoginController());
+Widget driverDrawer(context) {
   return Drawer(
     child: ListView(
       children: [
@@ -44,17 +49,20 @@ Widget driverDrawer() {
               ],
             )),
         _listTile(IconlyLight.user, "Тохиргоо", () {
-          Get.to(DriverSettingsPage());
+          Get.to(() => const DriverSettingsPage());
         }),
         _listTile(IconlyLight.location, "Хүргэлтүүд", () {
-          Get.to(DriverDeliverListPage());
+          Get.to(() => const DriverDeliverListPage());
         }),
         _listTile(IconlyLight.wallet, "Төлбөр", () {
-          Get.to(DriverPaymentsPage());
+          Get.to(() => const DriverPaymentsPage());
         }),
-        _listTile(IconlyLight.logout, "Аппаас гарах", () {
-          // Get.to(DriverPaymentsPage());
-        }),
+        _listTile(
+            IconlyLight.logout,
+            "Аппаас гарах",
+            () => logOutModal(context, () {
+                  _loginCtx.logout();
+                })),
         const SizedBox(height: 18),
       ],
     ),

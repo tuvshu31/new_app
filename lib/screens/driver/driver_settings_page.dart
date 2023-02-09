@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
@@ -18,95 +19,91 @@ class DriverSettingsPage extends StatefulWidget {
 }
 
 class _DriverSettingsPageState extends State<DriverSettingsPage> {
-  List settingsList = [
-    {
-      "icon": IconlyLight.call,
-      "name": "Утас",
-      "value": "99921312",
-      "editable": true,
-      "type": "number"
-    },
-    {
-      "icon": IconlyLight.message,
-      "name": "Имэйл",
-      "value": "eet12@gmail.com",
-      "editable": true,
-      "type": "text",
-    },
-    {
-      "icon": IconlyLight.wallet,
-      "name": "Данс",
-      "value": "5020405012",
-      "editable": false,
-      "type": "text",
-    },
-    {
-      "icon": IconlyLight.tick_square,
-      "name": "Хувийн дугаар",
-      "value": "1234",
-      "editable": false,
-      "type": "text"
-    },
-  ];
+  final _driverCtx = Get.put(DriverController());
+
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
       title: "Тохиргоо",
       customActions: Container(),
-      body: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          // padding: const EdgeInsets.symmetric(horizontal: 12),
-          shrinkWrap: true,
-          itemCount: settingsList.length,
-          itemBuilder: (context, index) {
-            var data = settingsList[index];
-            return CustomInkWell(
-              borderRadius: BorderRadius.zero,
-              onTap: () {
-                data["editable"]
-                    ? Get.to(
-                        () => DriverSettingsEditView(
-                          data: data,
-                        ),
-                      )
-                    : null;
-              },
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                leading: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      data["icon"],
-                      color: MyColors.black,
-                      size: 22,
-                    ),
-                  ],
-                ),
-                title: CustomText(text: data["name"]),
-                subtitle: CustomText(text: data["value"]),
-                trailing: data["editable"]
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            IconlyLight.arrow_right_2,
-                            size: 20,
-                            color: MyColors.black,
-                          ),
-                        ],
-                      )
-                    : Container(width: 12),
-              ),
-            );
-          }),
+      body: Column(
+        children: [
+          _listTile(
+            "Утас",
+            _driverCtx.driverInfo["phone"],
+            IconlyLight.call,
+            true,
+          ),
+          _listTile(
+            "Имэйл хаяг",
+            _driverCtx.driverInfo["email"] ?? "@",
+            IconlyLight.message,
+            true,
+          ),
+          _listTile(
+            "Данс",
+            _driverCtx.driverInfo["account"],
+            IconlyLight.wallet,
+            false,
+          ),
+          _listTile(
+            "Хувийн дугаар",
+            _driverCtx.driverInfo["privateNumber"],
+            IconlyLight.tick_square,
+            false,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _listTile(String title, String value, IconData icon, bool editable) {
+    return CustomInkWell(
+      onTap: () => editable
+          ? Get.to(() => DriverSettingsEditView(
+                title: title,
+                value: value,
+              ))
+          : null,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: MyColors.black,
+              size: 22,
+            ),
+          ],
+        ),
+        title: CustomText(text: title),
+        subtitle: CustomText(text: value),
+        trailing: editable
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    IconlyLight.arrow_right_2,
+                    size: 20,
+                    color: MyColors.black,
+                  ),
+                ],
+              )
+            : Container(width: 12),
+      ),
     );
   }
 }
 
 class DriverSettingsEditView extends StatefulWidget {
-  final dynamic data;
-  const DriverSettingsEditView({this.data, super.key});
+  final String title;
+  final String value;
+  const DriverSettingsEditView({
+    this.title = "",
+    this.value = "",
+    super.key,
+  });
 
   @override
   State<DriverSettingsEditView> createState() => _DriverSettingsEditViewState();
@@ -114,13 +111,26 @@ class DriverSettingsEditView extends StatefulWidget {
 
 class _DriverSettingsEditViewState extends State<DriverSettingsEditView> {
   bool isEdited = false;
+  final _driverCtx = Get.put(DriverController());
   TextEditingController controller = TextEditingController();
+  void updateDriverInfo() {
+    var body = {_fieldTitle(widget.title): controller.text};
+    _driverCtx.updateDriverInfo(body);
+  }
 
   @override
   void initState() {
     super.initState();
-    controller.text = widget.data["value"];
-    log(widget.data.toString());
+    controller.text = widget.value;
+  }
+
+  _fieldTitle(String text) {
+    switch (text) {
+      case "Утас":
+        return 'phone';
+      case "Имэйл хаяг":
+        return 'email';
+    }
   }
 
   @override
@@ -134,21 +144,21 @@ class _DriverSettingsEditViewState extends State<DriverSettingsEditView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomText(text: widget.data["name"]),
+              CustomText(text: widget.title),
               const SizedBox(height: 12),
               CustomTextField(
                 autoFocus: true,
                 controller: controller,
                 onChanged: ((p0) {
                   setState(() {
-                    isEdited = p0 != widget.data["value"];
+                    isEdited = p0 != widget.value && p0.length == 8;
                   });
                 }),
               ),
               const SizedBox(height: 24),
               CustomButton(
                 isActive: isEdited,
-                onPressed: () {},
+                onPressed: updateDriverInfo,
                 text: "Хадгалах",
               )
             ],

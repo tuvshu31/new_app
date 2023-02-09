@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,6 +25,7 @@ class DriverController extends GetxController {
   RxMap deliveryInfo = {}.obs;
   RxDouble driverBearing = 0.0.obs;
   RxString fcmToken = "".obs;
+  dynamic driverInfo = [].obs;
   Rx<HashSet<Circle>> circles = HashSet<Circle>().obs;
   Rx<LatLng> driverTarget = LatLng(49.02821126030273, 104.04634376483777).obs;
   //Location-tai holbootoi values
@@ -37,7 +39,17 @@ class DriverController extends GetxController {
   void fetchDriverInfo(int id) async {
     dynamic response = await RestApi().getDriver(id);
     dynamic d = Map<String, dynamic>.from(response);
-    log(d.toString());
+    if (d["success"]) {
+      driverInfo = d["data"];
+    }
+    log(driverInfo.toString());
+  }
+
+  void updateDriverInfo(dynamic body) async {
+    var id = RestApiHelper.getUserId();
+    dynamic user = await RestApi().updateDriver(id, body);
+    dynamic data = Map<String, dynamic>.from(user);
+    if (data["success"]) {}
   }
 
   void turnOnOff(value) async {

@@ -47,6 +47,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
+    _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
     _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
   }
 
@@ -64,7 +65,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
           child: Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: MyColors.white,
-            drawer: driverDrawer(),
+            drawer: driverDrawer(context),
             appBar: _appBar(),
             body: Stack(
               children: [

@@ -24,6 +24,12 @@ String removeBracket(String num) {
   return num.replaceAll("(", "").replaceAll(")", " ");
 }
 
+String formattedTime(DateTime time) {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final String formatted = formatter.format(time);
+  return formatted;
+}
+
 String convertToCurrencyFormat(
   num? number, {
   bool toInt = false,
