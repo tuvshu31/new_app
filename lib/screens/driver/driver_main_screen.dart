@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
@@ -46,7 +47,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    _driverCtx.firebaseMessagingForegroundHandler();
+    _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
   }
 
   @override

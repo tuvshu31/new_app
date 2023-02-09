@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
@@ -21,6 +23,7 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxDouble driverBearing = 0.0.obs;
+  RxString fcmToken = "".obs;
   Rx<HashSet<Circle>> circles = HashSet<Circle>().obs;
   Rx<LatLng> driverTarget = LatLng(49.02821126030273, 104.04634376483777).obs;
   //Location-tai holbootoi values
@@ -30,6 +33,12 @@ class DriverController extends GetxController {
   Rx<LatLng> driverLocation = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> googleMapController =
       Completer<GoogleMapController>().obs;
+
+  void fetchDriverInfo(int id) async {
+    dynamic response = await RestApi().getDriver(id);
+    dynamic d = Map<String, dynamic>.from(response);
+    log(d.toString());
+  }
 
   void turnOnOff(value) async {
     if (step.value == 0) {
@@ -183,7 +192,9 @@ class DriverController extends GetxController {
     );
   }
 
-  void firebaseMessagingForegroundHandler() async {
+  void firebaseMessagingForegroundHandler(id) async {
+    var body = {"mapToken": fcmToken.value};
+    await RestApi().updateDriver(id, body);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       storeLocation.value = LatLng(
         double.parse(message.data["latitude"]),

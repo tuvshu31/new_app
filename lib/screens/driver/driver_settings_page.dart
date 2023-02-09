@@ -34,13 +34,6 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
       "type": "text",
     },
     {
-      "icon": IconlyLight.lock,
-      "name": "Нууц үг",
-      "value": "******",
-      "editable": true,
-      "type": "password",
-    },
-    {
       "icon": IconlyLight.wallet,
       "name": "Данс",
       "value": "5020405012",
@@ -144,9 +137,6 @@ class _DriverSettingsEditViewState extends State<DriverSettingsEditView> {
               CustomText(text: widget.data["name"]),
               const SizedBox(height: 12),
               CustomTextField(
-                suffixButton: widget.data["type"] == "password"
-                    ? Icon(IconlyLight.lock)
-                    : Icon(IconlyLight.unlock),
                 autoFocus: true,
                 controller: controller,
                 onChanged: ((p0) {

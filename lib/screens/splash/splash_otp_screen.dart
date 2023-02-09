@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
@@ -32,6 +33,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   Timer? countdownTimer;
   Duration myDuration = const Duration(minutes: 1);
   final _loginCtrl = Get.put(LoginController());
+  final _driverCtx = Get.put(DriverController());
   @override
   void initState() {
     super.initState();
@@ -103,6 +105,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");
+            _driverCtx.fetchDriverInfo(data["driverId"]);
             Get.offAll(const DriverMainScreen());
             break;
         }

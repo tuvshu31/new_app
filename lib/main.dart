@@ -2,7 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
+import 'package:Erdenet24/screens/store/store.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -59,10 +62,10 @@ void main() async {
   log('User granted permission: ${settings.authorizationStatus}');
   final fcmToken = await FirebaseMessaging.instance.getToken();
   if (fcmToken != "") {
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(53, body);
+    _driverCtx.fcmToken.value = fcmToken!;
   }
   log(fcmToken.toString());
+
   _driverCtx.checkPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // Only call clearSavedSettings() during testing to reset internal values.
@@ -75,11 +78,39 @@ void main() async {
     // GeolocatorApple.registerWith();
   }
 
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((value) {
+    if (RestApiHelper.getUserId() == 0) {
+      runApp(const MyApp(
+        initialRoute: '/SplashScreenRoute',
+      ));
+    } else if (RestApiHelper.getUserRole() == "store") {
+      runApp(const MyApp(
+        initialRoute: "/StoreScreenRoute",
+      ));
+    } else if (RestApiHelper.getUserRole() == "user") {
+      runApp(const MyApp(
+        initialRoute: "/MainScreenRoute",
+      ));
+    } else if (RestApiHelper.getUserRole() == "driver") {
+      runApp(const MyApp(
+        initialRoute: "/DriverScreenRoute",
+      ));
+    } else {
+      runApp(const MyApp(
+        initialRoute: "/SplashScreenRoute",
+      ));
+    }
+  });
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final String initialRoute;
+  const MyApp({
+    Key? key,
+    this.initialRoute = "/",
+  }) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -148,22 +179,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "Erdenet24",
-      initialRoute: "/",
+      initialRoute: widget.initialRoute,
       // defaultTransition: Transition.,
       theme: ThemeData(fontFamily: 'Nunito'),
       getPages: [
-        // GetPage(
-        //     name: "/",
-        //     page: () => RestApiHelper.getUserId() == 0
-        //         ? const SplashMainScreen()
-        //         : RestApiHelper.getUserRole() == "store"
-        //             ? const StorePage()
-        //             : RestApiHelper.getUserRole() == "user"
-        //                 ? const MainScreen()
-        //                 : RestApiHelper.getUserRole() == "driver"
-        //                     ? HomePage()
-        //                     : const SplashMainScreen()),
-        GetPage(name: "/", page: () => const DriverMainScreen()),
+        GetPage(
+            name: "/SplashScreenRoute", page: () => const SplashMainScreen()),
+        GetPage(name: "/StoreScreenRoute", page: () => const StorePage()),
+        GetPage(name: "/MainScreenRoute", page: () => const MainScreen()),
+        GetPage(
+            name: "/DriverScreenRoute", page: () => const DriverMainScreen()),
         GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
         GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
         GetPage(name: "/CategoryRoute", page: () => const CategoryProducts()),

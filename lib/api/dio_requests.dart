@@ -181,4 +181,14 @@ class RestApi {
     return DioMessage()
         .sendMessage("send", phone, "Erdenet24 nevtrekh kod: $code");
   }
+
+  //Жолоочийн мэдээллийг авах
+  Future getDriver(int id) async {
+    return DioClient().sendRequest('drivers/$id', Method.get, [], {});
+  }
+
+  //Тухайн хэрэглэгчийн мэдээллийг засах
+  Future updateDriver(int driverId, dynamic body) async {
+    return DioClient().sendRequest('drivers/$driverId', Method.put, body, {});
+  }
 }
