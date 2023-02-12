@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
+import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
@@ -32,16 +33,6 @@ import 'firebase_options.dart';
 
 final _driverCtx = Get.put(DriverController());
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-  _driverCtx.deliveryInfo.value = message.data;
-  _driverCtx.getNewDelivery();
-  print("Handling a background message: ${message.messageId}");
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -60,14 +51,8 @@ void main() async {
   );
 
   log('User granted permission: ${settings.authorizationStatus}');
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  if (fcmToken != "") {
-    _driverCtx.fcmToken.value = fcmToken!;
-  }
-  log(fcmToken.toString());
 
-  _driverCtx.checkPermission();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();

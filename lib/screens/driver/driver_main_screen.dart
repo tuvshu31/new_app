@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/button.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
+import 'package:iconly/iconly.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,14 +31,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
   final GlobalKey<SlideActionState> key = GlobalKey();
 
-  List<Widget> steps = [
-    Container(),
-    step1(),
-    step2(),
-    step3(),
-    step4(),
-    step5()
-  ];
+  List<Widget> steps = [step0(), step1(), step2(), step3(), step4(), step5()];
   List<String> texts = [
     "",
     "Зөвшөөрөх",
@@ -48,7 +44,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
-    _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
+    // _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
   }
 
   @override
@@ -70,6 +66,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
             body: Stack(
               children: [
                 const DriverScreenMapView(),
+                _infoSnackbar(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -144,19 +141,19 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
 
   Widget bottomSheets() {
     return Obx(
-      () => _driverCtx.step.value != 0
-          ? Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                margin: const EdgeInsets.all(24),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: MyColors.white,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  steps[_driverCtx.step.value],
-                  Builder(
+      () => Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: MyColors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            steps[_driverCtx.step.value],
+            _driverCtx.step.value != 0
+                ? Builder(
                     builder: (context) {
                       final GlobalKey<SlideActionState> key = GlobalKey();
                       return Padding(
@@ -197,11 +194,107 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                         ),
                       );
                     },
+                  )
+                : Container(),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _infoSnackbar() {
+    return Obx(
+      () => Container(
+        height: _driverCtx.snackbarHeight.value,
+        width: double.infinity,
+        color: MyColors.black,
+        child: _driverCtx.isActive.value
+            ? Row(
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      dense: true,
+                      horizontalTitleGap: 0,
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            IconlyLight.wallet,
+                            color: MyColors.white,
+                          ),
+                        ],
+                      ),
+                      title: const CustomText(
+                        text: "Өнөөдрийн орлого:",
+                        color: MyColors.white,
+                        fontSize: 12,
+                      ),
+                      subtitle: CustomText(
+                          color: MyColors.white,
+                          text: convertToCurrencyFormat(
+                            int.parse("24000"),
+                            locatedAtTheEnd: true,
+                            toInt: true,
+                          )),
+                    ),
                   ),
-                ]),
+                  Expanded(
+                    child: ListTile(
+                      dense: true,
+                      horizontalTitleGap: 0,
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            IconlyLight.time_circle,
+                            color: MyColors.white,
+                          ),
+                        ],
+                      ),
+                      title: const CustomText(
+                        text: "Идэвхтэй хугацаа:",
+                        color: MyColors.white,
+                        fontSize: 12,
+                      ),
+                      subtitle: CustomText(
+                        color: MyColors.white,
+                        text: "02:15:00",
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      dense: true,
+                      horizontalTitleGap: 0,
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.nightlight_outlined,
+                            color: MyColors.white,
+                          ),
+                        ],
+                      ),
+                      title: const CustomText(
+                        text: "Та идэвхгүй байна!",
+                        color: MyColors.white,
+                        fontSize: 12,
+                      ),
+                      subtitle: const CustomText(
+                          color: MyColors.white,
+                          text: "Идэвхтэй үед захиалга хүлээн авах боломжтой"),
+                    ),
+                  ),
+                ],
               ),
-            )
-          : Container(),
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:iconly/iconly.dart';
 import 'package:slide_countdown/slide_countdown.dart';
 
 final _driverCtx = Get.put(DriverController());
@@ -17,6 +18,81 @@ void playSound(type) async {
 
 void stopSound() async {
   player.stop();
+}
+
+Widget step0() {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const CustomText(
+        text: "Сүүлийн хүргэлт:",
+        fontSize: 14,
+        color: MyColors.gray,
+      ),
+      const SizedBox(height: 24),
+      Container(
+        height: 70,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: MyColors.black,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.primary,
+                    ),
+                    child: Icon(
+                      IconlyLight.wallet,
+                      color: MyColors.white,
+                    ),
+                  ),
+                  CustomText(
+                    color: MyColors.white,
+                    text: convertToCurrencyFormat(
+                      int.parse("2400"),
+                      locatedAtTheEnd: true,
+                      toInt: true,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.primary,
+                    ),
+                    child: Icon(
+                      IconlyLight.time_circle,
+                      color: MyColors.white,
+                    ),
+                  ),
+                  CustomText(
+                    color: MyColors.white,
+                    text: "3:24 мин",
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      )
+    ],
+  );
 }
 
 Widget step1() {
@@ -139,8 +215,7 @@ Widget step2() {
             ),
             trailing: GestureDetector(
               onTap: () {
-                _driverCtx.makePhoneCall(
-                    "+976-${_driverCtx.deliveryInfo["storePhone"]}");
+                makePhoneCall("+976-${_driverCtx.deliveryInfo["storePhone"]}");
               },
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -204,8 +279,7 @@ Widget step4() {
             ),
             trailing: GestureDetector(
               onTap: () {
-                _driverCtx.makePhoneCall(
-                    "+976-${_driverCtx.deliveryInfo["userPhone"]}");
+                makePhoneCall("+976-${_driverCtx.deliveryInfo["userPhone"]}");
               },
               child: const Padding(
                 padding: EdgeInsets.all(8.0),

@@ -19,7 +19,7 @@ class DriverScreenMapViewState extends State<DriverScreenMapView> {
   @override
   void initState() {
     super.initState();
-    _driverCtx.getCurrentLocation();
+    // _driverCtx.getCurrentLocation();
   }
 
   @override

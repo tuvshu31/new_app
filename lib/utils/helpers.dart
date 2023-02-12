@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 int random4digit() {
   var rnd = Random();
@@ -55,4 +56,12 @@ String convertToCurrencyFormat(
     }
   }
   return '$mSymbol 0';
+}
+
+Future<void> makePhoneCall(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'tel',
+    path: phoneNumber,
+  );
+  await launchUrl(launchUri);
 }
