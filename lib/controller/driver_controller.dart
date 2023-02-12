@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/map_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:custom_timer/custom_timer.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -18,7 +19,6 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxDouble driverBearing = 0.0.obs;
-  RxDouble snackbarHeight = (Get.height * .075).obs;
   RxString fcmToken = "".obs;
   dynamic driverInfo = [].obs;
   Rx<HashSet<Circle>> circles = HashSet<Circle>().obs;
@@ -48,18 +48,9 @@ class DriverController extends GetxController {
   }
 
   void turnOnOff(value) async {
-    if (value) {
-      snackbarHeight.value = 0;
-      snackbarHeight.value = Get.height * .075;
-    } else {
-      snackbarHeight.value = 0;
-      snackbarHeight.value = Get.height * .075;
-    }
     if (step.value == 0) {
       isActive.value = value;
-
       if (value) {
-        // positionStreamForServer();
         moveCamera(driverLocation.value, 18);
         addCircles("driver", driverLocation.value);
       }

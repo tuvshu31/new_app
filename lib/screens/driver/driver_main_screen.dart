@@ -4,6 +4,9 @@ import 'dart:developer';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:custom_timer/custom_timer.dart';
+import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
@@ -19,6 +22,8 @@ import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
 
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:timer_count_down/timer_controller.dart';
+import 'package:timer_count_down/timer_count_down.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});
@@ -30,8 +35,17 @@ class DriverMainScreen extends StatefulWidget {
 class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
   final GlobalKey<SlideActionState> key = GlobalKey();
+  late CountdownTimerController controller;
+  int endTime = DateTime.now().millisecondsSinceEpoch + 20000 * 540;
 
-  List<Widget> steps = [step0(), step1(), step2(), step3(), step4(), step5()];
+  List<Widget> steps = [
+    step0(),
+    step1(),
+    step2(),
+    step3(),
+    step4(),
+    step5(),
+  ];
   List<String> texts = [
     "",
     "Зөвшөөрөх",
@@ -44,11 +58,19 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
+    controller = CountdownTimerController(endTime: endTime, onEnd: onEnd);
+    controller.start();
     // _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
+  }
+
+  void onEnd() {
+    log("onEnd");
   }
 
   @override
   void dispose() {
+    onEnd();
+    controller.dispose();
     super.dispose();
   }
 
@@ -141,71 +163,73 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
 
   Widget bottomSheets() {
     return Obx(
-      () => Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: MyColors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            steps[_driverCtx.step.value],
-            _driverCtx.step.value != 0
-                ? Builder(
-                    builder: (context) {
-                      final GlobalKey<SlideActionState> key = GlobalKey();
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SlideAction(
-                          outerColor: MyColors.black,
-                          innerColor: MyColors.primary,
-                          elevation: 0,
-                          key: key,
-                          submittedIcon: const Icon(
-                            FontAwesomeIcons.check,
-                            color: MyColors.white,
-                          ),
-                          onSubmit: () {
-                            Future.delayed(const Duration(milliseconds: 300),
-                                () {
-                              key.currentState!.reset();
-                              if (_driverCtx.step.value == 5) {
-                                _driverCtx.finishDelivery();
-                              } else {
-                                stopSound();
-                                _driverCtx.step.value += 1;
-                              }
-                            });
+      () => _driverCtx.isActive.value
+          ? Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: MyColors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  steps[_driverCtx.step.value],
+                  _driverCtx.step.value != 0
+                      ? Builder(
+                          builder: (context) {
+                            final GlobalKey<SlideActionState> key = GlobalKey();
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SlideAction(
+                                outerColor: MyColors.black,
+                                innerColor: MyColors.primary,
+                                elevation: 0,
+                                key: key,
+                                submittedIcon: const Icon(
+                                  FontAwesomeIcons.check,
+                                  color: MyColors.white,
+                                ),
+                                onSubmit: () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 300), () {
+                                    key.currentState!.reset();
+                                    if (_driverCtx.step.value == 5) {
+                                      _driverCtx.finishDelivery();
+                                    } else {
+                                      stopSound();
+                                      _driverCtx.step.value += 1;
+                                    }
+                                  });
+                                },
+                                alignment: Alignment.centerRight,
+                                sliderButtonIcon: const Icon(
+                                  Icons.double_arrow_rounded,
+                                  color: MyColors.white,
+                                ),
+                                child: Text(
+                                  texts[_driverCtx.step.value].toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
                           },
-                          alignment: Alignment.centerRight,
-                          sliderButtonIcon: const Icon(
-                            Icons.double_arrow_rounded,
-                            color: MyColors.white,
-                          ),
-                          child: Text(
-                            texts[_driverCtx.step.value].toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                : Container(),
-          ]),
-        ),
-      ),
+                        )
+                      : Container(),
+                ]),
+              ),
+            )
+          : Container(),
     );
   }
 
   Widget _infoSnackbar() {
     return Obx(
       () => Container(
-        height: _driverCtx.snackbarHeight.value,
+        height: Get.height * .075,
         width: double.infinity,
         color: MyColors.black,
         child: _driverCtx.isActive.value
@@ -258,9 +282,15 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                         color: MyColors.white,
                         fontSize: 12,
                       ),
-                      subtitle: CustomText(
-                        color: MyColors.white,
-                        text: "02:15:00",
+                      // subtitle: CustomText(
+                      //   color: MyColors.white,
+                      //   text: "02:15:00",
+                      // ),
+                      subtitle: CountdownTimer(
+                        textStyle: const TextStyle(color: MyColors.white),
+                        controller: controller,
+                        onEnd: onEnd,
+                        endTime: endTime,
                       ),
                     ),
                   ),

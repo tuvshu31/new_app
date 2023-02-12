@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -15,6 +16,7 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -73,9 +75,12 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
     }
   }
 
-  void putUserIntoBox(int id, String type) {
+  void putUserIntoBox(int id, String type) async {
     RestApiHelper.saveUserId(id);
     RestApiHelper.saveUserRole(type);
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
   }
 
   void submit() async {

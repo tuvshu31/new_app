@@ -22,6 +22,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.2.0"
+  app_settings:
+    dependency: "direct main"
+    description:
+      name: app_settings
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.2.0"
   archive:
     dependency: transitive
     description:
@@ -454,6 +461,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  flutter_countdown_timer:
+    dependency: "direct main"
+    description:
+      name: flutter_countdown_timer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.0"
   flutter_easyloading:
     dependency: "direct main"
     description:
@@ -1307,6 +1321,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.13"
+  timer_count_down:
+    dependency: "direct main"
+    description:
+      name: timer_count_down
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.2"
   timezone:
     dependency: transitive
     description:

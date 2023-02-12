@@ -158,8 +158,8 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        // createOrder();
-                        Get.to(const UserOrderNotificationScreen());
+                        createOrder();
+                        // Get.to(const UserOrderNotificationScreen());
                       }),
                       child: Center(
                         child: Column(

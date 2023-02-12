@@ -15,8 +15,3 @@ Future<Map<String, dynamic>> firebaseMessagingBackgroundHandler(
   await Firebase.initializeApp();
   return message.data;
 }
-
-Future<String?> getToken() async {
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  return fcmToken;
-}
