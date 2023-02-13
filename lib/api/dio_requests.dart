@@ -142,6 +142,12 @@ class RestApi {
     return DioClient().sendRequest('orders', Method.get, [], query);
   }
 
+  //Шинэ захиалгын мэдээллийг жолооч руу илгээх
+  Future assignDriver(dynamic body) async {
+    return DioClient()
+        .sendRequest('drivers/assignDriver', Method.post, body, {});
+  }
+
   //Захиалгын мэдээлэл өөрчлөх
   Future updateOrder(int id, dynamic body) async {
     return DioClient().sendRequest('orders/$id', Method.put, body, {});

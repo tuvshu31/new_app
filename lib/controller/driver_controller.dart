@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/utils/map_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:custom_timer/custom_timer.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../screens/driver/driver_bottom_views.dart';
@@ -51,6 +56,9 @@ class DriverController extends GetxController {
     if (step.value == 0) {
       isActive.value = value;
       if (value) {
+        getCurrentLocation();
+        positionStreamForMap();
+        // positionStreamForServer();
         moveCamera(driverLocation.value, 18);
         addCircles("driver", driverLocation.value);
       }
@@ -62,7 +70,7 @@ class DriverController extends GetxController {
       double.parse(deliveryInfo["latitude"]),
       double.parse(deliveryInfo["longitude"]),
     );
-    calculateDistance(driverLocation.value, storeLocation.value);
+    getDistance(driverLocation.value, storeLocation.value);
     addCircles("store", storeLocation.value);
     moveCamera(storeLocation.value, 14);
     step.value = 1;
@@ -85,13 +93,62 @@ class DriverController extends GetxController {
 
   //Controller-d hereglej bga helper.uud:
 
+  void getCurrentLocation() async {
+    var info = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    driverLocation.value = LatLng(info.latitude, info.longitude);
+  }
+
+  void positionStreamForMap() {
+    LocationSettings locationSettingsForMap = const LocationSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 3,
+    );
+    Geolocator.getPositionStream(locationSettings: locationSettingsForMap)
+        .listen((Position? info) {
+      driverLocation.value = LatLng(info!.latitude, info.longitude);
+    });
+    moveCamera(driverLocation.value, 18);
+  }
+
+  void positionStreamForServer() {
+    LocationSettings locationSettingsForServer = const LocationSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 200,
+    );
+    Geolocator.getPositionStream(locationSettings: locationSettingsForServer)
+        .listen((Position info) {});
+  }
+
   void moveCamera(LatLng latLng, double zoom) async {
     final GoogleMapController controller =
         await googleMapController.value.future;
-
     controller.animateCamera(
-      CameraUpdate.newLatLngZoom(latLng, zoom),
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: latLng,
+          zoom: zoom,
+          bearing: driverBearing.value,
+        ),
+      ),
     );
+  }
+
+  void getDistance(LatLng driver, LatLng store) async {
+    const String baseUrl =
+        'https://maps.googleapis.com/maps/api/directions/json?';
+    final respose = await Dio().get(baseUrl, queryParameters: {
+      "origin": "${driver.latitude}, ${driver.longitude}",
+      "destination": "${store.latitude}, ${store.longitude}",
+      "key": "AIzaSyAHTYs2cMm87YH3wppr6wTtKRZxfyXjvB4"
+    });
+    final Map parsed = json.decode(respose.toString());
+    String distanceText = parsed["routes"][0]["legs"][0]["distance"]["text"];
+    String durationText = parsed["routes"][0]["legs"][0]["duration"]["text"];
+    distanceText = distanceText.substring(0, distanceText.length - 3);
+    double distanceMile = double.parse(distanceText);
+    String distanceKm = (distanceMile * 1.609).toStringAsFixed(3);
+    distanceAndDuration.value = "$distanceKm km, $durationText";
   }
 
   void addMarker(String type, LatLng latLng) async {
@@ -145,5 +202,49 @@ class DriverController extends GetxController {
     markers.removeWhere(
       (key, value) => value.markerId == MarkerId(type),
     );
+  }
+
+  void firebaseMessagingForegroundHandler() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      storeLocation.value = LatLng(
+        double.parse(message.data["latitude"]),
+        double.parse(message.data["longitude"]),
+      );
+      deliveryInfo.value = message.data;
+      storeLocation.value = LatLng(
+        double.parse(deliveryInfo["latitude"]),
+        double.parse(deliveryInfo["longitude"]),
+      );
+      getNewDelivery();
+    });
+  }
+
+  Future<void> makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
+  void checkPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
   }
 }

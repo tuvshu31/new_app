@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:custom_timer/custom_timer.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:get/get.dart';
@@ -57,6 +58,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
+    _driverCtx.firebaseMessagingForegroundHandler();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
     controller = CountdownTimerController(endTime: endTime, onEnd: onEnd);
     controller.start();
@@ -257,7 +259,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                       subtitle: CustomText(
                           color: MyColors.white,
                           text: convertToCurrencyFormat(
-                            int.parse("24000"),
+                            int.parse("0"),
                             locatedAtTheEnd: true,
                             toInt: true,
                           )),

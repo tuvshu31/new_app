@@ -1,9 +1,16 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
 import 'package:Erdenet24/screens/store/orders/main.dart';
 import 'package:Erdenet24/screens/store/settings/settings.dart';
+import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:circular_countdown/circular_countdown.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +19,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 class StorePage extends StatefulWidget {
   const StorePage({Key? key}) : super(key: key);
@@ -32,7 +40,80 @@ class _StorePageState extends State<StorePage> {
   @override
   void initState() {
     super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      playSound("incoming");
+      Get.bottomSheet(backgroundColor: MyColors.white, _orderNotification());
+      log("Foreground message irj bn lastly");
+    });
     getStoreInfo();
+  }
+
+  Widget _orderNotification() {
+    return Container(
+      margin: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          CustomText(
+            text: "Шинэ захиалга ирлээ!",
+            fontSize: 16,
+          ),
+          SizedBox(
+            width: Get.width * .3,
+            child: TimeCircularCountdown(
+              countdownRemainingColor: MyColors.primary,
+              unit: CountdownUnit.second,
+              textStyle: const TextStyle(
+                color: MyColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+              countdownTotal: 90,
+              onUpdated: (unit, remainingTime) {},
+              onFinished: () {},
+            ),
+          ),
+          Builder(
+            builder: (context) {
+              final GlobalKey<SlideActionState> key = GlobalKey();
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SlideAction(
+                  outerColor: MyColors.black,
+                  innerColor: MyColors.primary,
+                  elevation: 0,
+                  key: key,
+                  submittedIcon: const Icon(
+                    FontAwesomeIcons.check,
+                    color: MyColors.white,
+                  ),
+                  onSubmit: () {
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      key.currentState!.reset();
+                      stopSound();
+                      Get.back();
+                      Get.to(() => const StoreOrders());
+                    });
+                  },
+                  alignment: Alignment.centerRight,
+                  sliderButtonIcon: const Icon(
+                    Icons.double_arrow_rounded,
+                    color: MyColors.white,
+                  ),
+                  child: Text(
+                    "Хүлээн авах",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              );
+            },
+          )
+        ],
+      ),
+    );
   }
 
   void getStoreInfo() async {
@@ -90,7 +171,7 @@ class _StorePageState extends State<StorePage> {
                           Get.to(() => AddProducts());
                         }),
                         _listTile(IconlyLight.chart, "Захиалгууд", () {
-                          Get.to(() => StoreOrders());
+                          Get.to(() => const StoreOrders());
                         }),
                         // _divider(),
                         // _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),

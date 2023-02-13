@@ -58,7 +58,7 @@ Widget step0() {
                   CustomText(
                     color: MyColors.white,
                     text: convertToCurrencyFormat(
-                      int.parse("2400"),
+                      int.parse("3000"),
                       locatedAtTheEnd: true,
                       toInt: true,
                     ),

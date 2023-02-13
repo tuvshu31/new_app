@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/home/product_screen.dart';
@@ -9,7 +11,9 @@ import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 class NewOrdersView extends StatefulWidget {
   const NewOrdersView({super.key});
@@ -49,37 +53,19 @@ class _NewOrdersViewState extends State<NewOrdersView> {
     }
   }
 
+  void callDriver(dynamic info) async {
+    var body = {
+      "orderId": info['id'],
+      'address': info["address"],
+      'phone': info["phone"],
+    };
+    await RestApi().assignDriver(body);
+    log(info.toString());
+  }
+
   String timeDiffCalctr(time) {
     var difference = DateTime.now().difference(DateTime.parse(time)).inMinutes;
     return difference.toString();
-  }
-
-  Color colorChanger(String status) {
-    return status == "sent"
-        ? MyColors.primary
-        : status == "preparing"
-            ? MyColors.warning
-            : status == "delivering"
-                ? MyColors.green
-                : MyColors.black;
-  }
-
-  String statusChanger(String status) {
-    return status == "sent"
-        ? "preparing"
-        : status == "preparing"
-            ? "delivering"
-            : status == "delivering"
-                ? "received"
-                : "";
-  }
-
-  String buttonTextChanger(String status) {
-    return status == "sent"
-        ? "Хүргэлтэнд бэлдэх"
-        : status == "preparing"
-            ? "Хүргэлтэнд гаргах"
-            : "";
   }
 
   void _showOrderDetauls(int int) {
@@ -91,159 +77,132 @@ class _NewOrdersViewState extends State<NewOrdersView> {
           physics: const BouncingScrollPhysics(),
           child: Container(
             color: MyColors.white,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: Get.back,
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: MyColors.fadedGrey,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.close,
-                              size: 20,
-                            )),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          CustomText(text: "Хаяг:"),
-                          SizedBox(width: 8),
-                          CustomText(text: _data[int]["address"])
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          CustomText(text: "Утас:"),
-                          SizedBox(width: 8),
-                          CustomText(text: _data[int]["phone"])
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          CustomText(text: "Нийт үнэ:"),
-                          SizedBox(width: 8),
-                          CustomText(
-                            text: convertToCurrencyFormat(
-                              double.parse(_data[int]["totalAmount"]),
-                              toInt: true,
-                              locatedAtTheEnd: true,
-                            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: Get.back,
+                      child: Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.fadedGrey,
+                            shape: BoxShape.circle,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: Get.height * .05),
-                  ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Container(height: 8);
-                      },
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: CachedImage(
-                                image:
-                                    "${URL.AWS}/products/${products[index]["id"]}.png"),
-                          ),
-                          title: CustomText(
-                            text: products[index]["name"],
-                            overflow: TextOverflow.ellipsis,
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.close)),
+                    )
+                  ],
+                ),
+                SizedBox(height: Get.height * .05),
+                ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return Container(height: 8);
+                    },
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: CachedImage(
+                              image:
+                                  "${URL.AWS}/products/${products[index]["id"]}.png"),
+                        ),
+                        title: CustomText(
+                          text: products[index]["name"],
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 14,
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              text: convertToCurrencyFormat(
+                                double.parse(products[index]["price"]),
+                                toInt: true,
+                                locatedAtTheEnd: true,
+                              ),
+                            ),
+                            CustomText(
+                              text: "Баялаг ресторан",
+                              fontSize: 12,
+                              color: MyColors.gray,
+                            )
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: MyColors.fadedGrey,
+                                shape: BoxShape.circle,
+                              ),
+                              child: CustomText(
+                                text: products[index]["quantity"].toString(),
+                                fontSize: 14,
+                                isLowerCase: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                SizedBox(height: Get.height * .1),
+                Builder(
+                  builder: (context) {
+                    final GlobalKey<SlideActionState> key = GlobalKey();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: SlideAction(
+                        outerColor: MyColors.black,
+                        innerColor: MyColors.primary,
+                        elevation: 0,
+                        key: key,
+                        submittedIcon: const Icon(
+                          FontAwesomeIcons.check,
+                          color: MyColors.white,
+                        ),
+                        onSubmit: () {
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            key.currentState!.reset();
+                            _data[int]["orderStatus"] != "delivering"
+                                ? {
+                                    orderUpdateHelper(_data[int]["id"],
+                                        {"orderStatus": "delivering"}),
+                                    callDriver(_data[int]),
+                                    setState(() {
+                                      _data[int]["orderStatus"] = "delivering";
+                                    })
+                                  }
+                                : null;
+                            Get.back();
+                          });
+                        },
+                        alignment: Alignment.centerRight,
+                        sliderButtonIcon: const Icon(
+                          Icons.double_arrow_rounded,
+                          color: MyColors.white,
+                        ),
+                        child: Text(
+                          "Хүргэлтэнд гаргах",
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 14,
                           ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                text: convertToCurrencyFormat(
-                                  double.parse(products[index]["price"]),
-                                  toInt: true,
-                                  locatedAtTheEnd: true,
-                                ),
-                              ),
-                              CustomText(
-                                text: "Баялаг ресторан",
-                                fontSize: 12,
-                                color: MyColors.gray,
-                              )
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: MyColors.fadedGrey,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: CustomText(
-                                  text: products[index]["quantity"].toString(),
-                                  fontSize: 14,
-                                  isLowerCase: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                  SizedBox(height: Get.height * .1),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          text: "Хэвлэх",
                         ),
                       ),
-                      _data[int]["orderStatus"] != "delivering"
-                          ? Expanded(
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: CustomButton(
-                                      bgColor: colorChanger(
-                                          _data[int]["orderStatus"]),
-                                      onPressed: (() {
-                                        orderUpdateHelper(_data[int]["id"], {
-                                          "orderStatus": statusChanger(
-                                              _data[int]["orderStatus"])
-                                        });
-                                        setState(() {
-                                          _data[int]["orderStatus"] =
-                                              statusChanger(
-                                                  _data[int]["orderStatus"]);
-                                        });
-                                        Get.back();
-                                      }),
-                                      text: buttonTextChanger(
-                                          _data[int]["orderStatus"]),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Container()
-                    ],
-                  )
-                ],
-              ),
+                    );
+                  },
+                )
+              ],
             ),
           ),
         ),
@@ -281,18 +240,21 @@ class _NewOrdersViewState extends State<NewOrdersView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.circle,
-                                size: 8, color: colorChanger(status)),
+                            Icon(
+                              Icons.circle,
+                              size: 8,
+                              color: status == "delivering"
+                                  ? MyColors.success
+                                  : MyColors.primary,
+                            ),
                             const SizedBox(width: 4),
                             CustomText(
-                              text: status == "sent"
-                                  ? "Шинэ"
-                                  : status == "preparing"
-                                      ? "Хүргэлтэнд бэлдэж байгаа"
-                                      : status == "delivering"
-                                          ? "Хүргэлтэнд гарсан"
-                                          : "",
-                              color: colorChanger(status),
+                              text: status == "delivering"
+                                  ? "Хүргэлтэнд гарсан"
+                                  : "Шинэ",
+                              color: status == "delivering"
+                                  ? MyColors.success
+                                  : MyColors.primary,
                               fontSize: 12,
                             )
                           ],

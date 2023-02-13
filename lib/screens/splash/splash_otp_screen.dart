@@ -59,6 +59,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   void resetTimer() async {
     loadingDialog(context);
     _loginCtrl.verifyCode.value = random6digit();
+
     dynamic authCode = await RestApi().sendAuthCode(
         _loginCtrl.phoneController.text,
         _loginCtrl.verifyCode.value.toString());
@@ -88,7 +89,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
     dynamic response =
         await RestApi().checkUser(_loginCtrl.phoneController.text);
     dynamic data = Map<String, dynamic>.from(response);
-    log(data.toString());
+
     if (data["success"] &&
         data["role"] != "test" &&
         _loginCtrl.verifyCode.value == int.parse(pinCode)) {
@@ -102,7 +103,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             putUserIntoBox(data["managerId"], "manager");
             break;
           case "store":
-            loginTypeBottomSheet(data["userId"], data["storeId"]);
+            loginTypeBottomSheet(data["storeId"], data["storeId"]);
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
