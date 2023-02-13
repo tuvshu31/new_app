@@ -64,18 +64,18 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       "kod": _incoming["kode"],
       "products": _cartCtrl.cartList,
     };
-    log(body.toString());
-    // dynamic response = await RestApi().createOrder(body);
-    // dynamic data = Map<String, dynamic>.from(response);
-    // log(data.toString());
-    // Get.back();
-    // successOrderModal(context, () {
-    //   _cartCtrl.cartList.clear();
-    //   Get.back();
-    //   Get.back();
-    //   Get.back();
-    //   _navCtrl.onItemTapped(4);
-    // });
+    // log(body.toString());
+    dynamic response = await RestApi().createOrder(body);
+    dynamic data = Map<String, dynamic>.from(response);
+    log(data.toString());
+    Get.back();
+    successOrderModal(context, () {
+      _cartCtrl.cartList.clear();
+      Get.back();
+      Get.back();
+      Get.back();
+      _navCtrl.onItemTapped(4);
+    });
   }
 
   @override
