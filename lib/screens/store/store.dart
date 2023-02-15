@@ -44,6 +44,7 @@ class _StorePageState extends State<StorePage> {
   @override
   void initState() {
     super.initState();
+    getToken();
     _storeCtx.fetchNewOrders();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -53,6 +54,16 @@ class _StorePageState extends State<StorePage> {
       log("Foreground message irj bn lastly");
     });
     getStoreInfo();
+  }
+
+  void getToken() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      var body = {"mapToken": newToken};
+      await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    });
   }
 
   void getStoreInfo() async {

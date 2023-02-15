@@ -50,13 +50,6 @@ void main() async {
     sound: true,
   );
 
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  var body = {"mapToken": fcmToken};
-  await RestApi().updateUser(RestApiHelper.getUserId(), body);
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    var body = {"mapToken": newToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-  });
   log('User granted permission: ${settings.authorizationStatus}');
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);

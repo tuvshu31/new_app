@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -58,11 +59,22 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
+    getToken();
     _driverCtx.firebaseMessagingForegroundHandler();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
     controller = CountdownTimerController(endTime: endTime, onEnd: onEnd);
     controller.start();
     // _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
+  }
+
+  void getToken() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      var body = {"mapToken": newToken};
+      await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    });
   }
 
   void onEnd() {
