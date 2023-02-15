@@ -1,16 +1,29 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/swipe_button.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
+import 'package:numberpicker/numberpicker.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
-List numbers = List<int>.generate(60, (i) => i + 1);
-void showOrdersSetTime(context) {
+final _storeCtx = Get.put(StoreController());
+void callDriver(dynamic info) async {
+  var body = {
+    "orderId": info['id'],
+    'address': info["address"],
+    'phone': info["phone"],
+  };
+  await RestApi().assignDriver(body);
+}
+
+void storeOrdersToDeliveryView(context, data) {
+  var products = data["products"];
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -43,13 +56,13 @@ void showOrdersSetTime(context) {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(
-                      text: "3224",
+                      text: data["orderId"].toString(),
                       fontSize: 16,
                       color: MyColors.black,
                     ),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        24000,
+                        double.parse(data["totalAmount"]),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -62,45 +75,56 @@ void showOrdersSetTime(context) {
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: 6,
+                  itemCount: products.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       dense: true,
-                      title: CustomText(text: "Гуляш", fontSize: 14),
-                      trailing: CustomText(text: "1"),
+                      title: CustomText(
+                          text: products[index]["name"], fontSize: 14),
+                      trailing: CustomText(
+                          text: products[index]["quantity"].toString()),
                     );
                   },
                 ),
-                const SizedBox(height: 12),
-                const CustomText(text: "Бэлэн болох хугацаа:"),
-                SizedBox(
-                  height: Get.height * .2,
-                  width: Get.width * .3,
-                  child: CupertinoPicker(
-                    magnification: 1.1,
-                    squeeze: 1,
-                    useMagnifier: false,
-                    itemExtent: 24,
-                    // This is called when selected item is changed.
-                    onSelectedItemChanged: (int selectedItem) {
-                      log(selectedItem.toString());
-                    },
-                    children:
-                        List<Widget>.generate(numbers.length, (int index) {
-                      return Center(
-                        child: CustomText(
-                          text: "${numbers[index]} минут",
-                          fontSize: 14,
+                SizedBox(height: Get.height * .5),
+                Builder(
+                  builder: (contexts) {
+                    final GlobalKey<SlideActionState> key = GlobalKey();
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SlideAction(
+                        outerColor: MyColors.black,
+                        innerColor: MyColors.primary,
+                        elevation: 0,
+                        key: key,
+                        submittedIcon: const Icon(
+                          FontAwesomeIcons.check,
+                          color: MyColors.white,
                         ),
-                      );
-                    }),
-                  ),
+                        onSubmit: () {
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            key.currentState!.reset();
+                            callDriver(data);
+                            Get.back();
+                          });
+                        },
+                        alignment: Alignment.centerRight,
+                        sliderButtonIcon: const Icon(
+                          Icons.double_arrow_rounded,
+                          color: MyColors.white,
+                        ),
+                        child: Text(
+                          "Хүргэлтэнд гаргах",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                SizedBox(height: Get.height * .15),
-                swipeButton("Хүргэлтэнд", () {
-                  Get.back();
-                })
               ],
             ),
           ),

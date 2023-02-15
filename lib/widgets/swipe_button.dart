@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
-Widget swipeButton(String title, dynamic onSubmit) {
+Widget swipeButton(String title, dynamic onSubmit, BuildContext contexts) {
   return Builder(
-    builder: (context) {
+    builder: (contexts) {
       final GlobalKey<SlideActionState> key = GlobalKey();
       return Padding(
         padding: const EdgeInsets.all(8.0),

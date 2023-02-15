@@ -1,13 +1,15 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_notification_view.dart';
-import 'package:Erdenet24/screens/store/orders/store_orders_set_time_view.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class StoreOrdersNewOrdersScreen extends StatefulWidget {
   const StoreOrdersNewOrdersScreen({super.key});
@@ -19,39 +21,23 @@ class StoreOrdersNewOrdersScreen extends StatefulWidget {
 
 class _StoreOrdersNewOrdersScreenState
     extends State<StoreOrdersNewOrdersScreen> {
-  dynamic _newOrdersList = [];
-  bool fetching = false;
-  @override
-  void initState() {
-    super.initState();
-    fetchNewOrders();
-  }
-
-  void fetchNewOrders() async {
-    fetching = true;
-    dynamic response =
-        await RestApi().getStoreOrders(RestApiHelper.getUserId(), {});
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      _newOrdersList = d["data"];
-    }
-    fetching = false;
-    setState(() {});
-  }
+  final _storeCtx = Get.put(StoreController());
 
   @override
   Widget build(BuildContext context) {
-    return _newOrdersList.isEmpty && !fetching
+    return _storeCtx.orderList.isEmpty && !_storeCtx.fetching.value
         ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
         : ListView.separated(
+            reverse: true,
             separatorBuilder: (context, index) {
               return Container(height: 8);
             },
             physics: const BouncingScrollPhysics(),
             shrinkWrap: true,
-            itemCount: _newOrdersList.isEmpty ? 4 : _newOrdersList.length,
+            itemCount:
+                _storeCtx.orderList.isEmpty ? 4 : _storeCtx.orderList.length,
             itemBuilder: (context, index) {
-              if (_newOrdersList.isEmpty) {
+              if (_storeCtx.orderList.isEmpty) {
                 return MyShimmers().listView2();
               } else {
                 return _cardListItem(index);
@@ -60,12 +46,12 @@ class _StoreOrdersNewOrdersScreenState
   }
 
   Widget _cardListItem(int index) {
-    var data = _newOrdersList[index];
+    var data = _storeCtx.orderList[index];
     return GestureDetector(
       onTap: (() {
         // _showOrderDetauls(index);
         // showOrdersSetTime(context);
-        showOrdersNotificationView(context);
+        storeOrdersToDeliveryView(context, _storeCtx.orderList[index]);
       }),
       child: Card(
         shape: RoundedRectangleBorder(
@@ -81,7 +67,7 @@ class _StoreOrdersNewOrdersScreenState
             text: data["orderTime"],
             fontSize: 12,
           ),
-          trailing: _itemStatus(data["orderStatus"] == "sent"),
+          // trailing: _itemStatus(data["orderStatus"] == "sent"),
         ),
       ),
     );

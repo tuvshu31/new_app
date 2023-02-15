@@ -50,6 +50,13 @@ void main() async {
     sound: true,
   );
 
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  var body = {"mapToken": fcmToken};
+  await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    var body = {"mapToken": newToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  });
   log('User granted permission: ${settings.authorizationStatus}');
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -63,33 +70,31 @@ void main() async {
     // GeolocatorApple.registerWith();
   }
 
-  // SystemChrome.setPreferredOrientations([
-  //   DeviceOrientation.portraitUp,
-  // ]).then((value) {
-  //   if (RestApiHelper.getUserId() == 0) {
-  //     runApp(const MyApp(
-  //       initialRoute: '/SplashScreenRoute',
-  //     ));
-  //   } else if (RestApiHelper.getUserRole() == "store") {
-  //     runApp(const MyApp(
-  //       initialRoute: "/StoreScreenRoute",
-  //     ));
-  //   } else if (RestApiHelper.getUserRole() == "user") {
-  //     runApp(const MyApp(
-  //       initialRoute: "/MainScreenRoute",
-  //     ));
-  //   } else if (RestApiHelper.getUserRole() == "driver") {
-  //     runApp(const MyApp(
-  //       initialRoute: "/DriverScreenRoute",
-  //     ));
-  //   } else {
-  //     runApp(const MyApp(
-  //       initialRoute: "/SplashScreenRoute",
-  //     ));
-  //   }
-  // });
-  RestApiHelper.saveUserId(10);
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((value) {
+    if (RestApiHelper.getUserId() == 0) {
+      runApp(const MyApp(
+        initialRoute: '/SplashScreenRoute',
+      ));
+    } else if (RestApiHelper.getUserRole() == "store") {
+      runApp(const MyApp(
+        initialRoute: "/StoreScreenRoute",
+      ));
+    } else if (RestApiHelper.getUserRole() == "user") {
+      runApp(const MyApp(
+        initialRoute: "/MainScreenRoute",
+      ));
+    } else if (RestApiHelper.getUserRole() == "driver") {
+      runApp(const MyApp(
+        initialRoute: "/DriverScreenRoute",
+      ));
+    } else {
+      runApp(const MyApp(
+        initialRoute: "/SplashScreenRoute",
+      ));
+    }
+  });
 }
 
 class MyApp extends StatefulWidget {

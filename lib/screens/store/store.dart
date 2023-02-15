@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_main_screen.dart';
@@ -21,6 +22,9 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
+import 'orders/store_orders_notification_view.dart';
+import 'orders/store_orders_set_time_view.dart';
+
 class StorePage extends StatefulWidget {
   const StorePage({Key? key}) : super(key: key);
 
@@ -36,84 +40,19 @@ class _StorePageState extends State<StorePage> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _passwordRepeat = TextEditingController();
   final _loginCtrl = Get.put(LoginController());
-
+  final _storeCtx = Get.put(StoreController());
   @override
   void initState() {
     super.initState();
+    _storeCtx.fetchNewOrders();
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       playSound("incoming");
-      Get.bottomSheet(backgroundColor: MyColors.white, _orderNotification());
+      var data = message.data;
+      showOrdersNotificationView(context, data);
       log("Foreground message irj bn lastly");
     });
     getStoreInfo();
-  }
-
-  Widget _orderNotification() {
-    return Container(
-      margin: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          CustomText(
-            text: "Шинэ захиалга ирлээ!",
-            fontSize: 16,
-          ),
-          SizedBox(
-            width: Get.width * .3,
-            child: TimeCircularCountdown(
-              countdownRemainingColor: MyColors.primary,
-              unit: CountdownUnit.second,
-              textStyle: const TextStyle(
-                color: MyColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-              countdownTotal: 90,
-              onUpdated: (unit, remainingTime) {},
-              onFinished: () {},
-            ),
-          ),
-          Builder(
-            builder: (context) {
-              final GlobalKey<SlideActionState> key = GlobalKey();
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SlideAction(
-                  outerColor: MyColors.black,
-                  innerColor: MyColors.primary,
-                  elevation: 0,
-                  key: key,
-                  submittedIcon: const Icon(
-                    FontAwesomeIcons.check,
-                    color: MyColors.white,
-                  ),
-                  onSubmit: () {
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      key.currentState!.reset();
-                      stopSound();
-                      Get.back();
-                      Get.to(() => const StoreOrdersMainScreen());
-                    });
-                  },
-                  alignment: Alignment.centerRight,
-                  sliderButtonIcon: const Icon(
-                    Icons.double_arrow_rounded,
-                    color: MyColors.white,
-                  ),
-                  child: Text(
-                    "Хүлээн авах",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              );
-            },
-          )
-        ],
-      ),
-    );
   }
 
   void getStoreInfo() async {

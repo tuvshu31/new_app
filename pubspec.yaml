@@ -89,6 +89,8 @@ dependencies:
   timer_count_down: ^2.2.2
   flutter_countdown_timer: ^4.1.0
   app_settings: ^4.2.0
+  flutter_material_pickers: ^3.3.0
+  numberpicker: ^2.1.1
 
 dev_dependencies:
   flutter_test:
