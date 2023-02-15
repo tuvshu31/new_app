@@ -1,36 +1,18 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_new_orders_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/screens/store/orders/delivered_orders.dart';
 import 'package:Erdenet24/screens/store/orders/new_orders.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/controller/product_controller.dart';
 
-class StoreOrders extends StatefulWidget {
-  const StoreOrders({super.key});
+class StoreOrdersMainScreen extends StatefulWidget {
+  const StoreOrdersMainScreen({super.key});
 
   @override
-  State<StoreOrders> createState() => _StoreOrdersState();
+  State<StoreOrdersMainScreen> createState() => _StoreOrdersMainScreenState();
 }
 
-class _StoreOrdersState extends State<StoreOrders> {
-  dynamic _products = {};
-  final _prodCtrl = Get.put(ProductController());
-  void getOrders() async {
-    dynamic response =
-        await RestApi().getOrders({"userId": RestApiHelper.getUserId()});
-    dynamic d = Map<String, dynamic>.from(response);
-    print(d);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getOrders();
-  }
-
+class _StoreOrdersMainScreenState extends State<StoreOrdersMainScreen> {
   PageController pageController = PageController();
 
   @override
@@ -55,16 +37,10 @@ class _StoreOrdersState extends State<StoreOrders> {
               labelColor: MyColors.primary,
               unselectedLabelColor: MyColors.black,
               indicatorColor: MyColors.primary,
-              tabs: [
-                Tab(
-                  text: "Шинэ",
-                ),
-                Tab(
-                  text: "Хүргэгдсэн",
-                ),
-                Tab(
-                  text: "Цуцлагдсан",
-                ),
+              tabs: const [
+                Tab(text: "Шинэ"),
+                Tab(text: "Хүргэлтэнд"),
+                Tab(text: "Хүргэсэн"),
               ],
             ),
           ),
@@ -73,7 +49,7 @@ class _StoreOrdersState extends State<StoreOrders> {
               physics: const NeverScrollableScrollPhysics(),
               controller: pageController,
               children: const [
-                NewOrdersView(),
+                StoreOrdersNewOrdersScreen(),
                 DeliveredOrdersView(),
                 DeliveredOrdersView(),
               ],

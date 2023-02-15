@@ -63,31 +63,33 @@ void main() async {
     // GeolocatorApple.registerWith();
   }
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]).then((value) {
-    if (RestApiHelper.getUserId() == 0) {
-      runApp(const MyApp(
-        initialRoute: '/SplashScreenRoute',
-      ));
-    } else if (RestApiHelper.getUserRole() == "store") {
-      runApp(const MyApp(
-        initialRoute: "/StoreScreenRoute",
-      ));
-    } else if (RestApiHelper.getUserRole() == "user") {
-      runApp(const MyApp(
-        initialRoute: "/MainScreenRoute",
-      ));
-    } else if (RestApiHelper.getUserRole() == "driver") {
-      runApp(const MyApp(
-        initialRoute: "/DriverScreenRoute",
-      ));
-    } else {
-      runApp(const MyApp(
-        initialRoute: "/SplashScreenRoute",
-      ));
-    }
-  });
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  // ]).then((value) {
+  //   if (RestApiHelper.getUserId() == 0) {
+  //     runApp(const MyApp(
+  //       initialRoute: '/SplashScreenRoute',
+  //     ));
+  //   } else if (RestApiHelper.getUserRole() == "store") {
+  //     runApp(const MyApp(
+  //       initialRoute: "/StoreScreenRoute",
+  //     ));
+  //   } else if (RestApiHelper.getUserRole() == "user") {
+  //     runApp(const MyApp(
+  //       initialRoute: "/MainScreenRoute",
+  //     ));
+  //   } else if (RestApiHelper.getUserRole() == "driver") {
+  //     runApp(const MyApp(
+  //       initialRoute: "/DriverScreenRoute",
+  //     ));
+  //   } else {
+  //     runApp(const MyApp(
+  //       initialRoute: "/SplashScreenRoute",
+  //     ));
+  //   }
+  // });
+  RestApiHelper.saveUserId(10);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -168,6 +170,7 @@ class _MyAppState extends State<MyApp> {
       // defaultTransition: Transition.,
       theme: ThemeData(fontFamily: 'Nunito'),
       getPages: [
+        GetPage(name: "/", page: () => const StorePage()),
         GetPage(
             name: "/SplashScreenRoute", page: () => const SplashMainScreen()),
         GetPage(name: "/StoreScreenRoute", page: () => const StorePage()),

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
-import 'package:Erdenet24/screens/store/orders/main.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_main_screen.dart';
 import 'package:Erdenet24/screens/store/settings/settings.dart';
 import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -92,7 +92,7 @@ class _StorePageState extends State<StorePage> {
                       key.currentState!.reset();
                       stopSound();
                       Get.back();
-                      Get.to(() => const StoreOrders());
+                      Get.to(() => const StoreOrdersMainScreen());
                     });
                   },
                   alignment: Alignment.centerRight,
@@ -171,13 +171,8 @@ class _StorePageState extends State<StorePage> {
                           Get.to(() => AddProducts());
                         }),
                         _listTile(IconlyLight.chart, "Захиалгууд", () {
-                          Get.to(() => const StoreOrders());
+                          Get.to(() => const StoreOrdersMainScreen());
                         }),
-                        // _divider(),
-                        // _listTile(IconlyLight.wallet, "Төлбөр тооцоо", () {}),
-                        // _divider(),
-                        // _listTile(IconlyLight.info_circle,
-                        //     "Үйлчилгээний нөхцөл", () {}),
                         _divider(),
                         _listTile(IconlyLight.setting, "Тохиргоо", () {
                           Get.to(() => const StoreSettingsView());
