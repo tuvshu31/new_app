@@ -28,7 +28,6 @@ class _StoreOrdersNewOrdersScreenState
     return _storeCtx.orderList.isEmpty && !_storeCtx.fetching.value
         ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
         : ListView.separated(
-            reverse: true,
             separatorBuilder: (context, index) {
               return Container(height: 8);
             },

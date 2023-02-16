@@ -50,6 +50,7 @@ class _StorePageState extends State<StorePage> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       playSound("incoming");
       var data = message.data;
+      log(data.toString());
       showOrdersNotificationView(context, data);
       log("Foreground message irj bn lastly");
     });
