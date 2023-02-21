@@ -7,13 +7,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/swipe_button.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown/circular_countdown.dart';
-import 'package:http/http.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
-final _storeCtx = Get.put(StoreController());
 void showOrdersNotificationView(context, data) {
   showModalBottomSheet(
     context: context,

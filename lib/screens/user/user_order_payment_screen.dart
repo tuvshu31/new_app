@@ -49,7 +49,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   void createOrder() async {
     loadingDialog(context);
     var body = {
-      "orderId": _cartCtrl.generateOrderId(),
+      "orderId": random4digit(),
       "userId": RestApiHelper.getUserId(),
       "storeId1": _cartCtrl.stores.isNotEmpty ? _cartCtrl.stores[0] : null,
       "storeId2": _cartCtrl.stores.length > 1 ? _cartCtrl.stores[1] : null,
@@ -67,7 +67,6 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     // log(body.toString());
     dynamic response = await RestApi().createOrder(body);
     dynamic data = Map<String, dynamic>.from(response);
-    log(data.toString());
     Get.back();
     successOrderModal(context, () {
       _cartCtrl.cartList.clear();

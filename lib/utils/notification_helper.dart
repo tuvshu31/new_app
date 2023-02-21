@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_notification_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -13,9 +15,11 @@ Future<Map<String, dynamic>> firebaseMessagingForegroundHandler() async {
 }
 
 @pragma('vm:entry-point')
-Future<Map<String, dynamic>> firebaseMessagingBackgroundHandler(
-    RemoteMessage message) async {
+Future firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  log("Background message irj bn :)");
-  return message.data;
+  playSound("incoming");
+  var data = message.data;
+  log(data.toString());
+  // showOrdersNotificationView(context, data);
+  log("Foreground message irj bn lastly");
 }

@@ -52,7 +52,6 @@ void main() async {
 
   log('User granted permission: ${settings.authorizationStatus}');
 
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   // Only call clearSavedSettings() during testing to reset internal values.
   await Upgrader.clearSavedSettings(); // REMOVE this for release builds
   await Hive.initFlutter();

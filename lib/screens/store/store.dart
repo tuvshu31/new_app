@@ -10,6 +10,7 @@ import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:circular_countdown/circular_countdown.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -41,12 +42,25 @@ class _StorePageState extends State<StorePage> {
   final TextEditingController _passwordRepeat = TextEditingController();
   final _loginCtrl = Get.put(LoginController());
   final _storeCtx = Get.put(StoreController());
+
+  @pragma('vm:entry-point')
+  Future firebaseMessagingBackgroundHandle(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    return doSMTHG(message.data);
+  }
+
+  void doSMTHG(data) {
+    playSound("incoming");
+    showOrdersNotificationView(context, data);
+    log("Background message irj bn lastly");
+  }
+
   @override
   void initState() {
     super.initState();
     getToken();
     _storeCtx.fetchNewOrders();
-
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       playSound("incoming");
       var data = message.data;

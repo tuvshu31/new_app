@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_notification_view.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_set_time_view.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -50,7 +51,7 @@ class _StoreOrdersNewOrdersScreenState
       onTap: (() {
         // _showOrderDetauls(index);
         // showOrdersSetTime(context);
-        storeOrdersToDeliveryView(context, _storeCtx.orderList[index]);
+        storeOrdersToDeliveryView(context, data);
       }),
       child: Card(
         shape: RoundedRectangleBorder(
