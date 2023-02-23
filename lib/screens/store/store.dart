@@ -40,18 +40,16 @@ class _StorePageState extends State<StorePage> {
   final TextEditingController _phone = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _passwordRepeat = TextEditingController();
+
   final _loginCtrl = Get.put(LoginController());
   final _storeCtx = Get.put(StoreController());
 
   @pragma('vm:entry-point')
   Future firebaseMessagingBackgroundHandle(RemoteMessage message) async {
     await Firebase.initializeApp();
-    return doSMTHG(message.data);
-  }
 
-  void doSMTHG(data) {
-    playSound("incoming");
-    showOrdersNotificationView(context, data);
+    // playSound("incoming");
+    // showOrdersNotificationView(context, message.data);
     log("Background message irj bn lastly");
   }
 
@@ -61,6 +59,7 @@ class _StorePageState extends State<StorePage> {
     getToken();
     _storeCtx.fetchNewOrders();
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       playSound("incoming");
       var data = message.data;
@@ -68,6 +67,7 @@ class _StorePageState extends State<StorePage> {
       showOrdersNotificationView(context, data);
       log("Foreground message irj bn lastly");
     });
+
     getStoreInfo();
   }
 

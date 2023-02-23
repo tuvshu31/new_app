@@ -91,6 +91,7 @@ dependencies:
   app_settings: ^4.2.0
   flutter_material_pickers: ^3.3.0
   numberpicker: ^2.1.1
+  geocoding: ^2.0.5
 
 dev_dependencies:
   flutter_test:

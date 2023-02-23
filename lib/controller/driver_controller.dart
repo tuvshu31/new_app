@@ -18,23 +18,157 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../screens/driver/driver_bottom_views.dart';
 
 class DriverController extends GetxController {
-  //General values
+  //=========================Driver states==================================
   RxInt step = 0.obs;
-  RxBool isActive = false.obs;
+  RxBool isOnline = false.obs;
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
-  RxDouble driverBearing = 0.0.obs;
   RxString fcmToken = "".obs;
   dynamic driverInfo = [].obs;
-  Rx<HashSet<Circle>> circles = HashSet<Circle>().obs;
-  Rx<LatLng> driverTarget = LatLng(49.02821126030273, 104.04634376483777).obs;
-  //Location-tai holbootoi values
+
+  //=========================Map states==================================
   RxString distanceAndDuration = "".obs;
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
   Rx<LatLng> storeLocation = LatLng(49.02821126030273, 104.04634376483777).obs;
-  Rx<LatLng> driverLocation = LatLng(49.02821126030273, 104.04634376483777).obs;
-  Rx<Completer<GoogleMapController>> googleMapController =
+  RxBool isGPSActive = false.obs;
+  RxInt markerIdCounter = 0.obs;
+  RxDouble markerRotation = 0.0.obs;
+  Rx<LatLng> initialPosition =
+      LatLng(49.02821126030273, 104.04634376483777).obs;
+  Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
+
+  //=========================Map controllers==================================
+  void getUserLocation() async {
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      isGPSActive.value = false;
+    } else {
+      isGPSActive.value = true;
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      initialPosition.value = LatLng(position.latitude, position.longitude);
+      CameraPosition currentCameraPosition = CameraPosition(
+        bearing: 0,
+        target: initialPosition.value,
+        zoom: 16,
+      );
+      final GoogleMapController controller = await mapController.value.future;
+      controller
+          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+      markerRotation.value = position.heading;
+      addMarker();
+    }
+  }
+
+  void addMarker() async {
+    BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(),
+      "assets/images/png/app/driver.png",
+    );
+    MarkerId markerId = MarkerId(markerIdVal());
+    Marker marker = Marker(
+      markerId: markerId,
+      position: initialPosition.value,
+      icon: iconBitmap,
+      rotation: markerRotation.value,
+    );
+    markers[markerId] = marker;
+  }
+
+  String markerIdVal({bool increment = false}) {
+    String val = 'marker_id_$markerIdCounter';
+    if (increment) markerIdCounter++;
+    return val;
+  }
+
+  void onCameraMove(CameraPosition cameraPosition) {
+    if (markers.isNotEmpty) {
+      MarkerId markerId = MarkerId(markerIdVal());
+      Marker? marker = markers[markerId];
+      Marker updatedMarker = marker!.copyWith(
+        positionParam: cameraPosition.target,
+      );
+      markers[markerId] = updatedMarker;
+    }
+  }
+
+  void getPositionStream() {
+    Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 3,
+      ),
+    ).listen((Position? info) async {
+      initialPosition.value = LatLng(info!.latitude, info.longitude);
+      CameraPosition currentCameraPosition = CameraPosition(
+        bearing: 0,
+        target: initialPosition.value,
+        zoom: 16,
+      );
+      markerRotation.value = info.heading;
+      addMarker();
+      final GoogleMapController controller = await mapController.value.future;
+      controller
+          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+    });
+  }
+
+  void onMapCreated(GoogleMapController controller) async {
+    if (!mapController.value.isCompleted) {
+      mapController.value.complete(controller);
+    }
+
+    addMarker();
+    Future.delayed(const Duration(seconds: 1), () async {
+      if (!mapController.value.isCompleted) {
+        GoogleMapController controller = await mapController.value.future;
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: initialPosition.value,
+              zoom: 17.0,
+            ),
+          ),
+        );
+      } else {
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: initialPosition.value,
+              zoom: 17.0,
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  //=========================Driver controllers==================================
+  void turnOnOff(value) async {
+    isOnline.value = value;
+    if (value == true) {
+      playSound("engine_start");
+      getUserLocation();
+      getPositionStream();
+      startTimer(10800);
+    } else {
+      stopTimer();
+      stopSound();
+    }
+  }
 
   void fetchDriverInfo(int id) async {
     dynamic response = await RestApi().getDriver(id);
@@ -42,7 +176,6 @@ class DriverController extends GetxController {
     if (d["success"]) {
       driverInfo = d["data"];
     }
-    log(driverInfo.toString());
   }
 
   void updateDriverInfo(dynamic body) async {
@@ -52,86 +185,38 @@ class DriverController extends GetxController {
     if (data["success"]) {}
   }
 
-  void turnOnOff(value) async {
-    if (step.value == 0) {
-      isActive.value = value;
-      if (value) {
-        getCurrentLocation();
-        positionStreamForMap();
-        // positionStreamForServer();
-        moveCamera(driverLocation.value, 18);
-        addCircles("driver", driverLocation.value);
-      }
-    }
-  }
-
   void getNewDelivery() async {
     storeLocation.value = LatLng(
       double.parse(deliveryInfo["latitude"]),
       double.parse(deliveryInfo["longitude"]),
     );
-    getDistance(driverLocation.value, storeLocation.value);
-    addCircles("store", storeLocation.value);
-    moveCamera(storeLocation.value, 14);
+    // getDistance(driverLocation.value, storeLocation.value);
+
     step.value = 1;
     playSound("incoming");
+  }
+
+  void sendUserTokenToTheServer() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      var body = {"mapToken": newToken};
+      await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    });
   }
 
   void cancelNewDelivery() async {
     step.value = 0;
     stopSound();
     removeMarker("store");
-    moveCamera(driverLocation.value, 18);
   }
 
   void finishDelivery() {
     step.value = 0;
     removeMarker("store");
-    moveCamera(driverLocation.value, 18);
+
     deliveryInfo.clear();
-  }
-
-  //Controller-d hereglej bga helper.uud:
-
-  void getCurrentLocation() async {
-    var info = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    driverLocation.value = LatLng(info.latitude, info.longitude);
-  }
-
-  void positionStreamForMap() {
-    LocationSettings locationSettingsForMap = const LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 3,
-    );
-    Geolocator.getPositionStream(locationSettings: locationSettingsForMap)
-        .listen((Position? info) {
-      driverLocation.value = LatLng(info!.latitude, info.longitude);
-    });
-    moveCamera(driverLocation.value, 18);
-  }
-
-  void positionStreamForServer() {
-    LocationSettings locationSettingsForServer = const LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 200,
-    );
-    Geolocator.getPositionStream(locationSettings: locationSettingsForServer)
-        .listen((Position info) {});
-  }
-
-  void moveCamera(LatLng latLng, double zoom) async {
-    final GoogleMapController controller =
-        await googleMapController.value.future;
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: latLng,
-          zoom: zoom,
-          bearing: driverBearing.value,
-        ),
-      ),
-    );
   }
 
   void getDistance(LatLng driver, LatLng store) async {
@@ -149,53 +234,6 @@ class DriverController extends GetxController {
     double distanceMile = double.parse(distanceText);
     String distanceKm = (distanceMile * 1.609).toStringAsFixed(3);
     distanceAndDuration.value = "$distanceKm km, $durationText";
-  }
-
-  void addMarker(String type, LatLng latLng) async {
-    BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(),
-      "assets/images/png/app/$type.png",
-    );
-    var markerIdVal = type;
-    final MarkerId markerId = MarkerId(markerIdVal);
-    final Marker marker = Marker(
-      markerId: markerId,
-      position: latLng,
-      icon: iconBitmap,
-    );
-    markers[markerId] = marker;
-  }
-
-  void addCircles(String type, LatLng point) {
-    String circleId = "origin";
-    double radius = 5;
-    int strokeWidth = 24;
-    Color fillColor = MyColors.white;
-    Color strokeColor = MyColors.white;
-    if (type == "driver") {
-      circleId = "driver";
-      fillColor = MyColors.primary;
-      strokeColor = MyColors.primary.withOpacity(0.3);
-    } else if (type == "store") {
-      circleId = "store";
-      radius = 15;
-      fillColor = MyColors.white;
-      strokeColor = MyColors.green;
-      strokeWidth = 40;
-    }
-
-    circles.value.add(Circle(
-      circleId: CircleId(circleId),
-      center: point,
-      radius: radius,
-      fillColor: fillColor,
-      strokeWidth: strokeWidth,
-      strokeColor: strokeColor,
-    ));
-  }
-
-  void removeCircles(String type) {
-    circles.value.removeWhere((element) => element.circleId == type);
   }
 
   void removeMarker(String type) {
@@ -227,24 +265,34 @@ class DriverController extends GetxController {
     await launchUrl(launchUri);
   }
 
-  void checkPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+//time controller====================
+
+  Timer? _timer;
+  int remainingSeconds = 0;
+  final time = '00.00'.obs;
+
+  void stopTimer() {
+    _timer!.cancel();
+  }
+
+  void startTimer(int seconds) {
+    const duration = Duration(seconds: 1);
+    remainingSeconds = seconds;
+    _timer = Timer.periodic(duration, (Timer timer) {
+      if (remainingSeconds == 0) {
+        turnOnOff(false);
+        timer.cancel();
+      } else {
+        int hours = remainingSeconds ~/ 3600;
+        int minutes = remainingSeconds ~/ 60 % 60;
+        int seconds = (remainingSeconds % 60);
+        time.value = hours.toString().padLeft(2, "0") +
+            ":" +
+            minutes.toString().padLeft(2, "0") +
+            ":" +
+            seconds.toString().padLeft(2, "0");
+        remainingSeconds--;
       }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+    });
   }
 }

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:custom_timer/custom_timer.dart';
@@ -37,8 +38,6 @@ class DriverMainScreen extends StatefulWidget {
 class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
   final GlobalKey<SlideActionState> key = GlobalKey();
-  late CountdownTimerController controller;
-  int endTime = DateTime.now().millisecondsSinceEpoch + 20000 * 540;
 
   List<Widget> steps = [
     step0(),
@@ -59,33 +58,9 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    getToken();
+    _driverCtx.sendUserTokenToTheServer();
     _driverCtx.firebaseMessagingForegroundHandler();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
-    controller = CountdownTimerController(endTime: endTime, onEnd: onEnd);
-    controller.start();
-    // _driverCtx.firebaseMessagingForegroundHandler(RestApiHelper.getUserId());
-  }
-
-  void getToken() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
-  }
-
-  void onEnd() {
-    log("onEnd");
-  }
-
-  @override
-  void dispose() {
-    onEnd();
-    controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -101,8 +76,8 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
             appBar: _appBar(),
             body: Stack(
               children: [
-                const DriverScreenMapView(),
-                _infoSnackbar(),
+                DriverScreenMapView(),
+                DriverActiveInfoView(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -128,7 +103,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
         centerTitle: true,
         titleSpacing: 0,
         title: CustomText(
-          text: _driverCtx.isActive.value ? "Online" : "Offline",
+          text: _driverCtx.isOnline.value ? "Online" : "Offline",
           color: MyColors.black,
           fontSize: 16,
         ),
@@ -136,14 +111,16 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
           Container(
             margin: const EdgeInsets.only(right: 8),
             child: CupertinoSwitch(
-                value: _driverCtx.isActive.value,
-                thumbColor: _driverCtx.isActive.value
+                value: _driverCtx.isOnline.value,
+                thumbColor: _driverCtx.isOnline.value
                     ? MyColors.primary
                     : MyColors.gray,
                 trackColor: MyColors.background,
                 activeColor: MyColors.black,
                 onChanged: (value) {
-                  _driverCtx.turnOnOff(value);
+                  if (_driverCtx.step.value == 0) {
+                    _driverCtx.turnOnOff(value);
+                  }
                 }),
           ),
         ],
@@ -177,7 +154,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
 
   Widget bottomSheets() {
     return Obx(
-      () => _driverCtx.isActive.value
+      () => _driverCtx.isOnline.value
           ? Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -237,108 +214,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
               ),
             )
           : Container(),
-    );
-  }
-
-  Widget _infoSnackbar() {
-    return Obx(
-      () => Container(
-        height: Get.height * .075,
-        width: double.infinity,
-        color: MyColors.black,
-        child: _driverCtx.isActive.value
-            ? Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      dense: true,
-                      horizontalTitleGap: 0,
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            IconlyLight.wallet,
-                            color: MyColors.white,
-                          ),
-                        ],
-                      ),
-                      title: const CustomText(
-                        text: "Өнөөдрийн орлого:",
-                        color: MyColors.white,
-                        fontSize: 12,
-                      ),
-                      subtitle: CustomText(
-                          color: MyColors.white,
-                          text: convertToCurrencyFormat(
-                            int.parse("0"),
-                            locatedAtTheEnd: true,
-                            toInt: true,
-                          )),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListTile(
-                      dense: true,
-                      horizontalTitleGap: 0,
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            IconlyLight.time_circle,
-                            color: MyColors.white,
-                          ),
-                        ],
-                      ),
-                      title: const CustomText(
-                        text: "Идэвхтэй хугацаа:",
-                        color: MyColors.white,
-                        fontSize: 12,
-                      ),
-                      // subtitle: CustomText(
-                      //   color: MyColors.white,
-                      //   text: "02:15:00",
-                      // ),
-                      subtitle: CountdownTimer(
-                        textStyle: const TextStyle(color: MyColors.white),
-                        controller: controller,
-                        onEnd: onEnd,
-                        endTime: endTime,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      dense: true,
-                      horizontalTitleGap: 0,
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.nightlight_outlined,
-                            color: MyColors.white,
-                          ),
-                        ],
-                      ),
-                      title: const CustomText(
-                        text: "Та идэвхгүй байна!",
-                        color: MyColors.white,
-                        fontSize: 12,
-                      ),
-                      subtitle: const CustomText(
-                          color: MyColors.white,
-                          text: "Идэвхтэй үед захиалга хүлээн авах боломжтой"),
-                    ),
-                  ),
-                ],
-              ),
-      ),
     );
   }
 }
