@@ -35,15 +35,14 @@ class _AddressViewState extends State<AddressView> {
     dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
     dynamic data = Map<String, dynamic>.from(res);
     _user = data["data"];
-    if (_user["deliveryPhone"] != 0 && _user["deliveryPhone"] != null) {
-      phoneController.text = _user["deliveryPhone"].toString();
+    if (_user["userPhone"] != 0 && _user["userPhone"] != null) {
+      phoneController.text = _user["userPhone"].toString();
     }
-    if (_user["deliveryAddress"] != null &&
-        _user["deliveryAddress"].isNotEmpty) {
-      addressController.text = _user["deliveryAddress"];
+    if (_user["userAddress"] != null && _user["userAddress"].isNotEmpty) {
+      addressController.text = _user["userAddress"];
     }
-    if (_user["deliveryAddress"] != null && _user["deliveryKode"].isNotEmpty) {
-      kodeController.text = _user["deliveryKode"];
+    if (_user["userAddress"] != null && _user["userEntranceCode"].isNotEmpty) {
+      kodeController.text = _user["userEntranceCode"];
     }
     setState(() {});
   }
@@ -51,9 +50,9 @@ class _AddressViewState extends State<AddressView> {
   void saveDeliveryInfo() async {
     loadingDialog(context);
     var body = {
-      "deliveryPhone": phoneController.text,
-      "deliveryAddress": addressController.text,
-      "deliveryKode": kodeController.text,
+      "userPhone": phoneController.text,
+      "userAddress": addressController.text,
+      "userEntranceCode": kodeController.text,
     };
     dynamic authCode =
         await RestApi().updateUser(RestApiHelper.getUserId(), body);

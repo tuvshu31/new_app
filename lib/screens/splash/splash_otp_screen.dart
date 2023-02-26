@@ -8,7 +8,6 @@ import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:Erdenet24/screens/user/home/home.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/notification_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';

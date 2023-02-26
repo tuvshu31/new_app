@@ -145,7 +145,7 @@ class RestApi {
   //Шинэ захиалгын мэдээллийг жолооч руу илгээх
   Future assignDriver(dynamic body) async {
     return DioClient()
-        .sendRequest('drivers/assignDriver', Method.post, body, {});
+        .sendRequest('users/drivers/assignDriver', Method.post, body, {});
   }
 
   //Захиалгын мэдээлэл өөрчлөх
@@ -190,11 +190,12 @@ class RestApi {
 
   //Жолоочийн мэдээллийг авах
   Future getDriver(int id) async {
-    return DioClient().sendRequest('drivers/$id', Method.get, [], {});
+    return DioClient().sendRequest('users/drivers/$id', Method.get, [], {});
   }
 
-  //Тухайн хэрэглэгчийн мэдээллийг засах
+  //Тухайн жолоочийн мэдээллийг засах
   Future updateDriver(int driverId, dynamic body) async {
-    return DioClient().sendRequest('drivers/$driverId', Method.put, body, {});
+    return DioClient()
+        .sendRequest('users/drivers/$driverId', Method.put, body, {});
   }
 }

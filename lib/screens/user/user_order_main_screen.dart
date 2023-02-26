@@ -42,15 +42,15 @@ class _UserOrderMainScreenState extends State<UserOrderMainScreen> {
     dynamic res = await RestApi().getUsers(query);
     dynamic data = Map<String, dynamic>.from(res);
     _user = data["data"][0];
-    if (_user["deliveryPhone"] != null && _user["deliveryPhone"] != 0) {
-      phone.text = _user["deliveryPhone"].toString();
+    if (_user["userPhone"] != null && _user["userPhone"] != 0) {
+      phone.text = _user["userPhone"].toString();
     }
-    if (_user["deliveryAddress"] != null &&
-        _user["deliveryAddress"].isNotEmpty) {
-      address.text = _user["deliveryAddress"];
+    if (_user["userAddress"] != null && _user["userAddress"].isNotEmpty) {
+      address.text = _user["userAddress"];
     }
-    if (_user["deliveryKode"] != null && _user["deliveryKode"].isNotEmpty) {
-      kod.text = _user["deliveryKode"];
+    if (_user["userEntranceCode"] != null &&
+        _user["userEntranceCode"].isNotEmpty) {
+      kod.text = _user["userEntranceCode"];
     }
     isPhoneOk = phone.text.isNotEmpty;
     isAddressOk = address.text.isNotEmpty;

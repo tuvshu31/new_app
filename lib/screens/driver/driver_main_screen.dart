@@ -76,8 +76,8 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
             appBar: _appBar(),
             body: Stack(
               children: [
-                DriverScreenMapView(),
-                DriverActiveInfoView(),
+                const DriverScreenMapView(),
+                const DriverActiveInfoView(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

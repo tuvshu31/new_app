@@ -3,15 +3,14 @@ import 'package:Erdenet24/screens/driver/driver_deliver_list_page.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_page.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_page.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:iconly/iconly.dart';
+import 'package:app_settings/app_settings.dart';
 
 final _loginCtx = Get.put(LoginController());
 Widget driverDrawer(context) {
@@ -35,7 +34,7 @@ Widget driverDrawer(context) {
                       shape: BoxShape.circle,
                       color: MyColors.white,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       FontAwesomeIcons.user,
                       size: 40,
                       color: MyColors.grey,
@@ -49,7 +48,7 @@ Widget driverDrawer(context) {
               ],
             )),
         _listTile(IconlyLight.user, "Тохиргоо", () {
-          Get.to(() => const DriverSettingsPage());
+          AppSettings.openAppSettings();
         }),
         _listTile(IconlyLight.location, "Хүргэлтүүд", () {
           Get.to(() => const DriverDeliverListPage());

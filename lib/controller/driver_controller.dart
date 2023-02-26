@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -69,16 +70,31 @@ class DriverController extends GetxController {
       controller
           .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
       markerRotation.value = position.heading;
-      addMarker();
+      addDriverMarker();
     }
   }
 
-  void addMarker() async {
+  LatLngBounds getBounds() {
+    var lngs = markers.values.map((e) => e.position.longitude).toList();
+    var lats = markers.values.map((e) => e.position.latitude).toList();
+    double topMost = lngs.reduce(max);
+    double leftMost = lats.reduce(min);
+    double rightMost = lats.reduce(max);
+    double bottomMost = lngs.reduce(min);
+    LatLngBounds bounds = LatLngBounds(
+      northeast: LatLng(rightMost, topMost),
+      southwest: LatLng(leftMost, bottomMost),
+    );
+
+    return bounds;
+  }
+
+  void addDriverMarker() async {
     BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(),
       "assets/images/png/app/driver.png",
     );
-    MarkerId markerId = MarkerId(markerIdVal());
+    MarkerId markerId = const MarkerId("driver");
     Marker marker = Marker(
       markerId: markerId,
       position: initialPosition.value,
@@ -88,15 +104,23 @@ class DriverController extends GetxController {
     markers[markerId] = marker;
   }
 
-  String markerIdVal({bool increment = false}) {
-    String val = 'marker_id_$markerIdCounter';
-    if (increment) markerIdCounter++;
-    return val;
+  void addStoreMarker() async {
+    BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(),
+      "assets/images/png/app/store.png",
+    );
+    MarkerId markerId = const MarkerId("store");
+    Marker marker = Marker(
+      markerId: markerId,
+      position: storeLocation.value,
+      icon: iconBitmap,
+    );
+    markers[markerId] = marker;
   }
 
   void onCameraMove(CameraPosition cameraPosition) {
     if (markers.isNotEmpty) {
-      MarkerId markerId = MarkerId(markerIdVal());
+      MarkerId markerId = const MarkerId("driver");
       Marker? marker = markers[markerId];
       Marker updatedMarker = marker!.copyWith(
         positionParam: cameraPosition.target,
@@ -119,7 +143,6 @@ class DriverController extends GetxController {
         zoom: 16,
       );
       markerRotation.value = info.heading;
-      addMarker();
       final GoogleMapController controller = await mapController.value.future;
       controller
           .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
@@ -127,32 +150,17 @@ class DriverController extends GetxController {
   }
 
   void onMapCreated(GoogleMapController controller) async {
-    if (!mapController.value.isCompleted) {
-      mapController.value.complete(controller);
-    }
-
-    addMarker();
+    mapController.value.complete(controller);
     Future.delayed(const Duration(seconds: 1), () async {
-      if (!mapController.value.isCompleted) {
-        GoogleMapController controller = await mapController.value.future;
-        controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: initialPosition.value,
-              zoom: 17.0,
-            ),
+      GoogleMapController controller = await mapController.value.future;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: initialPosition.value,
+            zoom: 17.0,
           ),
-        );
-      } else {
-        controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: initialPosition.value,
-              zoom: 17.0,
-            ),
-          ),
-        );
-      }
+        ),
+      );
     });
   }
 
@@ -183,17 +191,6 @@ class DriverController extends GetxController {
     dynamic user = await RestApi().updateDriver(id, body);
     dynamic data = Map<String, dynamic>.from(user);
     if (data["success"]) {}
-  }
-
-  void getNewDelivery() async {
-    storeLocation.value = LatLng(
-      double.parse(deliveryInfo["latitude"]),
-      double.parse(deliveryInfo["longitude"]),
-    );
-    // getDistance(driverLocation.value, storeLocation.value);
-
-    step.value = 1;
-    playSound("incoming");
   }
 
   void sendUserTokenToTheServer() async {
@@ -244,16 +241,15 @@ class DriverController extends GetxController {
 
   void firebaseMessagingForegroundHandler() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      storeLocation.value = LatLng(
-        double.parse(message.data["latitude"]),
-        double.parse(message.data["longitude"]),
-      );
       deliveryInfo.value = message.data;
       storeLocation.value = LatLng(
         double.parse(deliveryInfo["latitude"]),
         double.parse(deliveryInfo["longitude"]),
       );
-      getNewDelivery();
+      addStoreMarker();
+      getDistance(initialPosition.value, storeLocation.value);
+      step.value = 1;
+      playSound("incoming");
     });
   }
 
