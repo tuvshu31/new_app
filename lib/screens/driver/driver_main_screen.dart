@@ -185,11 +185,20 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                   Future.delayed(
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
-                                    if (_driverCtx.step.value == 5) {
-                                      _driverCtx.finishDelivery();
-                                    } else {
+                                    if (_driverCtx.step.value == 0) {
+                                      _driverCtx.step.value += 1;
+                                    } else if (_driverCtx.step.value == 1) {
                                       stopSound();
                                       _driverCtx.step.value += 1;
+                                      _driverCtx.updateOrder();
+                                    } else if (_driverCtx.step.value == 2) {
+                                      log("step2");
+                                    } else if (_driverCtx.step.value == 3) {
+                                      log("step3");
+                                    } else if (_driverCtx.step.value == 4) {
+                                      log("step4");
+                                    } else {
+                                      _driverCtx.finishDelivery();
                                     }
                                   });
                                 },

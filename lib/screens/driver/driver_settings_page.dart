@@ -20,9 +20,15 @@ class DriverSettingsPage extends StatefulWidget {
 
 class _DriverSettingsPageState extends State<DriverSettingsPage> {
   final _driverCtx = Get.put(DriverController());
+  @override
+  void initState() {
+    super.initState();
+    log(_driverCtx.driverInfo.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
+    var info = _driverCtx.driverInfo[0];
     return CustomHeader(
       title: "Тохиргоо",
       customActions: Container(),
@@ -30,25 +36,19 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
         children: [
           _listTile(
             "Утас",
-            _driverCtx.driverInfo["phone"],
+            info["phone"],
             IconlyLight.call,
             true,
           ),
           _listTile(
-            "Имэйл хаяг",
-            _driverCtx.driverInfo["email"] ?? "@",
-            IconlyLight.message,
-            true,
-          ),
-          _listTile(
             "Данс",
-            _driverCtx.driverInfo["account"],
+            info["bankAccount"],
             IconlyLight.wallet,
             false,
           ),
           _listTile(
             "Хувийн дугаар",
-            _driverCtx.driverInfo["privateNumber"],
+            info["driverCode"],
             IconlyLight.tick_square,
             false,
           )
@@ -59,6 +59,7 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
 
   Widget _listTile(String title, String value, IconData icon, bool editable) {
     return CustomInkWell(
+      borderRadius: BorderRadius.zero,
       onTap: () => editable
           ? Get.to(() => DriverSettingsEditView(
                 title: title,
@@ -66,6 +67,7 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
               ))
           : null,
       child: ListTile(
+        dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 24),
         leading: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -77,8 +79,8 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
             ),
           ],
         ),
-        title: CustomText(text: title),
-        subtitle: CustomText(text: value),
+        title: CustomText(text: title, fontSize: 14),
+        subtitle: CustomText(text: value, fontSize: 12),
         trailing: editable
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,

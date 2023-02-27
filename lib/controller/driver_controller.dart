@@ -212,7 +212,6 @@ class DriverController extends GetxController {
   void finishDelivery() {
     step.value = 0;
     removeMarker("store");
-
     deliveryInfo.clear();
   }
 
@@ -251,6 +250,11 @@ class DriverController extends GetxController {
       step.value = 1;
       playSound("incoming");
     });
+  }
+
+  void updateOrder() async {
+    print(deliveryInfo);
+    // await RestApi().updateOrder(orderId, body);
   }
 
   Future<void> makePhoneCall(String phoneNumber) async {
