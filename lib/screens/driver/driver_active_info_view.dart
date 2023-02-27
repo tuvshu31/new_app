@@ -45,7 +45,7 @@ class _DriverActiveInfoViewState extends State<DriverActiveInfoView> {
                       ),
                       subtitle: CustomText(
                           text: convertToCurrencyFormat(
-                        int.parse("0"),
+                        _driverCtx.fakeOrderCount.value * 3000,
                         locatedAtTheEnd: true,
                         toInt: true,
                       )),

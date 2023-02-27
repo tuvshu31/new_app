@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
@@ -14,103 +18,96 @@ class DriverDeliverListPage extends StatefulWidget {
 }
 
 class _DriverDeliverListPageState extends State<DriverDeliverListPage> {
-  List deliveryList = [
-    {
-      "storeName": "Asia restaurant",
-      "duration": "13:24",
-      "date": "2023-02-04",
-      "cost": "3000"
-    },
-    {
-      "storeName": "Хаан бууз",
-      "duration": "13:24",
-      "date": "2023-02-04",
-      "cost": "3000"
-    },
-    {
-      "storeName": "Баялаг ресторан",
-      "duration": "13:24",
-      "date": "2023-02-04",
-      "cost": "3000"
-    },
-    {
-      "storeName": "Монсүү ХХК",
-      "duration": "13:24",
-      "date": "2023-02-04",
-      "cost": "3000"
+  List<dynamic> orderList = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchDriverOrders();
+  }
+
+  void fetchDriverOrders() async {
+    var query = {
+      "deliveryDriverId": RestApiHelper.getUserId(),
+      "orderStatus": "received",
+    };
+    dynamic res = await RestApi().getOrders(query);
+    dynamic data = Map<String, dynamic>.from(res);
+    if (data["success"]) {
+      setState(() {
+        orderList = data["data"];
+      });
+      log(orderList.toString());
     }
-  ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
       title: "Хүргэлтүүд",
       customActions: Container(),
-      body: Stack(
-        children: [
-          ListView.builder(
+      body: orderList.isEmpty
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: MyColors.primary,
+            ))
+          : ListView.separated(
+              separatorBuilder: (context, index) {
+                return Container(
+                  height: 7,
+                  color: MyColors.fadedGrey,
+                );
+              },
               physics: const BouncingScrollPhysics(),
               // padding: const EdgeInsets.symmetric(horizontal: 12),
               shrinkWrap: true,
-              itemCount: deliveryList.length,
+              itemCount: orderList.length,
               itemBuilder: (context, index) {
-                var data = deliveryList[index];
-                return ListTile(
-                  title: CustomText(text: data["storeName"]),
-                  subtitle: Row(
-                    children: [
-                      CustomText(text: data["date"]),
-                      const SizedBox(width: 24),
-                      CustomText(text: "${data["duration"]} минут"),
-                    ],
-                  ),
-                  trailing: CustomText(
-                      text: convertToCurrencyFormat(
-                    double.parse(data["cost"]),
-                    toInt: true,
-                    locatedAtTheEnd: true,
-                  )),
-                );
-              }),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              height: Get.height * .14,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                var data = orderList[index];
+                return _item(data);
+              },
+            ),
+    );
+  }
+
+  Widget _item(data) {
+    return Container(
+      height: Get.height * .09,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      color: MyColors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CustomText(
+                text: "Restaurant",
+                fontSize: 14,
+              ),
+              Row(
                 children: [
-                  const MySeparator(color: MyColors.grey),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CustomText(text: "Нийт хүргэлтийн тоо:"),
-                        CustomText(
-                          text: "123",
-                          fontWeight: FontWeight.bold,
-                        )
-                      ],
-                    ),
+                  CustomText(
+                    text: data["orderTime"],
+                    fontSize: 12,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CustomText(text: "Нийт ашиг:"),
-                        CustomText(
-                          text: convertToCurrencyFormat(
-                            double.parse("50000"),
-                            locatedAtTheEnd: true,
-                            toInt: true,
-                          ),
-                          fontWeight: FontWeight.bold,
-                        )
-                      ],
-                    ),
+                  const SizedBox(width: 24),
+                  CustomText(
+                    text: "${data["deliveryDuration"]} ceкунт",
+                    color: MyColors.gray,
+                    fontSize: 12,
                   ),
                 ],
+              ),
+            ],
+          ),
+          Center(
+            child: CustomText(
+              text: convertToCurrencyFormat(
+                double.parse(data["deliveryPrice"]),
+                toInt: true,
+                locatedAtTheEnd: true,
               ),
             ),
           )

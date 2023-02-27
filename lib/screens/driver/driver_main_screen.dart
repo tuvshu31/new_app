@@ -1,19 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/button.dart';
-import 'package:custom_timer/custom_timer.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
-import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
-import 'package:iconly/iconly.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,8 +17,6 @@ import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
 
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:timer_count_down/timer_controller.dart';
-import 'package:timer_count_down/timer_count_down.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});
@@ -190,13 +180,35 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                     } else if (_driverCtx.step.value == 1) {
                                       stopSound();
                                       _driverCtx.step.value += 1;
-                                      _driverCtx.updateOrder();
+                                      _driverCtx.updateOrder({
+                                        "orderStatus": "delivering",
+                                        "deliveryDriverId":
+                                            RestApiHelper.getUserId().toString()
+                                      });
+                                      _driverCtx.stopwatch.value.start();
                                     } else if (_driverCtx.step.value == 2) {
-                                      log("step2");
+                                      _driverCtx.step.value += 1;
+                                      log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 3) {
-                                      log("step3");
+                                      _driverCtx.step.value += 1;
+                                      log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 4) {
-                                      log("step4");
+                                      var deliveryDuration = _driverCtx
+                                          .stopwatch.value.elapsed.inSeconds;
+                                      _driverCtx.updateOrder({
+                                        "orderStatus": "received",
+                                        "deliveryDuration": deliveryDuration,
+                                        "deliveryPrice": "3000",
+                                        "deliveryPaidOff": false,
+                                      });
+                                      _driverCtx.fakeDeliveryTimer.value =
+                                          deliveryDuration.toString();
+                                      _driverCtx.stopwatch.value.reset();
+                                      _driverCtx.deliveryInfo.clear();
+                                      _driverCtx.storeLocation.refresh();
+                                      _driverCtx.step.value += 1;
+                                      _driverCtx.fakeOrderCount.value += 1;
+                                      log(_driverCtx.step.value.toString());
                                     } else {
                                       _driverCtx.finishDelivery();
                                     }

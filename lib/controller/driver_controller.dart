@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:math';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -26,6 +25,9 @@ class DriverController extends GetxController {
   RxMap deliveryInfo = {}.obs;
   RxString fcmToken = "".obs;
   dynamic driverInfo = [].obs;
+  Rx<Stopwatch> stopwatch = Stopwatch().obs;
+  RxInt fakeOrderCount = 0.obs;
+  RxString fakeDeliveryTimer = "".obs;
 
   //=========================Map states==================================
   RxString distanceAndDuration = "".obs;
@@ -74,20 +76,20 @@ class DriverController extends GetxController {
     }
   }
 
-  LatLngBounds getBounds() {
-    var lngs = markers.values.map((e) => e.position.longitude).toList();
-    var lats = markers.values.map((e) => e.position.latitude).toList();
-    double topMost = lngs.reduce(max);
-    double leftMost = lats.reduce(min);
-    double rightMost = lats.reduce(max);
-    double bottomMost = lngs.reduce(min);
-    LatLngBounds bounds = LatLngBounds(
-      northeast: LatLng(rightMost, topMost),
-      southwest: LatLng(leftMost, bottomMost),
-    );
+  // LatLngBounds getBounds() {
+  //   var lngs = markers.values.map((e) => e.position.longitude).toList();
+  //   var lats = markers.values.map((e) => e.position.latitude).toList();
+  //   double topMost = lngs.reduce(max);
+  //   double leftMost = lats.reduce(min);
+  //   double rightMost = lats.reduce(max);
+  //   double bottomMost = lngs.reduce(min);
+  //   LatLngBounds bounds = LatLngBounds(
+  //     northeast: LatLng(rightMost, topMost),
+  //     southwest: LatLng(leftMost, bottomMost),
+  //   );
 
-    return bounds;
-  }
+  //   return bounds;
+  // }
 
   void addDriverMarker() async {
     BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
@@ -143,6 +145,7 @@ class DriverController extends GetxController {
         zoom: 16,
       );
       markerRotation.value = info.heading;
+      addDriverMarker();
       final GoogleMapController controller = await mapController.value.future;
       controller
           .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
@@ -171,9 +174,9 @@ class DriverController extends GetxController {
       playSound("engine_start");
       getUserLocation();
       getPositionStream();
-      startTimer(10800);
+      startActiveTimer(10800);
     } else {
-      stopTimer();
+      stopActiveTimer();
       stopSound();
     }
   }
@@ -252,9 +255,10 @@ class DriverController extends GetxController {
     });
   }
 
-  void updateOrder() async {
-    print(deliveryInfo);
-    // await RestApi().updateOrder(orderId, body);
+  void updateOrder(dynamic body) async {
+    var response =
+        await RestApi().updateOrder(int.parse(deliveryInfo["id"]), body);
+    log(response.toString());
   }
 
   Future<void> makePhoneCall(String phoneNumber) async {
@@ -267,18 +271,18 @@ class DriverController extends GetxController {
 
 //time controller====================
 
-  Timer? _timer;
+  Timer? _activeTimer;
   int remainingSeconds = 0;
   final time = '00.00'.obs;
 
-  void stopTimer() {
-    _timer!.cancel();
+  void stopActiveTimer() {
+    _activeTimer!.cancel();
   }
 
-  void startTimer(int seconds) {
+  void startActiveTimer(int seconds) {
     const duration = Duration(seconds: 1);
     remainingSeconds = seconds;
-    _timer = Timer.periodic(duration, (Timer timer) {
+    _activeTimer = Timer.periodic(duration, (Timer timer) {
       if (remainingSeconds == 0) {
         turnOnOff(false);
         timer.cancel();

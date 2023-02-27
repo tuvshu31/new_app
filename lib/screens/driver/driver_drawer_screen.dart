@@ -1,3 +1,4 @@
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_page.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_page.dart';
@@ -13,12 +14,13 @@ import 'package:iconly/iconly.dart';
 import 'package:app_settings/app_settings.dart';
 
 final _loginCtx = Get.put(LoginController());
+final _driverCtx = Get.put(DriverController());
 Widget driverDrawer(context) {
   return Drawer(
     child: ListView(
       children: [
         DrawerHeader(
-            decoration: BoxDecoration(color: Colors.red),
+            decoration: const BoxDecoration(color: Colors.red),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,

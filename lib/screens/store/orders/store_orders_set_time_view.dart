@@ -35,7 +35,6 @@ void showOrdersSetTime(context, data) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (context) {
       return FractionallySizedBox(
         heightFactor: 1,

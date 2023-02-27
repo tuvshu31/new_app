@@ -21,77 +21,79 @@ void stopSound() async {
 }
 
 Widget step0() {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const CustomText(
-        text: "Сүүлийн хүргэлт:",
-        fontSize: 14,
-        color: MyColors.gray,
-      ),
-      const SizedBox(height: 24),
-      Container(
-        height: 70,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: MyColors.black,
-          borderRadius: BorderRadius.circular(50),
+  return Obx(
+    () => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const CustomText(
+          text: "Сүүлийн хүргэлт:",
+          fontSize: 14,
+          color: MyColors.gray,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyColors.primary,
+        const SizedBox(height: 24),
+        Container(
+          height: 70,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: MyColors.black,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MyColors.primary,
+                      ),
+                      child: Icon(
+                        IconlyLight.wallet,
+                        color: MyColors.white,
+                      ),
                     ),
-                    child: Icon(
-                      IconlyLight.wallet,
+                    CustomText(
                       color: MyColors.white,
-                    ),
-                  ),
-                  CustomText(
-                    color: MyColors.white,
-                    text: convertToCurrencyFormat(
-                      int.parse("3000"),
-                      locatedAtTheEnd: true,
-                      toInt: true,
-                    ),
-                  )
-                ],
+                      text: convertToCurrencyFormat(
+                        int.parse("3000"),
+                        locatedAtTheEnd: true,
+                        toInt: true,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyColors.primary,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MyColors.primary,
+                      ),
+                      child: Icon(
+                        IconlyLight.time_circle,
+                        color: MyColors.white,
+                      ),
                     ),
-                    child: Icon(
-                      IconlyLight.time_circle,
+                    CustomText(
                       color: MyColors.white,
-                    ),
-                  ),
-                  CustomText(
-                    color: MyColors.white,
-                    text: "3:24 мин",
-                  )
-                ],
+                      text: "3:24 мин",
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      )
-    ],
+            ],
+          ),
+        )
+      ],
+    ),
   );
 }
 
@@ -232,25 +234,27 @@ Widget step2() {
 }
 
 Widget step3() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      const CustomText(
-        text: "Баталгаажуулах код:",
-        color: MyColors.gray,
-      ),
-      const SizedBox(height: 12),
-      CustomText(
-        text: random4digit().toString(),
-        fontSize: 28,
-      ),
-      const SizedBox(height: 12),
-      SlideCountdownSeparated(
-        duration: const Duration(minutes: 15),
-        onDone: () {},
-      ),
-      const SizedBox(height: 24),
-    ],
+  return Obx(
+    () => Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const CustomText(
+          text: "Баталгаажуулах код:",
+          color: MyColors.gray,
+        ),
+        const SizedBox(height: 12),
+        CustomText(
+          text: _driverCtx.deliveryInfo["orderId"],
+          fontSize: 28,
+        ),
+        const SizedBox(height: 12),
+        SlideCountdownSeparated(
+          duration: const Duration(minutes: 15),
+          onDone: () {},
+        ),
+        const SizedBox(height: 24),
+      ],
+    ),
   );
 }
 
