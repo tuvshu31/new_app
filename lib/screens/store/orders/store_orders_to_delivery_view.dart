@@ -1,16 +1,12 @@
-import 'dart:convert';
 import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/swipe_button.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
 final _storeCtx = Get.put(StoreController());
@@ -29,7 +25,7 @@ void storeOrdersToDeliveryView(context, data) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
+    // useSafeArea: true,
     builder: (context) {
       return FractionallySizedBox(
         heightFactor: 1,
@@ -87,8 +83,17 @@ void storeOrdersToDeliveryView(context, data) {
                       color: MyColors.white,
                     ),
                     onSubmit: () {
-                      Future.delayed(const Duration(milliseconds: 300), () {
+                      Future.delayed(const Duration(milliseconds: 300),
+                          () async {
                         key.currentState!.reset();
+                        for (dynamic i in _storeCtx.orderList) {
+                          if (i == data) {
+                            i["orderStatus"] = "delivering";
+                          }
+                        }
+                        _storeCtx.filterOrders(0);
+                        var body = {"orderStatus": "delivering"};
+                        await RestApi().updateOrder(data["id"], body);
                         callDriver(data);
                         Get.back();
                       });

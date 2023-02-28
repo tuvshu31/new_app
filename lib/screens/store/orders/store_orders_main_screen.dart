@@ -1,8 +1,9 @@
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_new_orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/screens/store/orders/delivered_orders.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:get/get.dart';
 
 class StoreOrdersMainScreen extends StatefulWidget {
   const StoreOrdersMainScreen({super.key});
@@ -13,6 +14,12 @@ class StoreOrdersMainScreen extends StatefulWidget {
 
 class _StoreOrdersMainScreenState extends State<StoreOrdersMainScreen> {
   PageController pageController = PageController();
+  final _storeCtx = Get.put(StoreController());
+  @override
+  void initState() {
+    super.initState();
+    _storeCtx.filterOrders(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +39,7 @@ class _StoreOrdersMainScreenState extends State<StoreOrdersMainScreen> {
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.bounceInOut,
                 );
+                _storeCtx.filterOrders(value);
               }),
               labelColor: MyColors.primary,
               unselectedLabelColor: MyColors.black,
@@ -49,8 +57,8 @@ class _StoreOrdersMainScreenState extends State<StoreOrdersMainScreen> {
               controller: pageController,
               children: const [
                 StoreOrdersNewOrdersScreen(),
-                DeliveredOrdersView(),
-                DeliveredOrdersView(),
+                StoreOrdersNewOrdersScreen(),
+                StoreOrdersNewOrdersScreen(),
               ],
             ),
           ),

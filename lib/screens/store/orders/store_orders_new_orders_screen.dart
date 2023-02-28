@@ -8,7 +8,8 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 
 class StoreOrdersNewOrdersScreen extends StatefulWidget {
-  const StoreOrdersNewOrdersScreen({super.key});
+  final String filterType;
+  const StoreOrdersNewOrdersScreen({this.filterType = "sent", super.key});
 
   @override
   State<StoreOrdersNewOrdersScreen> createState() =>
@@ -21,32 +22,29 @@ class _StoreOrdersNewOrdersScreenState
 
   @override
   Widget build(BuildContext context) {
-    return _storeCtx.orderList.isEmpty && !_storeCtx.fetching.value
-        ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
-        : Obx(
-            () => ListView.separated(
+    return Obx(
+      () => _storeCtx.filteredOrderList.isEmpty
+          ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
+          : ListView.separated(
               separatorBuilder: (context, index) {
                 return const SizedBox(height: 7);
               },
               physics: const BouncingScrollPhysics(),
-              itemCount:
-                  _storeCtx.orderList.isEmpty ? 4 : _storeCtx.orderList.length,
+              itemCount: _storeCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
-                if (_storeCtx.orderList.isEmpty) {
-                  return MyShimmers().listView2();
-                } else {
-                  var data = _storeCtx.orderList[index];
-                  return _cardListItem(data);
-                }
+                var data = _storeCtx.filteredOrderList[index];
+                return _cardListItem(data);
               },
             ),
-          );
+    );
   }
 
   Widget _cardListItem(dynamic data) {
     return GestureDetector(
       onTap: (() {
-        storeOrdersToDeliveryView(context, data);
+        data["orderStatus"] == "sent"
+            ? storeOrdersToDeliveryView(context, data)
+            : null;
       }),
       child: Card(
         shape: RoundedRectangleBorder(
@@ -63,7 +61,7 @@ class _StoreOrdersNewOrdersScreenState
             fontSize: 12,
           ),
           // trailing: _itemStatus(data["orderStatus"] == "sent"),
-          trailing: _remainingTimeIndicator(),
+          // trailing: _remainingTimeIndicator(),
         ),
       ),
     );
