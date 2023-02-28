@@ -2,7 +2,6 @@ import 'package:Erdenet24/screens/store/orders/store_orders_new_orders_screen.da
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/screens/store/orders/delivered_orders.dart';
-import 'package:Erdenet24/screens/store/orders/new_orders.dart';
 import 'package:Erdenet24/utils/styles.dart';
 
 class StoreOrdersMainScreen extends StatefulWidget {

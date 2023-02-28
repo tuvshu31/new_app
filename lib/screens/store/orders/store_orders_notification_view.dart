@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_set_time_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -61,7 +59,7 @@ void showOrdersNotificationView(context, data) {
                           key.currentState!.reset();
                           stopSound();
                           Get.back();
-                          showOrdersSetTime(context, json.decode(data["data"]));
+                          showOrdersSetTime(context, data);
                         });
                       },
                       alignment: Alignment.centerRight,
@@ -69,9 +67,9 @@ void showOrdersNotificationView(context, data) {
                         Icons.double_arrow_rounded,
                         color: MyColors.white,
                       ),
-                      child: Text(
+                      child: const Text(
                         "Баталгаажуулах",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                         ),

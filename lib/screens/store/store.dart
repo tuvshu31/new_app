@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -54,29 +55,24 @@ class _StorePageState extends State<StorePage> {
   @override
   void initState() {
     super.initState();
-    getToken();
+    _storeCtx.getToken();
     _storeCtx.fetchNewOrders();
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
+    // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      playSound("incoming");
       var data = message.data;
-      log(data.toString());
-      showOrdersNotificationView(context, data);
-      log("Foreground message irj bn lastly");
+      var jsonData = json.decode(data["data"]);
+      var dataType = data["type"];
+      if (dataType == "new_order") {
+        playSound("incoming");
+        _storeCtx.orderList.add(jsonData);
+        showOrdersNotificationView(context, jsonData);
+      }
+      if (dataType == "on_delivery") {}
+      if (dataType == "on_finish") {}
     });
 
     getStoreInfo();
-  }
-
-  void getToken() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
   }
 
   void getStoreInfo() async {
@@ -131,7 +127,7 @@ class _StorePageState extends State<StorePage> {
                         _switchListTile(),
                         _listTile(IconlyLight.edit, "Бараа нэмэх, засварлах",
                             () {
-                          Get.to(() => AddProducts());
+                          Get.to(() => const AddProducts());
                         }),
                         _listTile(IconlyLight.chart, "Захиалгууд", () {
                           Get.to(() => const StoreOrdersMainScreen());

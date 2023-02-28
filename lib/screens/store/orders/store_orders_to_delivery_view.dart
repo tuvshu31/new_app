@@ -29,6 +29,7 @@ void storeOrdersToDeliveryView(context, data) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       return FractionallySizedBox(
         heightFactor: 1,
@@ -91,19 +92,19 @@ void storeOrdersToDeliveryView(context, data) {
                         callDriver(data);
                         Get.back();
                       });
-                      Future.delayed(const Duration(minutes: 5), () {
-                        key.currentState!.reset();
-                        callDriver(data);
-                      });
+                      // Future.delayed(const Duration(minutes: 5), () {
+                      //   key.currentState!.reset();
+                      //   callDriver(data);
+                      // });
                     },
                     alignment: Alignment.centerRight,
                     sliderButtonIcon: const Icon(
                       Icons.double_arrow_rounded,
                       color: MyColors.white,
                     ),
-                    child: Text(
+                    child: const Text(
                       "Хүргэлтэнд гаргах",
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                       ),

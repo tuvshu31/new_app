@@ -21,79 +21,77 @@ void stopSound() async {
 }
 
 Widget step0() {
-  return Obx(
-    () => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const CustomText(
-          text: "Сүүлийн хүргэлт:",
-          fontSize: 14,
-          color: MyColors.gray,
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const CustomText(
+        text: "Сүүлийн хүргэлт:",
+        fontSize: 14,
+        color: MyColors.gray,
+      ),
+      const SizedBox(height: 24),
+      Container(
+        height: 70,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: MyColors.black,
+          borderRadius: BorderRadius.circular(50),
         ),
-        const SizedBox(height: 24),
-        Container(
-          height: 70,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: MyColors.black,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MyColors.primary,
-                      ),
-                      child: Icon(
-                        IconlyLight.wallet,
-                        color: MyColors.white,
-                      ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.primary,
                     ),
-                    CustomText(
+                    child: Icon(
+                      IconlyLight.wallet,
                       color: MyColors.white,
-                      text: convertToCurrencyFormat(
-                        int.parse("3000"),
-                        locatedAtTheEnd: true,
-                        toInt: true,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MyColors.primary,
-                      ),
-                      child: Icon(
-                        IconlyLight.time_circle,
-                        color: MyColors.white,
-                      ),
                     ),
-                    CustomText(
-                      color: MyColors.white,
-                      text: "3:24 мин",
-                    )
-                  ],
-                ),
+                  ),
+                  CustomText(
+                    color: MyColors.white,
+                    text: convertToCurrencyFormat(
+                      int.parse("3000"),
+                      locatedAtTheEnd: true,
+                      toInt: true,
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
-        )
-      ],
-    ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.primary,
+                    ),
+                    child: Icon(
+                      IconlyLight.time_circle,
+                      color: MyColors.white,
+                    ),
+                  ),
+                  CustomText(
+                    color: MyColors.white,
+                    text: "3:24 мин",
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      )
+    ],
   );
 }
 

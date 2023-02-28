@@ -1,16 +1,11 @@
-import 'dart:developer';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/screens/store/orders/store_orders_notification_view.dart';
-import 'package:Erdenet24/screens/store/orders/store_orders_set_time_view.dart';
-import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 
 class StoreOrdersNewOrdersScreen extends StatefulWidget {
   const StoreOrdersNewOrdersScreen({super.key});
@@ -28,29 +23,29 @@ class _StoreOrdersNewOrdersScreenState
   Widget build(BuildContext context) {
     return _storeCtx.orderList.isEmpty && !_storeCtx.fetching.value
         ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
-        : ListView.separated(
-            separatorBuilder: (context, index) {
-              return Container(height: 8);
-            },
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount:
-                _storeCtx.orderList.isEmpty ? 4 : _storeCtx.orderList.length,
-            itemBuilder: (context, index) {
-              if (_storeCtx.orderList.isEmpty) {
-                return MyShimmers().listView2();
-              } else {
-                return _cardListItem(index);
-              }
-            });
+        : Obx(
+            () => ListView.separated(
+              separatorBuilder: (context, index) {
+                return const SizedBox(height: 7);
+              },
+              physics: const BouncingScrollPhysics(),
+              itemCount:
+                  _storeCtx.orderList.isEmpty ? 4 : _storeCtx.orderList.length,
+              itemBuilder: (context, index) {
+                if (_storeCtx.orderList.isEmpty) {
+                  return MyShimmers().listView2();
+                } else {
+                  var data = _storeCtx.orderList[index];
+                  return _cardListItem(data);
+                }
+              },
+            ),
+          );
   }
 
-  Widget _cardListItem(int index) {
-    var data = _storeCtx.orderList[index];
+  Widget _cardListItem(dynamic data) {
     return GestureDetector(
       onTap: (() {
-        // _showOrderDetauls(index);
-        // showOrdersSetTime(context);
         storeOrdersToDeliveryView(context, data);
       }),
       child: Card(
@@ -60,7 +55,7 @@ class _StoreOrdersNewOrdersScreenState
         margin: const EdgeInsets.symmetric(horizontal: 12),
         child: ListTile(
           title: CustomText(
-            text: data["orderId"].toString(),
+            text: "${data["orderId"]}",
             fontSize: 14,
           ),
           subtitle: CustomText(
@@ -68,8 +63,31 @@ class _StoreOrdersNewOrdersScreenState
             fontSize: 12,
           ),
           // trailing: _itemStatus(data["orderStatus"] == "sent"),
+          trailing: _remainingTimeIndicator(),
         ),
       ),
+    );
+  }
+
+  Widget _remainingTimeIndicator() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: const [
+        SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            value: 0.7,
+            color: MyColors.primary,
+            backgroundColor: MyColors.background,
+            strokeWidth: 1.5,
+          ),
+        ),
+        CustomText(
+          text: "15:23",
+          fontSize: 12,
+        )
+      ],
     );
   }
 
