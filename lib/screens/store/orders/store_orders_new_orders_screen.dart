@@ -1,8 +1,9 @@
+import 'package:Erdenet24/screens/store/orders/store_orders_notification_view.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_set_time_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
@@ -42,9 +43,7 @@ class _StoreOrdersNewOrdersScreenState
   Widget _cardListItem(dynamic data) {
     return GestureDetector(
       onTap: (() {
-        data["orderStatus"] == "sent"
-            ? storeOrdersToDeliveryView(context, data)
-            : null;
+        storeOrdersToDeliveryView(context, data);
       }),
       child: Card(
         shape: RoundedRectangleBorder(

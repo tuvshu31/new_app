@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/profile/user/address/address.dart';
 import 'package:Erdenet24/screens/profile/user/help/help.dart';
-import 'package:Erdenet24/screens/profile/user/orders/user_orders.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_order_active_screen.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_orders_main_screen.dart';
 import 'package:Erdenet24/screens/profile/user/phone/phone.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -30,11 +32,13 @@ class _UserPageState extends State<UserPage> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _passwordRepeat = TextEditingController();
   final _loginCtrl = Get.put(LoginController());
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
     getUserInfo();
+    _userCtx.getOrders();
   }
 
   void getUserInfo() async {
@@ -82,7 +86,8 @@ class _UserPageState extends State<UserPage> {
                   Get.to(() => const AddressView());
                 }),
                 _listTile(IconlyLight.chart, "Захиалгууд", () {
-                  Get.to(() => const UserOrders());
+                  // Get.to(() => const UserOrderScreen());
+                  Get.to(() => const UserOrdersMainScreen());
                 }),
                 _divider(),
                 _listTile(IconlyLight.info_circle, "Тусламж", () {

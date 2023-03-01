@@ -21,7 +21,6 @@ class _OrderDetailsOldState extends State<OrderDetailsOld> {
   @override
   void initState() {
     super.initState();
-    print(_incoming);
     getOrderProducts();
   }
 
@@ -84,7 +83,7 @@ class _OrderDetailsOldState extends State<OrderDetailsOld> {
                       text: "${data['name']}",
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     CustomText(
                       text: convertToCurrencyFormat(
                         double.parse(data["price"]),

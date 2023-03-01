@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class StoreController extends GetxController {
@@ -11,6 +13,7 @@ class StoreController extends GetxController {
   RxBool fetching = false.obs;
   RxInt pickedMinutes = 0.obs;
   RxString orderStatus = "".obs;
+  RxInt selectedTime = 0.obs;
 
   void fetchNewOrders() async {
     fetching.value = true;

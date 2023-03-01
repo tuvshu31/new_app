@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_order_active_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -69,10 +70,11 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     Get.back();
     successOrderModal(context, () {
       _cartCtrl.cartList.clear();
+      RestApiHelper.saveUserOrder(true);
       Get.back();
       Get.back();
       Get.back();
-      _navCtrl.onItemTapped(4);
+      Get.to(const UserOrderActiveScreen());
     });
   }
 

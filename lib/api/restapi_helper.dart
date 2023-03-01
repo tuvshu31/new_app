@@ -8,4 +8,9 @@ class RestApiHelper {
   // Login хийсэн хэрэглэгчийн role-г хадлагах, авах
   static void saveUserRole(String type) => authBox?.put("role", type);
   static String getUserRole() => authBox?.get('role', defaultValue: '');
+  // Login хийсэн хэрэглэгчийн захиалга хийсэн эсэсхийг-г хадлагах, авах
+  static void saveUserOrder(bool isWithOrder) =>
+      authBox?.put("isWithOrder", isWithOrder);
+  static bool getUserOrder() =>
+      authBox?.get('isWithOrder', defaultValue: false);
 }

@@ -1,18 +1,25 @@
-import 'package:Erdenet24/screens/profile/user/orders/going_orders.dart';
-import 'package:Erdenet24/screens/profile/user/orders/order_history.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_orders_delivered_screen.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:get/get.dart';
 
-class UserOrders extends StatefulWidget {
-  const UserOrders({super.key});
+class UserOrdersMainScreen extends StatefulWidget {
+  const UserOrdersMainScreen({super.key});
 
   @override
-  State<UserOrders> createState() => _UserOrdersState();
+  State<UserOrdersMainScreen> createState() => _UserOrdersMainScreenState();
 }
 
-class _UserOrdersState extends State<UserOrders> {
+class _UserOrdersMainScreenState extends State<UserOrdersMainScreen> {
   PageController pageController = PageController();
+  final _userCtx = Get.put(UserController());
+  @override
+  void initState() {
+    super.initState();
+    _userCtx.filterOrders("sent");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +39,15 @@ class _UserOrdersState extends State<UserOrders> {
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.bounceInOut,
                 );
+                var status = value == 0 ? "sent" : "cancelled";
+                _userCtx.filterOrders(status);
               }),
               labelColor: MyColors.primary,
               unselectedLabelColor: MyColors.black,
               indicatorColor: MyColors.primary,
-              tabs: [
-                Tab(
-                  text: "Хүргэгдэж буй",
-                ),
-                Tab(
-                  text: "Хүргэгдсэн",
-                ),
+              tabs: const [
+                Tab(text: "Хүргэгдсэн"),
+                Tab(text: "Цуцлагдсан"),
               ],
             ),
           ),
@@ -51,8 +56,8 @@ class _UserOrdersState extends State<UserOrders> {
               physics: const NeverScrollableScrollPhysics(),
               controller: pageController,
               children: const [
-                GoingOrdersView(),
-                OrderHistoryView(),
+                UserOrdersListScreen(),
+                UserOrdersListScreen(),
               ],
             ),
           ),

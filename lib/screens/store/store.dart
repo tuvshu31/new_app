@@ -6,13 +6,12 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/edit_products/main.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_main_screen.dart';
+import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 import 'package:Erdenet24/screens/store/settings/settings.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:circular_countdown/circular_countdown.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +20,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:slide_to_act/slide_to_act.dart';
-import 'orders/store_orders_notification_view.dart';
-import 'orders/store_orders_set_time_view.dart';
 
 class StorePage extends StatefulWidget {
   const StorePage({Key? key}) : super(key: key);

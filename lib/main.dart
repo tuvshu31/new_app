@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/screens/profile/user/orders/user_order_active_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -73,9 +74,15 @@ void main() async {
         initialRoute: "/StoreScreenRoute",
       ));
     } else if (RestApiHelper.getUserRole() == "user") {
-      runApp(const MyApp(
-        initialRoute: "/MainScreenRoute",
-      ));
+      if (RestApiHelper.getUserOrder()) {
+        runApp(const MyApp(
+          initialRoute: "/UserOrderActiveRoute",
+        ));
+      } else {
+        runApp(const MyApp(
+          initialRoute: "/MainScreenRoute",
+        ));
+      }
     } else if (RestApiHelper.getUserRole() == "driver") {
       runApp(const MyApp(
         initialRoute: "/DriverScreenRoute",
@@ -182,6 +189,9 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: "/ProductsRoute", page: () => const ProductScreenNew()),
         GetPage(name: "/SearchRoute", page: () => const SearchScreenMain()),
         GetPage(name: "/OrdersRoute", page: () => const UserOrderMainScreen()),
+        GetPage(
+            name: "/UserOrderActiveRoute",
+            page: () => const UserOrderActiveScreen()),
       ],
     );
   }

@@ -19,6 +19,7 @@ class CustomHeader extends StatefulWidget {
   final dynamic subtitle;
   final dynamic totalAmount;
   final int? cartLength;
+  final bool centerTitle;
   final dynamic bottomSheet;
   final bool isMainPage;
   final bool customBottom;
@@ -40,6 +41,7 @@ class CustomHeader extends StatefulWidget {
     this.isScrollable = false,
     this.floatingActionButton,
     this.actionIcon = IconlyLight.buy,
+    this.centerTitle = false,
     this.subtitle,
     this.customLeading,
     this.onChanged,
@@ -86,7 +88,7 @@ class _CustomHeaderState extends State<CustomHeader>
                   _leading(widget.customLeading, widget.isMainPage, _navCtrl),
               backgroundColor: MyColors.white,
               elevation: widget.appBarElevation.toDouble(),
-              centerTitle: false,
+              centerTitle: widget.centerTitle,
               titleSpacing: 0,
               title: _title(widget.customTitle, widget.title, widget.subtitle),
               actions: [
