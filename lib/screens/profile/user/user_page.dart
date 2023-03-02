@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -8,6 +9,7 @@ import 'package:Erdenet24/screens/profile/user/orders/user_orders_main_screen.da
 import 'package:Erdenet24/screens/profile/user/phone/phone.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +40,6 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     super.initState();
     getUserInfo();
-    _userCtx.getOrders();
   }
 
   void getUserInfo() async {

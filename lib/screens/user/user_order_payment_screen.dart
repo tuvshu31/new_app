@@ -68,14 +68,24 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     dynamic response = await RestApi().createOrder(body);
     dynamic data = Map<String, dynamic>.from(response);
     Get.back();
-    successOrderModal(context, () {
-      _cartCtrl.cartList.clear();
-      RestApiHelper.saveUserOrder(true);
-      Get.back();
-      Get.back();
-      Get.back();
-      Get.to(const UserOrderActiveScreen());
-    });
+    if (data["success"]) {
+      log(data.toString());
+      moveToOrderStatusView(data["data"]);
+    }
+  }
+
+  void moveToOrderStatusView(data) {
+    successOrderModal(
+      context,
+      () {
+        _cartCtrl.cartList.clear();
+        RestApiHelper.saveUserOrder(true);
+        Get.back();
+        Get.back();
+        Get.back();
+        Get.to(() => UserOrderActiveScreen(data: data));
+      },
+    );
   }
 
   @override

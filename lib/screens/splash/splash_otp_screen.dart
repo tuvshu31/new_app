@@ -102,7 +102,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             putUserIntoBox(data["managerId"], "manager");
             break;
           case "store":
-            loginTypeBottomSheet(data["storeId"], data["storeId"]);
+            loginTypeBottomSheet(data["userId"], data["storeId"]);
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");

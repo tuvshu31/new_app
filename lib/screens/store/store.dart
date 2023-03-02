@@ -59,13 +59,15 @@ class _StorePageState extends State<StorePage> {
       var data = message.data;
       var jsonData = json.decode(data["data"]);
       var dataType = data["type"];
-      if (dataType == "new_order") {
+      if (dataType == "sent") {
         playSound("incoming");
         _storeCtx.orderList.add(jsonData);
         showOrdersNotificationView(context, jsonData);
-      }
-      if (dataType == "on_delivery") {}
-      if (dataType == "on_finish") {}
+      } else if (dataType == "received") {
+      } else if (dataType == "preparing") {
+      } else if (dataType == "delivering") {
+      } else if (dataType == "delivered") {
+      } else {}
     });
 
     getStoreInfo();

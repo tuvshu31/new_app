@@ -1,3 +1,5 @@
+import 'package:Erdenet24/screens/user/home/product_screen.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -9,7 +11,11 @@ import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class UserOrderActiveScreen extends StatefulWidget {
-  const UserOrderActiveScreen({super.key});
+  final dynamic data;
+  const UserOrderActiveScreen({
+    this.data,
+    super.key,
+  });
 
   @override
   State<UserOrderActiveScreen> createState() => _UserOrderActiveScreenState();
@@ -28,7 +34,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
         withTabBar: true,
         customLeading: Container(),
         centerTitle: true,
-        customTitle: CustomText(
+        customTitle: const CustomText(
           text: "Захиалга",
           color: MyColors.black,
           fontSize: 16,
@@ -166,7 +172,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
             color: MyColors.fadedGrey,
           ),
           CustomInkWell(
-            onTap: () {},
+            onTap: () => userActiveOrderDetailView(context, widget.data),
             borderRadius: BorderRadius.zero,
             child: SizedBox(
               height: Get.height * .09,
@@ -176,10 +182,11 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomText(text: "Захиалгын дугаар: 8450"),
+                      CustomText(
+                          text: "Захиалгын дугаар: ${widget.data["orderId"]}"),
                       const SizedBox(height: 4),
                       CustomText(
-                        text: "2023.01.30 08:47",
+                        text: widget.data["orderTime"],
                         color: MyColors.gray,
                         fontSize: 10,
                       )
@@ -198,4 +205,101 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
       ),
     );
   }
+}
+
+void userActiveOrderDetailView(context, data) {
+  showModalBottomSheet(
+    backgroundColor: MyColors.white,
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: 0.9,
+        child: SafeArea(
+          minimum: const EdgeInsets.symmetric(vertical: 24),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const CustomText(
+                  text: "Захиалгын код:",
+                  fontSize: 14,
+                  color: MyColors.gray,
+                ),
+                CustomText(
+                  text: data["orderId"].toString(),
+                  fontSize: 16,
+                  color: MyColors.black,
+                ),
+                const SizedBox(height: 12),
+                ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) {
+                    return Container(
+                      height: 7,
+                      color: MyColors.fadedGrey,
+                    );
+                  },
+                  shrinkWrap: true,
+                  itemCount: data["products"].length,
+                  itemBuilder: (context, index) {
+                    var product = data["products"][index];
+                    return Container(
+                        height: Get.height * .09,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        color: MyColors.white,
+                        child: Center(
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            minLeadingWidth: Get.width * .15,
+                            leading: Container(
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: CachedImage(
+                                    image:
+                                        "${URL.AWS}/products/${product["id"]}/small/1.png")),
+                            title: CustomText(
+                              text: product["name"],
+                              fontSize: 14,
+                            ),
+                            subtitle: CustomText(
+                                text: convertToCurrencyFormat(
+                              int.parse(product["price"]),
+                              toInt: true,
+                              locatedAtTheEnd: true,
+                            )),
+                            trailing: CustomText(
+                                text: "${product["quantity"]} ширхэг"),
+                          ),
+                        ));
+                  },
+                ),
+                Container(
+                  height: 7,
+                  color: MyColors.fadedGrey,
+                ),
+                SizedBox(
+                  height: Get.height * .09,
+                  child: Center(
+                    child: ListTile(
+                      leading: const CustomText(text: "Нийт үнэ:"),
+                      trailing: CustomText(
+                        text: convertToCurrencyFormat(
+                          data["totalAmount"],
+                          toInt: true,
+                          locatedAtTheEnd: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

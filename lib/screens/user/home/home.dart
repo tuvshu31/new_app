@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/home/navigation_drawer.dart';
 import 'package:Erdenet24/screens/user/home/search.dart';
@@ -11,6 +13,7 @@ import 'package:Erdenet24/screens/profile/profile.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
@@ -26,12 +29,28 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final _navCtrl = Get.put(NavigationController());
   final _cartCtrl = Get.put(CartController());
+  final _userCtx = Get.put(UserController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   void initState() {
     super.initState();
     _cartCtrl.getUserProducts();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
+    _userCtx.getToken();
+
+    _userCtx.getOrders();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      var data = message.data;
+      var jsonData = json.decode(data["data"]);
+      log(jsonData.toString());
+      var dataType = data["type"];
+      if (dataType == "sent") {
+      } else if (dataType == "received") {
+      } else if (dataType == "preparing") {
+      } else if (dataType == "delivering") {
+      } else if (dataType == "delivered") {
+      } else {}
+    });
   }
 
   // void getUserInfo() async {

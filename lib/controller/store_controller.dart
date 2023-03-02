@@ -13,7 +13,7 @@ class StoreController extends GetxController {
   RxBool fetching = false.obs;
   RxInt pickedMinutes = 0.obs;
   RxString orderStatus = "".obs;
-  RxInt selectedTime = 0.obs;
+  RxInt prepDuration = 0.obs;
 
   void fetchNewOrders() async {
     fetching.value = true;
@@ -28,10 +28,10 @@ class StoreController extends GetxController {
 
   void filterOrders(int value) {
     String type = value == 0
-        ? "sent"
+        ? "preparing"
         : value == 1
             ? "delivering"
-            : "received";
+            : "delivered";
     filteredOrderList.value =
         orderList.where((p0) => p0["orderStatus"] == type).toList();
   }
@@ -44,5 +44,15 @@ class StoreController extends GetxController {
       var body = {"mapToken": newToken};
       await RestApi().updateUser(RestApiHelper.getUserId(), body);
     });
+  }
+
+  void updateOrder(int id, dynamic body) async {
+    var response = await RestApi().updateOrder(id, body);
+    log(response.toString());
+  }
+
+  void callDriver(dynamic body) async {
+    var response = await RestApi().assignDriver(body);
+    log(response.toString());
   }
 }

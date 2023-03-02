@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
@@ -96,7 +98,7 @@ void storeOrdersToDeliveryView(context, data) {
                   ),
                 ],
               ),
-              data["orderStatus"] == "sent"
+              data["orderStatus"] == "preparing"
                   ? Align(
                       alignment: AlignmentDirectional.bottomEnd,
                       child: Container(
@@ -127,14 +129,14 @@ void storeOrdersToDeliveryView(context, data) {
                                   }
                                   _storeCtx.filterOrders(0);
                                   var body = {"orderStatus": "delivering"};
-                                  await RestApi().updateOrder(data["id"], body);
+                                  _storeCtx.updateOrder(data["id"], body);
                                   //  CALL DRIVER
                                   var body1 = {
                                     "orderId": data['id'],
                                     'address': data["address"],
                                     'phone': data["phone"],
                                   };
-                                  await RestApi().assignDriver(body1);
+                                  _storeCtx.callDriver(body1);
                                   Get.back();
                                 });
                                 // Future.delayed(const Duration(minutes: 5), () {
@@ -169,6 +171,7 @@ void storeOrdersToDeliveryView(context, data) {
 }
 
 void showOrdersNotificationView(context, data) {
+  log(data.toString());
   showModalBottomSheet(
     backgroundColor: MyColors.white,
     context: context,
@@ -228,6 +231,8 @@ void showOrdersNotificationView(context, data) {
                             key.currentState!.reset();
                             stopSound();
                             Get.back();
+                            var body = {"orderStatus": "received"};
+                            _storeCtx.updateOrder(data["id"], body);
                             showOrdersSetTime(context, data);
                           });
                         },
@@ -257,7 +262,6 @@ void showOrdersNotificationView(context, data) {
 }
 
 void showOrdersSetTime(context, data) {
-  _storeCtx.selectedTime.value = 0;
   showModalBottomSheet(
     backgroundColor: MyColors.white,
     context: context,
@@ -397,9 +401,9 @@ void showOrdersSetTime(context, data) {
                                     children: [
                                       CustomButton(
                                         isFullWidth: false,
-                                        text: _storeCtx.selectedTime.value == 0
+                                        text: _storeCtx.prepDuration.value == 0
                                             ? "Сонгох"
-                                            : "${_storeCtx.selectedTime.value} минут",
+                                            : "${_storeCtx.prepDuration.value} минут",
                                         onPressed: () {
                                           showPickerNumber(context);
                                         },
@@ -416,7 +420,7 @@ void showOrdersSetTime(context, data) {
                     ),
                   ],
                 ),
-                _storeCtx.selectedTime.value != 0
+                _storeCtx.prepDuration.value != 0
                     ? Align(
                         alignment: AlignmentDirectional.bottomEnd,
                         child: Container(
@@ -442,6 +446,14 @@ void showOrdersSetTime(context, data) {
                                     key.currentState!.reset();
                                     _storeCtx.orderList.add(data);
                                     Get.back();
+                                    var body = {
+                                      "orderStatus": "preparing",
+                                      "prepDuration": _storeCtx
+                                          .prepDuration.value
+                                          .toString(),
+                                    };
+                                    _storeCtx.updateOrder(data["id"], body);
+                                    _storeCtx.prepDuration.value = 0;
                                     Get.to(() => const StoreOrdersMainScreen());
                                   });
                                 },
@@ -497,6 +509,6 @@ showPickerNumber(BuildContext context) {
       confirmTextStyle:
           const TextStyle(color: MyColors.black, fontFamily: "Nunito"),
       onConfirm: (Picker picker, List value) {
-        _storeCtx.selectedTime.value = picker.getSelectedValues()[0];
+        _storeCtx.prepDuration.value = picker.getSelectedValues()[0];
       }).showDialog(context);
 }

@@ -1,8 +1,8 @@
+import 'package:Erdenet24/screens/user/home/product_screen.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -129,40 +129,31 @@ void userOrdersDetailView(context, data) {
                           height: Get.height * .09,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           color: MyColors.white,
-                          child: ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.zero,
-                            leading: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
+                          child: Center(
+                            child: ListTile(
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                              minLeadingWidth: Get.width * .15,
+                              leading: Container(
+                                  clipBehavior: Clip.hardEdge,
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: MyColors.black,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: CustomText(
-                                    text: "${index + 1}",
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: CachedImage(
+                                      image:
+                                          "${URL.AWS}/products/${product["id"]}/small/1.png")),
+                              title: CustomText(
+                                text: product["name"],
+                                fontSize: 14,
+                              ),
+                              subtitle: CustomText(
+                                  text: convertToCurrencyFormat(
+                                int.parse(product["price"]),
+                                toInt: true,
+                                locatedAtTheEnd: true,
+                              )),
+                              trailing: CustomText(
+                                  text: "${product["quantity"]} ширхэг"),
                             ),
-                            title: CustomText(
-                              text: product["name"],
-                              fontSize: 16,
-                            ),
-                            subtitle: CustomText(
-                                text: convertToCurrencyFormat(
-                              int.parse(product["price"]),
-                              toInt: true,
-                              locatedAtTheEnd: true,
-                            )),
-                            trailing: CustomText(
-                                text: "${product["quantity"]} ширхэг"),
                           ));
                     },
                   ),
