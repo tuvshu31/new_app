@@ -23,7 +23,7 @@ class _StoreOrdersNewOrdersScreenState
   Widget build(BuildContext context) {
     return Obx(
       () => _storeCtx.filteredOrderList.isEmpty
-          ? const CustomLoadingIndicator(text: "Шинэ захиалга байхгүй байна")
+          ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
           : ListView.separated(
               separatorBuilder: (context, index) {
                 return const SizedBox(height: 7);

@@ -74,7 +74,7 @@ void main() async {
         initialRoute: "/StoreScreenRoute",
       ));
     } else if (RestApiHelper.getUserRole() == "user") {
-      if (RestApiHelper.getUserOrder()) {
+      if (RestApiHelper.getOrderId() != 0) {
         runApp(const MyApp(
           initialRoute: "/UserOrderActiveRoute",
         ));

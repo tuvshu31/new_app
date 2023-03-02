@@ -59,17 +59,35 @@ class _StorePageState extends State<StorePage> {
       var data = message.data;
       var jsonData = json.decode(data["data"]);
       var dataType = data["type"];
-      if (dataType == "sent") {
-        playSound("incoming");
-        _storeCtx.orderList.add(jsonData);
-        showOrdersNotificationView(context, jsonData);
-      } else if (dataType == "received") {
-      } else if (dataType == "preparing") {
-      } else if (dataType == "delivering") {
-      } else if (dataType == "delivered") {
-      } else {}
+      if (RestApiHelper.getUserRole() == "store") {
+        if (dataType == "sent") {
+          playSound("incoming");
+          _storeCtx.orderList.add(jsonData);
+          showOrdersNotificationView(context, jsonData);
+        } else if (dataType == "received") {
+        } else if (dataType == "preparing") {
+        } else if (dataType == "delivering") {
+        } else if (dataType == "delivered") {
+          for (dynamic i in _storeCtx.orderList) {
+            if (i == data) {
+              i["orderStatus"] = "delivered";
+            }
+          }
+          _storeCtx.filterOrders(0);
+          var body = {"orderStatus": "delivered"};
+          _storeCtx.updateOrder(data["id"], body);
+        } else {
+          for (dynamic i in _storeCtx.orderList) {
+            if (i == data) {
+              i["orderStatus"] = "canceled";
+            }
+          }
+          _storeCtx.filterOrders(0);
+          var body = {"orderStatus": "canceled"};
+          _storeCtx.updateOrder(data["id"], body);
+        }
+      }
     });
-
     getStoreInfo();
   }
 

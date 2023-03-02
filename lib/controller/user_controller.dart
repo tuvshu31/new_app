@@ -1,14 +1,17 @@
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 
 class UserController extends GetxController {
+  RxInt activeOrderStep = 0.obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
   RxBool loading = false.obs;
+  Rx<PageController> activeOrderPageController = PageController().obs;
   void getToken() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     var body = {"mapToken": fcmToken};
@@ -30,8 +33,27 @@ class UserController extends GetxController {
     loading.value = false;
   }
 
+  void getActiveOrderInfo() async {
+    loading.value = true;
+    var body = {"id": RestApiHelper.getOrderId()};
+    dynamic response = await RestApi().getOrders(body);
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"]) {
+      userOrderList.value = d["data"];
+    }
+    loading.value = false;
+  }
+
   void filterOrders(String status) {
     filteredOrderList.value =
         userOrderList.where((p0) => p0["orderStatus"] == status).toList();
+  }
+
+  void activeOrderChangeScreen(int value) {
+    activeOrderPageController.value.animateToPage(
+      value,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.bounceInOut,
+    );
   }
 }

@@ -1,17 +1,13 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -149,6 +145,14 @@ class DriverController extends GetxController {
       final GoogleMapController controller = await mapController.value.future;
       controller
           .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+      var body = {
+        "latitude": info.latitude.toString(),
+        "longitude": info.longitude.toString(),
+        "heading": info.heading.toString()
+      };
+      if (step.value == 1) {
+        updateUser(body);
+      }
     });
   }
 
@@ -258,6 +262,11 @@ class DriverController extends GetxController {
   void updateOrder(dynamic body) async {
     var response =
         await RestApi().updateOrder(int.parse(deliveryInfo["id"]), body);
+    log(response.toString());
+  }
+
+  void updateUser(dynamic body) async {
+    var response = await RestApi().updateUser(RestApiHelper.getUserId(), body);
     log(response.toString());
   }
 

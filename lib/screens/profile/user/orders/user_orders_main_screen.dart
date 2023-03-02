@@ -1,9 +1,9 @@
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/profile/user/orders/user_orders_delivered_screen.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:flutter/material.dart';
-import 'package:Erdenet24/widgets/header.dart';
-import 'package:get/get.dart';
 
 class UserOrdersMainScreen extends StatefulWidget {
   const UserOrdersMainScreen({super.key});
@@ -18,7 +18,7 @@ class _UserOrdersMainScreenState extends State<UserOrdersMainScreen> {
   @override
   void initState() {
     super.initState();
-    _userCtx.filterOrders("sent");
+    _userCtx.filterOrders("delivered");
   }
 
   @override
@@ -39,7 +39,7 @@ class _UserOrdersMainScreenState extends State<UserOrdersMainScreen> {
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.bounceInOut,
                 );
-                var status = value == 0 ? "sent" : "cancelled";
+                var status = value == 0 ? "delivered" : "cancelled";
                 _userCtx.filterOrders(status);
               }),
               labelColor: MyColors.primary,

@@ -79,11 +79,11 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       context,
       () {
         _cartCtrl.cartList.clear();
-        RestApiHelper.saveUserOrder(true);
+        RestApiHelper.saveOrderId(data["id"]);
         Get.back();
         Get.back();
         Get.back();
-        Get.to(() => UserOrderActiveScreen(data: data));
+        Get.to(() => const UserOrderActiveScreen());
       },
     );
   }

@@ -196,7 +196,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       var deliveryDuration = _driverCtx
                                           .stopwatch.value.elapsed.inSeconds;
                                       _driverCtx.updateOrder({
-                                        "orderStatus": "received",
+                                        "orderStatus": "delivered",
                                         "deliveryDuration": deliveryDuration,
                                         "deliveryPrice": "3000",
                                         "deliveryPaidOff": false,
