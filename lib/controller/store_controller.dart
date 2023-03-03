@@ -27,6 +27,7 @@ class StoreController extends GetxController {
   }
 
   void filterOrders(int value) {
+    filteredOrderList.clear();
     String type = value == 0
         ? "preparing"
         : value == 1

@@ -129,7 +129,7 @@ void storeOrdersToDeliveryView(context, data) {
                                   }
                                   _storeCtx.filterOrders(0);
                                   var body = {"orderStatus": "delivering"};
-                                  _storeCtx.updateOrder(data["id"], body);
+                                  // _storeCtx.updateOrder(data["id"], body);
                                   //  CALL DRIVER
                                   var body1 = {
                                     "orderId": data['id'],
@@ -171,7 +171,6 @@ void storeOrdersToDeliveryView(context, data) {
 }
 
 void showOrdersNotificationView(context, data) {
-  log(data.toString());
   showModalBottomSheet(
     backgroundColor: MyColors.white,
     context: context,
@@ -444,8 +443,15 @@ void showOrdersSetTime(context, data) {
                                   Future.delayed(
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
-                                    _storeCtx.orderList.add(data);
                                     Get.back();
+                                    _storeCtx.orderList.add(data);
+                                    for (dynamic i in _storeCtx.orderList) {
+                                      if (i == data) {
+                                        i["orderStatus"] = "preparing";
+                                      }
+                                    }
+                                    _storeCtx.filterOrders(0);
+                                    log("Hello");
                                     var body = {
                                       "orderStatus": "preparing",
                                       "prepDuration": _storeCtx

@@ -7,8 +7,7 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/store/orders/store_orders_to_delivery_view.dart';
 
 class StoreOrdersNewOrdersScreen extends StatefulWidget {
-  final String filterType;
-  const StoreOrdersNewOrdersScreen({this.filterType = "sent", super.key});
+  const StoreOrdersNewOrdersScreen({super.key});
 
   @override
   State<StoreOrdersNewOrdersScreen> createState() =>

@@ -57,13 +57,14 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
           _userCtx.activeOrderStep.value = 2;
           _userCtx.activeOrderChangeScreen(2);
         } else if (data["type"] == "delivering") {
-          setState(() {
-            driverId = int.parse(data["deliveryDriverId"]);
-          });
-          fetchDriverPositionSctream(driverId);
           _userCtx.activeOrderStep.value = 3;
           _userCtx.activeOrderChangeScreen(3);
+          setState(() {
+            driverId = int.parse(jsonData["deliveryDriverId"]);
+          });
+          fetchDriverPositionSctream(driverId);
         } else if (data["type"] == "delivered") {
+          _userCtx.activeOrderStep.value = 0;
           Get.to(() => const MainScreen());
           RestApiHelper.saveOrderId(0);
         } else {}
@@ -72,16 +73,25 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   }
 
   void fetchDriverPositionSctream(int id) {
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
+    Timer.periodic(const Duration(seconds: 3), (timer) async {
       dynamic response = await RestApi().getDriver(id);
       dynamic d = Map<String, dynamic>.from(response);
       if (d["success"]) {
         setState(() {
-          driverHeading = double.parse(d["data"]["heading"]);
-          driverLatLng = LatLng(double.parse(d["data"]["latitude"]),
-              double.parse(d["data"]["longitude"]));
+          driverHeading = double.parse(d["data"][0]["heading"]);
+          driverLatLng = LatLng(double.parse(d["data"][0]["latitude"]),
+              double.parse(d["data"][0]["longitude"]));
         });
       }
+      CameraPosition currentCameraPosition = CameraPosition(
+        bearing: 0,
+        target: driverLatLng,
+        zoom: 16,
+      );
+      _driverCtx.addDriverMarker();
+      final GoogleMapController controller = await mapController.future;
+      controller
+          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
     });
   }
 

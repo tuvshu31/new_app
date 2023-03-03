@@ -175,21 +175,22 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                   Future.delayed(
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
-                                    if (_driverCtx.step.value == 0) {
-                                      _driverCtx.step.value += 1;
-                                    } else if (_driverCtx.step.value == 1) {
+                                    if (_driverCtx.step.value == 1) {
                                       stopSound();
-                                      _driverCtx.step.value += 1;
                                       _driverCtx.updateOrder({
-                                        "orderStatus": "delivering",
                                         "deliveryDriverId":
                                             RestApiHelper.getUserId().toString()
                                       });
                                       _driverCtx.stopwatch.value.start();
+                                      _driverCtx.step.value += 1;
                                     } else if (_driverCtx.step.value == 2) {
                                       _driverCtx.step.value += 1;
+
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 3) {
+                                      _driverCtx.updateOrder({
+                                        "orderStatus": "delivering",
+                                      });
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 4) {

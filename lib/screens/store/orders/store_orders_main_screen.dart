@@ -15,11 +15,6 @@ class StoreOrdersMainScreen extends StatefulWidget {
 class _StoreOrdersMainScreenState extends State<StoreOrdersMainScreen> {
   PageController pageController = PageController();
   final _storeCtx = Get.put(StoreController());
-  @override
-  void initState() {
-    super.initState();
-    _storeCtx.filterOrders(0);
-  }
 
   @override
   Widget build(BuildContext context) {

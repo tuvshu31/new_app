@@ -53,6 +53,7 @@ class _StorePageState extends State<StorePage> {
     super.initState();
     _storeCtx.getToken();
     _storeCtx.fetchNewOrders();
+    _storeCtx.filterOrders(0);
     // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -62,9 +63,9 @@ class _StorePageState extends State<StorePage> {
       if (RestApiHelper.getUserRole() == "store") {
         if (dataType == "sent") {
           playSound("incoming");
-          _storeCtx.orderList.add(jsonData);
           showOrdersNotificationView(context, jsonData);
         } else if (dataType == "received") {
+          log("received");
         } else if (dataType == "preparing") {
         } else if (dataType == "delivering") {
         } else if (dataType == "delivered") {
@@ -74,8 +75,8 @@ class _StorePageState extends State<StorePage> {
             }
           }
           _storeCtx.filterOrders(0);
-          var body = {"orderStatus": "delivered"};
-          _storeCtx.updateOrder(data["id"], body);
+          // var body = {"orderStatus": "delivered"};
+          // _storeCtx.updateOrder(data["id"], body);
         } else {
           for (dynamic i in _storeCtx.orderList) {
             if (i == data) {

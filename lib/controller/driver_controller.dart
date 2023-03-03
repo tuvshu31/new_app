@@ -150,7 +150,7 @@ class DriverController extends GetxController {
         "longitude": info.longitude.toString(),
         "heading": info.heading.toString()
       };
-      if (step.value == 1) {
+      if (step.value != 0) {
         updateUser(body);
       }
     });
