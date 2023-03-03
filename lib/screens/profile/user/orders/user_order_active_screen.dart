@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:Erdenet24/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -28,7 +27,7 @@ class UserOrderActiveScreen extends StatefulWidget {
 }
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
-  int step = 3;
+  int step = 0;
   PageController pageController = PageController();
   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
   final _userCtx = Get.put(UserController());
@@ -36,7 +35,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   @override
   void initState() {
     super.initState();
-    _userCtx.getActiveOrderInfo(RestApiHelper.getOrderId());
+    _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       var data = message.data;
@@ -215,9 +214,9 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         children: [
-          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
           Obx(
             () => GoogleMap(
               zoomControlsEnabled: false,

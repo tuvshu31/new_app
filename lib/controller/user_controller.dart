@@ -37,7 +37,7 @@ class UserController extends GetxController {
     loading.value = false;
   }
 
-  void getActiveOrderInfo(int orderId) async {
+  void getCurrentOrderInfo(int orderId) async {
     loading.value = true;
     var body = {"id": orderId};
     dynamic response = await RestApi().getOrders(body);
@@ -52,34 +52,6 @@ class UserController extends GetxController {
     filteredOrderList.value =
         userOrderList.where((p0) => p0["orderStatus"] == status).toList();
   }
-  // void getPositionStream() {
-  //   Geolocator.getPositionStream(
-  //     locationSettings: const LocationSettings(
-  //       accuracy: LocationAccuracy.bestForNavigation,
-  //       distanceFilter: 3,
-  //     ),
-  //   ).listen((Position? info) async {
-  //     initialPosition.value = LatLng(info!.latitude, info.longitude);
-  //     CameraPosition currentCameraPosition = CameraPosition(
-  //       bearing: 0,
-  //       target: initialPosition.value,
-  //       zoom: 16,
-  //     );
-  //     markerRotation.value = info.heading;
-  //     addDriverMarker();
-  //     final GoogleMapController controller = await mapController.value.future;
-  //     controller
-  //         .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
-  //     var body = {
-  //       "latitude": info.latitude.toString(),
-  //       "longitude": info.longitude.toString(),
-  //       "heading": info.heading.toString()
-  //     };
-  //     if (step.value != 0) {
-  //       updateUser(body);
-  //     }
-  //   });
-  // }
 
   void fetchDriverPositionSctream(int driverId) {
     Timer.periodic(const Duration(seconds: 5), (timer) async {
