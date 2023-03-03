@@ -1,17 +1,22 @@
+import 'dart:async';
 import 'dart:developer';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController extends GetxController {
-  RxInt activeOrderStep = 0.obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
   RxBool loading = false.obs;
-  Rx<PageController> activeOrderPageController = PageController().obs;
+  RxDouble markerRotation = 0.0.obs;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
+  Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
+  Rx<Completer<GoogleMapController>> mapController =
+      Completer<GoogleMapController>().obs;
+
   void getToken() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     var body = {"mapToken": fcmToken};
@@ -33,9 +38,9 @@ class UserController extends GetxController {
     loading.value = false;
   }
 
-  void getActiveOrderInfo() async {
+  void getActiveOrderInfo(int orderId) async {
     loading.value = true;
-    var body = {"id": RestApiHelper.getOrderId()};
+    var body = {"id": orderId};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
@@ -48,12 +53,94 @@ class UserController extends GetxController {
     filteredOrderList.value =
         userOrderList.where((p0) => p0["orderStatus"] == status).toList();
   }
+  // void getPositionStream() {
+  //   Geolocator.getPositionStream(
+  //     locationSettings: const LocationSettings(
+  //       accuracy: LocationAccuracy.bestForNavigation,
+  //       distanceFilter: 3,
+  //     ),
+  //   ).listen((Position? info) async {
+  //     initialPosition.value = LatLng(info!.latitude, info.longitude);
+  //     CameraPosition currentCameraPosition = CameraPosition(
+  //       bearing: 0,
+  //       target: initialPosition.value,
+  //       zoom: 16,
+  //     );
+  //     markerRotation.value = info.heading;
+  //     addDriverMarker();
+  //     final GoogleMapController controller = await mapController.value.future;
+  //     controller
+  //         .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+  //     var body = {
+  //       "latitude": info.latitude.toString(),
+  //       "longitude": info.longitude.toString(),
+  //       "heading": info.heading.toString()
+  //     };
+  //     if (step.value != 0) {
+  //       updateUser(body);
+  //     }
+  //   });
+  // }
 
-  void activeOrderChangeScreen(int value) {
-    activeOrderPageController.value.animateToPage(
-      value,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.bounceInOut,
+  void fetchDriverPositionSctream(int driverId) {
+    Timer.periodic(const Duration(seconds: 3), (timer) async {
+      dynamic response = await RestApi().getDriver(driverId);
+      dynamic d = Map<String, dynamic>.from(response);
+      if (d["success"]) {
+        markerRotation.value = double.parse(d["data"][0]["heading"]);
+        driverPosition.value = LatLng(double.parse(d["data"][0]["latitude"]),
+            double.parse(d["data"][0]["longitude"]));
+      }
+      CameraPosition currentCameraPosition = CameraPosition(
+        bearing: 0,
+        target: driverPosition.value,
+        zoom: 16,
+      );
+      addDriverMarker();
+      final GoogleMapController controller = await mapController.value.future;
+      controller
+          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+    });
+  }
+
+  void addDriverMarker() async {
+    BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(),
+      "assets/images/png/app/driver.png",
     );
+    MarkerId markerId = const MarkerId("driver");
+    Marker marker = Marker(
+      markerId: markerId,
+      position: driverPosition.value,
+      icon: iconBitmap,
+      rotation: markerRotation.value,
+    );
+    markers[markerId] = marker;
+  }
+
+  void onCameraMove(CameraPosition cameraPosition) {
+    if (markers.isNotEmpty) {
+      MarkerId markerId = const MarkerId("driver");
+      Marker? marker = markers[markerId];
+      Marker updatedMarker = marker!.copyWith(
+        positionParam: cameraPosition.target,
+      );
+      markers[markerId] = updatedMarker;
+    }
+  }
+
+  void onMapCreated(GoogleMapController controller) async {
+    mapController.value.complete(controller);
+    Future.delayed(const Duration(seconds: 1), () async {
+      GoogleMapController controller = await mapController.value.future;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: driverPosition.value,
+            zoom: 17.0,
+          ),
+        ),
+      );
+    });
   }
 }

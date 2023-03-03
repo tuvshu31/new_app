@@ -1,24 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'package:flutter/material.dart';
 
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/user/home/home.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:iconly/iconly.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/user/home/home.dart';
+import 'package:Erdenet24/screens/user/home/product_screen.dart';
 
 class UserOrderActiveScreen extends StatefulWidget {
   const UserOrderActiveScreen({
@@ -30,41 +28,36 @@ class UserOrderActiveScreen extends StatefulWidget {
 }
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
+  int step = 0;
+  PageController pageController = PageController();
   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
-  final _userCtx = Get.put(UserController());
-  final _driverCtx = Get.put(DriverController());
-  int driverId = 0;
+
   LatLng driverLatLng = LatLng(49.02821126030273, 104.04634376483777);
   double driverHeading = 0;
-  final Completer<GoogleMapController> mapController =
+  Completer<GoogleMapController> mapController =
       Completer<GoogleMapController>();
+
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
-    _userCtx.getActiveOrderInfo();
+    _userCtx.getActiveOrderInfo(RestApiHelper.getOrderId());
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       var data = message.data;
       var jsonData = json.decode(data["data"]);
       if (RestApiHelper.getUserRole() == "user") {
         if (data["type"] == "sent") {
-          _userCtx.activeOrderStep.value = 0;
         } else if (data["type"] == "received") {
-          _userCtx.activeOrderStep.value = 1;
-          _userCtx.activeOrderChangeScreen(1);
+          changeView(1);
         } else if (data["type"] == "preparing") {
-          _userCtx.activeOrderStep.value = 2;
-          _userCtx.activeOrderChangeScreen(2);
+          changeView(2);
         } else if (data["type"] == "delivering") {
-          _userCtx.activeOrderStep.value = 3;
-          _userCtx.activeOrderChangeScreen(3);
-          setState(() {
-            driverId = int.parse(jsonData["deliveryDriverId"]);
-          });
-          fetchDriverPositionSctream(driverId);
+          changeView(3);
+          _userCtx.fetchDriverPositionSctream(
+              int.parse(jsonData["deliveryDriverId"]));
         } else if (data["type"] == "delivered") {
-          _userCtx.activeOrderStep.value = 0;
           Get.to(() => const MainScreen());
           RestApiHelper.saveOrderId(0);
         } else {}
@@ -72,42 +65,27 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     });
   }
 
-  void fetchDriverPositionSctream(int id) {
-    Timer.periodic(const Duration(seconds: 3), (timer) async {
-      dynamic response = await RestApi().getDriver(id);
-      dynamic d = Map<String, dynamic>.from(response);
-      if (d["success"]) {
-        setState(() {
-          driverHeading = double.parse(d["data"][0]["heading"]);
-          driverLatLng = LatLng(double.parse(d["data"][0]["latitude"]),
-              double.parse(d["data"][0]["longitude"]));
-        });
-      }
-      CameraPosition currentCameraPosition = CameraPosition(
-        bearing: 0,
-        target: driverLatLng,
-        zoom: 16,
-      );
-      _driverCtx.addDriverMarker();
-      final GoogleMapController controller = await mapController.future;
-      controller
-          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
-    });
+  void changeView(int activeStep) {
+    step = activeStep;
+    setState(() {});
+    pageController.animateToPage(
+      activeStep,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.bounceInOut,
+    );
   }
 
-  void onMapCreated(GoogleMapController controller) async {
-    mapController.complete(controller);
-    Future.delayed(const Duration(seconds: 1), () async {
-      GoogleMapController controller = await mapController.future;
-      controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: driverLatLng,
-            zoom: 17.0,
-          ),
-        ),
-      );
-    });
+  _percent() {
+    switch (step) {
+      case 0:
+        return .01;
+      case 1:
+        return .25;
+      case 2:
+        return .5;
+      case 3:
+        return 1.0;
+    }
   }
 
   @override
@@ -116,41 +94,13 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
       onWillPop: () async => false,
       child: Obx(
         () => _userCtx.userOrderList.isEmpty
-            ? Material(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18)),
-                        child: Image(
-                          image:
-                              const AssetImage("assets/images/png/android.png"),
-                          width: Get.width * .22,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        "ERDENET24",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontFamily: "Exo",
-                          fontSize: 22,
-                          color: MyColors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
+            ? _loadingLogo()
             : CustomHeader(
                 withTabBar: true,
                 customLeading: Container(),
                 centerTitle: true,
                 customTitle: const CustomText(
-                  text: "Захиалга",
+                  text: "Таны захиалга",
                   color: MyColors.black,
                   fontSize: 16,
                 ),
@@ -158,21 +108,8 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                 body: Column(
                   children: [
                     _stepper(),
-                    Expanded(
-                      child: PageView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        onPageChanged: (value) {
-                          _userCtx.activeOrderStep.value = value;
-                        },
-                        controller: _userCtx.activeOrderPageController.value,
-                        children: [
-                          step0(),
-                          step0(),
-                          step1(),
-                          step2(),
-                        ],
-                      ),
-                    )
+                    _orderInfoView(),
+                    _bottomViews(),
                   ],
                 ),
               ),
@@ -181,34 +118,26 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   }
 
   Widget _stepper() {
-    return Obx(
-      () => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LinearPercentIndicator(
-              backgroundColor: MyColors.black,
-              alignment: MainAxisAlignment.center,
-              barRadius: const Radius.circular(12),
-              lineHeight: 8.0,
-              percent: _userCtx.activeOrderStep.value == 0
-                  ? 0
-                  : _userCtx.activeOrderStep.value == 1
-                      ? 0.25
-                      : _userCtx.activeOrderStep.value == 2
-                          ? 0.5
-                          : 1,
-              progressColor: MyColors.primary,
-              curve: Curves.bounceIn,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _buildRowList(),
-            )
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          LinearPercentIndicator(
+            backgroundColor: MyColors.black,
+            alignment: MainAxisAlignment.center,
+            barRadius: const Radius.circular(12),
+            lineHeight: 8.0,
+            percent: _percent(),
+            progressColor: MyColors.primary,
+            curve: Curves.bounceIn,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: _buildRowList(),
+          )
+        ],
       ),
     );
   }
@@ -216,7 +145,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   List<Widget> _buildRowList() {
     List<Widget> lines = [];
     statusList.asMap().forEach((index, value) {
-      bool active = index + 1 == _userCtx.activeOrderStep.value;
+      bool active = index + 1 == step;
       lines.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -237,53 +166,6 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
       ));
     });
     return lines;
-  }
-
-  Widget step0() {
-    return Column(
-      children: [
-        _orderInfoView(),
-        const Image(image: AssetImage("assets/images/png/app/banner1.jpg"))
-      ],
-    );
-  }
-
-  Widget step1() {
-    return Column(
-      children: [
-        _orderInfoView(),
-        const Image(image: AssetImage("assets/images/png/app/banner1.jpg"))
-      ],
-    );
-  }
-
-  Widget step2() {
-    return Obx(
-      () => Column(
-        children: [
-          _orderInfoView(),
-          Expanded(
-            child: GoogleMap(
-              zoomControlsEnabled: false,
-              zoomGesturesEnabled: false,
-              mapType: MapType.normal,
-              buildingsEnabled: true,
-              myLocationButtonEnabled: true,
-              onCameraMove: _driverCtx.onCameraMove,
-              rotateGesturesEnabled: true,
-              trafficEnabled: false,
-              compassEnabled: false,
-              markers: Set<Marker>.of(_driverCtx.markers.values),
-              initialCameraPosition: CameraPosition(
-                target: driverLatLng,
-                zoom: 14.4746,
-              ),
-              onMapCreated: _driverCtx.onMapCreated,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _orderInfoView() {
@@ -318,7 +200,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                         )
                       ],
                     ),
-                    trailing: Icon(IconlyLight.arrow_right_2),
+                    trailing: const Icon(IconlyLight.arrow_right_2),
                   ),
                 ),
               ),
@@ -327,6 +209,70 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
               height: 7,
               color: MyColors.fadedGrey,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomViews() {
+    return Expanded(
+      child: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: pageController,
+        children: [
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          Obx(
+            () => GoogleMap(
+              zoomControlsEnabled: false,
+              zoomGesturesEnabled: false,
+              mapType: MapType.normal,
+              buildingsEnabled: true,
+              myLocationButtonEnabled: true,
+              onCameraMove: _userCtx.onCameraMove,
+              rotateGesturesEnabled: true,
+              trafficEnabled: false,
+              compassEnabled: false,
+              markers: Set<Marker>.of(_userCtx.markers.values),
+              initialCameraPosition: CameraPosition(
+                target: driverLatLng,
+                zoom: 14.4746,
+              ),
+              onMapCreated: _userCtx.onMapCreated,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _loadingLogo() {
+    return Material(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              clipBehavior: Clip.hardEdge,
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(18)),
+              child: Image(
+                image: const AssetImage("assets/images/png/android.png"),
+                width: Get.width * .22,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              "ERDENET24",
+              softWrap: true,
+              style: TextStyle(
+                fontFamily: "Exo",
+                fontSize: 22,
+                color: MyColors.black,
+              ),
+            )
           ],
         ),
       ),
