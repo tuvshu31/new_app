@@ -1,6 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/user/user_order_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/loading.dart';
@@ -333,7 +333,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
             child: CustomButton(
               onPressed: () {
                 // getUserProducts();
-                Get.to(() => const UserOrderMainScreen());
+                Get.to(() => const UserCartAddressInfoScreen());
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",

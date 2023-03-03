@@ -5,8 +5,8 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
-import 'package:Erdenet24/screens/store/store.dart';
-import 'package:Erdenet24/screens/user/home/home.dart';
+import 'package:Erdenet24/screens/store/store_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -106,7 +106,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
-            Get.offAll(const MainScreen());
+            Get.offAll(const UserHomeScreen());
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");
@@ -121,14 +121,14 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
         dynamic response = await RestApi().registerUser(body);
         dynamic data = Map<String, dynamic>.from(response);
         putUserIntoBox(data["data"]["id"], "user");
-        Get.offAll(const MainScreen());
+        Get.offAll(const UserHomeScreen());
       }
     } else if (data["success"] &&
         data["role"] == "test" &&
         int.parse(pinCode) == 111111) {
       Get.back();
       putUserIntoBox(data["testId"], "test");
-      Get.offAll(const MainScreen());
+      Get.offAll(const UserHomeScreen());
     } else {
       Get.back();
       errorSnackBar("Баталгаажуулах код буруу байна", 2, context);
@@ -259,7 +259,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
                   onPressed: (() {
                     if (loginType == "user") {
                       putUserIntoBox(userId, "user");
-                      Get.offAll(() => const MainScreen());
+                      Get.offAll(() => const UserHomeScreen());
                     } else if (loginType == "store") {
                       putUserIntoBox(storeId, "store");
                       Get.offAll(() => const StorePage());

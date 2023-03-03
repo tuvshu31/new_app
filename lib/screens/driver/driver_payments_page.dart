@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
+import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';

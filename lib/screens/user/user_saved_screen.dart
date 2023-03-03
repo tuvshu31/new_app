@@ -2,7 +2,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
+import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';

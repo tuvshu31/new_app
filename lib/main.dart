@@ -1,10 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/screens/profile/user/orders/user_order_active_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
-import 'package:Erdenet24/screens/store/store.dart';
+import 'package:Erdenet24/screens/store/store_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_category_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
@@ -14,16 +15,13 @@ import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
-import 'package:Erdenet24/screens/user/home/category_products.dart';
-import 'package:Erdenet24/screens/user/home/home.dart';
-import 'package:Erdenet24/screens/user/home/subcategory_products.dart';
-import 'package:Erdenet24/screens/user/home/product_screen.dart';
-import 'package:Erdenet24/screens/user/home/search_screen.dart';
-import 'package:Erdenet24/screens/profile/user/user_settings.dart';
-import 'package:Erdenet24/screens/user/user_order_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_home_screen.dart';
+import 'package:Erdenet24/screens/user/user_subcategory_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
+import 'package:Erdenet24/screens/user/user_search_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:new_version_plus/new_version_plus.dart';
@@ -177,18 +175,26 @@ class _MyAppState extends State<MyApp> {
         GetPage(
             name: "/SplashScreenRoute", page: () => const SplashMainScreen()),
         GetPage(name: "/StoreScreenRoute", page: () => const StorePage()),
-        GetPage(name: "/MainScreenRoute", page: () => const MainScreen()),
+        // GetPage(name: "/MainScreenRoute", page: () => const ),
         GetPage(
             name: "/DriverScreenRoute", page: () => const DriverMainScreen()),
-        GetPage(name: "/UserSettingsRoute", page: () => const UserSettings()),
-        GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
-        GetPage(name: "/CategoryRoute", page: () => const CategoryProducts()),
-        GetPage(name: "/MainScreen", page: () => const MainScreen()),
         GetPage(
-            name: "/CategoryNoTabbar", page: () => const SubCategoryProducts()),
-        GetPage(name: "/ProductsRoute", page: () => const ProductScreenNew()),
-        GetPage(name: "/SearchRoute", page: () => const SearchScreenMain()),
-        GetPage(name: "/OrdersRoute", page: () => const UserOrderMainScreen()),
+            name: "/UserSettingsRoute",
+            page: () => const UserProfileHelpScreen()),
+        GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
+        GetPage(
+            name: "/CategoryRoute",
+            page: () => const UserCategoryProductScreen()),
+        GetPage(name: "/MainScreen", page: () => const UserHomeScreen()),
+        GetPage(
+            name: "/CategoryNoTabbar",
+            page: () => const UserSubCategoryProductsScreen()),
+        GetPage(
+            name: "/ProductsRoute", page: () => const UserProductScreenNew()),
+        GetPage(name: "/SearchRoute", page: () => const UserSearchMainScreen()),
+        GetPage(
+            name: "/OrdersRoute",
+            page: () => const UserCartAddressInfoScreen()),
         GetPage(
             name: "/UserOrderActiveRoute",
             page: () => const UserOrderActiveScreen()),
