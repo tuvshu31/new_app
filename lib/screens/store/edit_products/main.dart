@@ -1,9 +1,8 @@
-import 'package:Erdenet24/screens/store/edit_products/create_product.dart';
-import 'package:Erdenet24/screens/store/edit_products/edit_products.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:Erdenet24/screens/store/edit_products/create_product.dart';
+import 'package:Erdenet24/screens/store/edit_products/edit_products.dart';
 
 class AddProducts extends StatefulWidget {
   const AddProducts({Key? key}) : super(key: key);
