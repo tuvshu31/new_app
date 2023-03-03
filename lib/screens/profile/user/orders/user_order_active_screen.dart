@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'dart:convert';
+import 'package:Erdenet24/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -28,15 +28,9 @@ class UserOrderActiveScreen extends StatefulWidget {
 }
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
-  int step = 0;
+  int step = 3;
   PageController pageController = PageController();
   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
-
-  LatLng driverLatLng = LatLng(49.02821126030273, 104.04634376483777);
-  double driverHeading = 0;
-  Completer<GoogleMapController> mapController =
-      Completer<GoogleMapController>();
-
   final _userCtx = Get.put(UserController());
 
   @override
@@ -69,7 +63,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     step = activeStep;
     setState(() {});
     pageController.animateToPage(
-      activeStep,
+      step,
       duration: const Duration(milliseconds: 500),
       curve: Curves.bounceInOut,
     );
@@ -221,9 +215,9 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         children: [
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          // const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
           Obx(
             () => GoogleMap(
               zoomControlsEnabled: false,
@@ -237,7 +231,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
               compassEnabled: false,
               markers: Set<Marker>.of(_userCtx.markers.values),
               initialCameraPosition: CameraPosition(
-                target: driverLatLng,
+                target: _userCtx.driverPosition.value,
                 zoom: 14.4746,
               ),
               onMapCreated: _userCtx.onMapCreated,

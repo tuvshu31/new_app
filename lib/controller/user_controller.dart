@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -83,7 +82,7 @@ class UserController extends GetxController {
   // }
 
   void fetchDriverPositionSctream(int driverId) {
-    Timer.periodic(const Duration(seconds: 3), (timer) async {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
       dynamic response = await RestApi().getDriver(driverId);
       dynamic d = Map<String, dynamic>.from(response);
       if (d["success"]) {
@@ -141,6 +140,7 @@ class UserController extends GetxController {
           ),
         ),
       );
+      addDriverMarker();
     });
   }
 }
