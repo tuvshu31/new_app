@@ -1,10 +1,7 @@
 import 'dart:developer';
-
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class StoreController extends GetxController {
@@ -15,7 +12,7 @@ class StoreController extends GetxController {
   RxString orderStatus = "".obs;
   RxInt prepDuration = 0.obs;
 
-  void fetchNewOrders() async {
+  void fetchStoreOrders() async {
     fetching.value = true;
     dynamic response =
         await RestApi().getStoreOrders(RestApiHelper.getUserId(), {});

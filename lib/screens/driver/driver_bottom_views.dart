@@ -130,15 +130,12 @@ Widget step1() {
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: () {
+              IconButton(
+                onPressed: () {
                   _driverCtx.cancelNewDelivery();
                 },
-                child: const Icon(
-                  Icons.close,
-                  size: 28,
-                ),
-              ),
+                icon: const Icon(Icons.close, size: 28),
+              )
             ],
           ),
         ),

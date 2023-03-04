@@ -1,21 +1,115 @@
 import 'dart:developer';
-
-import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
-import 'package:Erdenet24/screens/store/store_orders_main_screen.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:circular_countdown/circular_countdown.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_picker/flutter_picker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+
 import 'package:slide_to_act/slide_to_act.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+import 'package:circular_countdown/circular_countdown.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/screens/store/store_orders_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 
 final _storeCtx = Get.put(StoreController());
+final _driverCtx = Get.put(DriverController());
 int selectedTime = 0;
+
+void showOrdersNotificationView(context, data) {
+  showModalBottomSheet(
+    backgroundColor: MyColors.white,
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: 0.9,
+        child: SafeArea(
+          minimum: const EdgeInsets.symmetric(vertical: 24),
+          child: Stack(
+            children: [
+              Align(
+                alignment: AlignmentDirectional.topCenter,
+                child: Container(
+                    margin: EdgeInsets.only(top: Get.height * .1),
+                    child: const CustomText(
+                      text: "Шинэ захиалга ирлээ!",
+                      fontSize: 18,
+                    )),
+              ),
+              Align(
+                alignment: AlignmentDirectional.center,
+                child: TimeCircularCountdown(
+                  diameter: Get.width * .5,
+                  countdownRemainingColor: MyColors.primary,
+                  unit: CountdownUnit.second,
+                  textStyle: const TextStyle(
+                    color: MyColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                  countdownTotal: 60,
+                  onUpdated: (unit, remainingTime) {},
+                  onFinished: () {},
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional.bottomEnd,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  height: 70,
+                  child: Builder(
+                    builder: (contexts) {
+                      final GlobalKey<SlideActionState> key = GlobalKey();
+                      return SlideAction(
+                        height: 70,
+                        outerColor: MyColors.black,
+                        innerColor: MyColors.primary,
+                        elevation: 0,
+                        key: key,
+                        submittedIcon: const Icon(
+                          FontAwesomeIcons.check,
+                          color: MyColors.white,
+                        ),
+                        onSubmit: () {
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            key.currentState!.reset();
+                            stopSound();
+                            Get.back();
+                            var body = {"orderStatus": "received"};
+                            _storeCtx.updateOrder(data["id"], body);
+                            showOrdersSetTime(context, data);
+                          });
+                        },
+                        alignment: Alignment.centerRight,
+                        sliderButtonIcon: const Icon(
+                          Icons.double_arrow_rounded,
+                          color: MyColors.white,
+                        ),
+                        child: const Text(
+                          "Баталгаажуулах",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
 void storeOrdersToDeliveryView(context, data) {
   showModalBottomSheet(
@@ -121,22 +215,24 @@ void storeOrdersToDeliveryView(context, data) {
                                     const Duration(milliseconds: 300),
                                     () async {
                                   key.currentState!.reset();
-                                  for (dynamic i in _storeCtx.orderList) {
-                                    if (i == data) {
-                                      i["orderStatus"] = "delivering";
-                                    }
-                                  }
-                                  _storeCtx.filterOrders(0);
+                                  // for (dynamic i in _storeCtx.orderList) {
+                                  //   if (i == data) {
+                                  //     i["orderStatus"] = "delivering";
+                                  //   }
+                                  // }
+                                  // _storeCtx.filterOrders(0);
                                   var body = {"orderStatus": "delivering"};
                                   // _storeCtx.updateOrder(data["id"], body);
                                   //  CALL DRIVER
                                   var body1 = {
-                                    "orderId": data['id'],
+                                    "orderId": data['orderId'],
                                     'address': data["address"],
                                     'phone': data["phone"],
                                   };
+
                                   _storeCtx.callDriver(body1);
-                                  Get.back();
+                                  notifyToDrivers(context, data);
+                                  // Get.back();
                                 });
                                 // Future.delayed(const Duration(minutes: 5), () {
                                 //   key.currentState!.reset();
@@ -161,96 +257,6 @@ void storeOrdersToDeliveryView(context, data) {
                       ),
                     )
                   : Container()
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-
-void showOrdersNotificationView(context, data) {
-  showModalBottomSheet(
-    backgroundColor: MyColors.white,
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return FractionallySizedBox(
-        heightFactor: 0.9,
-        child: SafeArea(
-          minimum: const EdgeInsets.symmetric(vertical: 24),
-          child: Stack(
-            children: [
-              Align(
-                alignment: AlignmentDirectional.topCenter,
-                child: Container(
-                    margin: EdgeInsets.only(top: Get.height * .1),
-                    child: CustomText(
-                      text: "Шинэ захиалга ирлээ!",
-                      fontSize: 18,
-                    )),
-              ),
-              Align(
-                alignment: AlignmentDirectional.center,
-                child: TimeCircularCountdown(
-                  diameter: Get.width * .5,
-                  countdownRemainingColor: MyColors.primary,
-                  unit: CountdownUnit.second,
-                  textStyle: const TextStyle(
-                    color: MyColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                  countdownTotal: 60,
-                  onUpdated: (unit, remainingTime) {},
-                  onFinished: () {},
-                ),
-              ),
-              Align(
-                alignment: AlignmentDirectional.bottomEnd,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  height: 70,
-                  child: Builder(
-                    builder: (contexts) {
-                      final GlobalKey<SlideActionState> key = GlobalKey();
-                      return SlideAction(
-                        height: 70,
-                        outerColor: MyColors.black,
-                        innerColor: MyColors.primary,
-                        elevation: 0,
-                        key: key,
-                        submittedIcon: const Icon(
-                          FontAwesomeIcons.check,
-                          color: MyColors.white,
-                        ),
-                        onSubmit: () {
-                          Future.delayed(const Duration(milliseconds: 300), () {
-                            key.currentState!.reset();
-                            stopSound();
-                            Get.back();
-                            var body = {"orderStatus": "received"};
-                            _storeCtx.updateOrder(data["id"], body);
-                            showOrdersSetTime(context, data);
-                          });
-                        },
-                        alignment: Alignment.centerRight,
-                        sliderButtonIcon: const Icon(
-                          Icons.double_arrow_rounded,
-                          color: MyColors.white,
-                        ),
-                        child: const Text(
-                          "Баталгаажуулах",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              )
             ],
           ),
         ),
@@ -459,7 +465,7 @@ void showOrdersSetTime(context, data) {
                                     };
                                     _storeCtx.updateOrder(data["id"], body);
                                     _storeCtx.prepDuration.value = 0;
-                                    Get.to(() => const StoreOrdersMainScreen());
+                                    Get.to(() => const StoreOrdersScreen());
                                   });
                                 },
                                 alignment: Alignment.centerRight,
@@ -516,4 +522,47 @@ showPickerNumber(BuildContext context) {
       onConfirm: (Picker picker, List value) {
         _storeCtx.prepDuration.value = picker.getSelectedValues()[0];
       }).showDialog(context);
+}
+
+void notifyToDrivers(context, data) {
+  showModalBottomSheet(
+    isDismissible: false,
+    enableDrag: false,
+    backgroundColor: MyColors.white,
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: 0.5,
+        child: SafeArea(
+          minimum: const EdgeInsets.symmetric(vertical: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8, bottom: 8),
+                    child: IconButton(
+                        onPressed: Get.back, icon: const Icon(Icons.close)),
+                  )
+                ],
+              ),
+              Lottie.asset(
+                'assets/json/calling.json',
+                height: Get.width * .5,
+                width: Get.width * .5,
+              ),
+              const CustomText(
+                textAlign: TextAlign.center,
+                text: "Хамгийн ойрхон байгаа жолоочтой \n холбогдож байна...",
+                // fontSize: 18,
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

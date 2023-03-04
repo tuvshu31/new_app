@@ -64,7 +64,7 @@ class _UserCategoryProductScreenState extends State<UserCategoryProductScreen> {
         child: CustomHeader(
           customActions: IconButton(
             icon: Badge(
-              badgeAnimation: BadgeAnimation.scale(),
+              badgeAnimation: BadgeAnimation.rotation(),
               position: BadgePosition.custom(top: -12, end: -8),
               badgeContent: CustomText(
                 text: _cartCtrl.cartList.length.toString(),

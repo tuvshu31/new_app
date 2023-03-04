@@ -131,7 +131,7 @@ class DriverController extends GetxController {
     Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 3,
+        distanceFilter: 5,
       ),
     ).listen((Position? info) async {
       initialPosition.value = LatLng(info!.latitude, info.longitude);
@@ -150,9 +150,7 @@ class DriverController extends GetxController {
         "longitude": info.longitude.toString(),
         "heading": info.heading.toString()
       };
-      if (step.value != 0) {
-        updateUser(body);
-      }
+      updateUser(body);
     });
   }
 
@@ -173,6 +171,8 @@ class DriverController extends GetxController {
 
   //=========================Driver controllers==================================
   void turnOnOff(value) async {
+    var body = {"isOpen": value};
+    updateUser(body);
     isOnline.value = value;
     if (value == true) {
       playSound("engine_start");
@@ -187,6 +187,7 @@ class DriverController extends GetxController {
 
   void fetchDriverInfo(int id) async {
     dynamic response = await RestApi().getDriver(id);
+    log(response.toString());
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       driverInfo = d["data"];
@@ -212,8 +213,23 @@ class DriverController extends GetxController {
 
   void cancelNewDelivery() async {
     step.value = 0;
+    stopwatch.value.stop();
     stopSound();
     removeMarker("store");
+    List canceledDrivers = json.decode(deliveryInfo["canceledDrivers"]);
+    canceledDrivers.add(RestApiHelper.getUserId());
+    var body = {
+      "orderId": int.parse(deliveryInfo['orderId']),
+      "address": deliveryInfo["address"] ?? "Gok Garden 7A",
+      "phone": deliveryInfo["phone"] ?? "99921312",
+      "canceledDrivers": canceledDrivers
+    };
+    dynamic response = await RestApi().assignDriver(body);
+    dynamic d = Map<String, dynamic>.from(response);
+
+    if (d["success"]) {
+      step.value = 0;
+    }
   }
 
   void finishDelivery() {
@@ -260,9 +276,10 @@ class DriverController extends GetxController {
   }
 
   void updateOrder(dynamic body) async {
-    var response =
+    dynamic response =
         await RestApi().updateOrder(int.parse(deliveryInfo["id"]), body);
-    log(response.toString());
+    dynamic d = Map<String, dynamic>.from(response);
+    log(d.toString());
   }
 
   void updateUser(dynamic body) async {

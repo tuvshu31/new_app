@@ -78,9 +78,6 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   void putUserIntoBox(int id, String type) async {
     RestApiHelper.saveUserId(id);
     RestApiHelper.saveUserRole(type);
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
   }
 
   void submit() async {

@@ -4,14 +4,15 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
-import 'package:Erdenet24/screens/store/store_orders_main_screen.dart';
-import 'package:Erdenet24/screens/store/store_orders_to_delivery_view.dart';
+import 'package:Erdenet24/screens/store/store_orders_screen.dart';
+import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,6 @@ class _StorePageState extends State<StorePage> {
   @pragma('vm:entry-point')
   Future firebaseMessagingBackgroundHandle(RemoteMessage message) async {
     await Firebase.initializeApp();
-
     // playSound("incoming");
     // showOrdersNotificationView(context, message.data);
     log("Background message irj bn lastly");
@@ -52,10 +52,7 @@ class _StorePageState extends State<StorePage> {
   void initState() {
     super.initState();
     _storeCtx.getToken();
-    _storeCtx.fetchNewOrders();
-    _storeCtx.filterOrders(0);
-    // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandle);
-
+    _storeCtx.fetchStoreOrders();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       var data = message.data;
       var jsonData = json.decode(data["data"]);
@@ -147,7 +144,7 @@ class _StorePageState extends State<StorePage> {
                           Get.to(() => const StoreProductsEditMainScreen());
                         }),
                         _listTile(IconlyLight.chart, "Захиалгууд", () {
-                          Get.to(() => const StoreOrdersMainScreen());
+                          Get.to(() => const StoreOrdersScreen());
                         }),
                         _divider(),
                         _listTile(IconlyLight.setting, "Тохиргоо", () {
@@ -248,10 +245,12 @@ class _StorePageState extends State<StorePage> {
         text: isOpen ? "Дэлгүүрээ хаах" : "Дэлгүүрээ нээх",
         fontSize: 14,
       ),
-      trailing: Switch(
-          activeColor: MyColors.primary,
+      trailing: CupertinoSwitch(
           value: isOpen,
-          onChanged: (val) {
+          thumbColor: isOpen ? MyColors.primary : MyColors.gray,
+          trackColor: MyColors.background,
+          activeColor: MyColors.black,
+          onChanged: (value) {
             closeStoreModal(
               context,
               "Дэлгүүрээ ${isOpen ? "хаах уу?" : "нээх үү?"}",
@@ -262,10 +261,10 @@ class _StorePageState extends State<StorePage> {
               () {
                 Get.back();
                 loadingDialog(context);
-                updateStoreHelper(_user["id"], {..._user, "isOpen": val});
+                updateStoreHelper(_user["id"], {..._user, "isOpen": value});
                 Get.back();
                 setState(() {
-                  isOpen = val;
+                  isOpen = value;
                 });
               },
             );
