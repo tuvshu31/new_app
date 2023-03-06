@@ -29,8 +29,8 @@ class MyColors {
   static const Color gray = Color(0xff9B9B9B);
   static const Color background = Color(0xffedeff4);
   static const Color white = Color(0xffFFFFFF);
-  static const Color error = Color(0xffee476f);
-  static const Color success = Color(0xff28a745);
+  static const Color error = Color(0xffff4444);
+  static const Color success = Color(0xff00c851);
   static const Color warning = Color(0xFFffd200);
   static const Color border = Color(0xffdddddd);
   static const Color fadedGreen = Color(0xffd8f4e5);

@@ -214,7 +214,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         children: [
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+          const Image(image: AssetImage("assets/images/png/app/Banner2.webp")),
           const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
           const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
           Obx(

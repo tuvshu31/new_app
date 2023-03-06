@@ -1,5 +1,7 @@
 import 'dart:developer';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -409,7 +411,7 @@ void showOrdersSetTime(context, data) {
                                             ? "Сонгох"
                                             : "${_storeCtx.prepDuration.value} минут",
                                         onPressed: () {
-                                          showPickerNumber(context);
+                                          showPickerNumber(context, data);
                                         },
                                       )
                                     ],
@@ -453,10 +455,20 @@ void showOrdersSetTime(context, data) {
                                     for (dynamic i in _storeCtx.orderList) {
                                       if (i == data) {
                                         i["orderStatus"] = "preparing";
+                                        i["prepDuration"] =
+                                            _storeCtx.prepDuration.value;
                                       }
                                     }
+
                                     _storeCtx.filterOrders(0);
-                                    log("Hello");
+                                    for (var element
+                                        in _storeCtx.filteredOrderList) {
+                                      CountDownController countDownController =
+                                          CountDownController();
+                                      _storeCtx.countDownControllerList
+                                          .add(countDownController);
+                                    }
+
                                     var body = {
                                       "orderStatus": "preparing",
                                       "prepDuration": _storeCtx
@@ -495,7 +507,7 @@ void showOrdersSetTime(context, data) {
   );
 }
 
-showPickerNumber(BuildContext context) {
+showPickerNumber(BuildContext context, data) {
   Picker(
       adapter: NumberPickerAdapter(data: [
         const NumberPickerColumn(begin: 1, end: 60),
@@ -542,6 +554,23 @@ void notifyToDrivers(context, data) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 12),
+                  //   child: AnimatedTextKit(
+                  //     repeatForever: true,
+                  //     animatedTexts: [
+                  //       RotateAnimatedText(
+                  //         '1 жолооч татгалзлаа',
+                  //         textStyle: TextStyle(
+                  //           color: MyColors.primary,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //     onTap: () {
+                  //       print("Tap Event");
+                  //     },
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8, bottom: 8),
                     child: IconButton(
@@ -555,10 +584,9 @@ void notifyToDrivers(context, data) {
                 width: Get.width * .5,
               ),
               const CustomText(
-                textAlign: TextAlign.center,
-                text: "Хамгийн ойрхон байгаа жолоочтой \n холбогдож байна...",
-                // fontSize: 18,
-              ),
+                  textAlign: TextAlign.center,
+                  text:
+                      "Хамгийн ойрхон байгаа жолоочтой \n холбогдож байна..."),
             ],
           ),
         ),

@@ -1,3 +1,8 @@
+import 'dart:developer';
+
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/card_ribbon.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -18,11 +23,6 @@ class StoreOrdersScreen extends StatefulWidget {
 class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
   PageController pageController = PageController();
   final _storeCtx = Get.put(StoreController());
-  @override
-  void initState() {
-    super.initState();
-    _storeCtx.filterOrders(0);
-  }
 
   @override
   void dispose() {
@@ -81,6 +81,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
       () => _storeCtx.filteredOrderList.isEmpty
           ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
           : ListView.separated(
+              padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
               separatorBuilder: (context, index) {
                 return const SizedBox(height: 7);
               },
@@ -88,24 +89,81 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
               itemCount: _storeCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
                 var data = _storeCtx.filteredOrderList[index];
+                bool withTrailing = data["orderStatus"] == "preparing";
                 return GestureDetector(
                   onTap: (() {
                     storeOrdersToDeliveryView(context, data);
                   }),
                   child: Card(
+                    elevation: 1,
+                    margin: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
                     child: ListTile(
                       title: CustomText(
-                        text: "${data["orderId"]}",
+                        text: "Захиалга: #${data["orderId"]}",
                         fontSize: 14,
                       ),
                       subtitle: CustomText(
                         text: data["orderTime"],
                         fontSize: 12,
                       ),
+                      trailing: withTrailing
+                          ? CircularCountDownTimer(
+                              duration: _storeCtx.filteredOrderList[index]
+                                      ['prepDuration'] *
+                                  60,
+                              initialDuration: 0,
+                              controller:
+                                  _storeCtx.countDownControllerList[index],
+                              width: 50,
+                              height: 50,
+                              ringColor: Colors.grey[300]!,
+                              ringGradient: null,
+                              fillColor: MyColors.primary,
+                              fillGradient: null,
+                              backgroundColor: MyColors.black,
+                              backgroundGradient: null,
+                              strokeWidth: 4.0,
+                              strokeCap: StrokeCap.round,
+                              textStyle: const TextStyle(
+                                fontSize: 10.0,
+                                color: Colors.white,
+                              ),
+                              textFormat: CountdownTextFormat.MM_SS,
+                              isReverse: true,
+                              isReverseAnimation: false,
+                              isTimerTextShown: true,
+                              autoStart: false,
+                              onStart: () {
+                                debugPrint('Countdown Started');
+                              },
+                              onComplete: () {
+                                debugPrint('Countdown Ended');
+                              },
+                              onChange: (String timeStamp) {
+                                debugPrint('Countdown Changed $timeStamp');
+                              },
+                              timeFormatterFunction:
+                                  (defaultFormatterFunction, duration) {
+                                if (duration.inSeconds == 0) {
+                                  // only format for '0'
+                                  return "Start";
+                                } else {
+                                  // other durations by it's default format
+                                  return Function.apply(
+                                      defaultFormatterFunction, [duration]);
+                                }
+                              },
+                            )
+                          : CustomText(
+                              text: convertToCurrencyFormat(
+                                double.parse(data["totalAmount"]),
+                                locatedAtTheEnd: true,
+                                toInt: true,
+                              ),
+                            ),
                     ),
                   ),
                 );

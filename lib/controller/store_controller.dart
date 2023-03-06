@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +12,8 @@ class StoreController extends GetxController {
   RxInt pickedMinutes = 0.obs;
   RxString orderStatus = "".obs;
   RxInt prepDuration = 0.obs;
+  RxList<CountDownController> countDownControllerList =
+      <CountDownController>[].obs;
 
   void fetchStoreOrders() async {
     fetching.value = true;

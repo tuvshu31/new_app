@@ -22,7 +22,6 @@ class _StoreProductsPreviewScreenState
   final _incoming = Get.arguments;
   @override
   Widget build(BuildContext context) {
-    print(_incoming);
     return CustomHeader(
       customActions: Container(),
       title: "Бүтээгдэхүүн",
