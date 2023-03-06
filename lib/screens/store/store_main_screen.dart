@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
@@ -33,12 +34,10 @@ class _StorePageState extends State<StorePage> {
   dynamic _user = [];
   bool isOpen = false;
   int userId = RestApiHelper.getUserId();
-  final TextEditingController _phone = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-  final TextEditingController _passwordRepeat = TextEditingController();
 
   final _loginCtrl = Get.put(LoginController());
   final _storeCtx = Get.put(StoreController());
+  final _networkCtx = Get.put(NetWorkController());
 
   @pragma('vm:entry-point')
   Future firebaseMessagingBackgroundHandle(RemoteMessage message) async {
@@ -51,8 +50,11 @@ class _StorePageState extends State<StorePage> {
   @override
   void initState() {
     super.initState();
+
+    _networkCtx.checkNetworkAccess(context);
     _storeCtx.getToken();
     _storeCtx.fetchStoreOrders();
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       var data = message.data;
       var jsonData = json.decode(data["data"]);
@@ -246,11 +248,12 @@ class _StorePageState extends State<StorePage> {
         fontSize: 14,
       ),
       trailing: CupertinoSwitch(
-          value: isOpen,
-          thumbColor: isOpen ? MyColors.primary : MyColors.gray,
-          trackColor: MyColors.background,
-          activeColor: MyColors.black,
-          onChanged: (value) {
+        value: isOpen,
+        thumbColor: isOpen ? MyColors.primary : MyColors.gray,
+        trackColor: MyColors.background,
+        activeColor: MyColors.black,
+        onChanged: (value) {
+          if (_networkCtx.hasNetwork.value) {
             closeStoreModal(
               context,
               "Дэлгүүрээ ${isOpen ? "хаах уу?" : "нээх үү?"}",
@@ -268,7 +271,13 @@ class _StorePageState extends State<StorePage> {
                 });
               },
             );
-          }),
+          } else {
+            if (value) {
+              _networkCtx.showNetworkSnackbar(context);
+            }
+          }
+        },
+      ),
     );
   }
 }
