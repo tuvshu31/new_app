@@ -33,9 +33,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 final _driverCtx = Get.put(DriverController());
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  await Hive.initFlutter();
+  RestApiHelper.authBox = await Hive.openBox('myBox');
+  RestApiHelper.saveMessage(message.data.toString());
+  log(RestApiHelper.getSavedMessage().toString());
+
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -43,7 +43,6 @@ class NetWorkController extends GetxController {
   Map _source = {ConnectivityResult.none: false};
   final NetworkConnectivity _networkConnectivity = NetworkConnectivity.instance;
   String string = '';
-  final _networkCtx = Get.put(NetWorkController());
   RxBool hasNetwork = true.obs;
   void checkNetworkAccess(context) {
     _networkConnectivity.initialise();
@@ -66,16 +65,21 @@ class NetWorkController extends GetxController {
             string = 'Offline';
         }
         if (_source.keys.toList()[0] == ConnectivityResult.none) {
-          string = "Offline";
-          _networkCtx.hasNetwork.value = false;
+          string = "Интернэт холболтоо шалгана уу!";
+          hasNetwork.value = false;
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: CustomText(text: string),
+              content: Text(
+                string,
+                style: const TextStyle(
+                  fontFamily: "Nunito",
+                ),
+              ),
             ),
           );
         } else {
-          _networkCtx.hasNetwork.value = true;
+          hasNetwork.value = true;
         }
       },
     );

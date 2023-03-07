@@ -15,6 +15,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -38,14 +40,6 @@ class _StorePageState extends State<StorePage> {
   final _loginCtrl = Get.put(LoginController());
   final _storeCtx = Get.put(StoreController());
   final _networkCtx = Get.put(NetWorkController());
-
-  @pragma('vm:entry-point')
-  Future firebaseMessagingBackgroundHandle(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    // playSound("incoming");
-    // showOrdersNotificationView(context, message.data);
-    log("Background message irj bn lastly");
-  }
 
   @override
   void initState() {
@@ -272,9 +266,7 @@ class _StorePageState extends State<StorePage> {
               },
             );
           } else {
-            if (value) {
-              _networkCtx.showNetworkSnackbar(context);
-            }
+            _networkCtx.showNetworkSnackbar(context);
           }
         },
       ),

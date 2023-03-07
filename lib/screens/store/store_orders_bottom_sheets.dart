@@ -25,6 +25,8 @@ int selectedTime = 0;
 
 void showOrdersNotificationView(context, data) {
   showModalBottomSheet(
+    enableDrag: false,
+    isDismissible: false,
     backgroundColor: MyColors.white,
     context: context,
     isScrollControlled: true,
@@ -451,24 +453,15 @@ void showOrdersSetTime(context, data) {
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
                                     Get.back();
+                                    data["orderStatus"] = "preparing";
+                                    data["prepDuration"] =
+                                        _storeCtx.prepDuration.value;
+                                    CountDownController cDownCtrl =
+                                        CountDownController();
+                                    _storeCtx.countDownControllerList
+                                        .add(cDownCtrl);
                                     _storeCtx.orderList.add(data);
-                                    for (dynamic i in _storeCtx.orderList) {
-                                      if (i == data) {
-                                        i["orderStatus"] = "preparing";
-                                        i["prepDuration"] =
-                                            _storeCtx.prepDuration.value;
-                                      }
-                                    }
-
                                     _storeCtx.filterOrders(0);
-                                    for (var element
-                                        in _storeCtx.filteredOrderList) {
-                                      CountDownController countDownController =
-                                          CountDownController();
-                                      _storeCtx.countDownControllerList
-                                          .add(countDownController);
-                                    }
-
                                     var body = {
                                       "orderStatus": "preparing",
                                       "prepDuration": _storeCtx
@@ -477,6 +470,8 @@ void showOrdersSetTime(context, data) {
                                     };
                                     _storeCtx.updateOrder(data["id"], body);
                                     _storeCtx.prepDuration.value = 0;
+                                    _storeCtx.countDownControllerList.last
+                                        .start();
                                     Get.to(() => const StoreOrdersScreen());
                                   });
                                 },

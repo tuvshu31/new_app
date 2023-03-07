@@ -116,7 +116,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
                                   60,
                               initialDuration: 0,
                               controller:
-                                  _storeCtx.countDownControllerList[index],
+                                  _storeCtx.countDownControllerList.last,
                               width: 50,
                               height: 50,
                               ringColor: Colors.grey[300]!,

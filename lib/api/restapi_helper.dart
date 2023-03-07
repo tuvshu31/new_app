@@ -11,4 +11,7 @@ class RestApiHelper {
   // Login хийсэн хэрэглэгчийн захиалга хийсэн эсэсхийг-г хадлагах, авах
   static void saveOrderId(int orderId) => authBox?.put("orderId", orderId);
   static int getOrderId() => authBox?.get('orderId', defaultValue: 0);
+  // Background message хадгалах, авах
+  static void saveMessage(String type) => authBox?.put("message", type);
+  static String getSavedMessage() => authBox?.get('message', defaultValue: '');
 }
