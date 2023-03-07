@@ -97,6 +97,7 @@ dependencies:
   animated_text_kit: ^4.2.2
   circular_countdown_timer: ^0.2.3
   connectivity_plus: ^3.0.3
+  awesome_notifications: any
 
 dev_dependencies:
   flutter_test:

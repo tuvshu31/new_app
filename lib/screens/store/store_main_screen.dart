@@ -11,6 +11,7 @@ import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';

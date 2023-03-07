@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/notification.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_category_products_screen.dart';
@@ -8,6 +9,7 @@ import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -37,17 +39,48 @@ final _driverCtx = Get.put(DriverController());
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-  await Hive.initFlutter();
-  RestApiHelper.authBox = await Hive.openBox('myBox');
-  RestApiHelper.saveMessage(message.data.toString());
-  log(RestApiHelper.getSavedMessage().toString());
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: 1,
+      channelKey: "basic_channel",
+      title: "Simple title",
+      body: "Simple button",
+      customSound: 'resource://raw/incoming',
+      payload: message.data.map(
+        (key, value) => MapEntry(
+          key,
+          value?.toString(),
+        ),
+      ),
+    ),
+    actionButtons: [
+      NotificationActionButton(
+        key: 'SHOW_SERVICE_DETAILS',
+        label: 'Show details',
+        showInCompactView: true,
+      )
+    ],
+  );
 
   print("Handling a background message: ${message.messageId}");
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: "basic_channel",
+        channelName: "Basic Notification",
+        channelDescription: "Notification channel for basic test",
+        playSound: true,
+        importance: NotificationImportance.High,
+        soundSource: 'resource://raw/incoming',
+      ),
+    ],
+    debug: true,
+  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -110,6 +143,8 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
   final String initialRoute;
   const MyApp({
     Key? key,
@@ -123,17 +158,34 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   AppUpdateInfo? _updateInfo;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
   //Huudas shiljiheer ondelete hiigdeed bga blhoor eniig duudaj bga. Ustgaj bolohgui
   final cartCtrl = Get.put(CartController(), permanent: true);
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
   @override
   void initState() {
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onDismissActionReceivedMethod);
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then((allowed) {
+      if (!allowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      } else {
+        log("allowed");
+      }
+    });
     final newVersionPlus = NewVersionPlus(
       iOSId: 'mn.et24',
       androidId: 'mn.et24',
     );
+
     advancedStatusCheck(NewVersionPlus newVersion) async {
       print("Checking");
       final status = await newVersion.getVersionStatus();
@@ -182,6 +234,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: MyApp.navigatorKey,
       title: "Erdenet24",
       initialRoute: widget.initialRoute,
       // defaultTransition: Transition.,
