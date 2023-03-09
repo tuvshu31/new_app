@@ -1,30 +1,22 @@
 import 'dart:convert';
-import 'dart:developer';
-
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/controller/network_controller.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
-import 'package:Erdenet24/screens/store/store_orders_screen.dart';
-import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
-import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
-import 'package:Erdenet24/screens/store/store_settings_screen.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/controller/network_controller.dart';
+import 'package:Erdenet24/screens/store/store_orders_screen.dart';
+import 'package:Erdenet24/screens/store/store_settings_screen.dart';
+import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
+import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 
 class StorePage extends StatefulWidget {
   const StorePage({Key? key}) : super(key: key);
@@ -34,157 +26,107 @@ class StorePage extends StatefulWidget {
 }
 
 class _StorePageState extends State<StorePage> {
-  dynamic _user = [];
-  bool isOpen = false;
-  int userId = RestApiHelper.getUserId();
-
-  final _loginCtrl = Get.put(LoginController());
+  final _arguments = Get.arguments;
   final _storeCtx = Get.put(StoreController());
+  final _loginCtrl = Get.put(LoginController());
   final _networkCtx = Get.put(NetWorkController());
 
   @override
   void initState() {
     super.initState();
-
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.getToken();
-    _storeCtx.fetchStoreOrders();
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      var data = message.data;
-      var jsonData = json.decode(data["data"]);
-      var dataType = data["type"];
-      if (RestApiHelper.getUserRole() == "store") {
-        if (dataType == "sent") {
-          playSound("incoming");
-          showOrdersNotificationView(context, jsonData);
-        } else if (dataType == "received") {
-          log("received");
-        } else if (dataType == "preparing") {
-        } else if (dataType == "delivering") {
-        } else if (dataType == "delivered") {
-          for (dynamic i in _storeCtx.orderList) {
-            if (i == data) {
-              i["orderStatus"] = "delivered";
-            }
-          }
-          _storeCtx.filterOrders(0);
-          // var body = {"orderStatus": "delivered"};
-          // _storeCtx.updateOrder(data["id"], body);
-        } else {
-          for (dynamic i in _storeCtx.orderList) {
-            if (i == data) {
-              i["orderStatus"] = "canceled";
-            }
-          }
-          _storeCtx.filterOrders(0);
-          var body = {"orderStatus": "canceled"};
-          _storeCtx.updateOrder(data["id"], body);
-        }
-      }
-    });
-    getStoreInfo();
-  }
-
-  void getStoreInfo() async {
-    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic data = Map<String, dynamic>.from(res);
-    setState(() {
-      _user = data["data"];
-      isOpen = data["data"]["isOpen"];
-    });
-  }
-
-  void updateStoreHelper(int id, dynamic body) async {
-    dynamic user = await RestApi().updateUser(id, body);
-    dynamic data = Map<String, dynamic>.from(user);
-    if (data["success"]) {
-      successSnackBar(
-          body["isOpen"] ? "Дэлгүүр нээгдлээ" : "Дэлгүүр хаагдлаа", 2, context);
-    } else {
-      errorSnackBar("Үл мэдэгдэх алдаа гарлаа", 2, context);
+    _storeCtx.firebaseMessagingForegroundHandlerStore(context);
+    _storeCtx.fetchStoreInfo();
+    if (_arguments != null) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        showOrdersNotificationView(context, json.decode(_arguments));
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _user.isNotEmpty
-          ? Column(
-              children: [
-                SizedBox(height: Get.height * .075),
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "${URL.AWS}/users/${_user["id"]}/small/1.png"),
-                  radius: Get.width * .1,
-                ),
-                const SizedBox(height: 8),
-                CustomText(
-                  text: _user["name"],
-                  fontSize: 16,
-                ),
-                const SizedBox(height: 4),
-                CustomText(
-                  text: _user["phone"],
-                  fontSize: 12,
-                  color: MyColors.gray,
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: Get.height * .02),
-                        _switchListTile(),
-                        _listTile(IconlyLight.edit, "Бараа нэмэх, засварлах",
-                            () {
-                          Get.to(() => const StoreProductsEditMainScreen());
-                        }),
-                        _listTile(IconlyLight.chart, "Захиалгууд", () {
-                          Get.to(() => const StoreOrdersScreen());
-                        }),
-                        _divider(),
-                        _listTile(IconlyLight.setting, "Тохиргоо", () {
-                          Get.to(() => const StoreSettingsScreen());
-                        }),
-                        _listTile(IconlyLight.info_circle, "Тусламж", () {}),
-                        _listTile(IconlyLight.login, "Аппаас гарах", () {
-                          logOutModal(context, () {
-                            _loginCtrl.logout();
-                          });
-                        })
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: Obx(
+        () => !_storeCtx.fetching.value
+            ? Column(
                 children: [
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(18)),
-                    child: Image(
-                      image: const AssetImage("assets/images/png/android.png"),
-                      width: Get.width * .22,
+                  SizedBox(height: Get.height * .075),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        "${URL.AWS}/users/${RestApiHelper.getUserId()}/small/1.png"),
+                    radius: Get.width * .1,
+                  ),
+                  const SizedBox(height: 8),
+                  CustomText(
+                    text: _storeCtx.storeInfo["name"],
+                    fontSize: 16,
+                  ),
+                  const SizedBox(height: 4),
+                  CustomText(
+                    text: _storeCtx.storeInfo["phone"],
+                    fontSize: 12,
+                    color: MyColors.gray,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: Get.height * .02),
+                          _switchListTile(),
+                          _listTile(IconlyLight.edit, "Бараа нэмэх, засварлах",
+                              () {
+                            Get.to(() => const StoreProductsEditMainScreen());
+                          }),
+                          _listTile(IconlyLight.chart, "Захиалгууд", () {
+                            Get.to(() => const StoreOrdersScreen());
+                          }),
+                          _divider(),
+                          _listTile(IconlyLight.setting, "Тохиргоо", () {
+                            Get.to(() => const StoreSettingsScreen());
+                          }),
+                          _listTile(IconlyLight.info_circle, "Тусламж", () {}),
+                          _listTile(IconlyLight.login, "Аппаас гарах", () {
+                            logOutModal(context, () {
+                              _loginCtrl.logout();
+                            });
+                          })
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    "ERDENET24",
-                    softWrap: true,
-                    style: TextStyle(
-                      fontFamily: "Exo",
-                      fontSize: 22,
-                      color: MyColors.black,
-                    ),
-                  )
                 ],
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18)),
+                      child: Image(
+                        image:
+                            const AssetImage("assets/images/png/android.png"),
+                        width: Get.width * .22,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      "ERDENET24",
+                      softWrap: true,
+                      style: TextStyle(
+                        fontFamily: "Exo",
+                        fontSize: 22,
+                        color: MyColors.black,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -224,6 +166,7 @@ class _StorePageState extends State<StorePage> {
   }
 
   Widget _switchListTile() {
+    bool isOpen = _storeCtx.storeInfo["isOpen"];
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
       dense: true,
@@ -258,12 +201,13 @@ class _StorePageState extends State<StorePage> {
               isOpen ? "Хаах" : "Нээх",
               () {
                 Get.back();
-                loadingDialog(context);
-                updateStoreHelper(_user["id"], {..._user, "isOpen": value});
-                Get.back();
-                setState(() {
-                  isOpen = value;
-                });
+                _storeCtx.storeInfo["isOpen"] = value;
+                var body = {"isOpen": value};
+                _storeCtx.updateStoreInfo(
+                    body,
+                    context,
+                    isOpen ? "Дэлгүүр хаагдлаа" : "Дэлгүүр нээгдлээ",
+                    "Алдаа гарлаа");
               },
             );
           } else {

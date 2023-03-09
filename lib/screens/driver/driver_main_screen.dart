@@ -49,7 +49,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     _driverCtx.sendUserTokenToTheServer();
-    _driverCtx.firebaseMessagingForegroundHandler();
+    _driverCtx.firebaseMessagingForegroundHandlerDriver();
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
   }
 
@@ -109,7 +109,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                 activeColor: MyColors.black,
                 onChanged: (value) {
                   if (_driverCtx.step.value == 0) {
-                    _driverCtx.turnOnOff(value);
+                    _driverCtx.turnOnOff(value, context);
                   }
                 }),
           ),

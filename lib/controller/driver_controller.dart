@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class DriverController extends GetxController {
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
+  final _networkCtx = Get.put(NetWorkController());
 
   //=========================Map controllers==================================
   void getUserLocation() async {
@@ -170,18 +172,22 @@ class DriverController extends GetxController {
   }
 
   //=========================Driver controllers==================================
-  void turnOnOff(value) async {
-    var body = {"isOpen": value};
-    updateUser(body);
-    isOnline.value = value;
-    if (value == true) {
-      playSound("engine_start");
-      getUserLocation();
-      getPositionStream();
-      startActiveTimer(10800);
+  void turnOnOff(value, context) async {
+    if (_networkCtx.hasNetwork.value) {
+      var body = {"isOpen": value};
+      updateUser(body);
+      isOnline.value = value;
+      if (value == true) {
+        playSound("engine_start");
+        getUserLocation();
+        getPositionStream();
+        startActiveTimer(10800, context);
+      } else {
+        stopActiveTimer();
+        stopSound();
+      }
     } else {
-      stopActiveTimer();
-      stopSound();
+      _networkCtx.showNetworkSnackbar(context);
     }
   }
 
@@ -261,7 +267,7 @@ class DriverController extends GetxController {
     );
   }
 
-  void firebaseMessagingForegroundHandler() async {
+  void firebaseMessagingForegroundHandlerDriver() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       deliveryInfo.value = message.data;
       storeLocation.value = LatLng(
@@ -305,12 +311,12 @@ class DriverController extends GetxController {
     _activeTimer!.cancel();
   }
 
-  void startActiveTimer(int seconds) {
+  void startActiveTimer(int seconds, context) {
     const duration = Duration(seconds: 1);
     remainingSeconds = seconds;
     _activeTimer = Timer.periodic(duration, (Timer timer) {
       if (remainingSeconds == 0) {
-        turnOnOff(false);
+        turnOnOff(false, context);
         timer.cancel();
       } else {
         int hours = remainingSeconds ~/ 3600;

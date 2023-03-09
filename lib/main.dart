@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/controller/notification.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_category_products_screen.dart';
@@ -43,8 +43,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     content: NotificationContent(
       id: 1,
       channelKey: "basic_channel",
-      title: "Simple title",
-      body: "Simple button",
+      title: "Erdenet24",
+      body: "Шинэ захиалга ирлээ!",
       customSound: 'resource://raw/incoming',
       payload: message.data.map(
         (key, value) => MapEntry(

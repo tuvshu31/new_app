@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:get/get.dart';
@@ -24,6 +26,7 @@ final _driverCtx = Get.put(DriverController());
 int selectedTime = 0;
 
 void showOrdersNotificationView(context, data) {
+  playSound("incoming");
   showModalBottomSheet(
     enableDrag: false,
     isDismissible: false,
@@ -85,9 +88,9 @@ void showOrdersNotificationView(context, data) {
                             key.currentState!.reset();
                             stopSound();
                             Get.back();
+                            showOrdersSetTimeView(context, data);
                             var body = {"orderStatus": "received"};
                             _storeCtx.updateOrder(data["id"], body);
-                            showOrdersSetTime(context, data);
                           });
                         },
                         alignment: Alignment.centerRight,
@@ -115,161 +118,7 @@ void showOrdersNotificationView(context, data) {
   );
 }
 
-void storeOrdersToDeliveryView(context, data) {
-  showModalBottomSheet(
-    backgroundColor: MyColors.white,
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return FractionallySizedBox(
-        heightFactor: 0.9,
-        child: SafeArea(
-          minimum: const EdgeInsets.symmetric(vertical: 24),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const CustomText(
-                    text: "Захиалгын код:",
-                    fontSize: 14,
-                    color: MyColors.gray,
-                  ),
-                  CustomText(
-                    text: data["orderId"].toString(),
-                    fontSize: 16,
-                    color: MyColors.black,
-                  ),
-                  const SizedBox(height: 12),
-                  ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return Container(
-                        height: 7,
-                        color: MyColors.fadedGrey,
-                      );
-                    },
-                    shrinkWrap: true,
-                    itemCount: data["products"].length,
-                    itemBuilder: (context, index) {
-                      var product = data["products"][index];
-                      return Container(
-                          height: Get.height * .09,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          color: MyColors.white,
-                          child: ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.zero,
-                            leading: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: MyColors.black,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: CustomText(
-                                    text: "${index + 1}",
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            title: CustomText(
-                              text: product["name"],
-                              fontSize: 16,
-                            ),
-                            subtitle: CustomText(
-                                text: convertToCurrencyFormat(
-                              int.parse(product["price"]),
-                              toInt: true,
-                              locatedAtTheEnd: true,
-                            )),
-                            trailing: CustomText(
-                                text: "${product["quantity"]} ширхэг"),
-                          ));
-                    },
-                  ),
-                ],
-              ),
-              data["orderStatus"] == "preparing"
-                  ? Align(
-                      alignment: AlignmentDirectional.bottomEnd,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
-                        height: 70,
-                        child: Builder(
-                          builder: (contexts) {
-                            final GlobalKey<SlideActionState> key = GlobalKey();
-                            return SlideAction(
-                              height: 70,
-                              outerColor: MyColors.black,
-                              innerColor: MyColors.primary,
-                              elevation: 0,
-                              key: key,
-                              submittedIcon: const Icon(
-                                FontAwesomeIcons.check,
-                                color: MyColors.white,
-                              ),
-                              onSubmit: () {
-                                Future.delayed(
-                                    const Duration(milliseconds: 300),
-                                    () async {
-                                  key.currentState!.reset();
-                                  // for (dynamic i in _storeCtx.orderList) {
-                                  //   if (i == data) {
-                                  //     i["orderStatus"] = "delivering";
-                                  //   }
-                                  // }
-                                  // _storeCtx.filterOrders(0);
-                                  var body = {"orderStatus": "delivering"};
-                                  // _storeCtx.updateOrder(data["id"], body);
-                                  //  CALL DRIVER
-                                  var body1 = {
-                                    "orderId": data['orderId'],
-                                    'address': data["address"],
-                                    'phone': data["phone"],
-                                  };
-
-                                  _storeCtx.callDriver(body1);
-                                  notifyToDrivers(context, data);
-                                  // Get.back();
-                                });
-                                // Future.delayed(const Duration(minutes: 5), () {
-                                //   key.currentState!.reset();
-                                //   callDriver(data);
-                                // });
-                              },
-                              alignment: Alignment.centerRight,
-                              sliderButtonIcon: const Icon(
-                                Icons.double_arrow_rounded,
-                                color: MyColors.white,
-                              ),
-                              child: const Text(
-                                "Хүргэлтэнд гаргах",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                  : Container()
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-
-void showOrdersSetTime(context, data) {
+void showOrdersSetTimeView(context, data) {
   showModalBottomSheet(
     backgroundColor: MyColors.white,
     context: context,
@@ -455,12 +304,8 @@ void showOrdersSetTime(context, data) {
                                     Get.back();
                                     data["orderStatus"] = "preparing";
                                     data["prepDuration"] =
-                                        _storeCtx.prepDuration.value;
-                                    CountDownController cDownCtrl =
-                                        CountDownController();
-                                    _storeCtx.countDownControllerList
-                                        .add(cDownCtrl);
-                                    _storeCtx.orderList.add(data);
+                                        _storeCtx.prepDuration.value.toString();
+                                    _storeCtx.storeOrderList.add(data);
                                     _storeCtx.filterOrders(0);
                                     var body = {
                                       "orderStatus": "preparing",
@@ -469,9 +314,15 @@ void showOrdersSetTime(context, data) {
                                           .toString(),
                                     };
                                     _storeCtx.updateOrder(data["id"], body);
+
+                                    _storeCtx.startTimer(Duration(
+                                        minutes: _storeCtx.prepDuration.value));
                                     _storeCtx.prepDuration.value = 0;
-                                    _storeCtx.countDownControllerList.last
-                                        .start();
+                                    // _storeCtx.countDownControllerList
+                                    //     .add(CountDownController());
+                                    // _storeCtx.countDownControllerList.last
+                                    //     .start();
+
                                     Get.to(() => const StoreOrdersScreen());
                                   });
                                 },
@@ -505,21 +356,31 @@ void showOrdersSetTime(context, data) {
 showPickerNumber(BuildContext context, data) {
   Picker(
       adapter: NumberPickerAdapter(data: [
-        const NumberPickerColumn(begin: 1, end: 60),
+        NumberPickerColumn(
+          initValue: _storeCtx.prepDuration.value == 0
+              ? 1
+              : _storeCtx.prepDuration.value,
+          begin: 1,
+          end: 60,
+        ),
       ]),
       delimiter: [
         PickerDelimiter(
-            child: Container(
-          width: 100.0,
-          alignment: Alignment.center,
-          child: const CustomText(
-            text: "минут",
-            isLowerCase: true,
+          child: Container(
+            width: 50.0,
+            alignment: Alignment.center,
+            child: const CustomText(
+              text: "минут",
+              isLowerCase: true,
+            ),
           ),
-        ))
+        )
       ],
       hideHeader: true,
-      title: const CustomText(text: "Хугацаа сонгох"),
+      title: const CustomText(
+        text: "Хугацаа сонгох",
+        fontSize: 18,
+      ),
       looping: true,
       smooth: 100,
       cancel: Container(),
@@ -529,6 +390,192 @@ showPickerNumber(BuildContext context, data) {
       onConfirm: (Picker picker, List value) {
         _storeCtx.prepDuration.value = picker.getSelectedValues()[0];
       }).showDialog(context);
+}
+
+void storeOrdersToDeliveryView(context, data) {
+  showModalBottomSheet(
+    backgroundColor: MyColors.white,
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: 0.9,
+        child: SafeArea(
+          minimum: const EdgeInsets.symmetric(vertical: 24),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const CustomText(
+                    text: "Захиалгын код:",
+                    fontSize: 14,
+                    color: MyColors.gray,
+                  ),
+                  CustomText(
+                    text: data["orderId"].toString(),
+                    fontSize: 16,
+                    color: MyColors.black,
+                  ),
+                  const SizedBox(height: 12),
+                  ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return Container(
+                        height: 7,
+                        color: MyColors.fadedGrey,
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount: data["products"].length,
+                    itemBuilder: (context, index) {
+                      var product = data["products"][index];
+                      return Container(
+                          height: Get.height * .09,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          color: MyColors.white,
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            leading: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: MyColors.black,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: CustomText(
+                                    text: "${index + 1}",
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            title: CustomText(
+                              text: product["name"],
+                              fontSize: 16,
+                            ),
+                            subtitle: CustomText(
+                                text: convertToCurrencyFormat(
+                              int.parse(product["price"]),
+                              toInt: true,
+                              locatedAtTheEnd: true,
+                            )),
+                            trailing: CustomText(
+                                text: "${product["quantity"]} ширхэг"),
+                          ));
+                    },
+                  ),
+                ],
+              ),
+              data["orderStatus"] == "preparing"
+                  ? Align(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        height: 70,
+                        child: Builder(
+                          builder: (contexts) {
+                            final GlobalKey<SlideActionState> key = GlobalKey();
+                            return SlideAction(
+                              height: 70,
+                              outerColor: MyColors.black,
+                              innerColor: MyColors.primary,
+                              elevation: 0,
+                              key: key,
+                              submittedIcon: const Icon(
+                                FontAwesomeIcons.check,
+                                color: MyColors.white,
+                              ),
+                              onSubmit: () {
+                                Future.delayed(
+                                    const Duration(milliseconds: 300),
+                                    () async {
+                                  // key.currentState!.reset();
+                                  // for (dynamic i in _storeCtx.orderList) {
+                                  //   if (i == data) {
+                                  //     i["orderStatus"] = "delivering";
+                                  //   }
+                                  // }
+                                  // _storeCtx.filterOrders(0);
+                                  // var body = {"orderStatus": "delivering"};
+                                  // _storeCtx.updateOrder(data["id"], body);
+                                  // //  CALL DRIVER
+                                  // var body1 = {
+                                  //   "orderId": data['orderId'],
+                                  //   'address': data["address"],
+                                  //   'phone': data["phone"],
+                                  // };
+
+                                  // _storeCtx.callDriver(body1);
+                                  key.currentState!.reset();
+                                  // for (dynamic i in _storeCtx.orderList) {
+                                  //   if (i == data) {
+                                  //     i["orderStatus"] = "delivering";
+                                  //   }
+                                  // }
+                                  // _storeCtx.filterOrders(0);
+
+                                  for (dynamic i in _storeCtx.storeOrderList) {
+                                    if (i == data) {
+                                      i["orderStatus"] = "delivering";
+                                    }
+                                  }
+                                  _storeCtx.filterOrders(0);
+                                  var body = {"orderStatus": "delivering"};
+                                  // _storeCtx.updateOrder(data["id"], body);
+                                  //  CALL DRIVER
+
+                                  var body1 = {
+                                    "orderId": data['orderId'],
+                                    'address': data["address"],
+                                    'phone': data["phone"],
+                                    'canceledDrivers': []
+                                  };
+                                  dynamic response =
+                                      await RestApi().assignDriver(body1);
+                                  // dynamic d =
+                                  //     Map<String, dynamic>.from(response);
+
+                                  Get.back();
+                                  // notifyToDrivers(context, data);
+                                  // notifyToDrivers(context, data);
+
+                                  // Get.back();
+                                });
+                                // Future.delayed(const Duration(minutes: 5), () {
+                                //   key.currentState!.reset();
+                                //   callDriver(data);
+                                // });
+                              },
+                              alignment: Alignment.centerRight,
+                              sliderButtonIcon: const Icon(
+                                Icons.double_arrow_rounded,
+                                color: MyColors.white,
+                              ),
+                              child: const Text(
+                                "Хүргэлтэнд гаргах",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  : Container()
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 void notifyToDrivers(context, data) {
@@ -549,23 +596,23 @@ void notifyToDrivers(context, data) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.only(left: 12),
-                  //   child: AnimatedTextKit(
-                  //     repeatForever: true,
-                  //     animatedTexts: [
-                  //       RotateAnimatedText(
-                  //         '1 жолооч татгалзлаа',
-                  //         textStyle: TextStyle(
-                  //           color: MyColors.primary,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //     onTap: () {
-                  //       print("Tap Event");
-                  //     },
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: AnimatedTextKit(
+                      repeatForever: true,
+                      animatedTexts: [
+                        RotateAnimatedText(
+                          '1 жолооч татгалзлаа',
+                          textStyle: TextStyle(
+                            color: MyColors.primary,
+                          ),
+                        ),
+                      ],
+                      onTap: () {
+                        print("Tap Event");
+                      },
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8, bottom: 8),
                     child: IconButton(

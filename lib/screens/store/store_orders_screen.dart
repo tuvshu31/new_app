@@ -21,8 +21,13 @@ class StoreOrdersScreen extends StatefulWidget {
 }
 
 class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
-  PageController pageController = PageController();
   final _storeCtx = Get.put(StoreController());
+  PageController pageController = PageController();
+  @override
+  void initState() {
+    super.initState();
+    _storeCtx.filterOrders(0);
+  }
 
   @override
   void dispose() {
@@ -89,7 +94,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
               itemCount: _storeCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
                 var data = _storeCtx.filteredOrderList[index];
-                bool withTrailing = data["orderStatus"] == "preparing";
+
                 return GestureDetector(
                   onTap: (() {
                     storeOrdersToDeliveryView(context, data);
@@ -109,52 +114,25 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
                         text: data["orderTime"],
                         fontSize: 12,
                       ),
-                      trailing: withTrailing
-                          ? CircularCountDownTimer(
-                              duration: _storeCtx.filteredOrderList[index]
-                                      ['prepDuration'] *
-                                  60,
-                              initialDuration: 0,
-                              controller:
-                                  _storeCtx.countDownControllerList.last,
-                              width: 50,
-                              height: 50,
-                              ringColor: Colors.grey[300]!,
-                              ringGradient: null,
-                              fillColor: MyColors.primary,
-                              fillGradient: null,
-                              backgroundColor: MyColors.black,
-                              backgroundGradient: null,
-                              strokeWidth: 4.0,
-                              strokeCap: StrokeCap.round,
-                              textStyle: const TextStyle(
-                                fontSize: 10.0,
-                                color: Colors.white,
-                              ),
-                              textFormat: CountdownTextFormat.MM_SS,
-                              isReverse: true,
-                              isReverseAnimation: false,
-                              isTimerTextShown: true,
-                              autoStart: false,
-                              onStart: () {
-                                debugPrint('Countdown Started');
-                              },
-                              onComplete: () {
-                                debugPrint('Countdown Ended');
-                              },
-                              onChange: (String timeStamp) {
-                                debugPrint('Countdown Changed $timeStamp');
-                              },
-                              timeFormatterFunction:
-                                  (defaultFormatterFunction, duration) {
-                                if (duration.inSeconds == 0) {
-                                  // only format for '0'
-                                  return "Start";
-                                } else {
-                                  // other durations by it's default format
-                                  return Function.apply(
-                                      defaultFormatterFunction, [duration]);
-                                }
+                      trailing: data["orderStatus"] == "preparing"
+                          ? Obx(
+                              () {
+                                String strDigits(int n) =>
+                                    n.toString().padLeft(2, '0');
+                                final days = strDigits(
+                                    _storeCtx.prepDurationList[index].inDays);
+                                // Step 7
+                                final hours = strDigits(_storeCtx
+                                    .prepDurationList[index].inHours
+                                    .remainder(24));
+                                final minutes = strDigits(_storeCtx
+                                    .prepDurationList[index].inMinutes
+                                    .remainder(60));
+                                final seconds = strDigits(_storeCtx
+                                    .prepDurationList[index].inSeconds
+                                    .remainder(60));
+                                return CustomText(
+                                    text: "$hours: $minutes: $seconds");
                               },
                             )
                           : CustomText(
