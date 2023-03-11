@@ -26,6 +26,7 @@ class _UserSubCategoryProductsScreenState
     _prodCtrl.storeId.value = 0;
     _prodCtrl.page.value = 1;
     _prodCtrl.search.value = 0;
+    _prodCtrl.storeName.value = "";
     _prodCtrl.callProducts();
   }
 

@@ -43,11 +43,12 @@ void showOrdersNotificationView(context, data) {
               Align(
                 alignment: AlignmentDirectional.topCenter,
                 child: Container(
-                    margin: EdgeInsets.only(top: Get.height * .1),
-                    child: const CustomText(
-                      text: "Шинэ захиалга ирлээ!",
-                      fontSize: 18,
-                    )),
+                  margin: EdgeInsets.only(top: Get.height * .1),
+                  child: const CustomText(
+                    text: "Шинэ захиалга ирлээ!",
+                    fontSize: 18,
+                  ),
+                ),
               ),
               Align(
                 alignment: AlignmentDirectional.center,

@@ -198,4 +198,10 @@ class RestApi {
     return DioClient()
         .sendRequest('users/drivers/$driverId', Method.put, body, {});
   }
+
+  //Тухайн жолоочийн мэдээллийг засах
+  Future qpayPayment(dynamic body) async {
+    return DioClient()
+        .sendRequest('payment/createInvoice', Method.post, body, {});
+  }
 }

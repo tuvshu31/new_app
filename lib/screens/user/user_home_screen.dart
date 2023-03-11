@@ -33,6 +33,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
     _userCtx.getToken();
     _userCtx.getOrders();
+    _userCtx.onBackgroundMessagingListerners();
   }
 
   // void getUserInfo() async {

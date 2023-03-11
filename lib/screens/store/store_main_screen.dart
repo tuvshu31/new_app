@@ -60,12 +60,12 @@ class _StorePageState extends State<StorePage> {
                   ),
                   const SizedBox(height: 8),
                   CustomText(
-                    text: _storeCtx.storeInfo["name"],
+                    text: _storeCtx.storeInfo["name"] ?? "",
                     fontSize: 16,
                   ),
                   const SizedBox(height: 4),
                   CustomText(
-                    text: _storeCtx.storeInfo["phone"],
+                    text: _storeCtx.storeInfo["phone"] ?? "",
                     fontSize: 12,
                     color: MyColors.gray,
                   ),

@@ -114,34 +114,34 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
                         text: data["orderTime"],
                         fontSize: 12,
                       ),
-                      trailing: data["orderStatus"] == "preparing"
-                          ? Obx(
-                              () {
-                                String strDigits(int n) =>
-                                    n.toString().padLeft(2, '0');
-                                final days = strDigits(
-                                    _storeCtx.prepDurationList[index].inDays);
-                                // Step 7
-                                final hours = strDigits(_storeCtx
-                                    .prepDurationList[index].inHours
-                                    .remainder(24));
-                                final minutes = strDigits(_storeCtx
-                                    .prepDurationList[index].inMinutes
-                                    .remainder(60));
-                                final seconds = strDigits(_storeCtx
-                                    .prepDurationList[index].inSeconds
-                                    .remainder(60));
-                                return CustomText(
-                                    text: "$hours: $minutes: $seconds");
-                              },
-                            )
-                          : CustomText(
-                              text: convertToCurrencyFormat(
-                                double.parse(data["totalAmount"]),
-                                locatedAtTheEnd: true,
-                                toInt: true,
-                              ),
-                            ),
+                      // trailing: data["orderStatus"] == "preparing"
+                      // ? Obx(
+                      //     () {
+                      //       String strDigits(int n) =>
+                      //           n.toString().padLeft(2, '0');
+                      //       final days = strDigits(
+                      //           _storeCtx.prepDurationList[index].inDays);
+                      //       // Step 7
+                      //       final hours = strDigits(_storeCtx
+                      //           .prepDurationList[index].inHours
+                      //           .remainder(24));
+                      //       final minutes = strDigits(_storeCtx
+                      //           .prepDurationList[index].inMinutes
+                      //           .remainder(60));
+                      //       final seconds = strDigits(_storeCtx
+                      //           .prepDurationList[index].inSeconds
+                      //           .remainder(60));
+                      //       return CustomText(
+                      //           text: "$hours: $minutes: $seconds");
+                      //     },
+                      //   )
+                      // : CustomText(
+                      //     text: convertToCurrencyFormat(
+                      //       double.parse(data["totalAmount"]),
+                      //       locatedAtTheEnd: true,
+                      //       toInt: true,
+                      //     ),
+                      //   ),
                     ),
                   ),
                 );

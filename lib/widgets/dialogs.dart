@@ -34,6 +34,7 @@ void showLoadingDialog() {
 void successOrderModal(context, onTap) {
   // player.play("sounds/success_bell.wav");
   QuickAlert.show(
+    barrierDismissible: false,
     context: context,
     type: QuickAlertType.success,
     title: "Амжилттай",

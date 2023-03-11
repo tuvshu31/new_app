@@ -40,6 +40,7 @@ class _UserSearchMainScreenState extends State<UserSearchMainScreen> {
       _prodCtrl.search.value = 1;
       _prodCtrl.searchText.value = _searchController.text;
       _prodCtrl.data.clear();
+      _prodCtrl.storeName.value = "";
       _prodCtrl.callProducts();
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/notifications.dart';
@@ -34,35 +35,31 @@ import 'package:upgrader/upgrader.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-final _driverCtx = Get.put(DriverController());
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  AwesomeNotifications().createNotification(
-    content: NotificationContent(
-      id: 1,
-      channelKey: "basic_channel",
-      title: "Erdenet24",
-      body: "Шинэ захиалга ирлээ!",
-      customSound: 'resource://raw/incoming',
-      payload: message.data.map(
-        (key, value) => MapEntry(
-          key,
-          value?.toString(),
+  var msg = jsonDecode(message.data["data"]);
+  log("Handling a background message: ${msg["role"]}");
+  if (msg["role"] == "user" && msg["action"] == "payment_paid") {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: "basic_channel",
+        title: "Erdenet24",
+        body: "Төлбөр амжилттай төлөгдлөө!",
+        // customSound: 'resource://raw/incoming',
+        payload: message.data.map(
+          (key, value) => MapEntry(
+            key,
+            value?.toString(),
+          ),
         ),
       ),
-    ),
-    actionButtons: [
-      NotificationActionButton(
-        key: 'SHOW_SERVICE_DETAILS',
-        label: 'Show details',
-        showInCompactView: true,
-      )
-    ],
-  );
-
-  print("Handling a background message: ${message.messageId}");
+    );
+  } else {
+    log("else");
+  }
 }
 
 void main() async {

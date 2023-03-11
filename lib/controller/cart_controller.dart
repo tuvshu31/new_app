@@ -18,21 +18,19 @@ class CartController extends GetxController {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
     var n = storeList.indexWhere((e) => e == product["store"]);
     product["storeClosed"] = false;
-    if (i > -1) {
-      cartList[i]["quantity"] += 1;
-      successSnackBar("Сагсанд нэмэгдлээ", 3, context);
+    if (cartList.any((element) => element["store"] != product["store"])) {
+      errorSnackBar(
+          "Зөвхөн нэг байгууллагаас худалдан авалт хийнэ үү", 2, context);
     } else {
-      cartList.add({...product, "quantity": 1});
-      successSnackBar("Сагсанд нэмэгдлээ", 3, context);
+      if (i > -1) {
+        cartList[i]["quantity"] += 1;
+        successSnackBar("Сагсанд нэмэгдлээ", 3, context);
+      } else {
+        cartList.add({...product, "quantity": 1});
+        successSnackBar("Сагсанд нэмэгдлээ", 3, context);
+      }
     }
-    if (n < 0) {
-      storeList.isEmpty
-          ? null
-          : Timer(Duration(seconds: 3), () {
-              warningSnackBar("Хүргэлтийн төлбөр нэмэгдлээ", 2, context);
-            });
-      storeList.add(product["store"]);
-    }
+
     cartList.refresh();
   }
 

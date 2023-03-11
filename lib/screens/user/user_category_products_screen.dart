@@ -40,6 +40,7 @@ class _UserCategoryProductScreenState extends State<UserCategoryProductScreen> {
     _prodCtrl.categoryId.value = 0;
     _prodCtrl.search.value = 0;
     _prodCtrl.storeId.value = 0;
+    _prodCtrl.storeName.value = "";
     _prodCtrl.callProducts();
   }
 

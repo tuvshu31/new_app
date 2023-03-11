@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -15,6 +17,7 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserOrderPaymentScreen extends StatefulWidget {
   const UserOrderPaymentScreen({Key? key}) : super(key: key);
@@ -27,29 +30,38 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   final _incoming = Get.arguments;
-
   final _notifications = FlutterLocalNotificationsPlugin();
 
   PageController pageController = PageController(initialPage: 0);
-  List bankList = [
-    {"name": "Хаан", "image": "khaan.png"},
-    {"name": "TDB", "image": "tdb.png"},
-    {"name": "Голомт", "image": "golomt.png"},
-    {"name": "Most Money", "image": "most_money.png"},
-    {"name": "Хас", "image": "khas.png"},
-    {"name": "Төрийн", "image": "state.png"},
-    {"name": "Капитрон", "image": "capitron.png"},
-  ];
+  List bankList = [];
+  int bankIndex = 0;
   @override
   void initState() {
     super.initState();
-    print(_incoming);
+    callBankList();
   }
 
-  void createOrder() async {
+  Future<void> callBankList() async {
+    String banks = await rootBundle.loadString('assets/json/banks.json');
+    dynamic banksJson = await json.decode(banks);
+    setState(() {
+      bankList = banksJson;
+    });
+  }
+
+  Future<void> _launchUrl(url) async {
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  void createOrder(int bankIndex) async {
     loadingDialog(context);
-    var body = {
-      "orderId": random4digit(),
+    int userId = RestApiHelper.getUserId();
+    int randomNumber = random4digit();
+    var orderId = int.parse(("$userId" "$randomNumber"));
+    var orderBody = {
+      "orderId": orderId,
       "userId": RestApiHelper.getUserId(),
       "storeId1": _cartCtrl.stores.isNotEmpty ? _cartCtrl.stores[0] : null,
       "storeId2": _cartCtrl.stores.length > 1 ? _cartCtrl.stores[1] : null,
@@ -57,7 +69,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       "storeId4": _cartCtrl.stores.length > 3 ? _cartCtrl.stores[3] : null,
       "storeId5": _cartCtrl.stores.length > 4 ? _cartCtrl.stores[4] : null,
       "address": _incoming["address"],
-      "orderStatus": "sent",
+      "orderStatus": "notPaid",
       "totalAmount": _cartCtrl.total,
       "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
       "phone": _incoming["phone"],
@@ -65,27 +77,18 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       "products": _cartCtrl.cartList,
     };
     // log(body.toString());
-    dynamic response = await RestApi().createOrder(body);
-    dynamic data = Map<String, dynamic>.from(response);
+    dynamic orderResponse = await RestApi().createOrder(orderBody);
+    dynamic orderData = Map<String, dynamic>.from(orderResponse);
+    var qpayBody = {"sender_invoice_no": orderId.toString(), "amount": 100};
+    dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
+    dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
     Get.back();
-    if (data["success"]) {
-      log(data.toString());
-      moveToOrderStatusView(data["data"]);
+    if (qpayData["success"]) {
+      dynamic resString = json.decode(qpayData["data"]);
+      _launchUrl(Uri.parse(resString["urls"][bankIndex]["link"]));
+      // log(resString["urls"].toString());
+      // moveToOrderStatusView(data["data"]);
     }
-  }
-
-  void moveToOrderStatusView(data) {
-    successOrderModal(
-      context,
-      () {
-        _cartCtrl.cartList.clear();
-        RestApiHelper.saveOrderId(data["id"]);
-        Get.back();
-        Get.back();
-        Get.back();
-        Get.to(() => const UserOrderActiveScreen());
-      },
-    );
   }
 
   @override
@@ -138,30 +141,32 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   Widget _cashView() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: Get.width * .05),
-      child: Column(
-        children: [
-          SizedBox(height: Get.height * .03),
-          const CustomText(text: "Төлөх дүн:"),
-          const SizedBox(height: 8),
-          CustomText(
-            fontSize: 18,
-            color: MyColors.primary,
-            text: convertToCurrencyFormat(
-              _cartCtrl.total,
-              toInt: true,
-              locatedAtTheEnd: true,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: Get.height * .03),
+            const CustomText(text: "Төлөх дүн:"),
+            const SizedBox(height: 8),
+            CustomText(
+              fontSize: 18,
+              color: MyColors.primary,
+              text: convertToCurrencyFormat(
+                _cartCtrl.total,
+                toInt: true,
+                locatedAtTheEnd: true,
+              ),
             ),
-          ),
-          SizedBox(height: Get.height * .05),
-          Expanded(
-            child: GridView.builder(
-                physics: const BouncingScrollPhysics(),
+            const SizedBox(height: 12),
+            GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
                 itemCount: bankList.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 1,
                 ),
                 itemBuilder: (context, index) {
+                  var bank = bankList[index];
                   return Container(
                     margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -169,28 +174,34 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        createOrder();
+                        createOrder(index);
+                        // khanbankcheck();
+
+                        // log(index.toString());
                         // Get.to(const UserOrderNotificationScreen());
                       }),
                       child: Center(
                         child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image(
                                 width: Get.width * .1,
                                 image: AssetImage(
-                                    "assets/images/png/bank/${bankList[index]["image"]}"),
+                                    "assets/images/png/bank/${bank["id"]}.png"),
                               ),
+                              SizedBox(height: 6),
                               CustomText(
-                                text: bankList[index]["name"],
+                                text: bank["name"],
+                                fontSize: 12,
+                                textAlign: TextAlign.center,
                               )
                             ]),
                       ),
                     ),
                   );
                 }),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

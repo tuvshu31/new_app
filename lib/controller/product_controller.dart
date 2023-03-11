@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 
@@ -7,6 +9,7 @@ class ProductController extends GetxController {
   var total = 0.obs;
   var search = 0.obs;
   var searchText = "".obs;
+  var storeName = "".obs;
   var storeId = 0.obs;
   var typeId = 1.obs;
   var categoryId = 0.obs;
@@ -21,10 +24,12 @@ class ProductController extends GetxController {
       "typeId": typeId.value,
       "page": page.value,
       "categoryId": categoryId.value,
+      "storeName": storeName.value,
       "store": storeId.value,
       "visibility": '1',
       "search": search.value != 0 ? searchText.value : 0,
     };
+
     query.removeWhere((key, value) => value == 0);
     print(query);
     dynamic products = await RestApi().getProducts(query);

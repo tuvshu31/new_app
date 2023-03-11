@@ -30,11 +30,13 @@ class _UserStoreProductsState extends State<UserStoreProducts> {
   @override
   void initState() {
     super.initState();
+    log("incomingDassta: $_incoming");
     _prodCtrl.data.clear();
     _prodCtrl.typeId.value = 0;
     _prodCtrl.categoryId.value = 0;
     _prodCtrl.storeId.value = _incoming["id"];
     _prodCtrl.page.value = 1;
+    _prodCtrl.storeName.value = _incoming["name"];
     _prodCtrl.search.value = 0;
     _prodCtrl.callProducts();
     callCategories();
@@ -43,7 +45,6 @@ class _UserStoreProductsState extends State<UserStoreProducts> {
   void callCategories() async {
     dynamic response = await RestApi().getStoreCategories(_incoming["id"]);
     dynamic d = Map<String, dynamic>.from(response);
-    print(d["data"]);
     var items = [
       {"id": null, "name": "Бүх"},
     ];
