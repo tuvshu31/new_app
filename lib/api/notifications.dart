@@ -1,15 +1,63 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 
 final _cartCtx = Get.put(CartController());
+final _userCtx = Get.put(UserController());
+final _storeCtx = Get.put(StoreController());
+final _driverCtx = Get.put(DriverController());
+
+void notificationHandler(data) {
+  var role = jsonDecode(data["data"])["role"];
+  switch (role) {
+    case "user":
+      _userCtx.userNotificationHandler();
+      break;
+    case "store":
+      _storeCtx.storeNotificationHandler(message);
+      break;
+    case "driver":
+      _driverCtx.driverNotificationHandler(message);
+      break;
+    default:
+      log(role.toString());
+      break;
+  }
+}
+
+void createCustomNotification({
+  bool isVisible = false,
+  String title = "Erdenet24",
+  String body = "",
+  bool customSound = false,
+}) {
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      displayOnForeground: isVisible,
+      displayOnBackground: isVisible,
+      criticalAlert: true,
+      progress: 32,
+      category: NotificationCategory.Message,
+      customSound: 'resource://raw/incoming',
+      id: 1,
+      channelKey: "basic_channel",
+      title: title,
+      body: body,
+    ),
+  );
+}
 
 class NotificationController {
   /// Use this method to detect when a new notification or a schedule is created
@@ -17,23 +65,25 @@ class NotificationController {
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
     // Your code goes here
-    var payload = jsonDecode(receivedNotification.payload!["data"]!);
-    if (payload["role"] == "user") {
-      if (payload["action"] == "payment_paid") {
-        successOrderModal(
-          MyApp.navigatorKey.currentContext,
-          () {
-            _cartCtx.cartList.clear();
-            RestApiHelper.saveOrderId(payload["orderId"]);
-            Get.back();
-            Get.back();
-            Get.back();
-            Get.to(() => const UserOrderActiveScreen());
-          },
-        );
-      }
-    }
     log("onNotificationCreatedMethod $receivedNotification");
+    var payload = jsonDecode(receivedNotification.payload!["data"]!);
+    if (payload["role"] == "user" && payload["action"] == "payment_paid") {
+      log("my code goes here");
+      successOrderModal(
+        MyApp.navigatorKey.currentContext,
+        () async {
+          _cartCtx.cartList.clear();
+          dynamic orderResponse =
+              await RestApi().createOrder(_userCtx.orderTempData);
+          dynamic orderData = Map<String, dynamic>.from(orderResponse);
+          if (orderData["success"]) {
+            _userCtx.orderTempData.clear();
+            RestApiHelper.saveOrderId(payload["orderId"]);
+            Get.off(() => const UserOrderActiveScreen());
+          }
+        },
+      );
+    }
     log(payload.toString());
   }
 

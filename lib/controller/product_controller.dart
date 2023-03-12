@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 
@@ -30,7 +28,7 @@ class ProductController extends GetxController {
       "search": search.value != 0 ? searchText.value : 0,
     };
 
-    query.removeWhere((key, value) => value == 0);
+    query.removeWhere((key, value) => value == 0 || value == "");
     print(query);
     dynamic products = await RestApi().getProducts(query);
     dynamic p = Map<String, dynamic>.from(products);

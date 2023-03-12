@@ -22,6 +22,7 @@ class CartController extends GetxController {
       errorSnackBar(
           "Зөвхөн нэг байгууллагаас худалдан авалт хийнэ үү", 2, context);
     } else {
+      storeList.add(product["store"]);
       if (i > -1) {
         cartList[i]["quantity"] += 1;
         successSnackBar("Сагсанд нэмэгдлээ", 3, context);
@@ -30,6 +31,13 @@ class CartController extends GetxController {
         successSnackBar("Сагсанд нэмэгдлээ", 3, context);
       }
     }
+    // if (n < 0) {
+    //   storeList.isEmpty
+    //       ? null
+    //       : Timer(Duration(seconds: 3), () {
+    //           warningSnackBar("Хүргэлтийн төлбөр нэмэгдлээ", 2, context);
+    //         });
+    // }
 
     cartList.refresh();
   }

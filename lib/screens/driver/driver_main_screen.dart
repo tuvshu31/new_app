@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
@@ -27,6 +28,7 @@ class DriverMainScreen extends StatefulWidget {
 
 class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
+  final _networkCtx = Get.put(NetWorkController());
   final GlobalKey<SlideActionState> key = GlobalKey();
 
   List<Widget> steps = [
@@ -48,8 +50,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    _driverCtx.sendUserTokenToTheServer();
-    _driverCtx.firebaseMessagingForegroundHandlerDriver();
+    _networkCtx.checkNetworkAccess(context);
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
   }
 

@@ -31,9 +31,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     super.initState();
     _cartCtrl.getUserProducts();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
-    _userCtx.getToken();
     _userCtx.getOrders();
-    _userCtx.onBackgroundMessagingListerners();
+    // _userCtx.onBackgroundMessagingListerners();
   }
 
   // void getUserInfo() async {

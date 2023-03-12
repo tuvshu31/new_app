@@ -259,7 +259,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
                       Get.offAll(() => const UserHomeScreen());
                     } else if (loginType == "store") {
                       putUserIntoBox(storeId, "store");
-                      Get.offAll(() => const StorePage());
+                      Get.offAll(() => const StoreMainScreen());
                     }
                   }),
                   text: "Нэвтрэх",

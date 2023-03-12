@@ -18,14 +18,14 @@ import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 
-class StorePage extends StatefulWidget {
-  const StorePage({Key? key}) : super(key: key);
+class StoreMainScreen extends StatefulWidget {
+  const StoreMainScreen({Key? key}) : super(key: key);
 
   @override
-  State<StorePage> createState() => _StorePageState();
+  State<StoreMainScreen> createState() => _StoreMainScreenState();
 }
 
-class _StorePageState extends State<StorePage> {
+class _StoreMainScreenState extends State<StoreMainScreen> {
   final _arguments = Get.arguments;
   final _storeCtx = Get.put(StoreController());
   final _loginCtrl = Get.put(LoginController());
@@ -34,9 +34,8 @@ class _StorePageState extends State<StorePage> {
   @override
   void initState() {
     super.initState();
+
     _networkCtx.checkNetworkAccess(context);
-    _storeCtx.getToken();
-    _storeCtx.firebaseMessagingForegroundHandlerStore(context);
     _storeCtx.fetchStoreInfo();
     if (_arguments != null) {
       Future.delayed(const Duration(milliseconds: 500), () {

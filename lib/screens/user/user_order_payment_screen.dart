@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'dart:convert';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -14,7 +14,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,21 +26,21 @@ class UserOrderPaymentScreen extends StatefulWidget {
 }
 
 class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
-  final _cartCtrl = Get.put(CartController());
-  final _navCtrl = Get.put(NavigationController());
   final _incoming = Get.arguments;
-  final _notifications = FlutterLocalNotificationsPlugin();
+  final _cartCtrl = Get.put(CartController());
+  final _userCtx = Get.put(UserController());
 
   PageController pageController = PageController(initialPage: 0);
+
   List bankList = [];
-  int bankIndex = 0;
+
   @override
   void initState() {
     super.initState();
-    callBankList();
+    fetchBankList();
   }
 
-  Future<void> callBankList() async {
+  Future<void> fetchBankList() async {
     String banks = await rootBundle.loadString('assets/json/banks.json');
     dynamic banksJson = await json.decode(banks);
     setState(() {
@@ -55,39 +54,32 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     }
   }
 
-  void createOrder(int bankIndex) async {
+  void createInvoice(int bankIndex) async {
     loadingDialog(context);
-    int userId = RestApiHelper.getUserId();
+    int storeId = int.parse(_cartCtrl.stores[0]);
     int randomNumber = random4digit();
-    var orderId = int.parse(("$userId" "$randomNumber"));
-    var orderBody = {
-      "orderId": orderId,
-      "userId": RestApiHelper.getUserId(),
-      "storeId1": _cartCtrl.stores.isNotEmpty ? _cartCtrl.stores[0] : null,
-      "storeId2": _cartCtrl.stores.length > 1 ? _cartCtrl.stores[1] : null,
-      "storeId3": _cartCtrl.stores.length > 2 ? _cartCtrl.stores[2] : null,
-      "storeId4": _cartCtrl.stores.length > 3 ? _cartCtrl.stores[3] : null,
-      "storeId5": _cartCtrl.stores.length > 4 ? _cartCtrl.stores[4] : null,
-      "address": _incoming["address"],
-      "orderStatus": "notPaid",
-      "totalAmount": _cartCtrl.total,
-      "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
-      "phone": _incoming["phone"],
-      "kod": _incoming["kode"],
-      "products": _cartCtrl.cartList,
-    };
-    // log(body.toString());
-    dynamic orderResponse = await RestApi().createOrder(orderBody);
-    dynamic orderData = Map<String, dynamic>.from(orderResponse);
+    var orderId = int.parse(("$storeId" "$randomNumber"));
     var qpayBody = {"sender_invoice_no": orderId.toString(), "amount": 100};
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
     Get.back();
+
     if (qpayData["success"]) {
+      var orderBody = {
+        "orderId": orderId,
+        "userId": RestApiHelper.getUserId(),
+        "storeId1": _cartCtrl.stores.isNotEmpty ? _cartCtrl.stores[0] : null,
+        "address": _incoming["address"],
+        "orderStatus": "sent",
+        "totalAmount": _cartCtrl.total,
+        "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
+        "phone": _incoming["phone"],
+        "kod": _incoming["kode"],
+        "products": _cartCtrl.cartList,
+      };
+      _userCtx.orderTempData.value = orderBody;
       dynamic resString = json.decode(qpayData["data"]);
       _launchUrl(Uri.parse(resString["urls"][bankIndex]["link"]));
-      // log(resString["urls"].toString());
-      // moveToOrderStatusView(data["data"]);
     }
   }
 
@@ -174,11 +166,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        createOrder(index);
-                        // khanbankcheck();
-
-                        // log(index.toString());
-                        // Get.to(const UserOrderNotificationScreen());
+                        createInvoice(index);
                       }),
                       child: Center(
                         child: Column(

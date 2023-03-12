@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController extends GetxController {
   RxList userOrderList = [].obs;
+  RxMap orderTempData = {}.obs;
   RxList filteredOrderList = [].obs;
   RxBool loading = false.obs;
   RxDouble markerRotation = 0.0.obs;
@@ -17,16 +18,6 @@ class UserController extends GetxController {
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
-
-  void getToken() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
-  }
 
   void getOrders() async {
     loading.value = true;
@@ -118,14 +109,11 @@ class UserController extends GetxController {
     });
   }
 
-  void onBackgroundMessagingListerners() {
-    AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:
-            NotificationController.onNotificationCreatedMethod,
-        onNotificationDisplayedMethod:
-            NotificationController.onNotificationDisplayedMethod,
-        onDismissActionReceivedMethod:
-            NotificationController.onDismissActionReceivedMethod);
+  void userNotificationHandler() {
+    createCustomNotification(
+      isVisible: true,
+      customSound: true,
+      body: "Захиалга амжилттай хийгдлээ",
+    );
   }
 }

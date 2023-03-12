@@ -16,7 +16,6 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
   @override
   void initState() {
     super.initState();
-    RestApiHelper.saveUserId(6);
     Timer(
       const Duration(seconds: 5),
       () => Navigator.pushReplacement(

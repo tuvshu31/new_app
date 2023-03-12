@@ -316,13 +316,9 @@ void showOrdersSetTimeView(context, data) {
                                     };
                                     _storeCtx.updateOrder(data["id"], body);
 
-                                    _storeCtx.startTimer(Duration(
-                                        minutes: _storeCtx.prepDuration.value));
+                                    // _storeCtx.startTimer(Duration(
+                                    //     minutes: _storeCtx.prepDuration.value));
                                     _storeCtx.prepDuration.value = 0;
-                                    // _storeCtx.countDownControllerList
-                                    //     .add(CountDownController());
-                                    // _storeCtx.countDownControllerList.last
-                                    //     .start();
 
                                     Get.to(() => const StoreOrdersScreen());
                                   });
@@ -496,62 +492,20 @@ void storeOrdersToDeliveryView(context, data) {
                                 Future.delayed(
                                     const Duration(milliseconds: 300),
                                     () async {
-                                  // key.currentState!.reset();
-                                  // for (dynamic i in _storeCtx.orderList) {
-                                  //   if (i == data) {
-                                  //     i["orderStatus"] = "delivering";
-                                  //   }
-                                  // }
-                                  // _storeCtx.filterOrders(0);
-                                  // var body = {"orderStatus": "delivering"};
-                                  // _storeCtx.updateOrder(data["id"], body);
-                                  // //  CALL DRIVER
-                                  // var body1 = {
-                                  //   "orderId": data['orderId'],
-                                  //   'address': data["address"],
-                                  //   'phone': data["phone"],
-                                  // };
-
-                                  // _storeCtx.callDriver(body1);
                                   key.currentState!.reset();
-                                  // for (dynamic i in _storeCtx.orderList) {
-                                  //   if (i == data) {
-                                  //     i["orderStatus"] = "delivering";
-                                  //   }
-                                  // }
-                                  // _storeCtx.filterOrders(0);
-
-                                  for (dynamic i in _storeCtx.storeOrderList) {
-                                    if (i == data) {
-                                      i["orderStatus"] = "delivering";
-                                    }
-                                  }
-                                  _storeCtx.filterOrders(0);
-                                  var body = {"orderStatus": "delivering"};
-                                  // _storeCtx.updateOrder(data["id"], body);
-                                  //  CALL DRIVER
-
-                                  var body1 = {
+                                  var findDriverBody = {
                                     "orderId": data['orderId'],
                                     'address': data["address"],
                                     'phone': data["phone"],
                                     'canceledDrivers': []
                                   };
-                                  dynamic response =
-                                      await RestApi().assignDriver(body1);
-                                  // dynamic d =
-                                  //     Map<String, dynamic>.from(response);
-
+                                  dynamic response = await RestApi()
+                                      .assignDriver(findDriverBody);
+                                  dynamic d =
+                                      Map<String, dynamic>.from(response);
                                   Get.back();
                                   // notifyToDrivers(context, data);
-                                  // notifyToDrivers(context, data);
-
-                                  // Get.back();
                                 });
-                                // Future.delayed(const Duration(minutes: 5), () {
-                                //   key.currentState!.reset();
-                                //   callDriver(data);
-                                // });
                               },
                               alignment: Alignment.centerRight,
                               sliderButtonIcon: const Icon(

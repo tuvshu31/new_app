@@ -207,16 +207,6 @@ class DriverController extends GetxController {
     if (data["success"]) {}
   }
 
-  void sendUserTokenToTheServer() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
-  }
-
   void cancelNewDelivery() async {
     step.value = 0;
     stopwatch.value.stop();
@@ -267,18 +257,16 @@ class DriverController extends GetxController {
     );
   }
 
-  void firebaseMessagingForegroundHandlerDriver() async {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      deliveryInfo.value = message.data;
-      storeLocation.value = LatLng(
-        double.parse(deliveryInfo["latitude"]),
-        double.parse(deliveryInfo["longitude"]),
-      );
-      addStoreMarker();
-      getDistance(initialPosition.value, storeLocation.value);
-      step.value = 1;
-      playSound("incoming");
-    });
+  void driverNotificationHandler(message) async {
+    deliveryInfo.value = message.data;
+    storeLocation.value = LatLng(
+      double.parse(deliveryInfo["latitude"]),
+      double.parse(deliveryInfo["longitude"]),
+    );
+    addStoreMarker();
+    getDistance(initialPosition.value, storeLocation.value);
+    step.value = 1;
+    playSound("incoming");
   }
 
   void updateOrder(dynamic body) async {

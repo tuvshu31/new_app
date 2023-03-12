@@ -72,53 +72,27 @@ class StoreController extends GetxController {
         storeOrderList.where((p0) => p0["orderStatus"] == type).toList();
   }
 
-  void getToken() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
-  }
-
   void updateOrder(int id, dynamic body) async {
     await RestApi().updateOrder(id, body);
   }
 
-  void firebaseMessagingForegroundHandlerStore(context) {
-    FirebaseMessaging.onMessage.listen(
-      (RemoteMessage message) {
-        var data = message.data;
-        var jsonData = json.decode(data["data"]);
-        var dataType = data["type"];
-        if (RestApiHelper.getUserRole() == "store") {
-          if (dataType == "sent") {
-            showOrdersNotificationView(context, jsonData);
-          } else if (dataType == "received") {
-          } else if (dataType == "preparing") {
-          } else if (dataType == "delivering") {
-          } else if (dataType == "delivered") {
-            for (dynamic i in storeOrderList) {
-              if (i == data) {
-                i["orderStatus"] = "delivered";
-              }
-            }
-            filterOrders(0);
-            // var body = {"orderStatus": "delivered"};
-            // _storeCtx.updateOrder(data["id"], body);
-          } else {
-            for (dynamic i in storeOrderList) {
-              if (i == data) {
-                i["orderStatus"] = "canceled";
-              }
-            }
-            filterOrders(0);
-            var body = {"orderStatus": "canceled"};
-            updateOrder(data["id"], body);
-          }
-        } else if (RestApiHelper.getUserRole() == "driver") {}
-      },
-    );
+  void storeNotificationHandler(message) {
+    var data = message.data;
+    var jsonData = json.decode(data["data"]);
+    var dataType = data["type"];
+    if (dataType == "sent") {
+      // showOrdersNotificationView(context, jsonData);
+      log("Hello");
+    } else if (dataType == "received") {
+    } else if (dataType == "preparing") {
+    } else if (dataType == "delivering") {
+    } else if (dataType == "delivered") {
+      for (dynamic i in storeOrderList) {
+        if (i == data) {
+          i["orderStatus"] = "delivered";
+        }
+      }
+      filterOrders(0);
+    }
   }
 }
