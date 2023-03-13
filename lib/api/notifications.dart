@@ -21,15 +21,16 @@ final _driverCtx = Get.put(DriverController());
 
 void notificationHandler(data) {
   var role = jsonDecode(data["data"])["role"];
+  var action = jsonDecode(data["data"])["action"];
   switch (role) {
     case "user":
-      _userCtx.userNotificationHandler();
+      _userCtx.userNotificationHandler(action);
       break;
     case "store":
-      _storeCtx.storeNotificationHandler(message);
+      _storeCtx.storeNotificationHandler(action);
       break;
     case "driver":
-      _driverCtx.driverNotificationHandler(message);
+      _driverCtx.driverNotificationHandler(action);
       break;
     default:
       log(role.toString());
@@ -64,6 +65,8 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
+    var role = receivedNotification.payload!["data"]!;
+    log(role.toString());
     // Your code goes here
     log("onNotificationCreatedMethod $receivedNotification");
     var payload = jsonDecode(receivedNotification.payload!["data"]!);

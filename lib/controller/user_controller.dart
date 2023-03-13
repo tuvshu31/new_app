@@ -109,11 +109,13 @@ class UserController extends GetxController {
     });
   }
 
-  void userNotificationHandler() {
-    createCustomNotification(
-      isVisible: true,
-      customSound: true,
-      body: "Захиалга амжилттай хийгдлээ",
-    );
+  void userNotificationHandler(String action) {
+    if (action == "payment_success") {
+      createCustomNotification(
+        isVisible: true,
+        customSound: true,
+        body: "Захиалга амжилттай хийгдлээ",
+      );
+    }
   }
 }

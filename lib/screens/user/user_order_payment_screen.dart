@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
