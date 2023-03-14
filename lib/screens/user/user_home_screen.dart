@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -30,6 +31,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void initState() {
     super.initState();
     _cartCtrl.getUserProducts();
+    saveUserToken();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
     _userCtx.getOrders();
     // _userCtx.onBackgroundMessagingListerners();

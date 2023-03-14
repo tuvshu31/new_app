@@ -76,7 +76,27 @@ class StoreController extends GetxController {
     await RestApi().updateOrder(id, body);
   }
 
-  void storeNotificationHandler(message) {
+  void storeNotifications(message) {
+    var data = message.data;
+    var jsonData = json.decode(data["data"]);
+    var dataType = data["type"];
+    if (dataType == "sent") {
+      // showOrdersNotificationView(context, jsonData);
+      log("Hello");
+    } else if (dataType == "received") {
+    } else if (dataType == "preparing") {
+    } else if (dataType == "delivering") {
+    } else if (dataType == "delivered") {
+      for (dynamic i in storeOrderList) {
+        if (i == data) {
+          i["orderStatus"] = "delivered";
+        }
+      }
+      filterOrders(0);
+    }
+  }
+
+  void storeNotificationDataHandler(message) {
     var data = message.data;
     var jsonData = json.decode(data["data"]);
     var dataType = data["type"];

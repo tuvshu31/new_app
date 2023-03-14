@@ -113,7 +113,7 @@ class CartController extends GetxController {
     return formattedDate;
   }
 
-  get deliveryCost => storeList.length * 2000;
+  get deliveryCost => 2000;
   get stores => storeList;
   get saved => savedList;
   get products => cartList;

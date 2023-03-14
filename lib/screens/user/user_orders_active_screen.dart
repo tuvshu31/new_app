@@ -1,11 +1,9 @@
-import 'dart:convert';
-import 'package:Erdenet24/screens/user/user_home_screen.dart';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:Erdenet24/utils/helpers.dart';
@@ -27,49 +25,18 @@ class UserOrderActiveScreen extends StatefulWidget {
 }
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
-  int step = 0;
-  PageController pageController = PageController();
-  List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
   final _userCtx = Get.put(UserController());
+  List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
 
   @override
   void initState() {
     super.initState();
+    saveUserToken();
     _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      var data = message.data;
-      var jsonData = json.decode(data["data"]);
-      if (RestApiHelper.getUserRole() == "user") {
-        if (data["type"] == "sent") {
-        } else if (data["type"] == "received") {
-          changeView(1);
-        } else if (data["type"] == "preparing") {
-          changeView(2);
-        } else if (data["type"] == "delivering") {
-          changeView(3);
-          _userCtx.fetchDriverPositionSctream(
-              int.parse(jsonData["deliveryDriverId"]));
-        } else if (data["type"] == "delivered") {
-          Get.to(() => const UserHomeScreen());
-          RestApiHelper.saveOrderId(0);
-        } else {}
-      }
-    });
-  }
-
-  void changeView(int activeStep) {
-    step = activeStep;
-    setState(() {});
-    pageController.animateToPage(
-      step,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.bounceInOut,
-    );
   }
 
   _percent() {
-    switch (step) {
+    switch (_userCtx.activeOrderStep.value) {
       case 0:
         return .01;
       case 1:
@@ -138,7 +105,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   List<Widget> _buildRowList() {
     List<Widget> lines = [];
     statusList.asMap().forEach((index, value) {
-      bool active = index + 1 == step;
+      bool active = index + 1 == _userCtx.activeOrderStep.value;
       lines.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -210,15 +177,16 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
 
   Widget _bottomViews() {
     return Expanded(
-      child: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: pageController,
-        children: [
-          const Image(image: AssetImage("assets/images/png/app/Banner2.webp")),
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-          Obx(
-            () => GoogleMap(
+      child: Obx(
+        () => PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _userCtx.activeOrderPageController.value,
+          children: [
+            const Image(
+                image: AssetImage("assets/images/png/app/Banner2.webp")),
+            const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+            const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+            GoogleMap(
               zoomControlsEnabled: false,
               zoomGesturesEnabled: false,
               mapType: MapType.normal,
@@ -235,8 +203,8 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
               ),
               onMapCreated: _userCtx.onMapCreated,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

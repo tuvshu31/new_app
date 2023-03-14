@@ -57,7 +57,7 @@ void successOrderModal(context, onTap) {
         SizedBox(height: 6),
         CustomText(
           text:
-              'Таны захиалгыг хүлээн авлаа. Миний захиалгууд хэсгээс хүргэлтийн явцыг харах боломжтой.',
+              'Таны захиалгыг хүлээн авлаа. Миний захиалга хэсгээс хүргэлтийн мэдээллийг харах боломжтой.',
           fontSize: 14,
           color: MyColors.gray,
           textAlign: TextAlign.center,
@@ -418,7 +418,7 @@ void loadingDialog(BuildContext context) async {
   showGeneralDialog(
     context: context,
     barrierLabel: "",
-    barrierDismissible: true,
+    barrierDismissible: false,
     pageBuilder: (ctx, a1, a2) {
       return Container();
     },
@@ -426,7 +426,7 @@ void loadingDialog(BuildContext context) async {
       var curve = Curves.bounceInOut.transform(a1.value);
       return Transform.scale(
         scale: curve,
-        child: Center(
+        child: const Center(
           child: CircularProgressIndicator(
             color: MyColors.white,
           ),

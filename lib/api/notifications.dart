@@ -12,6 +12,7 @@ import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 
 final _cartCtx = Get.put(CartController());
@@ -19,26 +20,55 @@ final _userCtx = Get.put(UserController());
 final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
 
-void notificationHandler(data) {
-  var role = jsonDecode(data["data"])["role"];
-  var action = jsonDecode(data["data"])["action"];
+void saveUserToken() async {
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  var body = {"mapToken": fcmToken};
+  await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    var body = {"mapToken": newToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  });
+}
+
+void switchNotifications(payload) {
+  log("switchNotifications: $payload");
+  var role = jsonDecode(payload["data"])["role"];
+  var action = jsonDecode(payload["data"])["action"];
   switch (role) {
     case "user":
-      _userCtx.userNotificationHandler(action);
+      _userCtx.userNotifications(action, payload);
       break;
     case "store":
-      _storeCtx.storeNotificationHandler(action);
+      _storeCtx.storeNotifications(payload);
       break;
     case "driver":
-      _driverCtx.driverNotificationHandler(action);
+      _driverCtx.driverNotifications(payload);
       break;
     default:
-      log(role.toString());
       break;
   }
 }
 
-void createCustomNotification({
+void handleNotifications(payload) {
+  var role = payload["role"];
+  var action = payload["action"];
+  switch (role) {
+    case "user":
+      _userCtx.userNotificationDataHandler(action, payload);
+      break;
+    case "store":
+      _storeCtx.storeNotificationDataHandler(action);
+      break;
+    case "driver":
+      _driverCtx.driverNotificationDataHandler(action);
+      break;
+    default:
+      break;
+  }
+}
+
+void createCustomNotification(
+  payload, {
   bool isVisible = false,
   String title = "Erdenet24",
   String body = "",
@@ -56,6 +86,7 @@ void createCustomNotification({
       channelKey: "basic_channel",
       title: title,
       body: body,
+      payload: Map<String, String>.from(payload),
     ),
   );
 }
@@ -65,29 +96,9 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
-    var role = receivedNotification.payload!["data"]!;
-    log(role.toString());
-    // Your code goes here
     log("onNotificationCreatedMethod $receivedNotification");
-    var payload = jsonDecode(receivedNotification.payload!["data"]!);
-    if (payload["role"] == "user" && payload["action"] == "payment_paid") {
-      log("my code goes here");
-      successOrderModal(
-        MyApp.navigatorKey.currentContext,
-        () async {
-          _cartCtx.cartList.clear();
-          dynamic orderResponse =
-              await RestApi().createOrder(_userCtx.orderTempData);
-          dynamic orderData = Map<String, dynamic>.from(orderResponse);
-          if (orderData["success"]) {
-            _userCtx.orderTempData.clear();
-            RestApiHelper.saveOrderId(payload["orderId"]);
-            Get.off(() => const UserOrderActiveScreen());
-          }
-        },
-      );
-    }
-    log(payload.toString());
+    var data = jsonDecode(receivedNotification.payload!["data"]!);
+    handleNotifications(data);
   }
 
   /// Use this method to detect every time that a new notification is displayed
@@ -95,7 +106,8 @@ class NotificationController {
   static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
     // Your code goes here
-    log("onNotificationDisplayedMethod");
+
+    log("onNotificationDisplayedMethod ${receivedNotification}");
   }
 
   /// Use this method to detect if the user dismissed a notification

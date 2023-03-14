@@ -25,8 +25,9 @@ class UserOrderPaymentScreen extends StatefulWidget {
 }
 
 class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
+  late bool isLoading;
   final _incoming = Get.arguments;
-  final _cartCtrl = Get.put(CartController());
+  final _cartCtx = Get.put(CartController());
   final _userCtx = Get.put(UserController());
 
   PageController pageController = PageController(initialPage: 0);
@@ -36,6 +37,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   @override
   void initState() {
     super.initState();
+    isLoading = false;
     fetchBankList();
   }
 
@@ -54,32 +56,39 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   }
 
   void createInvoice(int bankIndex) async {
+    setState(() {
+      isLoading = true;
+    });
     loadingDialog(context);
-    int storeId = int.parse(_cartCtrl.stores[0]);
+    int storeId = int.parse(_cartCtx.stores[0]);
     int randomNumber = random4digit();
     var orderId = int.parse(("$storeId" "$randomNumber"));
-    var qpayBody = {"sender_invoice_no": orderId.toString(), "amount": 100};
-    dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
-    dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
-    Get.back();
-
-    if (qpayData["success"]) {
-      var orderBody = {
-        "orderId": orderId,
-        "userId": RestApiHelper.getUserId(),
-        "storeId1": _cartCtrl.stores.isNotEmpty ? _cartCtrl.stores[0] : null,
-        "address": _incoming["address"],
-        "orderStatus": "sent",
-        "totalAmount": _cartCtrl.total,
-        "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
-        "phone": _incoming["phone"],
-        "kod": _incoming["kode"],
-        "products": _cartCtrl.cartList,
+    var orderBody = {
+      "orderId": orderId,
+      "userId": RestApiHelper.getUserId(),
+      "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
+      "address": _incoming["address"],
+      "orderStatus": "notPaid",
+      "totalAmount": _cartCtx.total,
+      "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
+      "phone": _incoming["phone"],
+      "kod": _incoming["kode"],
+      "products": _cartCtx.cartList,
+    };
+    dynamic orderResponse = await RestApi().createOrder(orderBody);
+    dynamic orderData = Map<String, dynamic>.from(orderResponse);
+    _cartCtx.cartList.clear();
+    if (orderData["success"]) {
+      var qpayBody = {
+        "sender_invoice_no": orderData["data"]["id"].toString(),
+        "amount": 100
       };
-      _userCtx.orderTempData.value = orderBody;
+      dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
+      dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
       dynamic resString = json.decode(qpayData["data"]);
       _launchUrl(Uri.parse(resString["urls"][bankIndex]["link"]));
     }
+    Get.back();
   }
 
   @override
@@ -142,7 +151,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
               fontSize: 18,
               color: MyColors.primary,
               text: convertToCurrencyFormat(
-                _cartCtrl.total,
+                _cartCtx.total,
                 toInt: true,
                 locatedAtTheEnd: true,
               ),
@@ -165,7 +174,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                         borderRadius: BorderRadius.circular(12)),
                     child: CustomInkWell(
                       onTap: (() {
-                        createInvoice(index);
+                        isLoading ? null : createInvoice(index);
                       }),
                       child: Center(
                         child: Column(
@@ -176,7 +185,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                                 image: AssetImage(
                                     "assets/images/png/bank/${bank["id"]}.png"),
                               ),
-                              SizedBox(height: 6),
+                              const SizedBox(height: 6),
                               CustomText(
                                 text: bank["name"],
                                 fontSize: 12,

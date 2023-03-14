@@ -257,7 +257,19 @@ class DriverController extends GetxController {
     );
   }
 
-  void driverNotificationHandler(message) async {
+  void driverNotifications(message) async {
+    deliveryInfo.value = message.data;
+    storeLocation.value = LatLng(
+      double.parse(deliveryInfo["latitude"]),
+      double.parse(deliveryInfo["longitude"]),
+    );
+    addStoreMarker();
+    getDistance(initialPosition.value, storeLocation.value);
+    step.value = 1;
+    playSound("incoming");
+  }
+
+  void driverNotificationDataHandler(message) async {
     deliveryInfo.value = message.data;
     storeLocation.value = LatLng(
       double.parse(deliveryInfo["latitude"]),

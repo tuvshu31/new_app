@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
@@ -50,6 +51,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
+    saveUserToken();
     _networkCtx.checkNetworkAccess(context);
     _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
   }

@@ -30,7 +30,7 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  notificationHandler(message.data);
+  switchNotifications(message.data);
 }
 
 void main() async {
@@ -59,7 +59,7 @@ void main() async {
   });
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    notificationHandler(message.data);
+    switchNotifications(message.data);
   });
 
   await Hive.initFlutter();
@@ -122,20 +122,11 @@ class _MyAppState extends State<MyApp> {
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
-  Future<void> sendUserTokenToTheServer() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    sendUserTokenToTheServer();
+
     AwesomeNotifications().setListeners(
         onActionReceivedMethod: NotificationController.onActionReceivedMethod,
         onNotificationCreatedMethod:

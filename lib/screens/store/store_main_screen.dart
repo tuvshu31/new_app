@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -34,7 +35,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   void initState() {
     super.initState();
-
+    saveUserToken();
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
     if (_arguments != null) {

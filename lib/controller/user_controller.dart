@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'package:Erdenet24/api/notifications.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/screens/user/user_home_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -9,8 +14,9 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController extends GetxController {
+  RxInt activeOrderStep = 0.obs;
+  Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
-  RxMap orderTempData = {}.obs;
   RxList filteredOrderList = [].obs;
   RxBool loading = false.obs;
   RxDouble markerRotation = 0.0.obs;
@@ -35,6 +41,7 @@ class UserController extends GetxController {
     var body = {"id": orderId};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
+    log(d.toString());
     if (d["success"]) {
       userOrderList.value = d["data"];
     }
@@ -109,13 +116,93 @@ class UserController extends GetxController {
     });
   }
 
-  void userNotificationHandler(String action) {
+  void updateOrder(int id, dynamic body) async {
+    dynamic response = await RestApi().updateOrder(id, body);
+    dynamic d = Map<String, dynamic>.from(response);
+    log(d.toString());
+  }
+
+  void userNotifications(action, payload) {
     if (action == "payment_success") {
       createCustomNotification(
+        payload,
         isVisible: true,
         customSound: true,
-        body: "Захиалга амжилттай хийгдлээ",
+        body: "Захиалгын төлбөр амжилттай төлөгдлөө",
       );
+    } else if (action == "sent") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        body: "Захиалгыг хүлээн авлаа",
+      );
+    } else if (action == "received") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        body: "Захиалгыг хүлээн авлаа",
+      );
+    } else if (action == "preparing") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        body: "Захиалгыг бэлтгэж эхэллээ",
+      );
+    } else if (action == "delivering") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        body: "Захиалга хүргэлтэнд гарлаа",
+      );
+    } else if (action == "delivered") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        body: "Захиалга амжилттай хүргэгдлээ",
+      );
+    } else {
+      log(payload.toString());
     }
+  }
+
+  void userActiveOrderChangeView(int activeStep) {
+    activeOrderStep.value = activeStep;
+    activeOrderPageController.value.animateToPage(
+      activeOrderStep.value,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.bounceInOut,
+    );
+  }
+
+  void userNotificationDataHandler(action, payload) {
+    if (action == "payment_success") {
+      successOrderModal(
+        MyApp.navigatorKey.currentContext,
+        () async {
+          var body = {"orderStatus": "sent"};
+          updateOrder(payload["id"], body);
+          RestApiHelper.saveOrderId(payload["id"]);
+          Get.off(() => const UserOrderActiveScreen());
+        },
+      );
+    } else if (action == "sent") {
+      log(payload.toString());
+    } else if (action == "received") {
+      userActiveOrderChangeView(1);
+    } else if (action == "preparing") {
+      userActiveOrderChangeView(2);
+    } else if (action == "delivering") {
+      userActiveOrderChangeView(3);
+      var jsonData = json.decode(payload);
+      fetchDriverPositionSctream(int.parse(jsonData["deliveryDriverId"]));
+    } else if (action == "delivered") {
+      Get.to(() => const UserHomeScreen());
+      RestApiHelper.saveOrderId(0);
+    } else {}
   }
 }
