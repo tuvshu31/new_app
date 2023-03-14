@@ -2,14 +2,24 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:slide_to_act/slide_to_act.dart';
+
+final _storeCtx = Get.put(StoreController());
 
 class StoreController extends GetxController {
   RxList storeOrderList = [].obs;
@@ -76,43 +86,169 @@ class StoreController extends GetxController {
     await RestApi().updateOrder(id, body);
   }
 
-  void storeNotifications(message) {
-    var data = message.data;
-    var jsonData = json.decode(data["data"]);
-    var dataType = data["type"];
-    if (dataType == "sent") {
-      // showOrdersNotificationView(context, jsonData);
-      log("Hello");
-    } else if (dataType == "received") {
-    } else if (dataType == "preparing") {
-    } else if (dataType == "delivering") {
-    } else if (dataType == "delivered") {
-      for (dynamic i in storeOrderList) {
-        if (i == data) {
-          i["orderStatus"] = "delivered";
-        }
-      }
-      filterOrders(0);
+  void storeNotifications(action, payload) {
+    if (action == "payment_success") {
+    } else if (action == "sent") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        isCall: true,
+        body: "Шинэ захиалга ирлээ",
+      );
+    } else if (action == "received") {
+    } else if (action == "preparing") {
+    } else if (action == "delivering") {
+    } else if (action == "delivered") {
+    } else {
+      log(payload.toString());
     }
   }
 
-  void storeNotificationDataHandler(message) {
-    var data = message.data;
-    var jsonData = json.decode(data["data"]);
-    var dataType = data["type"];
-    if (dataType == "sent") {
-      // showOrdersNotificationView(context, jsonData);
-      log("Hello");
-    } else if (dataType == "received") {
-    } else if (dataType == "preparing") {
-    } else if (dataType == "delivering") {
-    } else if (dataType == "delivered") {
+  // void storeNotifications(message) {
+  //   var data = message.data;
+  //   var jsonData = json.decode(data["data"]);
+  //   var dataType = data["type"];
+  //   if (dataType == "sent") {
+  //     // showOrdersNotificationView(context, jsonData);
+  //     log("Hello");
+  //   } else if (dataType == "received") {
+  //   } else if (dataType == "preparing") {
+  //   } else if (dataType == "delivering") {
+  //   } else if (dataType == "delivered") {
+  //     for (dynamic i in storeOrderList) {
+  //       if (i == data) {
+  //         i["orderStatus"] = "delivered";
+  //       }
+  //     }
+  //     filterOrders(0);
+  //   }
+  // }
+
+  // void storeNotificationDataHandler(message) {
+  //   var data = message.data;
+  //   var jsonData = json.decode(data["data"]);
+  //   var dataType = data["type"];
+  //   if (dataType == "sent") {
+  //     // showOrdersNotificationView(context, jsonData);
+  //     log("Hello");
+  //   } else if (dataType == "received") {
+  //   } else if (dataType == "preparing") {
+  //   } else if (dataType == "delivering") {
+  //   } else if (dataType == "delivered") {
+  //     for (dynamic i in storeOrderList) {
+  //       if (i == data) {
+  //         i["orderStatus"] = "delivered";
+  //       }
+  //     }
+  //     filterOrders(0);
+  //   }
+  // }
+  void storeNotificationDataHandler(action, payload) {
+    if (action == "payment_success") {
+    } else if (action == "sent") {
+      showDialog(
+          useSafeArea: true,
+          context: MyApp.navigatorKey.currentContext!,
+          barrierDismissible: false,
+          builder: (context) {
+            return FractionallySizedBox(
+              heightFactor: 0.5,
+              child: Container(
+                margin: const EdgeInsets.all(12),
+                child: Material(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SafeArea(
+                    minimum: const EdgeInsets.symmetric(vertical: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: CustomText(
+                            text: "Шинэ захиалга ирлээ!",
+                          ),
+                        ),
+                        TimeCircularCountdown(
+                          diameter: Get.width * .3,
+                          countdownRemainingColor: MyColors.primary,
+                          unit: CountdownUnit.second,
+                          textStyle: const TextStyle(
+                            color: MyColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                          countdownTotal: 60,
+                          onUpdated: (unit, remainingTime) {},
+                          onFinished: () {},
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          height: 70,
+                          child: Builder(
+                            builder: (contexts) {
+                              final GlobalKey<SlideActionState> key =
+                                  GlobalKey();
+                              return SlideAction(
+                                height: 70,
+                                outerColor: MyColors.black,
+                                innerColor: MyColors.primary,
+                                elevation: 0,
+                                key: key,
+                                submittedIcon: const Icon(
+                                  FontAwesomeIcons.check,
+                                  color: MyColors.white,
+                                ),
+                                onSubmit: () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 300), () {
+                                    key.currentState!.reset();
+                                    // stopSound();
+                                    Get.back();
+                                    showOrdersSetTimeView(context, payload);
+                                    var body = {"orderStatus": "received"};
+                                    _storeCtx.updateOrder(payload["id"], body);
+                                  });
+                                },
+                                alignment: Alignment.centerRight,
+                                sliderButtonIcon: const Icon(
+                                  Icons.double_arrow_rounded,
+                                  color: MyColors.white,
+                                ),
+                                child: const Text(
+                                  "Баталгаажуулах",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+    } else if (action == "received") {
+    } else if (action == "preparing") {
+    } else if (action == "delivering") {
       for (dynamic i in storeOrderList) {
-        if (i == data) {
+        if (i == json.decode(payload)) {
+          i["orderStatus"] = "delivering";
+        }
+      }
+      filterOrders(1);
+    } else if (action == "delivered") {
+      for (dynamic i in storeOrderList) {
+        if (i == json.decode(payload)) {
           i["orderStatus"] = "delivered";
         }
       }
-      filterOrders(0);
-    }
+      filterOrders(2);
+    } else {}
   }
 }

@@ -16,7 +16,6 @@ import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
-import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 
 class StoreMainScreen extends StatefulWidget {
@@ -27,7 +26,6 @@ class StoreMainScreen extends StatefulWidget {
 }
 
 class _StoreMainScreenState extends State<StoreMainScreen> {
-  final _arguments = Get.arguments;
   final _storeCtx = Get.put(StoreController());
   final _loginCtrl = Get.put(LoginController());
   final _networkCtx = Get.put(NetWorkController());
@@ -38,11 +36,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
     saveUserToken();
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
-    if (_arguments != null) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        showOrdersNotificationView(context, json.decode(_arguments));
-      });
-    }
   }
 
   @override

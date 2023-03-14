@@ -39,10 +39,10 @@ void switchNotifications(payload) {
       _userCtx.userNotifications(action, payload);
       break;
     case "store":
-      _storeCtx.storeNotifications(payload);
+      _storeCtx.storeNotifications(action, payload);
       break;
     case "driver":
-      _driverCtx.driverNotifications(payload);
+      _driverCtx.driverNotifications(action, payload);
       break;
     default:
       break;
@@ -57,10 +57,10 @@ void handleNotifications(payload) {
       _userCtx.userNotificationDataHandler(action, payload);
       break;
     case "store":
-      _storeCtx.storeNotificationDataHandler(action);
+      _storeCtx.storeNotificationDataHandler(action, payload);
       break;
     case "driver":
-      _driverCtx.driverNotificationDataHandler(action);
+      _driverCtx.driverNotificationDataHandler(action, payload);
       break;
     default:
       break;
@@ -70,6 +70,7 @@ void handleNotifications(payload) {
 void createCustomNotification(
   payload, {
   bool isVisible = false,
+  bool isCall = false,
   String title = "Erdenet24",
   String body = "",
   bool customSound = false,
@@ -80,7 +81,8 @@ void createCustomNotification(
       displayOnBackground: isVisible,
       criticalAlert: true,
       progress: 32,
-      category: NotificationCategory.Message,
+      category:
+          isCall ? NotificationCategory.Call : NotificationCategory.Message,
       customSound: 'resource://raw/incoming',
       id: 1,
       channelKey: "basic_channel",

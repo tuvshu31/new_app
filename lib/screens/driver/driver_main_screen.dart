@@ -188,7 +188,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       _driverCtx.step.value += 1;
                                     } else if (_driverCtx.step.value == 2) {
                                       _driverCtx.step.value += 1;
-
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 3) {
                                       _driverCtx.updateOrder({

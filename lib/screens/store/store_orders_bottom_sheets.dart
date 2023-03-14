@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -27,96 +28,92 @@ int selectedTime = 0;
 
 void showOrdersNotificationView(context, data) {
   playSound("incoming");
-  showModalBottomSheet(
-    enableDrag: false,
-    isDismissible: false,
-    backgroundColor: MyColors.white,
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return FractionallySizedBox(
-        heightFactor: 0.9,
-        child: SafeArea(
-          minimum: const EdgeInsets.symmetric(vertical: 24),
-          child: Stack(
-            children: [
-              Align(
-                alignment: AlignmentDirectional.topCenter,
-                child: Container(
-                  margin: EdgeInsets.only(top: Get.height * .1),
-                  child: const CustomText(
-                    text: "Шинэ захиалга ирлээ!",
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              Align(
-                alignment: AlignmentDirectional.center,
-                child: TimeCircularCountdown(
-                  diameter: Get.width * .5,
-                  countdownRemainingColor: MyColors.primary,
-                  unit: CountdownUnit.second,
-                  textStyle: const TextStyle(
-                    color: MyColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                  countdownTotal: 60,
-                  onUpdated: (unit, remainingTime) {},
-                  onFinished: () {},
-                ),
-              ),
-              Align(
-                alignment: AlignmentDirectional.bottomEnd,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  height: 70,
-                  child: Builder(
-                    builder: (contexts) {
-                      final GlobalKey<SlideActionState> key = GlobalKey();
-                      return SlideAction(
-                        height: 70,
-                        outerColor: MyColors.black,
-                        innerColor: MyColors.primary,
-                        elevation: 0,
-                        key: key,
-                        submittedIcon: const Icon(
-                          FontAwesomeIcons.check,
-                          color: MyColors.white,
-                        ),
-                        onSubmit: () {
-                          Future.delayed(const Duration(milliseconds: 300), () {
-                            key.currentState!.reset();
-                            stopSound();
-                            Get.back();
-                            showOrdersSetTimeView(context, data);
-                            var body = {"orderStatus": "received"};
-                            _storeCtx.updateOrder(data["id"], body);
-                          });
+  showDialog(
+      useSafeArea: true,
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.5,
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            child: Material(
+              borderRadius: BorderRadius.circular(12),
+              child: SafeArea(
+                minimum: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 12),
+                      child: CustomText(
+                        text: "Шинэ захиалга ирлээ!",
+                        fontSize: 18,
+                      ),
+                    ),
+                    TimeCircularCountdown(
+                      diameter: Get.width * .3,
+                      countdownRemainingColor: MyColors.primary,
+                      unit: CountdownUnit.second,
+                      textStyle: const TextStyle(
+                        color: MyColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                      countdownTotal: 60,
+                      onUpdated: (unit, remainingTime) {},
+                      onFinished: () {},
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      height: 70,
+                      child: Builder(
+                        builder: (contexts) {
+                          final GlobalKey<SlideActionState> key = GlobalKey();
+                          return SlideAction(
+                            height: 70,
+                            outerColor: MyColors.black,
+                            innerColor: MyColors.primary,
+                            elevation: 0,
+                            key: key,
+                            submittedIcon: const Icon(
+                              FontAwesomeIcons.check,
+                              color: MyColors.white,
+                            ),
+                            onSubmit: () {
+                              Future.delayed(const Duration(milliseconds: 300),
+                                  () {
+                                key.currentState!.reset();
+                                stopSound();
+                                Get.back();
+                                showOrdersSetTimeView(context, data);
+                                var body = {"orderStatus": "received"};
+                                _storeCtx.updateOrder(data["id"], body);
+                              });
+                            },
+                            alignment: Alignment.centerRight,
+                            sliderButtonIcon: const Icon(
+                              Icons.double_arrow_rounded,
+                              color: MyColors.white,
+                            ),
+                            child: const Text(
+                              "Баталгаажуулах",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          );
                         },
-                        alignment: Alignment.centerRight,
-                        sliderButtonIcon: const Icon(
-                          Icons.double_arrow_rounded,
-                          color: MyColors.white,
-                        ),
-                        child: const Text(
-                          "Баталгаажуулах",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
+              ),
+            ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      });
 }
 
 void showOrdersSetTimeView(context, data) {
@@ -499,6 +496,7 @@ void storeOrdersToDeliveryView(context, data) {
                                     'phone': data["phone"],
                                     'canceledDrivers': []
                                   };
+                                  log(findDriverBody.toString());
                                   dynamic response = await RestApi()
                                       .assignDriver(findDriverBody);
                                   dynamic d =

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:get/get.dart';
@@ -257,28 +258,30 @@ class DriverController extends GetxController {
     );
   }
 
-  void driverNotifications(message) async {
-    deliveryInfo.value = message.data;
-    storeLocation.value = LatLng(
-      double.parse(deliveryInfo["latitude"]),
-      double.parse(deliveryInfo["longitude"]),
-    );
-    addStoreMarker();
-    getDistance(initialPosition.value, storeLocation.value);
-    step.value = 1;
-    playSound("incoming");
+  void driverNotifications(action, payload) async {
+    if (action == "new_order") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: true,
+        isCall: true,
+        body: "Шинэ захиалга ирлээ",
+      );
+    }
   }
 
-  void driverNotificationDataHandler(message) async {
-    deliveryInfo.value = message.data;
-    storeLocation.value = LatLng(
-      double.parse(deliveryInfo["latitude"]),
-      double.parse(deliveryInfo["longitude"]),
-    );
-    addStoreMarker();
-    getDistance(initialPosition.value, storeLocation.value);
-    step.value = 1;
-    playSound("incoming");
+  void driverNotificationDataHandler(action, payload) async {
+    if (action == "new_order") {
+      deliveryInfo.value = payload;
+      storeLocation.value = LatLng(
+        double.parse(payload["latitude"]),
+        double.parse(payload["longitude"]),
+      );
+      addStoreMarker();
+      getDistance(initialPosition.value, storeLocation.value);
+      step.value = 1;
+      playSound("incoming");
+    }
   }
 
   void updateOrder(dynamic body) async {

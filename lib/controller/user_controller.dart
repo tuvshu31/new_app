@@ -127,43 +127,44 @@ class UserController extends GetxController {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
+        customSound: false,
         body: "Захиалгын төлбөр амжилттай төлөгдлөө",
       );
     } else if (action == "sent") {
       createCustomNotification(
         payload,
-        isVisible: true,
-        customSound: true,
+        isVisible: false,
+        customSound: false,
         body: "Захиалгыг хүлээн авлаа",
       );
     } else if (action == "received") {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
-        body: "Захиалгыг хүлээн авлаа",
+        customSound: false,
+        body: "Таны захиалгыг хүлээн авлаа",
       );
     } else if (action == "preparing") {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
-        body: "Захиалгыг бэлтгэж эхэллээ",
+        customSound: false,
+        body: "Таны захиалгыг бэлтгэж эхэллээ",
       );
     } else if (action == "delivering") {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
-        body: "Захиалга хүргэлтэнд гарлаа",
+        customSound: false,
+        body: "Таны захиалга хүргэлтэнд гарлаа",
       );
     } else if (action == "delivered") {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
-        body: "Захиалга амжилттай хүргэгдлээ",
+        customSound: false,
+        body:
+            "Таны захиалга амжилттай хүргэгдлээ. Манайхаар үйлчилүүлсэнд баярлалаа",
       );
     } else {
       log(payload.toString());
