@@ -45,7 +45,7 @@ void main() async {
         channelKey: "basic_channel",
         channelName: "Basic Notification",
         channelDescription: "Notification channel for basic test",
-        playSound: true,
+        playSound: false,
         importance: NotificationImportance.High,
         soundSource: 'resource://raw/incoming',
       ),

@@ -1,3 +1,4 @@
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:get/get.dart';
 import '../api/restapi_helper.dart';
@@ -10,9 +11,12 @@ class LoginController extends GetxController {
   TextEditingController phoneController = TextEditingController();
   //Хэрэглэгч системээс гарах
   void logout() async {
-    RestApiHelper.saveUserId(0);
-    RestApiHelper.saveUserRole("");
+    var body = {"mapToken": ""};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    RestApiHelper.deleteUserId(0);
+    RestApiHelper.deleteUserRole("");
     RestApiHelper.saveOrderId(0);
+
     _cartCtrl.savedList.clear();
     Get.offAll(() => const SplashPhoneRegisterScreen());
   }

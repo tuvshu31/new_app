@@ -149,11 +149,11 @@ Widget step1() {
                   "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
             ),
             title: CustomText(
-              text: _driverCtx.deliveryInfo["storeName"],
+              text: _driverCtx.deliveryInfo["storeName"] ?? "no data",
               fontSize: 16,
             ),
             subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["storeAddress"],
+              text: _driverCtx.deliveryInfo["storeAddress"] ?? "no data",
               fontSize: 12,
             ),
           ),

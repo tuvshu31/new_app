@@ -54,6 +54,7 @@ class UserController extends GetxController {
   }
 
   void fetchDriverPositionSctream(int driverId) {
+    log("fetchDriverPositionSctreamWorking");
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       dynamic response = await RestApi().getDriver(driverId);
       dynamic d = Map<String, dynamic>.from(response);
@@ -128,6 +129,7 @@ class UserController extends GetxController {
         payload,
         isVisible: true,
         customSound: false,
+        isCall: false,
         body: "Захиалгын төлбөр амжилттай төлөгдлөө",
       );
     } else if (action == "sent") {
@@ -135,6 +137,7 @@ class UserController extends GetxController {
         payload,
         isVisible: false,
         customSound: false,
+        isCall: false,
         body: "Захиалгыг хүлээн авлаа",
       );
     } else if (action == "received") {
@@ -142,6 +145,7 @@ class UserController extends GetxController {
         payload,
         isVisible: true,
         customSound: false,
+        isCall: false,
         body: "Таны захиалгыг хүлээн авлаа",
       );
     } else if (action == "preparing") {
@@ -149,6 +153,7 @@ class UserController extends GetxController {
         payload,
         isVisible: true,
         customSound: false,
+        isCall: false,
         body: "Таны захиалгыг бэлтгэж эхэллээ",
       );
     } else if (action == "delivering") {
@@ -156,6 +161,7 @@ class UserController extends GetxController {
         payload,
         isVisible: true,
         customSound: false,
+        isCall: false,
         body: "Таны захиалга хүргэлтэнд гарлаа",
       );
     } else if (action == "delivered") {
@@ -163,6 +169,7 @@ class UserController extends GetxController {
         payload,
         isVisible: true,
         customSound: false,
+        isCall: false,
         body:
             "Таны захиалга амжилттай хүргэгдлээ. Манайхаар үйлчилүүлсэнд баярлалаа",
       );
@@ -172,6 +179,7 @@ class UserController extends GetxController {
   }
 
   void userActiveOrderChangeView(int activeStep) {
+    log("fetchDriverPositionSctreamWorking: $activeStep");
     activeOrderStep.value = activeStep;
     activeOrderPageController.value.animateToPage(
       activeOrderStep.value,
@@ -193,17 +201,18 @@ class UserController extends GetxController {
       );
     } else if (action == "sent") {
       log(payload.toString());
+      userActiveOrderChangeView(0);
     } else if (action == "received") {
       userActiveOrderChangeView(1);
     } else if (action == "preparing") {
       userActiveOrderChangeView(2);
     } else if (action == "delivering") {
       userActiveOrderChangeView(3);
-      var jsonData = json.decode(payload);
-      fetchDriverPositionSctream(int.parse(jsonData["deliveryDriverId"]));
+      fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      Get.to(() => const UserHomeScreen());
+      userActiveOrderChangeView(0);
       RestApiHelper.saveOrderId(0);
+      Get.off(() => const UserHomeScreen());
     } else {}
   }
 }

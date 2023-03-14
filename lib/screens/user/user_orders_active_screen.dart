@@ -1,4 +1,5 @@
 import 'package:Erdenet24/api/notifications.dart';
+import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -33,6 +34,11 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     super.initState();
     saveUserToken();
     _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   _percent() {

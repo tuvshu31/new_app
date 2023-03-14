@@ -272,16 +272,24 @@ class DriverController extends GetxController {
 
   void driverNotificationDataHandler(action, payload) async {
     if (action == "new_order") {
+      // log("driverNotificationDataHandler: ${payload["data"]}");
+      // log("driverNotificationDataHandlerType: ${payload.runtimeType}");
       deliveryInfo.value = payload;
+      log("thisismypayload: $payload");
       storeLocation.value = LatLng(
-        double.parse(payload["latitude"]),
-        double.parse(payload["longitude"]),
+        double.parse(deliveryInfo["latitude"]),
+        double.parse(deliveryInfo["longitude"]),
       );
       addStoreMarker();
       getDistance(initialPosition.value, storeLocation.value);
       step.value = 1;
       playSound("incoming");
     }
+  }
+
+  void isOpenAndIsCLose(int id) async {
+    var body = {"isOpen": id};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
   }
 
   void updateOrder(dynamic body) async {

@@ -28,7 +28,6 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   late bool isLoading;
   final _incoming = Get.arguments;
   final _cartCtx = Get.put(CartController());
-  final _userCtx = Get.put(UserController());
 
   PageController pageController = PageController(initialPage: 0);
 
@@ -77,7 +76,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     };
     dynamic orderResponse = await RestApi().createOrder(orderBody);
     dynamic orderData = Map<String, dynamic>.from(orderResponse);
-    _cartCtx.cartList.clear();
+
     if (orderData["success"]) {
       var qpayBody = {
         "sender_invoice_no": orderData["data"]["id"].toString(),
@@ -86,6 +85,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
       dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
       dynamic resString = json.decode(qpayData["data"]);
+      _cartCtx.cartList.clear();
       _launchUrl(Uri.parse(resString["urls"][bankIndex]["link"]));
     }
     Get.back();

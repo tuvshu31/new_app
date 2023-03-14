@@ -301,6 +301,7 @@ void showOrdersSetTimeView(context, data) {
                                     key.currentState!.reset();
                                     Get.back();
                                     data["orderStatus"] = "preparing";
+
                                     data["prepDuration"] =
                                         _storeCtx.prepDuration.value.toString();
                                     _storeCtx.storeOrderList.add(data);
@@ -501,6 +502,7 @@ void storeOrdersToDeliveryView(context, data) {
                                       .assignDriver(findDriverBody);
                                   dynamic d =
                                       Map<String, dynamic>.from(response);
+                                  log("notifyToDrivers $d");
                                   Get.back();
                                   // notifyToDrivers(context, data);
                                 });

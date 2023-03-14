@@ -5,18 +5,15 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
 final _storeCtx = Get.put(StoreController());
@@ -92,61 +89,37 @@ class StoreController extends GetxController {
       createCustomNotification(
         payload,
         isVisible: true,
-        customSound: true,
+        customSound: false,
         isCall: true,
         body: "Шинэ захиалга ирлээ",
       );
     } else if (action == "received") {
     } else if (action == "preparing") {
     } else if (action == "delivering") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: false,
+        isCall: false,
+        body: "Хүргэлтэнд гарлаа",
+      );
     } else if (action == "delivered") {
+      createCustomNotification(
+        payload,
+        isVisible: true,
+        customSound: false,
+        isCall: false,
+        body: "Хүргэлт амжилттай",
+      );
     } else {
       log(payload.toString());
     }
   }
 
-  // void storeNotifications(message) {
-  //   var data = message.data;
-  //   var jsonData = json.decode(data["data"]);
-  //   var dataType = data["type"];
-  //   if (dataType == "sent") {
-  //     // showOrdersNotificationView(context, jsonData);
-  //     log("Hello");
-  //   } else if (dataType == "received") {
-  //   } else if (dataType == "preparing") {
-  //   } else if (dataType == "delivering") {
-  //   } else if (dataType == "delivered") {
-  //     for (dynamic i in storeOrderList) {
-  //       if (i == data) {
-  //         i["orderStatus"] = "delivered";
-  //       }
-  //     }
-  //     filterOrders(0);
-  //   }
-  // }
-
-  // void storeNotificationDataHandler(message) {
-  //   var data = message.data;
-  //   var jsonData = json.decode(data["data"]);
-  //   var dataType = data["type"];
-  //   if (dataType == "sent") {
-  //     // showOrdersNotificationView(context, jsonData);
-  //     log("Hello");
-  //   } else if (dataType == "received") {
-  //   } else if (dataType == "preparing") {
-  //   } else if (dataType == "delivering") {
-  //   } else if (dataType == "delivered") {
-  //     for (dynamic i in storeOrderList) {
-  //       if (i == data) {
-  //         i["orderStatus"] = "delivered";
-  //       }
-  //     }
-  //     filterOrders(0);
-  //   }
-  // }
   void storeNotificationDataHandler(action, payload) {
     if (action == "payment_success") {
     } else if (action == "sent") {
+      playSound("incoming");
       showDialog(
           useSafeArea: true,
           context: MyApp.navigatorKey.currentContext!,
@@ -203,7 +176,7 @@ class StoreController extends GetxController {
                                   Future.delayed(
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
-                                    // stopSound();
+                                    stopSound();
                                     Get.back();
                                     showOrdersSetTimeView(context, payload);
                                     var body = {"orderStatus": "received"};
@@ -237,18 +210,20 @@ class StoreController extends GetxController {
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       for (dynamic i in storeOrderList) {
-        if (i == json.decode(payload)) {
+        if (i["id"] == payload["id"]) {
+          log("orderStatus: ${i["id"]}");
           i["orderStatus"] = "delivering";
         }
       }
-      filterOrders(1);
+
+      filterOrders(0);
     } else if (action == "delivered") {
       for (dynamic i in storeOrderList) {
-        if (i == json.decode(payload)) {
+        if (i["id"] == payload["id"]) {
           i["orderStatus"] = "delivered";
         }
       }
-      filterOrders(2);
+      filterOrders(0);
     } else {}
   }
 }

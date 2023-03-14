@@ -21,6 +21,7 @@ final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
 
 void saveUserToken() async {
+  await FirebaseMessaging.instance.deleteToken();
   final fcmToken = await FirebaseMessaging.instance.getToken();
   var body = {"mapToken": fcmToken};
   await RestApi().updateUser(RestApiHelper.getUserId(), body);
@@ -31,7 +32,6 @@ void saveUserToken() async {
 }
 
 void switchNotifications(payload) {
-  log("switchNotifications: $payload");
   var role = jsonDecode(payload["data"])["role"];
   var action = jsonDecode(payload["data"])["action"];
   switch (role) {
@@ -98,7 +98,7 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
-    log("onNotificationCreatedMethod $receivedNotification");
+    log("onNotificationCreatedMethod");
     var data = jsonDecode(receivedNotification.payload!["data"]!);
     handleNotifications(data);
   }
@@ -109,7 +109,7 @@ class NotificationController {
       ReceivedNotification receivedNotification) async {
     // Your code goes here
 
-    log("onNotificationDisplayedMethod ${receivedNotification}");
+    log("onNotificationDisplayedMethod");
   }
 
   /// Use this method to detect if the user dismissed a notification
