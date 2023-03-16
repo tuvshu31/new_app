@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -7,6 +10,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
@@ -24,7 +28,7 @@ class UserCartAddressInfoScreen extends StatefulWidget {
 }
 
 class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
-  final _cartCtrl = Get.put(CartController());
+  final _cartCtx = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
   bool isPhoneOk = false;
   bool isAddressOk = false;
@@ -56,6 +60,29 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     isPhoneOk = phone.text.isNotEmpty;
     isAddressOk = address.text.isNotEmpty;
     setState(() {});
+  }
+
+  void createInvoice() async {
+    loadingDialog(context);
+    int storeId = int.parse(_cartCtx.stores[0]);
+    int randomNumber = random4digit();
+    var orderId = int.parse(("$storeId" "$randomNumber"));
+    var qpayBody = {
+      "sender_invoice_no": orderId.toString(),
+      "amount": 100,
+    };
+    dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
+    dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
+    Get.back();
+    if (qpayData["success"]) {
+      Get.off(() => const UserOrderPaymentScreen(), arguments: {
+        "orderId": orderId,
+        "phone": phone.text,
+        "address": address.text,
+        "kode": kod.text,
+        "data": jsonDecode(qpayData["data"]),
+      });
+    }
   }
 
   @override
@@ -159,7 +186,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
               const CustomText(text: "Захиалгын үнэ:"),
               CustomText(
                 text: convertToCurrencyFormat(
-                  _cartCtrl.subTotal,
+                  _cartCtx.subTotal,
                   toInt: true,
                   locatedAtTheEnd: true,
                 ),
@@ -172,7 +199,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
               CustomText(text: "Хүргэлтийн үнэ:"),
               CustomText(
                 text: convertToCurrencyFormat(
-                  _cartCtrl.deliveryCost,
+                  _cartCtx.deliveryCost,
                   toInt: true,
                   locatedAtTheEnd: true,
                 ),
@@ -185,7 +212,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
               CustomText(text: "Нийт үнэ:"),
               CustomText(
                 text: convertToCurrencyFormat(
-                  _cartCtrl.total,
+                  _cartCtx.total,
                   toInt: true,
                   locatedAtTheEnd: true,
                 ),
@@ -197,11 +224,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             text: "Төлбөр төлөх",
             isActive: isPhoneOk && isAddressOk,
             onPressed: () {
-              Get.to(() => const UserOrderPaymentScreen(), arguments: {
-                "phone": phone.text,
-                "address": address.text,
-                "kode": kod.text
-              });
+              createInvoice();
             },
           )
         ],

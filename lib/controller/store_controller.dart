@@ -10,6 +10,7 @@ import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -83,10 +84,11 @@ class StoreController extends GetxController {
     await RestApi().updateOrder(id, body);
   }
 
-  void storeNotifications(action, payload) {
+  void storeNotifications(action, payload, isBackground) {
     if (action == "payment_success") {
     } else if (action == "sent") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -97,6 +99,7 @@ class StoreController extends GetxController {
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -105,6 +108,7 @@ class StoreController extends GetxController {
       );
     } else if (action == "delivered") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -177,6 +181,8 @@ class StoreController extends GetxController {
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
                                     stopSound();
+                                    AwesomeNotifications().dismiss(1);
+
                                     Get.back();
                                     showOrdersSetTimeView(context, payload);
                                     var body = {"orderStatus": "received"};

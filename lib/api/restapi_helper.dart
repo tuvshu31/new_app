@@ -3,6 +3,10 @@ import 'package:hive/hive.dart';
 class RestApiHelper {
   static Box? authBox;
   // Login хийсэн хэрэглэгчийн ID-г хадлагах, авах
+  void deleteBoxInfo() async {
+    await authBox!.deleteFromDisk();
+  }
+
   static void saveUserId(int id) => authBox?.put("id", id);
   static void deleteUserId(int id) => authBox?.delete(id);
   static int getUserId() => authBox?.get("id", defaultValue: 0);

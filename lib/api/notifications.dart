@@ -31,18 +31,18 @@ void saveUserToken() async {
   });
 }
 
-void switchNotifications(payload) {
+void switchNotifications(payload, isBackground) {
   var role = jsonDecode(payload["data"])["role"];
   var action = jsonDecode(payload["data"])["action"];
   switch (role) {
     case "user":
-      _userCtx.userNotifications(action, payload);
+      _userCtx.userNotifications(action, payload, isBackground);
       break;
     case "store":
-      _storeCtx.storeNotifications(action, payload);
+      _storeCtx.storeNotifications(action, payload, isBackground);
       break;
     case "driver":
-      _driverCtx.driverNotifications(action, payload);
+      _driverCtx.driverNotifications(action, payload, isBackground);
       break;
     default:
       break;
@@ -68,6 +68,7 @@ void handleNotifications(payload) {
 }
 
 void createCustomNotification(
+  isBackground,
   payload, {
   bool isVisible = false,
   bool isCall = false,
@@ -81,8 +82,9 @@ void createCustomNotification(
       displayOnBackground: isVisible,
       criticalAlert: true,
       progress: 32,
-      category:
-          isCall ? NotificationCategory.Call : NotificationCategory.Message,
+      category: isBackground
+          ? (isCall ? NotificationCategory.Call : NotificationCategory.Message)
+          : NotificationCategory.Message,
       customSound: 'resource://raw/incoming',
       id: 1,
       channelKey: "basic_channel",

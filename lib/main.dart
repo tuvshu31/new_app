@@ -30,7 +30,7 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  switchNotifications(message.data);
+  switchNotifications(message.data, true);
 }
 
 void main() async {
@@ -59,7 +59,7 @@ void main() async {
   });
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    switchNotifications(message.data);
+    switchNotifications(message.data, false);
   });
 
   await Hive.initFlutter();

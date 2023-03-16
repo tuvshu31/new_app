@@ -258,9 +258,10 @@ class DriverController extends GetxController {
     );
   }
 
-  void driverNotifications(action, payload) async {
+  void driverNotifications(action, payload, isBackground) async {
     if (action == "new_order") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: true,
@@ -272,10 +273,7 @@ class DriverController extends GetxController {
 
   void driverNotificationDataHandler(action, payload) async {
     if (action == "new_order") {
-      // log("driverNotificationDataHandler: ${payload["data"]}");
-      // log("driverNotificationDataHandlerType: ${payload.runtimeType}");
       deliveryInfo.value = payload;
-      log("thisismypayload: $payload");
       storeLocation.value = LatLng(
         double.parse(deliveryInfo["latitude"]),
         double.parse(deliveryInfo["longitude"]),

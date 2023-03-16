@@ -7,6 +7,7 @@ import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -123,9 +124,10 @@ class UserController extends GetxController {
     log(d.toString());
   }
 
-  void userNotifications(action, payload) {
+  void userNotifications(action, payload, isBackground) {
     if (action == "payment_success") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -134,6 +136,7 @@ class UserController extends GetxController {
       );
     } else if (action == "sent") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: false,
         customSound: false,
@@ -142,6 +145,7 @@ class UserController extends GetxController {
       );
     } else if (action == "received") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -150,6 +154,7 @@ class UserController extends GetxController {
       );
     } else if (action == "preparing") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -158,6 +163,7 @@ class UserController extends GetxController {
       );
     } else if (action == "delivering") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,
@@ -166,6 +172,7 @@ class UserController extends GetxController {
       );
     } else if (action == "delivered") {
       createCustomNotification(
+        isBackground,
         payload,
         isVisible: true,
         customSound: false,

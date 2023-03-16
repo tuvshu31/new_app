@@ -13,6 +13,7 @@ class LoginController extends GetxController {
   void logout() async {
     var body = {"mapToken": ""};
     await RestApi().updateUser(RestApiHelper.getUserId(), body);
+
     RestApiHelper.deleteUserId(0);
     RestApiHelper.deleteUserRole("");
     RestApiHelper.saveOrderId(0);

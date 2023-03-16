@@ -37,14 +37,8 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   void initState() {
     super.initState();
     isLoading = false;
-    fetchBankList();
-  }
-
-  Future<void> fetchBankList() async {
-    String banks = await rootBundle.loadString('assets/json/banks.json');
-    dynamic banksJson = await json.decode(banks);
     setState(() {
-      bankList = banksJson;
+      bankList = _incoming['data']['urls'];
     });
   }
 
@@ -54,16 +48,13 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     }
   }
 
-  void createInvoice(int bankIndex) async {
+  void createOrder(int index) async {
     setState(() {
       isLoading = true;
     });
     loadingDialog(context);
-    int storeId = int.parse(_cartCtx.stores[0]);
-    int randomNumber = random4digit();
-    var orderId = int.parse(("$storeId" "$randomNumber"));
     var orderBody = {
-      "orderId": orderId,
+      "orderId": _incoming["orderId"],
       "userId": RestApiHelper.getUserId(),
       "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
       "address": _incoming["address"],
@@ -76,17 +67,9 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     };
     dynamic orderResponse = await RestApi().createOrder(orderBody);
     dynamic orderData = Map<String, dynamic>.from(orderResponse);
-
     if (orderData["success"]) {
-      var qpayBody = {
-        "sender_invoice_no": orderData["data"]["id"].toString(),
-        "amount": 100
-      };
-      dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
-      dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
-      dynamic resString = json.decode(qpayData["data"]);
       _cartCtx.cartList.clear();
-      _launchUrl(Uri.parse(resString["urls"][bankIndex]["link"]));
+      _launchUrl(Uri.parse(_incoming["data"]["urls"][index]["link"]));
     }
     Get.back();
   }
@@ -139,65 +122,65 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   }
 
   Widget _cashView() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: Get.width * .05),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: Get.height * .03),
-            const CustomText(text: "Төлөх дүн:"),
-            const SizedBox(height: 8),
-            CustomText(
-              fontSize: 18,
-              color: MyColors.primary,
-              text: convertToCurrencyFormat(
-                _cartCtx.total,
-                toInt: true,
-                locatedAtTheEnd: true,
-              ),
-            ),
-            const SizedBox(height: 12),
-            GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: bankList.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (context, index) {
-                  var bank = bankList[index];
-                  return Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: MyColors.fadedGrey,
-                        borderRadius: BorderRadius.circular(12)),
-                    child: CustomInkWell(
-                      onTap: (() {
-                        isLoading ? null : createInvoice(index);
-                      }),
-                      child: Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(
-                                width: Get.width * .1,
-                                image: AssetImage(
-                                    "assets/images/png/bank/${bank["id"]}.png"),
-                              ),
-                              const SizedBox(height: 6),
-                              CustomText(
-                                text: bank["name"],
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                              )
-                            ]),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Image.memory(
+            base64Decode(_incoming["data"]["qr_image"]),
+            width: Get.width * .4,
+            height: Get.width * .4,
+          ),
+          const SizedBox(height: 12),
+          ListView.separated(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
+            separatorBuilder: (context, index) {
+              return const SizedBox(height: 14);
+            },
+            physics: const BouncingScrollPhysics(),
+            itemCount: bankList.length,
+            itemBuilder: (context, index) {
+              var bank = bankList[index];
+              return CustomInkWell(
+                onTap: () {
+                  !isLoading ? createOrder(index) : null;
+                },
+                child: Card(
+                  elevation: 1,
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListTile(
+                    leading: Container(
+                      margin: const EdgeInsets.all(10),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Image.network(
+                        bank["logo"],
                       ),
                     ),
-                  );
-                }),
-          ],
-        ),
+                    title: CustomText(
+                      text: bank["description"],
+                      fontSize: 14,
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 18,
+                      color: MyColors.black,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+        ],
       ),
     );
   }

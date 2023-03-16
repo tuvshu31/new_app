@@ -16,6 +16,7 @@
                android:value="AIzaSyAHTYs2cMm87YH3wppr6wTtKRZxfyXjvB4"/>
         <activity
             android:allowBackup="false"
+            android:fullBackupOnly="false"
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
