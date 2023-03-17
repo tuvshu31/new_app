@@ -182,7 +182,6 @@ class StoreController extends GetxController {
                                     key.currentState!.reset();
                                     stopSound();
                                     AwesomeNotifications().dismiss(1);
-
                                     Get.back();
                                     showOrdersSetTimeView(context, payload);
                                     var body = {"orderStatus": "received"};

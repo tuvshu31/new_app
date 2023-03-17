@@ -25,7 +25,6 @@ class UserOrderPaymentScreen extends StatefulWidget {
 }
 
 class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
-  late bool isLoading;
   final _incoming = Get.arguments;
   final _cartCtx = Get.put(CartController());
 
@@ -36,7 +35,6 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   @override
   void initState() {
     super.initState();
-    isLoading = false;
     setState(() {
       bankList = _incoming['data']['urls'];
     });
@@ -49,9 +47,6 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   }
 
   void createOrder(int index) async {
-    setState(() {
-      isLoading = true;
-    });
     loadingDialog(context);
     var orderBody = {
       "orderId": _incoming["orderId"],
@@ -60,6 +55,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
       "address": _incoming["address"],
       "orderStatus": "notPaid",
       "totalAmount": _cartCtx.total,
+      "storeTotalAmount": _cartCtx.subTotal,
       "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
       "phone": _incoming["phone"],
       "kod": _incoming["kode"],
@@ -68,7 +64,6 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     dynamic orderResponse = await RestApi().createOrder(orderBody);
     dynamic orderData = Map<String, dynamic>.from(orderResponse);
     if (orderData["success"]) {
-      _cartCtx.cartList.clear();
       _launchUrl(Uri.parse(_incoming["data"]["urls"][index]["link"]));
     }
     Get.back();
@@ -146,7 +141,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
               var bank = bankList[index];
               return CustomInkWell(
                 onTap: () {
-                  !isLoading ? createOrder(index) : null;
+                  createOrder(index);
                 },
                 child: Card(
                   elevation: 1,
@@ -156,7 +151,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
                   ),
                   child: ListTile(
                     leading: Container(
-                      margin: const EdgeInsets.all(10),
+                      width: Get.width * .09,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),

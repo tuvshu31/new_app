@@ -227,7 +227,8 @@ void showOrdersSetTimeView(context, data) {
                                   ),
                                   trailing: CustomText(
                                     text: convertToCurrencyFormat(
-                                      int.parse(data["totalAmount"].toString()),
+                                      int.parse(
+                                          data["storeTotalAmount"].toString()),
                                       locatedAtTheEnd: true,
                                       toInt: true,
                                     ),

@@ -14,8 +14,8 @@ class LoginController extends GetxController {
     var body = {"mapToken": ""};
     await RestApi().updateUser(RestApiHelper.getUserId(), body);
 
-    RestApiHelper.deleteUserId(0);
-    RestApiHelper.deleteUserRole("");
+    RestApiHelper.saveUserId(0);
+    RestApiHelper.saveUserRole("");
     RestApiHelper.saveOrderId(0);
 
     _cartCtrl.savedList.clear();

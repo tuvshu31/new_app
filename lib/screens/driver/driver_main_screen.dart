@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
@@ -180,6 +181,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                     key.currentState!.reset();
                                     if (_driverCtx.step.value == 1) {
                                       stopSound();
+                                      AwesomeNotifications().dismiss(1);
                                       _driverCtx.updateOrder({
                                         "deliveryDriverId":
                                             RestApiHelper.getUserId().toString()

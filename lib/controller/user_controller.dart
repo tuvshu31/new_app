@@ -7,12 +7,13 @@ import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+final _cartCtx = Get.put(CartController());
 
 class UserController extends GetxController {
   RxInt activeOrderStep = 0.obs;
@@ -203,6 +204,7 @@ class UserController extends GetxController {
           var body = {"orderStatus": "sent"};
           updateOrder(payload["id"], body);
           RestApiHelper.saveOrderId(payload["id"]);
+          _cartCtx.cartList.clear();
           Get.off(() => const UserOrderActiveScreen());
         },
       );
