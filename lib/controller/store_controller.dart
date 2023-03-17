@@ -214,13 +214,13 @@ class StoreController extends GetxController {
     } else if (action == "received") {
     } else if (action == "preparing") {
     } else if (action == "delivering") {
+      Get.back();
       for (dynamic i in storeOrderList) {
         if (i["id"] == payload["id"]) {
           log("orderStatus: ${i["id"]}");
           i["orderStatus"] = "delivering";
         }
       }
-
       filterOrders(0);
     } else if (action == "delivered") {
       for (dynamic i in storeOrderList) {

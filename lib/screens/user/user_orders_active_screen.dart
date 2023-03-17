@@ -157,8 +157,12 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                       children: [
                         CustomText(
                             text:
-                                "Захиалгын дугаар: ${_userCtx.userOrderList[0]["orderId"]}"),
+                                "Захиалгын код: ${_userCtx.userOrderList[0]["orderId"]}"),
+                        //         CustomText(
+                        // text:
+                        //     "Захиалгын дугаар: ${_userCtx.userOrderList[0]["userAndDriverCode"]}"),
                         const SizedBox(height: 4),
+
                         CustomText(
                           text: _userCtx.userOrderList[0]["orderTime"],
                           color: MyColors.gray,

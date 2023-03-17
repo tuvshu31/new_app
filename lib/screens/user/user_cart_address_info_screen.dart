@@ -66,6 +66,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     loadingDialog(context);
     int storeId = int.parse(_cartCtx.stores[0]);
     int randomNumber = random4digit();
+    int userAndDriverCode = random4digit();
     var orderId = int.parse(("$storeId" "$randomNumber"));
     var qpayBody = {
       "sender_invoice_no": orderId.toString(),
@@ -81,6 +82,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
         "address": address.text,
         "kode": kod.text,
         "data": jsonDecode(qpayData["data"]),
+        "userAndDriverCode": userAndDriverCode,
       });
     }
   }

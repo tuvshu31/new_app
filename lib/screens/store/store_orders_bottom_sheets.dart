@@ -505,7 +505,7 @@ void storeOrdersToDeliveryView(context, data) {
                                       Map<String, dynamic>.from(response);
                                   log("notifyToDrivers $d");
                                   Get.back();
-                                  // notifyToDrivers(context, data);
+                                  notifyToDrivers(context, data);
                                 });
                               },
                               alignment: Alignment.centerRight,
@@ -552,23 +552,23 @@ void notifyToDrivers(context, data) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: AnimatedTextKit(
-                      repeatForever: true,
-                      animatedTexts: [
-                        RotateAnimatedText(
-                          '1 жолооч татгалзлаа',
-                          textStyle: TextStyle(
-                            color: MyColors.primary,
-                          ),
-                        ),
-                      ],
-                      onTap: () {
-                        print("Tap Event");
-                      },
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 12),
+                  //   child: AnimatedTextKit(
+                  //     repeatForever: true,
+                  //     animatedTexts: [
+                  //       RotateAnimatedText(
+                  //         '1 жолооч татгалзлаа',
+                  //         textStyle: TextStyle(
+                  //           color: MyColors.primary,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //     onTap: () {
+                  //       print("Tap Event");
+                  //     },
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8, bottom: 8),
                     child: IconButton(
