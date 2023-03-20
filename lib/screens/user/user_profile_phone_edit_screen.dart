@@ -11,14 +11,15 @@ import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-class PhoneEditView extends StatefulWidget {
-  const PhoneEditView({super.key});
+class UserProfilePhoneEditView extends StatefulWidget {
+  const UserProfilePhoneEditView({super.key});
 
   @override
-  State<PhoneEditView> createState() => _PhoneEditViewState();
+  State<UserProfilePhoneEditView> createState() =>
+      _UserProfilePhoneEditViewState();
 }
 
-class _PhoneEditViewState extends State<PhoneEditView> {
+class _UserProfilePhoneEditViewState extends State<UserProfilePhoneEditView> {
   TextEditingController phoneController = TextEditingController();
   bool phoneIsOk = false;
   dynamic _user = [];

@@ -1,25 +1,80 @@
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/loading.dart';
-import 'package:get/get.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:flutter/material.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
 
-class UserOrdersListScreen extends StatefulWidget {
-  const UserOrdersListScreen({super.key});
+import 'package:get/get.dart';
+
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
+
+class UserProfileOrdersScreen extends StatefulWidget {
+  const UserProfileOrdersScreen({super.key});
 
   @override
-  State<UserOrdersListScreen> createState() => _UserOrdersListScreenState();
+  State<UserProfileOrdersScreen> createState() =>
+      _UserProfileOrdersScreenState();
 }
 
-class _UserOrdersListScreenState extends State<UserOrdersListScreen> {
+class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
   final _userCtx = Get.put(UserController());
+  PageController pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _userCtx.filterOrders("delivered");
+  }
 
   @override
   Widget build(BuildContext context) {
+    return CustomHeader(
+      withTabBar: true,
+      title: "Захиалгууд",
+      customActions: Container(),
+      body: Column(
+        children: [
+          DefaultTabController(
+            length: 2,
+            initialIndex: 0,
+            child: TabBar(
+              onTap: ((value) {
+                pageController.animateToPage(
+                  value,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.bounceInOut,
+                );
+                var status = value == 0 ? "delivered" : "cancelled";
+                _userCtx.filterOrders(status);
+              }),
+              labelColor: MyColors.primary,
+              unselectedLabelColor: MyColors.black,
+              indicatorColor: MyColors.primary,
+              tabs: const [
+                Tab(text: "Хүргэгдсэн"),
+                Tab(text: "Цуцлагдсан"),
+              ],
+            ),
+          ),
+          Expanded(
+            child: PageView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: pageController,
+              children: [
+                _userOrdersListWidget(),
+                _userOrdersListWidget(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _userOrdersListWidget() {
     return Obx(
       () => _userCtx.filteredOrderList.isEmpty
           ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
@@ -33,7 +88,8 @@ class _UserOrdersListScreenState extends State<UserOrdersListScreen> {
               itemBuilder: (context, index) {
                 var data = _userCtx.filteredOrderList[index];
                 return _listItem(data);
-              }),
+              },
+            ),
     );
   }
 

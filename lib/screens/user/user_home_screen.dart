@@ -34,19 +34,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     saveUserToken();
     Timer(const Duration(seconds: 1), () => testingVersionModal(context));
     _userCtx.getOrders();
-    // _userCtx.onBackgroundMessagingListerners();
   }
-
-  // void getUserInfo() async {
-  //   loadingDialog(context);
-  //   var query = {"id": RestApiHelper.getUserId()};
-  //   dynamic res = await RestApi().getUsers(query);
-  //   dynamic data = Map<String, dynamic>.from(res);
-  //   log(data.toString());
-  //   // setState(() {
-  //   //   _user = data["data"][0];
-  //   // });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +43,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       const UserStoreListScreen(),
       const UserCartScreen(),
       const UserSavedScreen(),
-      const ProfileScreen()
+      const UserProfileScreen()
     ];
 
     return Obx(

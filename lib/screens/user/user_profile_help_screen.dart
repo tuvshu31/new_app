@@ -1,10 +1,12 @@
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
+
 import 'package:iconly/iconly.dart';
+import 'package:expandable/expandable.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/widgets/header.dart';
 
 class UserProfileHelpScreen extends StatefulWidget {
   const UserProfileHelpScreen({super.key});
@@ -80,7 +82,7 @@ class _UserProfileHelpScreenState extends State<UserProfileHelpScreen> {
         ),
         collapsed: Container(),
         expanded: Container(
-            margin: EdgeInsets.only(
+            margin: const EdgeInsets.only(
               right: 24,
               left: 24,
               bottom: 12,
