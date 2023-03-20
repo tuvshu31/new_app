@@ -17,14 +17,14 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 
-class UserProductScreenNew extends StatefulWidget {
-  const UserProductScreenNew({Key? key}) : super(key: key);
+class UserProductScreen extends StatefulWidget {
+  const UserProductScreen({Key? key}) : super(key: key);
 
   @override
-  State<UserProductScreenNew> createState() => _UserProductScreenNewState();
+  State<UserProductScreen> createState() => _UserProductScreenState();
 }
 
-class _UserProductScreenNewState extends State<UserProductScreenNew> {
+class _UserProductScreenState extends State<UserProductScreen> {
   final _incoming = Get.arguments;
   dynamic _data = [];
   bool _isSaved = false;

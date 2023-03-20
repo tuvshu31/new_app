@@ -164,8 +164,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(
             name: "/CategoryNoTabbar",
             page: () => const UserSubCategoryProductsScreen()),
-        GetPage(
-            name: "/ProductsRoute", page: () => const UserProductScreenNew()),
+        GetPage(name: "/ProductsRoute", page: () => const UserProductScreen()),
         GetPage(name: "/SearchRoute", page: () => const UserSearchMainScreen()),
         GetPage(
             name: "/OrdersRoute",

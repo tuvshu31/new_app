@@ -75,10 +75,6 @@ class MyDimentions {
   static const double elevation = 2;
 }
 
-class MyTexts {
-  static const contract = "";
-}
-
 String capitalize(String value) {
   var result = value[0].toUpperCase();
   bool cap = true;
