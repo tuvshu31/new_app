@@ -1,11 +1,8 @@
-import 'dart:developer';
 import 'dart:convert';
-import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:flutter/services.dart';
+import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
@@ -50,17 +47,19 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     loadingDialog(context);
     var orderBody = {
       "orderId": _incoming["orderId"],
+      "userAndDriverCode": _incoming["userAndDriverCode"],
       "userId": RestApiHelper.getUserId(),
       "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
       "address": _incoming["address"],
       "orderStatus": "notPaid",
       "totalAmount": _cartCtx.total,
-      "storeTotalAmount": _cartCtx.subTotal,
+      "storeTotalAmount": _cartCtx.subTotal.toString(),
       "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
       "phone": _incoming["phone"],
       "kod": _incoming["kode"],
       "products": _cartCtx.cartList,
     };
+    log(orderBody.toString());
     dynamic orderResponse = await RestApi().createOrder(orderBody);
     dynamic orderData = Map<String, dynamic>.from(orderResponse);
     if (orderData["success"]) {

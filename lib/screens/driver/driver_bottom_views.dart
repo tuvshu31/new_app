@@ -239,13 +239,9 @@ Widget step3() {
         ),
         const SizedBox(height: 12),
         CustomText(
-          text: _driverCtx.deliveryInfo["orderId"],
+          text: _driverCtx.deliveryInfo["userAndDriverCode"],
           fontSize: 28,
         ),
-        // CustomText(
-        //   text: _driverCtx.deliveryInfo["userAndDriverCode"],
-        //   fontSize: 28,
-        // ),
         const SizedBox(height: 12),
         SlideCountdownSeparated(
           duration: const Duration(minutes: 15),

@@ -94,7 +94,6 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
               itemCount: _storeCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
                 var data = _storeCtx.filteredOrderList[index];
-
                 return GestureDetector(
                   onTap: (() {
                     storeOrdersToDeliveryView(context, data);
