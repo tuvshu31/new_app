@@ -17,14 +17,16 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-class EditProductInfo extends StatefulWidget {
-  const EditProductInfo({super.key});
+class StoreProductsEditProductScreen extends StatefulWidget {
+  const StoreProductsEditProductScreen({super.key});
 
   @override
-  State<EditProductInfo> createState() => _EditProductInfoState();
+  State<StoreProductsEditProductScreen> createState() =>
+      _StoreProductsEditProductScreenState();
 }
 
-class _EditProductInfoState extends State<EditProductInfo> {
+class _StoreProductsEditProductScreenState
+    extends State<StoreProductsEditProductScreen> {
   final _incoming = Get.arguments;
   final _helpCtrl = Get.put(HelpController());
   TextEditingController productName = TextEditingController();

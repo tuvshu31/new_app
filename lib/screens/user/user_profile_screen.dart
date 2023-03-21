@@ -70,7 +70,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       trailing: IconButton(
                         onPressed: () {
-                          Get.to(() => const UserProfilePhoneEditView());
+                          Get.to(() => const UserProfilePhoneEditScreen());
                         },
                         icon: const Icon(
                           IconlyLight.edit_square,

@@ -12,7 +12,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
-import 'package:Erdenet24/screens/store/store_products_edit_product_info.dart';
 
 class StoreProductsEditProductsScreen extends StatefulWidget {
   const StoreProductsEditProductsScreen({super.key});
@@ -90,7 +89,8 @@ class _StoreProductsEditProductsScreenState
               List ontap = [
                 () {
                   Get.back();
-                  Get.to(() => const EditProductInfo(), arguments: data);
+                  Get.to(() => const StoreProductsEditProductsScreen(),
+                      arguments: data);
                 },
                 () {
                   Get.back();

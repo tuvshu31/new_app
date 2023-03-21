@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:Erdenet24/api/notifications.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -71,14 +72,14 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                           _switchListTile(),
                           _listTile(IconlyLight.edit, "Бараа нэмэх, засварлах",
                               () {
-                            Get.to(() => const StoreProductsEditMainScreen());
+                            Get.toNamed(storeProductsEditMainScreenRoute);
                           }),
                           _listTile(IconlyLight.chart, "Захиалгууд", () {
-                            Get.to(() => const StoreOrdersScreen());
+                            Get.toNamed(storeOrdersScreenRoute);
                           }),
                           _divider(),
                           _listTile(IconlyLight.setting, "Тохиргоо", () {
-                            Get.to(() => const StoreSettingsScreen());
+                            Get.toNamed(storeSettingsScreenRoute);
                           }),
                           _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                           _listTile(IconlyLight.login, "Аппаас гарах", () {

@@ -1,23 +1,20 @@
-import 'dart:developer';
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DriverPaymentsPage extends StatefulWidget {
-  const DriverPaymentsPage({super.key});
+class DriverPaymentsScreen extends StatefulWidget {
+  const DriverPaymentsScreen({super.key});
 
   @override
-  State<DriverPaymentsPage> createState() => _DriverPaymentsPageState();
+  State<DriverPaymentsScreen> createState() => _DriverPaymentsScreenState();
 }
 
-class _DriverPaymentsPageState extends State<DriverPaymentsPage> {
+class _DriverPaymentsScreenState extends State<DriverPaymentsScreen> {
   PageController pageController = PageController();
   final _driverCtx = Get.put(DriverController());
   @override

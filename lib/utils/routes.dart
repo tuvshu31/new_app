@@ -1,4 +1,7 @@
 //Splash screen routes
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:flutter/services.dart';
+
 const String splashMainScreenRoute = '/splashMainScreenRoute';
 const String splashOtpScreenRoute = '/splashOtpScreenRoute';
 const String splashPhoneRegisterScreenRoute = '/splashPhoneRegisterScreenRoute';
@@ -34,3 +37,37 @@ const String storeProductsCreateProductScreenRoute =
     '/storeProductsCreateProductScreenRoute';
 const String storeProductsEditMainScreenRoute =
     '/storeProductsEditMainScreenRoute';
+const String storeProductsEditProductRoute = '/storeProductsEditProductRoute';
+const String storeProductsPreviewScreenRoute =
+    '/storeProductsPreviewScreenRoute';
+const String storeSettingsScreenRoute = '/storeSettingsScreenRoute';
+//Driver screen routes
+const String driverMainScreenRoute = '/driverMainScreenRoute';
+const String driverDrawerScreenRoute = '/driverDrawerScreenRoute';
+const String driverDeliverListScreenRoute = '/driverDeliverListScreenRoute';
+const String driverPaymentsScreenRoute = '/driverPaymentsScreenRoute';
+const String driverSettingsScreenRoute = '/driverSettingsScreenRoute';
+
+initialRoute() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then(
+    (value) {
+      if (RestApiHelper.getUserId() == 0) {
+        splashMainScreenRoute;
+      } else if (RestApiHelper.getUserRole() == "store") {
+        storeMainScreenRoute;
+      } else if (RestApiHelper.getUserRole() == "driver") {
+        driverMainScreenRoute;
+      } else if (RestApiHelper.getUserRole() == "user") {
+        if (RestApiHelper.getOrderId() != 0) {
+          userOrdersActiveScreenRoute;
+        } else {
+          userHomeScreenRoute;
+        }
+      } else {
+        splashMainScreenRoute;
+      }
+    },
+  );
+}

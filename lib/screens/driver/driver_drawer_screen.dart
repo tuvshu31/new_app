@@ -2,9 +2,10 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_deliver_list_page.dart';
-import 'package:Erdenet24/screens/driver/driver_payments_page.dart';
-import 'package:Erdenet24/screens/driver/driver_settings_page.dart';
+import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -29,7 +30,7 @@ Widget driverDrawer(context) {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Get.to(const DriverSettingsPage());
+                    Get.toNamed(driverSettingsScreenRoute);
                   },
                   child: Container(
                     width: 75,
@@ -55,10 +56,10 @@ Widget driverDrawer(context) {
           AppSettings.openAppSettings();
         }),
         _listTile(IconlyLight.location, "Хүргэлтүүд", () {
-          Get.to(() => const DriverDeliverListPage());
+          Get.toNamed(driverDeliverListScreenRoute);
         }),
         _listTile(IconlyLight.wallet, "Төлбөр", () {
-          Get.to(() => const DriverPaymentsPage());
+          Get.toNamed(driverPaymentsScreenRoute);
         }),
         _listTile(
             IconlyLight.logout,

@@ -11,14 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-class DriverSettingsPage extends StatefulWidget {
-  const DriverSettingsPage({super.key});
+class DriverSettingsScreen extends StatefulWidget {
+  const DriverSettingsScreen({super.key});
 
   @override
-  State<DriverSettingsPage> createState() => _DriverSettingsPageState();
+  State<DriverSettingsScreen> createState() => _DriverSettingsScreenState();
 }
 
-class _DriverSettingsPageState extends State<DriverSettingsPage> {
+class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
   final _driverCtx = Get.put(DriverController());
   @override
   void initState() {

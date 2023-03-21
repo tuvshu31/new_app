@@ -5,19 +5,19 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DriverDeliverListPage extends StatefulWidget {
-  const DriverDeliverListPage({super.key});
+class DriverDeliverListScreen extends StatefulWidget {
+  const DriverDeliverListScreen({super.key});
 
   @override
-  State<DriverDeliverListPage> createState() => _DriverDeliverListPageState();
+  State<DriverDeliverListScreen> createState() =>
+      _DriverDeliverListScreenState();
 }
 
-class _DriverDeliverListPageState extends State<DriverDeliverListPage> {
+class _DriverDeliverListScreenState extends State<DriverDeliverListScreen> {
   List<dynamic> orderList = [];
   @override
   void initState() {

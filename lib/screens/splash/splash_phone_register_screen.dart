@@ -2,6 +2,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -52,7 +53,7 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
         _loginCtrl.verifyCode.value.toString());
     Get.back();
     if (authCode[0]["Result"] == "SUCCESS") {
-      Get.to(() => const SplashOtpScreen());
+      Get.toNamed(splashOtpScreenRoute);
     } else {
       errorSnackBar(
           "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
