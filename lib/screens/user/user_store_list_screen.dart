@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';

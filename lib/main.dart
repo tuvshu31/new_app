@@ -14,6 +14,7 @@ import 'package:Erdenet24/screens/store/store_products_edit_product_screen.dart'
 import 'package:Erdenet24/screens/store/store_products_preview_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/screens/user/user_category_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
@@ -30,6 +31,7 @@ import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -91,6 +93,13 @@ void main() async {
   } else if (Platform.isIOS) {
     // GeolocatorApple.registerWith();
   }
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then(
+    (value) {
+      runApp(const MyApp());
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -107,11 +116,13 @@ class _MyAppState extends State<MyApp> {
   final cartCtrl = Get.put(CartController(), permanent: true);
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
+  final _loginCtx = Get.put(LoginController());
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
 
   @override
   void initState() {
     super.initState();
+    _loginCtx.handleInitialRoute();
     AwesomeNotifications().setListeners(
         onActionReceivedMethod: NotificationController.onActionReceivedMethod,
         onNotificationCreatedMethod:
@@ -127,7 +138,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       navigatorKey: MyApp.navigatorKey,
       title: "Erdenet24",
-      initialRoute: initialRoute(),
+      initialRoute: _loginCtx.initialRoute.value,
       // defaultTransition: Transition.,
       theme: ThemeData(fontFamily: 'Nunito'),
       routes: <String, WidgetBuilder>{
@@ -135,7 +146,7 @@ class _MyAppState extends State<MyApp> {
         splashOtpScreenRoute: (context) => const SplashOtpScreen(),
         splashPhoneRegisterScreenRoute: (context) =>
             const SplashPhoneRegisterScreen(),
-        userHomeScreenRoute: (context) => const UserCartAddressInfoScreen(),
+        userHomeScreenRoute: (context) => const UserHomeScreen(),
         userCartScreenRoute: (context) => const UserCartScreen(),
         userCategoryProductsScreenRoute: (context) =>
             const UserCategoryProductScreen(),

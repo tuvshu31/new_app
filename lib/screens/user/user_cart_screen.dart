@@ -2,6 +2,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/separator.dart';
@@ -90,7 +91,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
                               children: [
                                 GestureDetector(
                                   onTap: () => Get.toNamed(
-                                    '/ProductsRoute',
+                                    userProductScreenRoute,
                                     arguments: {
                                       "data": data,
                                     },

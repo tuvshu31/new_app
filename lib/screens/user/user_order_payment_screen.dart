@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserOrderPaymentScreen extends StatefulWidget {
@@ -23,7 +22,6 @@ class UserOrderPaymentScreen extends StatefulWidget {
 
 class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   final _incoming = Get.arguments;
-  final _cartCtx = Get.put(CartController());
 
   PageController pageController = PageController(initialPage: 0);
 
@@ -43,28 +41,9 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
     }
   }
 
-  void createOrder(int index) async {
+  void navgiteToDeepLink(int index) async {
     loadingDialog(context);
-    var orderBody = {
-      "orderId": _incoming["orderId"],
-      "userAndDriverCode": _incoming["userAndDriverCode"],
-      "userId": RestApiHelper.getUserId(),
-      "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
-      "address": _incoming["address"],
-      "orderStatus": "notPaid",
-      "totalAmount": _cartCtx.total,
-      "storeTotalAmount": _cartCtx.subTotal.toString(),
-      "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
-      "phone": _incoming["phone"],
-      "kod": _incoming["kode"],
-      "products": _cartCtx.cartList,
-    };
-    log(orderBody.toString());
-    dynamic orderResponse = await RestApi().createOrder(orderBody);
-    dynamic orderData = Map<String, dynamic>.from(orderResponse);
-    if (orderData["success"]) {
-      _launchUrl(Uri.parse(_incoming["data"]["urls"][index]["link"]));
-    }
+    _launchUrl(Uri.parse(_incoming["data"]["urls"][index]["link"]));
     Get.back();
   }
 
@@ -140,7 +119,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
               var bank = bankList[index];
               return CustomInkWell(
                 onTap: () {
-                  createOrder(index);
+                  navgiteToDeepLink(index);
                 },
                 child: Card(
                   elevation: 1,

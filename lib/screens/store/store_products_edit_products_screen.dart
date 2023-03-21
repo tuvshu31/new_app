@@ -1,6 +1,7 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/bottom_sheet.dart';
@@ -89,8 +90,7 @@ class _StoreProductsEditProductsScreenState
               List ontap = [
                 () {
                   Get.back();
-                  Get.to(() => const StoreProductsEditProductsScreen(),
-                      arguments: data);
+                  Get.toNamed(storeProductsEditProductRoute, arguments: data);
                 },
                 () {
                   Get.back();

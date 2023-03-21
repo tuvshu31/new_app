@@ -1,5 +1,6 @@
 import 'package:Erdenet24/api/notifications.dart';
-import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -14,7 +15,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
 
 class UserOrderActiveScreen extends StatefulWidget {
   const UserOrderActiveScreen({
@@ -157,7 +157,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                       children: [
                         CustomText(
                             text:
-                                "Захиалгын дугаар: ${_userCtx.userOrderList[0]["userAndDriverCode"]}"),
+                                "Захиалгаа авах код: ${_userCtx.userOrderList[0]["userAndDriverCode"]}"),
                         const SizedBox(height: 4),
                         CustomText(
                           text: _userCtx.userOrderList[0]["orderTime"],
@@ -166,7 +166,31 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                         )
                       ],
                     ),
-                    trailing: const Icon(IconlyLight.arrow_right_2),
+                    trailing: _userCtx.activeOrderStep.value == 2
+                        ? CircularCountDownTimer(
+                            width: 50,
+                            height: 50,
+                            isReverse: true,
+                            duration: int.parse(
+                                    _userCtx.userOrderList[0]["prepDuration"]) *
+                                60,
+                            timeFormatterFunction:
+                                (defaultFormatterFunction, duration) {
+                              if (duration.inSeconds == 0) {
+                                return "0";
+                              } else {
+                                return Function.apply(
+                                    defaultFormatterFunction, [duration]);
+                              }
+                            },
+                            fillColor: MyColors.primary,
+                            ringColor: MyColors.black,
+                            strokeCap: StrokeCap.round,
+                            textStyle: const TextStyle(
+                              fontSize: 8.0,
+                            ),
+                          )
+                        : const Icon(IconlyLight.arrow_right_2),
                   ),
                 ),
               ),

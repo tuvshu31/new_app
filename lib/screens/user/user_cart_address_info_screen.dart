@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:intl/intl.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -62,7 +63,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     setState(() {});
   }
 
-  void createInvoice() async {
+  void createInvoiceAndOrder() async {
     loadingDialog(context);
     int storeId = int.parse(_cartCtx.stores[0]);
     int randomNumber = random4digit();
@@ -74,16 +75,33 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     };
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
-    Get.back();
     if (qpayData["success"]) {
-      Get.off(() => const UserOrderPaymentScreen(), arguments: {
+      var orderBody = {
         "orderId": orderId,
-        "phone": phone.text,
-        "address": address.text,
-        "kode": kod.text,
-        "data": jsonDecode(qpayData["data"]),
         "userAndDriverCode": userAndDriverCode,
-      });
+        "userId": RestApiHelper.getUserId(),
+        "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
+        "address": address.text,
+        "orderStatus": "notPaid",
+        "totalAmount": _cartCtx.total,
+        "storeTotalAmount": _cartCtx.subTotal.toString(),
+        "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
+        "phone": phone.text,
+        "kod": kod.text,
+        "products": _cartCtx.cartList,
+      };
+      log(orderBody.toString());
+      dynamic orderResponse = await RestApi().createOrder(orderBody);
+      dynamic orderData = Map<String, dynamic>.from(orderResponse);
+      if (orderData["success"]) {
+        Get.back();
+        Get.offAndToNamed(
+          userOrderPaymentScreenRoute,
+          arguments: {
+            "data": jsonDecode(qpayData["data"]),
+          },
+        );
+      }
     }
   }
 
@@ -102,7 +120,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                       const CustomText(text: "Утасны дугаар"),
                       const SizedBox(height: 12),
                       CustomTextField(
-                        hintText: "99352223",
+                        hintText: "99359024",
                         controller: phone,
                         maxLength: 8,
                         keyboardType: TextInputType.number,
@@ -226,7 +244,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             text: "Төлбөр төлөх",
             isActive: isPhoneOk && isAddressOk,
             onPressed: () {
-              createInvoice();
+              createInvoiceAndOrder();
             },
           )
         ],

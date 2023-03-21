@@ -1,3 +1,4 @@
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -9,7 +10,6 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
 
 class UserProfileOrdersScreen extends StatefulWidget {
   const UserProfileOrdersScreen({super.key});

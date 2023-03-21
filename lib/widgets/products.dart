@@ -1,4 +1,5 @@
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -122,7 +123,7 @@ class _CustomDataState extends State<CustomData> {
                               children: [
                                 GestureDetector(
                                   onTap: () => Get.toNamed(
-                                    '/ProductsRoute',
+                                    userProductScreenRoute,
                                     arguments: {
                                       "data": data,
                                     },

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:Erdenet24/screens/user/user_products_screen_new.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

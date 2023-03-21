@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +97,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               CustomInkWell(
                                 onTap: () {
                                   _count[index]["count"] > 0
-                                      ? Get.toNamed("/CategoryRoute",
+                                      ? Get.toNamed(
+                                          userCategoryProductsScreenRoute,
                                           arguments: _data[index])
                                       : () {};
                                 },
