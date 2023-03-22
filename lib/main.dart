@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
@@ -32,6 +33,7 @@ import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
@@ -119,10 +121,24 @@ class _MyAppState extends State<MyApp> {
   final _loginCtx = Get.put(LoginController());
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
 
+  final _checker = AppVersionChecker();
+
+  void checkVersion() async {
+    _checker.checkUpdate().then((value) {
+      log(value.toString());
+      print(value.canUpdate); //return true if update is available
+      print(value.currentVersion); //return current app version
+      print(value.newVersion); //return the new app version
+      print(value.appURL); //return the app url
+      print(value
+          .errorMessage); //return error message if found else it will return null
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    _loginCtx.handleInitialRoute();
+    checkVersion();
     AwesomeNotifications().setListeners(
         onActionReceivedMethod: NotificationController.onActionReceivedMethod,
         onNotificationCreatedMethod:
@@ -138,7 +154,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       navigatorKey: MyApp.navigatorKey,
       title: "Erdenet24",
-      initialRoute: _loginCtx.initialRoute.value,
+      initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,
       theme: ThemeData(fontFamily: 'Nunito'),
       routes: <String, WidgetBuilder>{

@@ -98,6 +98,7 @@ dependencies:
   circular_countdown_timer: ^0.2.3
   connectivity_plus: ^3.0.3
   awesome_notifications: any
+  flutter_app_version_checker: ^0.3.2
 
 dev_dependencies:
   flutter_test:
