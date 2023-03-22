@@ -34,6 +34,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     super.initState();
     saveUserToken();
     _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
+    _userCtx.userOrderList[0];
   }
 
   @override
@@ -166,7 +167,8 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                         )
                       ],
                     ),
-                    trailing: _userCtx.activeOrderStep.value == 2
+                    trailing: _userCtx.activeOrderStep.value == 2 &&
+                            !_userCtx.loading.value
                         ? CircularCountDownTimer(
                             width: 50,
                             height: 50,

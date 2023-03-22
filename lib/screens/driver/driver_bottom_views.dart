@@ -276,9 +276,9 @@ Widget step4() {
               text: _driverCtx.deliveryInfo["userAddress"],
               fontSize: 16,
             ),
-            subtitle: CustomText(
-                text:
-                    "Захиалгын код: ${_driverCtx.deliveryInfo["userAndDriverCode"]}"),
+            // subtitle: CustomText(
+            //     text:
+            //         "Захиалгын код: ${}"),
             trailing: GestureDetector(
               onTap: () {
                 makePhoneCall("+976-${_driverCtx.deliveryInfo["userPhone"]}");

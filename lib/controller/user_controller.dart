@@ -56,7 +56,6 @@ class UserController extends GetxController {
   }
 
   void fetchDriverPositionSctream(int driverId) {
-    log("fetchDriverPositionSctreamWorking");
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       dynamic response = await RestApi().getDriver(driverId);
       dynamic d = Map<String, dynamic>.from(response);
@@ -214,6 +213,7 @@ class UserController extends GetxController {
     } else if (action == "received") {
       userActiveOrderChangeView(1);
     } else if (action == "preparing") {
+      getCurrentOrderInfo(RestApiHelper.getOrderId());
       userActiveOrderChangeView(2);
     } else if (action == "delivering") {
       userActiveOrderChangeView(3);

@@ -5,6 +5,8 @@ import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
@@ -32,6 +34,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
   final _networkCtx = Get.put(NetWorkController());
   final GlobalKey<SlideActionState> key = GlobalKey();
+  TextEditingController driverApproveCodeCtrl = TextEditingController();
 
   List<Widget> steps = [
     step0(),
@@ -198,22 +201,42 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 4) {
-                                      var deliveryDuration = _driverCtx
-                                          .stopwatch.value.elapsed.inSeconds;
-                                      _driverCtx.updateOrder({
-                                        "orderStatus": "delivered",
-                                        "deliveryDuration": deliveryDuration,
-                                        "deliveryPrice": "3000",
-                                        "deliveryPaidOff": false,
-                                      });
-                                      _driverCtx.fakeDeliveryTimer.value =
-                                          deliveryDuration.toString();
-                                      _driverCtx.stopwatch.value.reset();
-                                      _driverCtx.deliveryInfo.clear();
-                                      _driverCtx.storeLocation.refresh();
-                                      _driverCtx.step.value += 1;
-                                      _driverCtx.fakeOrderCount.value += 1;
-                                      log(_driverCtx.step.value.toString());
+                                      driverDeliveryCodeApproveDialog(
+                                        context,
+                                        driverApproveCodeCtrl,
+                                        () {
+                                          if (driverApproveCodeCtrl.text ==
+                                              _driverCtx.deliveryInfo[
+                                                  "userAndDriverCode"]) {
+                                            Get.back();
+                                            var deliveryDuration = _driverCtx
+                                                .stopwatch
+                                                .value
+                                                .elapsed
+                                                .inSeconds;
+                                            _driverCtx.updateOrder({
+                                              "orderStatus": "delivered",
+                                              "deliveryDuration":
+                                                  deliveryDuration,
+                                              "deliveryPrice": "3000",
+                                              "deliveryPaidOff": false,
+                                            });
+                                            _driverCtx.fakeDeliveryTimer.value =
+                                                deliveryDuration.toString();
+                                            _driverCtx.stopwatch.value.reset();
+                                            _driverCtx.deliveryInfo.clear();
+                                            _driverCtx.storeLocation.refresh();
+                                            _driverCtx.step.value += 1;
+                                            _driverCtx.fakeOrderCount.value +=
+                                                1;
+                                          } else {
+                                            errorSnackBar(
+                                                "Захиалгын код буруу байна",
+                                                3,
+                                                context);
+                                          }
+                                        },
+                                      );
                                     } else {
                                       _driverCtx.finishDelivery();
                                     }

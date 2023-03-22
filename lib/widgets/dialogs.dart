@@ -509,3 +509,36 @@ void accountDeleteModal(dynamic context, dynamic onTap) {
         fontWeight: FontWeight.bold,
       ));
 }
+
+void driverDeliveryCodeApproveDialog(
+    dynamic context, TextEditingController controller, dynamic onTap) {
+  QuickAlert.show(
+    context: context,
+    type: QuickAlertType.custom,
+    barrierDismissible: true,
+    customAsset: 'assets/images/png/app/webp.webp',
+    showCancelBtn: false,
+    cancelBtnText: "Болих",
+    onConfirmBtnTap: onTap,
+    confirmBtnText: "Баталгаажуулах",
+    confirmBtnColor: MyColors.green,
+    cancelBtnTextStyle: TextStyle(
+      fontSize: 14,
+      color: MyColors.gray,
+      fontWeight: FontWeight.bold,
+    ),
+    confirmBtnTextStyle: TextStyle(
+      color: MyColors.white,
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+    ),
+    widget: CustomTextField(
+      textInputAction: TextInputAction.done,
+      keyboardType: TextInputType.number,
+      maxLength: 4,
+      autoFocus: true,
+      controller: controller,
+      hintText: "4 оронтой код оруулна уу",
+    ),
+  );
+}
