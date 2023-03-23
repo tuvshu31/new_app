@@ -216,8 +216,8 @@ class DriverController extends GetxController {
     canceledDrivers.add(RestApiHelper.getUserId());
     var body = {
       "orderId": int.parse(deliveryInfo['orderId']),
-      "address": deliveryInfo["address"] ?? "Gok Garden 7A",
-      "phone": deliveryInfo["phone"] ?? "99921312",
+      "address": deliveryInfo["address"] ?? "",
+      "phone": deliveryInfo["phone"] ?? "",
       "canceledDrivers": canceledDrivers
     };
     dynamic response = await RestApi().assignDriver(body);
