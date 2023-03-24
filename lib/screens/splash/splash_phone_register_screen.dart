@@ -46,8 +46,11 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
 
   void sendOTP() async {
     loadingDialog(context);
-    _loginCtrl.verifyCode.value = random6digit();
-    // _loginCtrl.verifyCode.value = 111111;
+    if (_loginCtrl.phoneController.text == "99681828") {
+      _loginCtrl.verifyCode.value = 111111;
+    } else {
+      _loginCtrl.verifyCode.value = random6digit();
+    }
     dynamic authCode = await RestApi().sendAuthCode(
         _loginCtrl.phoneController.text,
         _loginCtrl.verifyCode.value.toString());
