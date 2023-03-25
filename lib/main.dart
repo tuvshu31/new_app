@@ -36,6 +36,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator_android/geolocator_android.dart';
+import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
@@ -94,7 +95,7 @@ void main() async {
   if (Platform.isAndroid) {
     GeolocatorAndroid.registerWith();
   } else if (Platform.isIOS) {
-    // GeolocatorApple.registerWith();
+    GeolocatorApple.registerWith();
   }
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
