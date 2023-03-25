@@ -1,10 +1,7 @@
-import 'package:flutter/services.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:get/get.dart';
-
 //Splash screen routes
 const String splashMainScreenRoute = '/splashMainScreenRoute';
 const String splashOtpScreenRoute = '/splashOtpScreenRoute';
+const String splashPrivacyPolicyRoute = "/splashPrivacyPolicyRoute";
 const String splashPhoneRegisterScreenRoute = '/splashPhoneRegisterScreenRoute';
 //User screen routes
 const String userCartAddressInfoScreenRoute = '/userCartAddressInfoScreen';

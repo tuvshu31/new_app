@@ -7,6 +7,7 @@ import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_create_product_screen.dart';
@@ -160,6 +161,8 @@ class _MyAppState extends State<MyApp> {
       routes: <String, WidgetBuilder>{
         splashMainScreenRoute: (context) => const SplashMainScreen(),
         splashOtpScreenRoute: (context) => const SplashOtpScreen(),
+        splashPrivacyPolicyRoute: (context) =>
+            const SplashPrivacyPolicyScreen(),
         splashPhoneRegisterScreenRoute: (context) =>
             const SplashPhoneRegisterScreen(),
         userHomeScreenRoute: (context) => const UserHomeScreen(),
