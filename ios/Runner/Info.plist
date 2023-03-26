@@ -37,6 +37,8 @@
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner.</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
