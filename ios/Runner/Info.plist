@@ -57,6 +57,8 @@
 	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 	<string>sms</string>
