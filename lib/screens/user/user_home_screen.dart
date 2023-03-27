@@ -32,7 +32,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     super.initState();
     _cartCtrl.getUserProducts();
     saveUserToken();
-    Timer(const Duration(seconds: 1), () => testingVersionModal(context));
+    // Timer(const Duration(seconds: 1), () => testingVersionModal(context));
+    _userCtx.getUserLocationPermission();
     _userCtx.getOrders();
   }
 

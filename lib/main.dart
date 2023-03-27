@@ -7,6 +7,7 @@ import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_create_product_screen.dart';
@@ -35,6 +36,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator_android/geolocator_android.dart';
+import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
@@ -93,7 +95,7 @@ void main() async {
   if (Platform.isAndroid) {
     GeolocatorAndroid.registerWith();
   } else if (Platform.isIOS) {
-    // GeolocatorApple.registerWith();
+    GeolocatorApple.registerWith();
   }
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -160,6 +162,8 @@ class _MyAppState extends State<MyApp> {
       routes: <String, WidgetBuilder>{
         splashMainScreenRoute: (context) => const SplashMainScreen(),
         splashOtpScreenRoute: (context) => const SplashOtpScreen(),
+        splashPrivacyPolicyRoute: (context) =>
+            const SplashPrivacyPolicyScreen(),
         splashPhoneRegisterScreenRoute: (context) =>
             const SplashPhoneRegisterScreen(),
         userHomeScreenRoute: (context) => const UserHomeScreen(),

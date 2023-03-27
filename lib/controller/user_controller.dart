@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -223,5 +224,24 @@ class UserController extends GetxController {
       RestApiHelper.saveOrderId(0);
       Get.off(() => const UserHomeScreen());
     } else {}
+  }
+
+  void getUserLocationPermission() async {
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      log("locationSrviceNotEnabled");
+    } else {
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+    }
   }
 }
