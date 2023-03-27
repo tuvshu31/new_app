@@ -86,9 +86,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
         await RestApi().checkUser(_loginCtrl.phoneController.text);
     dynamic data = Map<String, dynamic>.from(response);
 
-    if (data["success"] &&
-        data["role"] != "test" &&
-        _loginCtrl.verifyCode.value == int.parse(pinCode)) {
+    if (data["success"] && _loginCtrl.verifyCode.value == int.parse(pinCode)) {
       Get.back();
       if (data.length > 1) {
         switch (data["role"]) {
@@ -120,12 +118,6 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
         putUserIntoBox(data["data"]["id"], "user");
         Get.offAll(const UserHomeScreen());
       }
-    } else if (data["success"] &&
-        data["role"] == "test" &&
-        int.parse(pinCode) == 111111) {
-      Get.back();
-      putUserIntoBox(data["testId"], "test");
-      Get.offAll(const UserHomeScreen());
     } else {
       Get.back();
       errorSnackBar("Баталгаажуулах код буруу байна", 2, context);

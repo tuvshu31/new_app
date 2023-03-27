@@ -56,8 +56,8 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-    double _height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: MyColors.white,
       body: stayOnScreen
@@ -75,7 +75,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
                         child: Image(
                           image:
                               const AssetImage("assets/images/png/android.png"),
-                          width: _width * .22,
+                          width: width * .22,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -105,7 +105,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
                         text: "Шинэчлэл шалгаж байна...",
                         fontSize: 12,
                       ),
-                      SizedBox(height: _height * .05)
+                      SizedBox(height: height * .05)
                     ],
                   )
                 ],
