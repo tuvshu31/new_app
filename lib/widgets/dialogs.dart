@@ -1,7 +1,9 @@
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quickalert/quickalert.dart';
@@ -107,24 +109,37 @@ void errorModal(String text, int duration, dynamic context) {
   );
 }
 
-void testingVersionModal(dynamic context) {
+void enableLocationModal(dynamic context) {
   QuickAlert.show(
-    context: context,
-    animType: QuickAlertAnimType.slideInDown,
-    widget: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CustomText(
-          textAlign: TextAlign.center,
-          text: "Туршилтын хувилбар тул захиалга хийгдэхгүйг анхаарна уу",
-          fontSize: 14,
-        )
-      ],
-    ),
-    title: "Уучлаарай...",
-    confirmBtnColor: MyColors.warning,
-    type: QuickAlertType.info,
-  );
+      barrierDismissible: false,
+      context: context,
+      animType: QuickAlertAnimType.slideInDown,
+      customAsset: 'assets/images/png/app/location.png',
+      widget: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomText(
+            textAlign: TextAlign.center,
+            text:
+                "Гар утасныхаа байршил заагчийг асааснаар хүргэлтийн мэдээллээ харах боломжтой",
+            fontSize: 12,
+            color: MyColors.gray,
+          )
+        ],
+      ),
+      title: "Байршил заагчаа асаах",
+      confirmBtnColor: MyColors.primary,
+      confirmBtnText: "Асаах",
+      showCancelBtn: true,
+      type: QuickAlertType.info,
+      onConfirmBtnTap: () {
+        Geolocator.openAppSettings();
+        Get.back();
+      },
+      onCancelBtnTap: (() {
+        Get.back();
+      }),
+      cancelBtnText: "Болих");
 }
 
 void customModal(String text, int duration, dynamic context) {

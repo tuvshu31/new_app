@@ -226,22 +226,26 @@ class UserController extends GetxController {
     } else {}
   }
 
-  void getUserLocationPermission() async {
-    if (!(await Geolocator.isLocationServiceEnabled())) {
-      log("locationSrviceNotEnabled");
+  void getUserLocationPermission(context) async {
+    LocationPermission permission;
+    var isEnabled = await Geolocator.checkPermission();
+    log(isEnabled.toString());
+    if (isEnabled == LocationPermission.always ||
+        isEnabled == LocationPermission.whileInUse) {
+      log("LocationEnabled");
     } else {
-      LocationPermission permission;
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      }
+      // permission = await Geolocator.checkPermission();
+      enableLocationModal(context);
+      // if (permission == LocationPermission.denied) {
+      //   permission = await Geolocator.requestPermission();
+      //   if (permission == LocationPermission.denied) {
+      //     return Future.error('Location permissions are denied');
+      //   }
+      // }
+      // if (permission == LocationPermission.deniedForever) {
+      //   return Future.error(
+      //       'Location permissions are permanently denied, we cannot request permissions.');
+      // }
     }
   }
 }

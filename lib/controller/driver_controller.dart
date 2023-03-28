@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -90,15 +92,23 @@ class DriverController extends GetxController {
   // }
 
   void addDriverMarker() async {
-    BitmapDescriptor iconBitmap = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(),
-      "assets/images/png/app/driver.png",
-    );
+    Future<Uint8List> getBytesFromAsset(String path, int width) async {
+      ByteData data = await rootBundle.load(path);
+      ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+          targetWidth: width);
+      ui.FrameInfo fi = await codec.getNextFrame();
+      return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+          .buffer
+          .asUint8List();
+    }
+
     MarkerId markerId = const MarkerId("driver");
+    final Uint8List markerIcon =
+        await getBytesFromAsset('assets/images/png/app/driver.png', 100);
     Marker marker = Marker(
       markerId: markerId,
       position: initialPosition.value,
-      icon: iconBitmap,
+      icon: BitmapDescriptor.fromBytes(markerIcon),
       rotation: markerRotation.value,
     );
     markers[markerId] = marker;
