@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class SplashProminentDisclosure extends StatefulWidget {
@@ -14,6 +17,17 @@ class SplashProminentDisclosure extends StatefulWidget {
 }
 
 class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
+  void requestPermission() async {
+    await Geolocator.requestPermission().then((value) => log(value.toString()));
+  }
+
+  final _route = Get.arguments;
+  @override
+  void initState() {
+    super.initState();
+    log(_route);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
@@ -42,7 +56,9 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
             ),
             SizedBox(height: Get.height * .03),
             CustomText(
-              text: "Таны хүргэлтийн мэдээлэл харагдана",
+              textAlign: TextAlign.center,
+              text:
+                  "Захиалга хийгдэхийн тулд таны байршилыг тодорхойлох шаардлагатай бөгөөд мөн та захиалгын хүргэлтийн мэдээллээ хянах боломжтой.",
               color: MyColors.gray,
             ),
             Expanded(
@@ -59,10 +75,10 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
                         elevation: 0,
                       ),
                     ),
-                    SizedBox(width: 24),
+                    const SizedBox(width: 24),
                     Expanded(
                       child: CustomButton(
-                        onPressed: () {},
+                        onPressed: requestPermission,
                         text: "Асаах",
                       ),
                     ),

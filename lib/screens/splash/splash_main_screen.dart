@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Erdenet24/controller/login_controller.dart';
 import "package:flutter/material.dart";
 
 import 'package:get/get.dart';
@@ -18,6 +19,7 @@ class SplashMainScreen extends StatefulWidget {
 
 class _SplashMainScreenState extends State<SplashMainScreen> {
   bool stayOnScreen = false;
+  final _loginCtx = Get.put(LoginController());
   @override
   void initState() {
     super.initState();

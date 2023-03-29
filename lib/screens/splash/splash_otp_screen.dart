@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -33,7 +34,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   String loginType = "";
   Timer? countdownTimer;
   Duration myDuration = const Duration(minutes: 1);
-  final _loginCtrl = Get.put(LoginController());
+  final _loginCtx = Get.put(LoginController());
   final _driverCtx = Get.put(DriverController());
   @override
   void initState() {
@@ -57,11 +58,10 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
 
   void resetTimer() async {
     loadingDialog(context);
-    _loginCtrl.verifyCode.value = random6digit();
+    _loginCtx.verifyCode.value = random6digit();
 
     dynamic authCode = await RestApi().sendAuthCode(
-        _loginCtrl.phoneController.text,
-        _loginCtrl.verifyCode.value.toString());
+        _loginCtx.phoneController.text, _loginCtx.verifyCode.value.toString());
     Get.back();
     if (authCode[0]["Result"] == "SUCCESS") {
       setState(() {
@@ -83,10 +83,10 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   void submit() async {
     loadingDialog(context);
     dynamic response =
-        await RestApi().checkUser(_loginCtrl.phoneController.text);
+        await RestApi().checkUser(_loginCtx.phoneController.text);
     dynamic data = Map<String, dynamic>.from(response);
 
-    if (data["success"] && _loginCtrl.verifyCode.value == int.parse(pinCode)) {
+    if (data["success"] && _loginCtx.verifyCode.value == int.parse(pinCode)) {
       Get.back();
       if (data.length > 1) {
         switch (data["role"]) {
@@ -101,8 +101,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
-
-            Get.offAll(const UserHomeScreen());
+            _loginCtx.navigateToScreen(userHomeScreenRoute);
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");
@@ -111,7 +110,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
         }
       } else {
         var body = {
-          "phone": _loginCtrl.phoneController.text,
+          "phone": _loginCtx.phoneController.text,
           "role": "user",
         };
         dynamic response = await RestApi().registerUser(body);
@@ -149,7 +148,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             SizedBox(height: Get.height * .03),
             CustomText(
               text:
-                  "${_loginCtrl.phoneController.text} дугаарлуу илгээсэн нэвтрэх кодыг оруулна уу",
+                  "${_loginCtx.phoneController.text} дугаарлуу илгээсэн нэвтрэх кодыг оруулна уу",
               color: MyColors.gray,
               textAlign: TextAlign.center,
             ),

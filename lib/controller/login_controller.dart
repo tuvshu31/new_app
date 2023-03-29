@@ -34,7 +34,7 @@ class LoginController extends GetxController {
         isEnabled == LocationPermission.whileInUse) {
       Get.offAllNamed(route);
     } else {
-      Get.offAndToNamed(splashProminentDisclosureScreenRoute);
+      Get.offAndToNamed(splashProminentDisclosureScreenRoute, arguments: route);
     }
   }
 }

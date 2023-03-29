@@ -214,32 +214,6 @@ class _MyAppState extends State<MyApp> {
         splashProminentDisclosureScreenRoute: (context) =>
             const SplashProminentDisclosure()
       },
-      // GetPage(name: "/", page: () => const UserHomeScreen()),
-      // GetPage(
-      //     name: "/SplashScreenRoute", page: () => const SplashMainScreen()),
-      // GetPage(name: "/StoreScreenRoute", page: () => const StoreMainScreen()),
-      // // GetPage(name: "/MainScreenRoute", page: () => const ),
-      // GetPage(
-      //     name: "/DriverScreenRoute", page: () => const DriverMainScreen()),
-      // GetPage(
-      //     name: "/UserSettingsRoute",
-      //     page: () => const UserProfileHelpScreen()),
-      // GetPage(name: "/CartRoute", page: () => const UserCartScreen()),
-      // GetPage(
-      //     name: "/CategoryRoute",
-      //     page: () => const UserCategoryProductScreen()),
-      // GetPage(name: "/MainScreen", page: () => const UserHomeScreen()),
-      // GetPage(
-      //     name: "/CategoryNoTabbar",
-      //     page: () => const UserSubCategoryProductsScreen()),
-      // GetPage(name: "/ProductsRoute", page: () => const UserProductScreen()),
-      // GetPage(name: "/SearchRoute", page: () => const UserSearchMainScreen()),
-      // GetPage(
-      //     name: "/OrdersRoute",
-      //     page: () => const UserCartAddressInfoScreen()),
-      // GetPage(
-      //     name: "/UserOrderActiveRoute",
-      //     page: () => const UserOrderActiveScreen()),
     );
   }
 }
