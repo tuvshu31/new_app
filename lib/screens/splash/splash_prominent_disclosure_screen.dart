@@ -18,7 +18,10 @@ class SplashProminentDisclosure extends StatefulWidget {
 
 class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
   void requestPermission() async {
-    await Geolocator.requestPermission().then((value) => log(value.toString()));
+    await Geolocator.requestPermission().then((value) {
+      log(value.toString());
+      Get.toNamed(_route);
+    });
   }
 
   final _route = Get.arguments;
@@ -70,7 +73,9 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
                       child: CustomButton(
                         text: "Татгалзах",
                         textColor: MyColors.gray,
-                        onPressed: (() {}),
+                        onPressed: () {
+                          Get.toNamed(_route);
+                        },
                         bgColor: MyColors.white,
                         elevation: 0,
                       ),
