@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_create_product_screen.dart';
@@ -209,7 +210,9 @@ class _MyAppState extends State<MyApp> {
         driverDeliverListScreenRoute: (context) =>
             const DriverDeliverListScreen(),
         driverPaymentsScreenRoute: (context) => const DriverPaymentsScreen(),
-        driverSettingsScreenRoute: (context) => const DriverSettingsScreen()
+        driverSettingsScreenRoute: (context) => const DriverSettingsScreen(),
+        splashProminentDisclosureScreenRoute: (context) =>
+            const SplashProminentDisclosure()
       },
       // GetPage(name: "/", page: () => const UserHomeScreen()),
       // GetPage(

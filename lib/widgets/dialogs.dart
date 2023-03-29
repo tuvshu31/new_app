@@ -109,39 +109,6 @@ void errorModal(String text, int duration, dynamic context) {
   );
 }
 
-void enableLocationModal(dynamic context) {
-  QuickAlert.show(
-      barrierDismissible: false,
-      context: context,
-      animType: QuickAlertAnimType.slideInDown,
-      customAsset: 'assets/images/png/app/location.png',
-      widget: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CustomText(
-            textAlign: TextAlign.center,
-            text:
-                "Гар утасныхаа байршил заагчийг асааснаар хүргэлтийн мэдээллээ харах боломжтой",
-            fontSize: 12,
-            color: MyColors.gray,
-          )
-        ],
-      ),
-      title: "Байршил заагчаа асаах",
-      confirmBtnColor: MyColors.primary,
-      confirmBtnText: "Асаах",
-      showCancelBtn: true,
-      type: QuickAlertType.info,
-      onConfirmBtnTap: () {
-        Geolocator.openAppSettings();
-        Get.back();
-      },
-      onCancelBtnTap: (() {
-        Get.back();
-      }),
-      cancelBtnText: "Болих");
-}
-
 void customModal(String text, int duration, dynamic context) {
   QuickAlert.show(
     context: context,

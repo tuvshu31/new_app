@@ -32,7 +32,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     super.initState();
     _cartCtrl.getUserProducts();
     saveUserToken();
-    _userCtx.getUserLocationPermission(context);
     _userCtx.getOrders();
   }
 

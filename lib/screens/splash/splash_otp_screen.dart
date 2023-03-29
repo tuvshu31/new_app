@@ -101,6 +101,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
+
             Get.offAll(const UserHomeScreen());
             break;
           case "driver":

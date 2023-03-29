@@ -1,5 +1,10 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../api/restapi_helper.dart';
 import 'package:flutter/material.dart';
@@ -21,5 +26,15 @@ class LoginController extends GetxController {
 
     _cartCtrl.savedList.clear();
     Get.offAll(() => const SplashPhoneRegisterScreen());
+  }
+
+  Future<void> navigateToScreen(String route) async {
+    var isEnabled = await Geolocator.checkPermission();
+    if (isEnabled == LocationPermission.always ||
+        isEnabled == LocationPermission.whileInUse) {
+      Get.offAllNamed(route);
+    } else {
+      Get.offAndToNamed(splashProminentDisclosureScreenRoute);
+    }
   }
 }

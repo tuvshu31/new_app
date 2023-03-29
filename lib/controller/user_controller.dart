@@ -225,27 +225,4 @@ class UserController extends GetxController {
       Get.off(() => const UserHomeScreen());
     } else {}
   }
-
-  void getUserLocationPermission(context) async {
-    LocationPermission permission;
-    var isEnabled = await Geolocator.checkPermission();
-    log(isEnabled.toString());
-    if (isEnabled == LocationPermission.always ||
-        isEnabled == LocationPermission.whileInUse) {
-      log("LocationEnabled");
-    } else {
-      // permission = await Geolocator.checkPermission();
-      enableLocationModal(context);
-      // if (permission == LocationPermission.denied) {
-      //   permission = await Geolocator.requestPermission();
-      //   if (permission == LocationPermission.denied) {
-      //     return Future.error('Location permissions are denied');
-      //   }
-      // }
-      // if (permission == LocationPermission.deniedForever) {
-      //   return Future.error(
-      //       'Location permissions are permanently denied, we cannot request permissions.');
-      // }
-    }
-  }
 }

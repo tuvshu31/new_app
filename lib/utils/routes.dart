@@ -3,6 +3,8 @@ const String splashMainScreenRoute = '/splashMainScreenRoute';
 const String splashOtpScreenRoute = '/splashOtpScreenRoute';
 const String splashPrivacyPolicyRoute = "/splashPrivacyPolicyRoute";
 const String splashPhoneRegisterScreenRoute = '/splashPhoneRegisterScreenRoute';
+const String splashProminentDisclosureScreenRoute =
+    '/splashProminentDisclosureScreenRoute';
 //User screen routes
 const String userCartAddressInfoScreenRoute = '/userCartAddressInfoScreen';
 const String userCartScreenRoute = '/userCartScreen';
