@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
@@ -101,7 +102,8 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
-            _loginCtx.navigateToScreen(userHomeScreenRoute);
+            showLocationDisclosureScreen(context);
+            // _loginCtx.navigateToScreen(userHomeScreenRoute, context);
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import "package:flutter/material.dart";
 
 import 'package:get/get.dart';
@@ -38,7 +39,8 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
         if (RestApiHelper.getOrderId() != 0) {
           Get.offAllNamed(userOrdersActiveScreenRoute);
         } else {
-          _loginCtx.navigateToScreen(userHomeScreenRoute);
+          showLocationDisclosureScreen(context);
+          // _loginCtx.navigateToScreen(userHomeScreenRoute, context);
         }
       }
     } else {

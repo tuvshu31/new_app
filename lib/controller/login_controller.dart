@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:geolocator/geolocator.dart';
@@ -28,11 +29,11 @@ class LoginController extends GetxController {
     Get.offAll(() => const SplashPhoneRegisterScreen());
   }
 
-  Future<void> navigateToScreen(String route) async {
+  Future<void> navigateToScreen(String route, context) async {
     var isEnabled = await Geolocator.checkPermission();
     if (isEnabled == LocationPermission.always ||
         isEnabled == LocationPermission.whileInUse) {
-      Get.offAllNamed(route);
+      showLocationDisclosureScreen(context);
     } else {
       Get.offAndToNamed(splashProminentDisclosureScreenRoute, arguments: route);
     }
