@@ -39,8 +39,8 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
         if (RestApiHelper.getOrderId() != 0) {
           Get.offAllNamed(userOrdersActiveScreenRoute);
         } else {
-          showLocationDisclosureScreen(context);
-          // _loginCtx.navigateToScreen(userHomeScreenRoute, context);
+          // showLocationDisclosureScreen(context);
+          _loginCtx.navigateToScreen(userHomeScreenRoute, context);
         }
       }
     } else {

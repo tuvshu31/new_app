@@ -102,8 +102,8 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             break;
           case "user":
             putUserIntoBox(data["userId"], "user");
-            showLocationDisclosureScreen(context);
-            // _loginCtx.navigateToScreen(userHomeScreenRoute, context);
+            // showLocationDisclosureScreen(context);
+            _loginCtx.navigateToScreen(userHomeScreenRoute, context);
             break;
           case "driver":
             putUserIntoBox(data["driverId"], "driver");

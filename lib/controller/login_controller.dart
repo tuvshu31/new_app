@@ -33,7 +33,7 @@ class LoginController extends GetxController {
     var isEnabled = await Geolocator.checkPermission();
     if (isEnabled == LocationPermission.always ||
         isEnabled == LocationPermission.whileInUse) {
-      showLocationDisclosureScreen(context);
+      Get.offAndToNamed(route);
     } else {
       Get.offAndToNamed(splashProminentDisclosureScreenRoute, arguments: route);
     }
