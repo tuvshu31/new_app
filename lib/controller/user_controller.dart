@@ -44,9 +44,9 @@ class UserController extends GetxController {
     var body = {"id": orderId};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
-    log(d.toString());
     if (d["success"]) {
       userOrderList.value = d["data"];
+      log("userOrderLists: $userOrderList");
     }
     loading.value = false;
   }
@@ -181,13 +181,10 @@ class UserController extends GetxController {
         body:
             "Таны захиалга амжилттай хүргэгдлээ. Манайхаар үйлчилүүлсэнд баярлалаа",
       );
-    } else {
-      log(payload.toString());
-    }
+    } else {}
   }
 
   void userActiveOrderChangeView(int activeStep) {
-    log("fetchDriverPositionSctreamWorking: $activeStep");
     activeOrderStep.value = activeStep;
     activeOrderPageController.value.animateToPage(
       activeOrderStep.value,

@@ -5,6 +5,7 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../api/restapi_helper.dart';
@@ -37,5 +38,19 @@ class LoginController extends GetxController {
     } else {
       Get.offAndToNamed(splashProminentDisclosureScreenRoute, arguments: route);
     }
+  }
+
+  final _checker = AppVersionChecker();
+
+  Future<void> checkVersion(context) async {
+    _checker.checkUpdate().then((value) {
+      log(value.toString());
+      print(value.canUpdate); //return true if update is available
+      print(value.currentVersion); //return current app version
+      print(value.newVersion); //return the new app version
+      print(value.appURL); //return the app url
+      print(value
+          .errorMessage); //return error message if found else it will return null
+    });
   }
 }

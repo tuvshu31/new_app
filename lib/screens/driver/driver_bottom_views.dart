@@ -174,11 +174,11 @@ Widget step1() {
               ),
             ),
             title: CustomText(
-              text: _driverCtx.deliveryInfo["userAddress"],
+              text: _driverCtx.deliveryInfo["userAddress"] ?? "null",
               fontSize: 16,
             ),
             subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["userPhone"],
+              text: _driverCtx.deliveryInfo["userPhone"] ?? "null",
               fontSize: 12,
             ),
           ),
