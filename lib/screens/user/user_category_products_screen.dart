@@ -63,25 +63,25 @@ class _UserCategoryProductScreenState extends State<UserCategoryProductScreen> {
         initialIndex: 0,
         length: _tabItems.length,
         child: CustomHeader(
-          customActions: IconButton(
-            icon: Badge(
-              badgeAnimation: BadgeAnimation.rotation(),
-              position: BadgePosition.custom(top: -12, end: -8),
-              badgeContent: CustomText(
-                text: _cartCtrl.cartList.length.toString(),
-                color: MyColors.white,
-              ),
-              child: Icon(
-                IconlyLight.buy,
-                color: MyColors.black,
-                size: 20,
-              ),
-            ),
-            onPressed: () {
-              Get.back();
-              _navCtrl.onItemTapped(2);
-            },
-          ),
+          // customActions: IconButton(
+          //   icon: Badge(
+          //     badgeAnimation: BadgeAnimation.rotation(),
+          //     position: BadgePosition.custom(top: -12, end: -8),
+          //     badgeContent: CustomText(
+          //       text: _cartCtrl.cartList.length.toString(),
+          //       color: MyColors.white,
+          //     ),
+          //     child: Icon(
+          //       IconlyLight.buy,
+          //       color: MyColors.black,
+          //       size: 20,
+          //     ),
+          //   ),
+          //   onPressed: () {
+          //     Get.back();
+          //     _navCtrl.onItemTapped(2);
+          //   },
+          // ),
           title: _incoming["name"],
           subtitle:
               subtitle(_prodCtrl.loading.value, _prodCtrl.total.value, "бараа"),

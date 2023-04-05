@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'dart:developer';
@@ -23,7 +24,7 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxString fcmToken = "".obs;
-  dynamic driverInfo = [].obs;
+  RxList driverInfo = [].obs;
   Rx<Stopwatch> stopwatch = Stopwatch().obs;
   RxInt fakeOrderCount = 0.obs;
   RxString fakeDeliveryTimer = "".obs;
@@ -31,7 +32,6 @@ class DriverController extends GetxController {
   //=========================Map states==================================
   RxString distanceAndDuration = "".obs;
   Rx<LatLng> storeLocation = LatLng(49.02821126030273, 104.04634376483777).obs;
-  RxBool isGPSActive = false.obs;
   RxInt markerIdCounter = 0.obs;
   RxDouble markerRotation = 0.0.obs;
   Rx<LatLng> initialPosition =
@@ -43,53 +43,21 @@ class DriverController extends GetxController {
 
   //=========================Map controllers==================================
   void getUserLocation() async {
-    if (!(await Geolocator.isLocationServiceEnabled())) {
-      isGPSActive.value = false;
-    } else {
-      isGPSActive.value = true;
-      LocationPermission permission;
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      }
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      initialPosition.value = LatLng(position.latitude, position.longitude);
-      CameraPosition currentCameraPosition = CameraPosition(
-        bearing: 0,
-        target: initialPosition.value,
-        zoom: 16,
-      );
-      final GoogleMapController controller = await mapController.value.future;
-      controller
-          .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
-      markerRotation.value = position.heading;
-      addDriverMarker();
-    }
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    initialPosition.value = LatLng(position.latitude, position.longitude);
+    CameraPosition currentCameraPosition = CameraPosition(
+      bearing: 0,
+      target: initialPosition.value,
+      zoom: 16,
+    );
+    final GoogleMapController controller = await mapController.value.future;
+    controller
+        .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
+    markerRotation.value = position.heading;
+    addDriverMarker();
   }
-
-  // LatLngBounds getBounds() {
-  //   var lngs = markers.values.map((e) => e.position.longitude).toList();
-  //   var lats = markers.values.map((e) => e.position.latitude).toList();
-  //   double topMost = lngs.reduce(max);
-  //   double leftMost = lats.reduce(min);
-  //   double rightMost = lats.reduce(max);
-  //   double bottomMost = lngs.reduce(min);
-  //   LatLngBounds bounds = LatLngBounds(
-  //     northeast: LatLng(rightMost, topMost),
-  //     southwest: LatLng(leftMost, bottomMost),
-  //   );
-
-  //   return bounds;
-  // }
 
   void addDriverMarker() async {
     Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -162,7 +130,7 @@ class DriverController extends GetxController {
         "longitude": info.longitude.toString(),
         "heading": info.heading.toString()
       };
-      updateUser(body);
+      updateDriverInfo(body);
     });
   }
 
@@ -184,8 +152,6 @@ class DriverController extends GetxController {
   //=========================Driver controllers==================================
   void turnOnOff(value, context) async {
     if (_networkCtx.hasNetwork.value) {
-      var body = {"isOpen": value};
-      updateUser(body);
       isOnline.value = value;
       if (value == true) {
         playSound("engine_start");
@@ -196,25 +162,26 @@ class DriverController extends GetxController {
         stopActiveTimer();
         stopSound();
       }
+      var body = {"isOpen": value};
+      updateDriverInfo(body);
     } else {
       _networkCtx.showNetworkSnackbar(context);
     }
   }
 
-  void fetchDriverInfo(int id) async {
-    dynamic response = await RestApi().getDriver(id);
-    log(response.toString());
+  void fetchDriverInfo() async {
+    dynamic response = await RestApi().getDriver(RestApiHelper.getUserId());
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
-      driverInfo = d["data"];
+      driverInfo.value = d["data"];
     }
   }
 
   void updateDriverInfo(dynamic body) async {
-    var id = RestApiHelper.getUserId();
-    dynamic user = await RestApi().updateDriver(id, body);
+    dynamic user =
+        await RestApi().updateDriver(RestApiHelper.getUserId(), body);
     dynamic data = Map<String, dynamic>.from(user);
-    if (data["success"]) {}
+    log(data.toString());
   }
 
   void cancelNewDelivery() async {
@@ -304,11 +271,6 @@ class DriverController extends GetxController {
         await RestApi().updateOrder(int.parse(deliveryInfo["id"]), body);
     dynamic d = Map<String, dynamic>.from(response);
     log(d.toString());
-  }
-
-  void updateUser(dynamic body) async {
-    var response = await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    log(response.toString());
   }
 
   Future<void> makePhoneCall(String phoneNumber) async {

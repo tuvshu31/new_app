@@ -30,7 +30,7 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
   Widget build(BuildContext context) {
     var info = _driverCtx.driverInfo[0];
     return CustomHeader(
-      title: "Тохиргоо",
+      title: "Жолоочийн мэдээлэл",
       customActions: Container(),
       body: Column(
         children: [
@@ -38,34 +38,26 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
             "Утас",
             info["phone"],
             IconlyLight.call,
-            true,
           ),
           _listTile(
             "Данс",
             info["bankAccount"],
             IconlyLight.wallet,
-            false,
           ),
           _listTile(
             "Хувийн дугаар",
             info["driverCode"],
             IconlyLight.tick_square,
-            false,
           )
         ],
       ),
     );
   }
 
-  Widget _listTile(String title, String value, IconData icon, bool editable) {
+  Widget _listTile(String title, String value, IconData icon) {
     return CustomInkWell(
       borderRadius: BorderRadius.zero,
-      onTap: () => editable
-          ? Get.to(() => DriverSettingsEditView(
-                title: title,
-                value: value,
-              ))
-          : null,
+      onTap: () {},
       child: ListTile(
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -81,18 +73,6 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
         ),
         title: CustomText(text: title, fontSize: 14),
         subtitle: CustomText(text: value, fontSize: 12),
-        trailing: editable
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    IconlyLight.arrow_right_2,
-                    size: 20,
-                    color: MyColors.black,
-                  ),
-                ],
-              )
-            : Container(width: 12),
       ),
     );
   }

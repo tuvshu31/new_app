@@ -45,7 +45,6 @@ dependencies:
   shimmer:
   simple_animations:
   url_launcher:
-  badges:
   flutter_spinkit:
   curved_navigation_bar:
   rename:
@@ -100,6 +99,7 @@ dependencies:
   webview_flutter: ^4.0.7
   firebase_core: ^2.8.0
   firebase_messaging: ^14.3.0
+  badges: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -36,7 +36,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
       if (RestApiHelper.getUserRole() == "store") {
         Get.offAllNamed(storeMainScreenRoute);
       } else if (RestApiHelper.getUserRole() == "driver") {
-        Get.offAllNamed(driverMainScreenRoute);
+        _loginCtx.navigateToScreen(driverMainScreenRoute, context);
       } else if (RestApiHelper.getUserRole() == "user") {
         if (RestApiHelper.getOrderId() != 0) {
           Get.offAllNamed(userOrdersActiveScreenRoute);

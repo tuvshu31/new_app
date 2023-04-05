@@ -21,25 +21,23 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
     return Obx(
       () => !_driverCtx.isOnline.value
           ? _offlineView()
-          : !_driverCtx.isGPSActive.value
-              ? _noGPSView()
-              : GoogleMap(
-                  zoomControlsEnabled: false,
-                  zoomGesturesEnabled: false,
-                  mapType: MapType.normal,
-                  buildingsEnabled: true,
-                  myLocationButtonEnabled: true,
-                  onCameraMove: _driverCtx.onCameraMove,
-                  rotateGesturesEnabled: true,
-                  trafficEnabled: false,
-                  compassEnabled: false,
-                  markers: Set<Marker>.of(_driverCtx.markers.values),
-                  initialCameraPosition: CameraPosition(
-                    target: _driverCtx.initialPosition.value,
-                    zoom: 14.4746,
-                  ),
-                  onMapCreated: _driverCtx.onMapCreated,
-                ),
+          : GoogleMap(
+              zoomControlsEnabled: false,
+              zoomGesturesEnabled: false,
+              mapType: MapType.normal,
+              buildingsEnabled: true,
+              myLocationButtonEnabled: true,
+              onCameraMove: _driverCtx.onCameraMove,
+              rotateGesturesEnabled: true,
+              trafficEnabled: false,
+              compassEnabled: false,
+              markers: Set<Marker>.of(_driverCtx.markers.values),
+              initialCameraPosition: CameraPosition(
+                target: _driverCtx.initialPosition.value,
+                zoom: 14.4746,
+              ),
+              onMapCreated: _driverCtx.onMapCreated,
+            ),
     );
   }
 
@@ -60,36 +58,6 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
             color: MyColors.gray,
             text:
                 "Та идэвхгүй байна. Идэвхжүүлэх товчийг дарж асаана уу бла бла бла...",
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _noGPSView() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Image(
-          width: Get.width,
-          image: const AssetImage(
-            "assets/images/png/app/gps_driver.png",
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(Get.width * .1),
-          child: const CustomText(
-            textAlign: TextAlign.center,
-            color: MyColors.gray,
-            text: "Gps асаахгүй бол ажиллахгүй өрбыйодроөолдбый бла бла бла...",
-          ),
-        ),
-        SizedBox(
-          width: Get.width * .5,
-          child: CustomButton(
-            isFullWidth: false,
-            text: "GPS асаах",
-            onPressed: () {},
           ),
         )
       ],

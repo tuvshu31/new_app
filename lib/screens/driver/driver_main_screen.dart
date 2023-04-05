@@ -57,7 +57,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     super.initState();
     saveUserToken();
     _networkCtx.checkNetworkAccess(context);
-    _driverCtx.fetchDriverInfo(RestApiHelper.getUserId());
+    _driverCtx.fetchDriverInfo();
   }
 
   @override
