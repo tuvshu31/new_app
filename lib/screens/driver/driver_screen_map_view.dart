@@ -56,8 +56,7 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
           child: const CustomText(
             textAlign: TextAlign.center,
             color: MyColors.gray,
-            text:
-                "Та идэвхгүй байна. Идэвхжүүлэх товчийг дарж асаана уу бла бла бла...",
+            text: "Та идэвхгүй байна. Идэвхжүүлэх товчийг дарж асаана уу",
           ),
         )
       ],

@@ -493,8 +493,6 @@ void storeOrdersToDeliveryView(context, data) {
                                   key.currentState!.reset();
                                   var findDriverBody = {
                                     "orderId": data['orderId'],
-                                    'address': data["address"],
-                                    'phone': data["phone"],
                                     'canceledDrivers': []
                                   };
                                   log(findDriverBody.toString());

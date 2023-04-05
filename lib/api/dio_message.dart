@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class DioMessage {
-  Dio dio = Dio(BaseOptions(
+  Dio dio = Dio(
+    BaseOptions(
       baseUrl: 'https://api.messagepro.mn/',
-      connectTimeout: 50000,
-      receiveTimeout: 30000));
+      connectTimeout: Duration(minutes: 2),
+      receiveTimeout: Duration(minutes: 1),
+    ),
+  );
 
   Future<dynamic> sendMessage(
     String path,

@@ -201,6 +201,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 4) {
+                                      driverApproveCodeCtrl.clear();
                                       driverDeliveryCodeApproveDialog(
                                         context,
                                         driverApproveCodeCtrl,

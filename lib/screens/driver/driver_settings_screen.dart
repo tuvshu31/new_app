@@ -20,11 +20,6 @@ class DriverSettingsScreen extends StatefulWidget {
 
 class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
   final _driverCtx = Get.put(DriverController());
-  @override
-  void initState() {
-    super.initState();
-    log(_driverCtx.driverInfo.toString());
-  }
 
   @override
   Widget build(BuildContext context) {

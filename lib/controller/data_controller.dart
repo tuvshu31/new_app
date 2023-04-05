@@ -26,9 +26,9 @@ class DataController extends GetxController {
   // void generate6digit() => Get.put(CartController()).generate6digit();
   DateTime now = DateTime.now();
   var dio = Dio(BaseOptions(
-    connectTimeout: 50000,
-    receiveTimeout: 30000,
-  ));
+      // connectTimeout: 50000,
+      // receiveTimeout: 30000,
+      ));
   void callProductsFromServer() async {
     try {
       final response = await dio.get(

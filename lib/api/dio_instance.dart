@@ -6,11 +6,14 @@ import 'package:dio/dio.dart';
 enum Method { get, post, put, delete }
 
 class DioClient {
-  Dio dio = Dio(BaseOptions(
+  Dio dio = Dio(
+    BaseOptions(
       // baseUrl: "http://192.168.32.1:8000/",
       baseUrl: 'http://3.35.52.56:8000/',
-      connectTimeout: 50000,
-      receiveTimeout: 30000));
+      connectTimeout: Duration(minutes: 2),
+      receiveTimeout: Duration(minutes: 1),
+    ),
+  );
 
   String _getMethodName(Method method) {
     switch (method) {

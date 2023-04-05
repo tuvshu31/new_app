@@ -193,8 +193,6 @@ class DriverController extends GetxController {
     canceledDrivers.add(RestApiHelper.getUserId());
     var body = {
       "orderId": int.parse(deliveryInfo['orderId']),
-      "address": deliveryInfo["address"] ?? "",
-      "phone": deliveryInfo["phone"] ?? "",
       "canceledDrivers": canceledDrivers
     };
     dynamic response = await RestApi().assignDriver(body);
@@ -202,6 +200,7 @@ class DriverController extends GetxController {
 
     if (d["success"]) {
       step.value = 0;
+      deliveryInfo.clear();
     }
   }
 
@@ -249,6 +248,7 @@ class DriverController extends GetxController {
 
   void driverNotificationDataHandler(action, payload) async {
     if (action == "new_order") {
+      deliveryInfo.clear();
       deliveryInfo.value = payload;
       storeLocation.value = LatLng(
         double.parse(deliveryInfo["latitude"]),

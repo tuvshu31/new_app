@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -174,11 +176,11 @@ Widget step1() {
               ),
             ),
             title: CustomText(
-              text: _driverCtx.deliveryInfo["userAddress"] ?? "null",
+              text: _driverCtx.deliveryInfo["userAddress"] ?? "no data",
               fontSize: 16,
             ),
             subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["userPhone"] ?? "null",
+              text: _driverCtx.deliveryInfo["userPhone"] ?? "no data",
               fontSize: 12,
             ),
           ),

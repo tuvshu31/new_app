@@ -219,6 +219,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
             const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
             const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
             GoogleMap(
+              scrollGesturesEnabled: false,
               zoomControlsEnabled: false,
               zoomGesturesEnabled: false,
               mapType: MapType.normal,
