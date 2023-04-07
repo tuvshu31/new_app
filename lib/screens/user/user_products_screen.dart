@@ -55,26 +55,26 @@ class _UserProductScreenState extends State<UserProductScreen> {
   Widget build(BuildContext context) {
     return Obx(
       () => CustomHeader(
-        // customActions: IconButton(
-        //   icon: Badge(
-        //     badgeAnimation: BadgeAnimation.scale(),
-        //     position: BadgePosition.custom(top: -12, end: -8),
-        //     badgeContent: CustomText(
-        //       text: _cartCtrl.cartList.length.toString(),
-        //       color: MyColors.white,
-        //     ),
-        //     child: Icon(
-        //       IconlyLight.buy,
-        //       color: MyColors.black,
-        //       size: 20,
-        //     ),
-        //   ),
-        //   onPressed: () {
-        //     Get.back();
-        //     Get.back();
-        //     _navCtrl.onItemTapped(2);
-        //   },
-        // ),
+        customActions: IconButton(
+          icon: Badge(
+            badgeAnimation: BadgeAnimation.scale(),
+            position: BadgePosition.custom(top: -12, end: -8),
+            badgeContent: CustomText(
+              text: _cartCtrl.cartList.length.toString(),
+              color: MyColors.white,
+            ),
+            child: Icon(
+              IconlyLight.buy,
+              color: MyColors.black,
+              size: 20,
+            ),
+          ),
+          onPressed: () {
+            Get.back();
+            Get.back();
+            _navCtrl.onItemTapped(2);
+          },
+        ),
         title: "Бүтээгдэхүүн",
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
