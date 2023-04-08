@@ -29,16 +29,16 @@ void successSnackBar(String text, int duration, dynamic context) {
 void errorSnackBar(String text, int duration, dynamic context) {
   showToast(text,
       context: context,
-      backgroundColor: MyColors.fadedRed,
+      backgroundColor: MyColors.primary,
       shapeBorder: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      textStyle: TextStyle(color: MyColors.primary),
+      textStyle: const TextStyle(color: MyColors.white),
       animation: StyledToastAnimation.slideFromTopFade,
       reverseAnimation: StyledToastAnimation.slideToTopFade,
-      position: StyledToastPosition(align: Alignment.topCenter),
+      position: const StyledToastPosition(align: Alignment.topCenter),
       duration: Duration(seconds: duration),
-      animDuration: Duration(seconds: 1),
+      animDuration: const Duration(seconds: 1),
       curve: Curves.fastLinearToSlowEaseIn,
       reverseCurve: Curves.fastOutSlowIn);
 }

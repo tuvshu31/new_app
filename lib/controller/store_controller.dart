@@ -28,6 +28,7 @@ class StoreController extends GetxController {
   RxInt prepDuration = 0.obs;
   Timer? countdownTimer;
   RxList prepDurationList = [].obs;
+  RxBool driverAccepted = false.obs;
 
   void startTimer(Duration i) {
     prepDurationList.add(i);
@@ -96,6 +97,17 @@ class StoreController extends GetxController {
         body: "Шинэ захиалга ирлээ",
       );
     } else if (action == "received") {
+    } else if (action == "driverAccepted") {
+      Get.back();
+      driverAccepted.value = true;
+      createCustomNotification(
+        isBackground,
+        payload,
+        isVisible: true,
+        customSound: false,
+        isCall: false,
+        body: "Жолооч дуудлага хүлээн авлаа",
+      );
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       createCustomNotification(
@@ -212,6 +224,8 @@ class StoreController extends GetxController {
             );
           });
     } else if (action == "received") {
+    } else if (action == "driverAccepted") {
+      log("driverAccepted");
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       Get.back();

@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:get/get.dart';
@@ -491,18 +492,23 @@ void storeOrdersToDeliveryView(context, data) {
                                     const Duration(milliseconds: 300),
                                     () async {
                                   key.currentState!.reset();
-                                  var findDriverBody = {
-                                    "orderId": data['orderId'],
-                                    'canceledDrivers': []
-                                  };
-                                  log(findDriverBody.toString());
-                                  dynamic response = await RestApi()
-                                      .assignDriver(findDriverBody);
-                                  dynamic d =
-                                      Map<String, dynamic>.from(response);
-                                  log("notifyToDrivers $d");
-                                  Get.back();
-                                  notifyToDrivers(context, data);
+                                  if (!_storeCtx.driverAccepted.value) {
+                                    var findDriverBody = {
+                                      "orderId": data['orderId'],
+                                      'canceledDrivers': []
+                                    };
+                                    dynamic response = await RestApi()
+                                        .assignDriver(findDriverBody);
+                                    dynamic d =
+                                        Map<String, dynamic>.from(response);
+                                    Get.back();
+                                    notifyToDrivers(context, data);
+                                  } else {
+                                    errorSnackBar(
+                                        "Хүргэлтийн жолооч ирж байгаа тул түр хүлээнэ үү",
+                                        4,
+                                        context);
+                                  }
                                 });
                               },
                               alignment: Alignment.centerRight,
@@ -533,6 +539,7 @@ void storeOrdersToDeliveryView(context, data) {
 
 void notifyToDrivers(context, data) {
   showModalBottomSheet(
+    useSafeArea: true,
     isDismissible: false,
     enableDrag: false,
     backgroundColor: MyColors.white,

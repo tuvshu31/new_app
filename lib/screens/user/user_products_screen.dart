@@ -205,6 +205,7 @@ class _UserProductScreenState extends State<UserProductScreen> {
                 child: CustomButton(
                   onPressed: () {
                     _cartCtrl.addProduct(_data, context);
+                    Get.back();
                   },
                   text: "Сагсанд нэмэх",
                   textColor: MyColors.white,

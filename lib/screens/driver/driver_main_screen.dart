@@ -186,6 +186,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       stopSound();
                                       AwesomeNotifications().dismiss(1);
                                       _driverCtx.updateOrder({
+                                        "orderStatus": "driverAccepted",
                                         "deliveryDriverId":
                                             RestApiHelper.getUserId().toString()
                                       });
