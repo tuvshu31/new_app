@@ -2,8 +2,6 @@ import 'package:hive/hive.dart';
 
 class RestApiHelper {
   static Box? authBox;
-
-  
   // Login хийсэн хэрэглэгчийн ID-г хадлагах, авах
   static void saveUserId(int id) => authBox?.put("id", id);
   static int getUserId() => authBox?.get("id", defaultValue: 0);
@@ -13,7 +11,8 @@ class RestApiHelper {
   // Login хийсэн хэрэглэгчийн захиалга хийсэн эсэсхийг-г хадлагах, авах
   static void saveOrderId(int orderId) => authBox?.put("orderId", orderId);
   static int getOrderId() => authBox?.get('orderId', defaultValue: 0);
-  // Background message хадгалах, авах
-  static void saveMessage(String type) => authBox?.put("message", type);
-  static String getSavedMessage() => authBox?.get('message', defaultValue: '');
+  // Идэвхтэй захиалгын алхамыг хадгалах, авах
+  static void saveOrderStep(int orderStep) =>
+      authBox?.put("orderStep", orderStep);
+  static int getOrderStep() => authBox?.get('orderStep', defaultValue: 0);
 }

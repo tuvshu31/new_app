@@ -43,7 +43,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   }
 
   _percent() {
-    switch (_userCtx.activeOrderStep.value) {
+    switch (RestApiHelper.getOrderStep()) {
       case 0:
         return .01;
       case 1:
@@ -112,7 +112,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   List<Widget> _buildRowList() {
     List<Widget> lines = [];
     statusList.asMap().forEach((index, value) {
-      bool active = index + 1 == _userCtx.activeOrderStep.value;
+      bool active = index + 1 == RestApiHelper.getOrderStep();
       lines.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -167,7 +167,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                         )
                       ],
                     ),
-                    trailing: _userCtx.activeOrderStep.value == 2 &&
+                    trailing: RestApiHelper.getOrderStep() == 2 &&
                             !_userCtx.loading.value
                         ? CircularCountDownTimer(
                             width: 50,

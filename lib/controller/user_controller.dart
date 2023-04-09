@@ -17,7 +17,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 final _cartCtx = Get.put(CartController());
 
 class UserController extends GetxController {
-  RxInt activeOrderStep = 0.obs;
   Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
@@ -185,9 +184,10 @@ class UserController extends GetxController {
   }
 
   void userActiveOrderChangeView(int activeStep) {
-    activeOrderStep.value = activeStep;
+    RestApiHelper.saveOrderStep(activeStep);
+    // activeOrderStep.value = activeStep;
     activeOrderPageController.value.animateToPage(
-      activeOrderStep.value,
+      activeStep,
       duration: const Duration(milliseconds: 500),
       curve: Curves.bounceInOut,
     );

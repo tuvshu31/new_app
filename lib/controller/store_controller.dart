@@ -119,6 +119,7 @@ class StoreController extends GetxController {
         body: "Хүргэлтэнд гарлаа",
       );
     } else if (action == "delivered") {
+      driverAccepted.value = false;
       createCustomNotification(
         isBackground,
         payload,
