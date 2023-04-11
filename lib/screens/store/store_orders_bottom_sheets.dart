@@ -539,7 +539,6 @@ void storeOrdersToDeliveryView(context, data) {
 
 void notifyToDrivers(context, data) {
   showModalBottomSheet(
-    useSafeArea: true,
     isDismissible: false,
     enableDrag: false,
     backgroundColor: MyColors.white,
