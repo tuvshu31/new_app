@@ -11,6 +11,7 @@ import flutter_local_notifications
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
+    GeneratedPluginRegistrant.register(with: self)
     GMSServices.provideAPIKey("AIzaSyAHTYs2cMm87YH3wppr6wTtKRZxfyXjvB4")
         // This is required to make any communication available in the action isolate.
     FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
@@ -19,7 +20,7 @@ import flutter_local_notifications
     if #available(iOS 10.0, *) {
         UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
     }
-    GeneratedPluginRegistrant.register(with: self)
+  
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
