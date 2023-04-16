@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
@@ -32,7 +33,6 @@ import 'package:Erdenet24/screens/user/user_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
@@ -52,15 +52,17 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  switchNotifications(message.data, true);
+  log("Background message irj bn: $message");
+  switchNotifications();
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  switchNotifications(message.data, false);
+  // switchNotifications(message.data, false);
+  log("Foreground message irj bn: $message");
 }
 
 void main() async {
@@ -68,25 +70,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: "basic_channel",
-        channelName: "Basic Notification",
-        channelDescription: "Notification channel for basic test",
-        playSound: false,
-        importance: NotificationImportance.High,
-        soundSource: 'resource://raw/incoming',
-      ),
-    ],
-    debug: true,
-  );
-  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-    if (!isAllowed) {
-      AwesomeNotifications().requestPermissionToSendNotifications();
-    }
-  });
+
+  NotificationService().initNotification();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
@@ -127,14 +112,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
-    AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:
-            NotificationController.onNotificationCreatedMethod,
-        onNotificationDisplayedMethod:
-            NotificationController.onNotificationDisplayedMethod,
-        onDismissActionReceivedMethod:
-            NotificationController.onDismissActionReceivedMethod);
   }
 
   @override

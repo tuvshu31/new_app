@@ -72,7 +72,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     var qpayBody = {
       "sender_invoice_no": orderId.toString(),
       // "amount": _cartCtx.total,
-      "amount": 100
+      "amount": 50
     };
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     dynamic qpayData = Map<String, dynamic>.from(qpayResponse);

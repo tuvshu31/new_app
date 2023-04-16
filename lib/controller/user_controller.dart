@@ -124,64 +124,64 @@ class UserController extends GetxController {
     log(d.toString());
   }
 
-  void userNotifications(action, payload, isBackground) {
-    if (action == "payment_success") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Захиалгын төлбөр амжилттай төлөгдлөө",
-      );
-    } else if (action == "sent") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: false,
-        customSound: false,
-        isCall: false,
-        body: "Захиалгыг хүлээн авлаа",
-      );
-    } else if (action == "received") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Таны захиалгыг хүлээн авлаа",
-      );
-    } else if (action == "preparing") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Таны захиалгыг бэлтгэж эхэллээ",
-      );
-    } else if (action == "delivering") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Таны захиалга хүргэлтэнд гарлаа",
-      );
-    } else if (action == "delivered") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body:
-            "Таны захиалга амжилттай хүргэгдлээ. Манайхаар үйлчилүүлсэнд баярлалаа",
-      );
-    } else {}
-  }
+  // void userNotifications(action, payload, isBackground) {
+  //   if (action == "payment_success") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Захиалгын төлбөр амжилттай төлөгдлөө",
+  //     );
+  //   } else if (action == "sent") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: false,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Захиалгыг хүлээн авлаа",
+  //     );
+  //   } else if (action == "received") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Таны захиалгыг хүлээн авлаа",
+  //     );
+  //   } else if (action == "preparing") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Таны захиалгыг бэлтгэж эхэллээ",
+  //     );
+  //   } else if (action == "delivering") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Таны захиалга хүргэлтэнд гарлаа",
+  //     );
+  //   } else if (action == "delivered") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body:
+  //           "Таны захиалга амжилттай хүргэгдлээ. Манайхаар үйлчилүүлсэнд баярлалаа",
+  //     );
+  //   } else {}
+  // }
 
   void userActiveOrderChangeView(int activeStep) {
     RestApiHelper.saveOrderStep(activeStep);

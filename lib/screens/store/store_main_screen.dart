@@ -34,7 +34,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   void initState() {
     super.initState();
-    saveUserToken();
+    // saveUserToken();
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
   }

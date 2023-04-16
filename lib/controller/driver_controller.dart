@@ -235,14 +235,14 @@ class DriverController extends GetxController {
 
   void driverNotifications(action, payload, isBackground) async {
     if (action == "new_order") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: true,
-        isCall: true,
-        body: "Шинэ захиалга ирлээ",
-      );
+      // createCustomNotification(
+      //   isBackground,
+      //   payload,
+      //   isVisible: true,
+      //   customSound: true,
+      //   isCall: true,
+      //   body: "Шинэ захиалга ирлээ",
+      // );
     }
   }
 

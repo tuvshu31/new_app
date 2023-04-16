@@ -10,7 +10,7 @@ import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+// import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -85,53 +85,53 @@ class StoreController extends GetxController {
     await RestApi().updateOrder(id, body);
   }
 
-  void storeNotifications(action, payload, isBackground) {
-    if (action == "payment_success") {
-    } else if (action == "sent") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: true,
-        body: "Шинэ захиалга ирлээ",
-      );
-    } else if (action == "received") {
-    } else if (action == "driverAccepted") {
-      Get.back();
-      driverAccepted.value = true;
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Жолооч дуудлага хүлээн авлаа",
-      );
-    } else if (action == "preparing") {
-    } else if (action == "delivering") {
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Хүргэлтэнд гарлаа",
-      );
-    } else if (action == "delivered") {
-      driverAccepted.value = false;
-      createCustomNotification(
-        isBackground,
-        payload,
-        isVisible: true,
-        customSound: false,
-        isCall: false,
-        body: "Хүргэлт амжилттай",
-      );
-    } else {
-      log(payload.toString());
-    }
-  }
+  // void storeNotifications(action, payload, isBackground) {
+  //   if (action == "payment_success") {
+  //   } else if (action == "sent") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: true,
+  //       body: "Шинэ захиалга ирлээ",
+  //     );
+  //   } else if (action == "received") {
+  //   } else if (action == "driverAccepted") {
+  //     Get.back();
+  //     driverAccepted.value = true;
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Жолооч дуудлага хүлээн авлаа",
+  //     );
+  //   } else if (action == "preparing") {
+  //   } else if (action == "delivering") {
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Хүргэлтэнд гарлаа",
+  //     );
+  //   } else if (action == "delivered") {
+  //     driverAccepted.value = false;
+  //     createCustomNotification(
+  //       isBackground,
+  //       payload,
+  //       isVisible: true,
+  //       customSound: false,
+  //       isCall: false,
+  //       body: "Хүргэлт амжилттай",
+  //     );
+  //   } else {
+  //     log(payload.toString());
+  //   }
+  // }
 
   void storeNotificationDataHandler(action, payload) {
     if (action == "payment_success") {
@@ -194,7 +194,7 @@ class StoreController extends GetxController {
                                       const Duration(milliseconds: 300), () {
                                     key.currentState!.reset();
                                     stopSound();
-                                    AwesomeNotifications().dismiss(1);
+                                    // AwesomeNotifications().dismiss(1);
                                     Get.back();
                                     showOrdersSetTimeView(context, payload);
                                     var body = {"orderStatus": "received"};

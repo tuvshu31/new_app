@@ -32,7 +32,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   @override
   void initState() {
     super.initState();
-    saveUserToken();
+    // saveUserToken();
     _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
     // _userCtx.userOrderList[0];
   }

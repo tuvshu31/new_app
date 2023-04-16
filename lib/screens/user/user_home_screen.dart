@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/notifications.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -10,6 +12,7 @@ import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
@@ -33,6 +36,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     _cartCtrl.getUserProducts();
     saveUserToken();
     _userCtx.getOrders();
+  }
+
+  void saveUserToken() async {
+    await FirebaseMessaging.instance.deleteToken();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      var body = {"mapToken": newToken};
+      await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    });
   }
 
   @override
