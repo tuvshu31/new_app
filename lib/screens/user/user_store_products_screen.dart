@@ -7,6 +7,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/products.dart';
@@ -60,7 +61,7 @@ class _UserStoreProductsState extends State<UserStoreProducts> {
         length: _tabItems.length,
         child: CustomHeader(
           customActions: IconButton(
-            icon: Badge(
+            icon: badges.Badge(
               badgeAnimation: BadgeAnimation.scale(),
               position: BadgePosition.custom(top: -12, end: -8),
               badgeContent: CustomText(
