@@ -73,11 +73,10 @@ void main() async {
   );
 
   NotificationService().initNotification();
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
-
-  NotificationSettings settings = await messaging.requestPermission(
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
