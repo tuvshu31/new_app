@@ -13,6 +13,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
@@ -56,7 +57,7 @@ class _UserProductScreenState extends State<UserProductScreen> {
     return Obx(
       () => CustomHeader(
         customActions: IconButton(
-          icon: Badge(
+          icon: badges.Badge(
             badgeAnimation: BadgeAnimation.scale(),
             position: BadgePosition.custom(top: -12, end: -8),
             badgeContent: CustomText(

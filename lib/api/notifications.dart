@@ -31,7 +31,11 @@
 //   });
 // }
 
+import 'dart:developer';
+
 import 'package:Erdenet24/api/notification.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:get/get.dart';
 
 void switchNotifications() {
   NotificationService()

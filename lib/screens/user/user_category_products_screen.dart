@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,7 @@ class _UserCategoryProductScreenState extends State<UserCategoryProductScreen> {
         length: _tabItems.length,
         child: CustomHeader(
           customActions: IconButton(
-            icon: Badge(
+            icon: badges.Badge(
               badgeAnimation: BadgeAnimation.rotation(),
               position: BadgePosition.custom(top: -12, end: -8),
               badgeContent: CustomText(

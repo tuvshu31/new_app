@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-	<dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Erdenet24 requires access to your phone’s camera.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Erdenet24 requires access to your phone’s gallery.</string>
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -26,8 +24,33 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Erdenet24 requires access to your phone’s camera.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Erdenet24 requires access to your phone’s gallery.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -47,23 +70,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>The main purpose of receiving the user's location data is to determine whether the user is in our delivery area, as well as to provide an opportunity to track the delivery of the ordered goods in a timely manner</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-	<string>sms</string>
-	<string>tel</string>
-	</array>
-
 </dict>
 </plist>
