@@ -62,8 +62,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
   // switchNotifications(message.data, false);
-  Get.back();
   log("Foreground message irj bn: $message");
+  switchNotifications();
 }
 
 void main() async {

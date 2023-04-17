@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:get/get.dart';
@@ -96,11 +97,13 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                             children: [
                               CustomInkWell(
                                 onTap: () {
-                                  _count[index]["count"] > 0
-                                      ? Get.toNamed(
-                                          userCategoryProductsScreenRoute,
-                                          arguments: _data[index])
-                                      : () {};
+                                  // _count[index]["count"] > 0
+                                  //     ? Get.toNamed(
+                                  //         userCategoryProductsScreenRoute,
+                                  //         arguments: _data[index])
+                                  //     : () {};
+                                  NotificationService()
+                                      .showNotification(3, "Hello", "BOdy");
                                 },
                                 borderRadius: BorderRadius.circular(50),
                                 child: Container(
