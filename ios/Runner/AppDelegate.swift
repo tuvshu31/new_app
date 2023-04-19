@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import GoogleMaps
 import FirebaseCore
+import FirebaseMessaging
 import flutter_local_notifications
 
 @UIApplicationMain
@@ -11,9 +12,9 @@ import flutter_local_notifications
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    application.registerForRemoteNotifications()
     GMSServices.provideAPIKey("AIzaSyAHTYs2cMm87YH3wppr6wTtKRZxfyXjvB4")
-        // This is required to make any communication available in the action isolate.
+    application.registerForRemoteNotifications()
+    // This is required to make any communication available in the action isolate.
 
     if #available(iOS 10.0, *) {
         UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
