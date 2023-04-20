@@ -65,3 +65,71 @@ Future<void> makePhoneCall(String phoneNumber) async {
   );
   await launchUrl(launchUri);
 }
+
+List notificationData = [
+  {
+    "role": "user",
+    "action": "payment_success",
+    "description": "Захиалгын төлбөр амжилттай төлөгдлөө",
+  },
+  {
+    "role": "user",
+    "action": "sent",
+    "description": "Захиалгыг хүлээн авлаа",
+  },
+  {
+    "role": "user",
+    "action": "sent",
+    "description": "Захиалгыг хүлээн авлаа",
+  },
+  {
+    "role": "user",
+    "action": "received",
+    "description": "Таны захиалгыг хүлээн авлаа",
+  },
+  {
+    "role": "user",
+    "action": "preparing",
+    "description": "Таны захиалгыг бэлтгэж эхэллээ",
+  },
+  {
+    "role": "user",
+    "action": "delivering",
+    "description": "Таны захиалга хүргэлтэнд гарлаа",
+  },
+  {
+    "role": "user",
+    "action": "delivered",
+    "description": "Таны захиалга амжилттай хүргэгдлээ",
+  },
+  {
+    "role": "store",
+    "action": "sent",
+    "description": "Шинэ захиалга ирлээ",
+  },
+  {
+    "role": "store",
+    "action": "received",
+    "description": "Захиалгыг хүлээн авлаа",
+  },
+  {
+    "role": "store",
+    "action": "driverAccepted",
+    "description": "Жолооч дуудлага хүлээн авлаа",
+  },
+  {
+    "role": "store",
+    "action": "delivering",
+    "description": "Хүргэлтэнд гарлаа",
+  },
+  {
+    "role": "store",
+    "action": "delivered",
+    "description": "Хүргэлт амжилттай",
+  },
+  {
+    "role": "driver",
+    "action": "new_order",
+    "description": "Шинэ захиалга ирлээ",
+  },
+];

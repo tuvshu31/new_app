@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -124,7 +126,7 @@ class UserController extends GetxController {
     log(d.toString());
   }
 
-  // void userNotifications(action, payload, isBackground) {
+  // void userNotificationHandler(action, payload, isBackground) {
   //   if (action == "payment_success") {
   //     createCustomNotification(
   //       isBackground,
@@ -193,18 +195,14 @@ class UserController extends GetxController {
     );
   }
 
-  void userNotificationDataHandler(action, payload) {
+  void userActionHandler(action, payload) {
+    log(payload.toString());
     if (action == "payment_success") {
-      successOrderModal(
-        MyApp.navigatorKey.currentContext,
-        () async {
-          var body = {"orderStatus": "sent"};
-          updateOrder(payload["id"], body);
-          RestApiHelper.saveOrderId(payload["id"]);
-          _cartCtx.cartList.clear();
-          Get.off(() => const UserOrderActiveScreen());
-        },
-      );
+      var body = {"orderStatus": "sent"};
+      updateOrder(payload["id"], body);
+      RestApiHelper.saveOrderId(payload["id"]);
+      _cartCtx.cartList.clear();
+      Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
       log(payload.toString());
       userActiveOrderChangeView(0);

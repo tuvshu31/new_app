@@ -54,16 +54,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+class NavigationService {
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  log("Background message irj bn: $message");
-  switchNotifications();
+  await Firebase.initializeApp();
+  notificationHandler(message.data, true);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  // switchNotifications(message.data, false);
-  log("Foreground message irj bn: $message");
-  switchNotifications();
+  notificationHandler(message.data, false);
 }
 
 void main() async {
@@ -103,8 +105,6 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -128,7 +128,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: MyApp.navigatorKey,
+      navigatorKey: NavigationService.navigatorKey,
       title: "Erdenet24",
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,

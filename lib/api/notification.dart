@@ -1,6 +1,23 @@
-import 'dart:ui';
-
+import 'dart:convert';
+import 'dart:developer';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:get/get.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final _userCtx = Get.put(UserController());
+final _storeCtx = Get.put(StoreController());
+final _driverCtx = Get.put(DriverController());
+
+void notificationHandler(payload, isBackground) {
+  NotificationService().showNotification(
+    3,
+    "Hello",
+    payload,
+  );
+}
 
 class NotificationService {
   static final NotificationService _notificationService =
@@ -35,7 +52,25 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showNotification(int id, String title, String body) async {
+  Future<void> showNotification(int id, String body, Map payload) async {
+    var data = jsonDecode(payload["data"]);
+    var role = data["role"];
+    var action = data["action"];
+    var description = notificationData
+        .firstWhere((e) => e["role"] == role && e["action"] == action);
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, data);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, data);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, data);
+        break;
+      default:
+        break;
+    }
     const AndroidNotificationDetails _androidNotificationDetails =
         AndroidNotificationDetails(
       'erdenet24_channel',
@@ -59,7 +94,7 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.show(
       id,
-      title,
+      "Erdenet24",
       body,
       platformChannelSpecifics,
       payload: 'Notification Payload',

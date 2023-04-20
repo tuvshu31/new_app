@@ -133,13 +133,13 @@ class StoreController extends GetxController {
   //   }
   // }
 
-  void storeNotificationDataHandler(action, payload) {
+  void storeActionHandler(action, payload) {
     if (action == "payment_success") {
     } else if (action == "sent") {
       playSound("incoming");
       showDialog(
           useSafeArea: true,
-          context: MyApp.navigatorKey.currentContext!,
+          context: NavigationService.navigatorKey.currentContext!,
           barrierDismissible: false,
           builder: (context) {
             return FractionallySizedBox(

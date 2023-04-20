@@ -233,20 +233,20 @@ class DriverController extends GetxController {
     );
   }
 
-  void driverNotifications(action, payload, isBackground) async {
-    if (action == "new_order") {
-      // createCustomNotification(
-      //   isBackground,
-      //   payload,
-      //   isVisible: true,
-      //   customSound: true,
-      //   isCall: true,
-      //   body: "Шинэ захиалга ирлээ",
-      // );
-    }
-  }
+  // void driverNotifications(action, payload, isBackground) async {
+  //   if (action == "new_order") {
+  //     // createCustomNotification(
+  //     //   isBackground,
+  //     //   payload,
+  //     //   isVisible: true,
+  //     //   customSound: true,
+  //     //   isCall: true,
+  //     //   body: "Шинэ захиалга ирлээ",
+  //     // );
+  //   }
+  // }
 
-  void driverNotificationDataHandler(action, payload) async {
+  void driverActionHandler(action, payload) async {
     if (action == "new_order") {
       deliveryInfo.clear();
       deliveryInfo.value = payload;
