@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/navigation.dart';
 import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
@@ -32,6 +34,7 @@ import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -54,18 +57,23 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class NavigationService {
-  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-}
-
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> _firebaseMessagingBackgroundHandler(
+    RemoteMessage message, BuildContext context) async {
   await Firebase.initializeApp();
-  notificationHandler(message.data, true);
+  notificationHandler(message.data, true, context);
 }
 
-Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  notificationHandler(message.data, false);
+Future<void> _firebaseMessagingForegroundHandler(
+    RemoteMessage message, BuildContext context) async {
+  notificationHandler(message.data, false, context);
+}
+
+void firebaseMessaging(context) {
+  FirebaseMessaging.onBackgroundMessage(
+      (message) => _firebaseMessagingBackgroundHandler(message, context));
+  FirebaseMessaging.onMessage.listen(
+      (message) => _firebaseMessagingForegroundHandler(message, context));
 }
 
 void main() async {
@@ -73,10 +81,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   NotificationService().initNotification();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+
   NotificationSettings settings =
       await FirebaseMessaging.instance.requestPermission(
     alert: true,
@@ -105,6 +111,8 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -123,6 +131,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
+    firebaseMessaging(context);
   }
 
   @override

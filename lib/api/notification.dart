@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
@@ -11,11 +12,11 @@ final _userCtx = Get.put(UserController());
 final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
 
-void notificationHandler(payload, isBackground) {
+void notificationHandler(payload, isBackground, context) {
   NotificationService().showNotification(
     3,
-    "Hello",
-    payload,
+    jsonDecode(payload["data"]),
+    context,
   );
 }
 
@@ -48,30 +49,16 @@ class NotificationService {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showNotification(int id, String body, Map payload) async {
-    var data = jsonDecode(payload["data"]);
-    var role = data["role"];
-    var action = data["action"];
+  Future<void> showNotification(
+      int id, Map payload, BuildContext context) async {
+    var role = payload["role"];
+    var action = payload["action"];
     var description = notificationData
         .firstWhere((e) => e["role"] == role && e["action"] == action);
-    switch (role) {
-      case "user":
-        _userCtx.userActionHandler(action, data);
-        break;
-      case "store":
-        _storeCtx.storeActionHandler(action, data);
-        break;
-      case "driver":
-        _driverCtx.driverActionHandler(action, data);
-        break;
-      default:
-        break;
-    }
-    const AndroidNotificationDetails _androidNotificationDetails =
+    const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
       'erdenet24_channel',
       'Erdenet24 Channel',
@@ -81,7 +68,7 @@ class NotificationService {
       importance: Importance.high,
     );
 
-    const IOSNotificationDetails _iosNotificationDetails =
+    const IOSNotificationDetails iosNotificationDetails =
         IOSNotificationDetails(
       sound: 'default.wav',
       presentAlert: true,
@@ -90,14 +77,29 @@ class NotificationService {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
-        android: _androidNotificationDetails, iOS: _iosNotificationDetails);
+      android: androidNotificationDetails,
+      iOS: iosNotificationDetails,
+    );
 
     await flutterLocalNotificationsPlugin.show(
       id,
       "Erdenet24",
-      body,
+      description["description"],
       platformChannelSpecifics,
-      payload: 'Notification Payload',
+      payload: 'Erdenet24',
     );
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, payload, context);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, payload, context);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, payload, context);
+        break;
+      default:
+        break;
+    }
   }
 }

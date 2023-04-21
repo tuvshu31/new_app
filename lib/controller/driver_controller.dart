@@ -246,7 +246,7 @@ class DriverController extends GetxController {
   //   }
   // }
 
-  void driverActionHandler(action, payload) async {
+  void driverActionHandler(action, payload, context) async {
     if (action == "new_order") {
       deliveryInfo.clear();
       deliveryInfo.value = payload;
