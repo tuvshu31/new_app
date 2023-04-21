@@ -12,14 +12,6 @@ final _userCtx = Get.put(UserController());
 final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
 
-void notificationHandler(payload, isBackground, context) {
-  NotificationService().showNotification(
-    3,
-    jsonDecode(payload["data"]),
-    context,
-  );
-}
-
 class NotificationService {
   static final NotificationService _notificationService =
       NotificationService._internal();
@@ -49,15 +41,33 @@ class NotificationService {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (payload) async {
+      log("payload: $payload");
+      // switch (role) {
+      //   case "user":
+      //     _userCtx.userActionHandler(action, payload);
+      //     break;
+      //   case "store":
+      //     _storeCtx.storeActionHandler(action, payload);
+      //     break;
+      //   case "driver":
+      //     _driverCtx.driverActionHandler(action, payload);
+      //     break;
+      //   default:
+      //     break;
+      // }
+    });
   }
 
-  Future<void> showNotification(
-      int id, Map payload, BuildContext context) async {
-    var role = payload["role"];
-    var action = payload["action"];
-    var description = notificationData
-        .firstWhere((e) => e["role"] == role && e["action"] == action);
+  Future<void> showNotification(Map payload, bool isBackground) async {
+    log(payload.toString());
+    log(isBackground.toString());
+    // var data = jsonDecode(payload["data"]);
+    // var role = payload["role"];
+    // var action = payload["action"];
+    // var description = notificationData
+    //     .firstWhere((e) => e["role"] == role && e["action"] == action);
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
       'erdenet24_channel',
@@ -82,24 +92,12 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      id,
+      0,
       "Erdenet24",
-      description["description"],
+      // description["description"],
+      "Hello",
       platformChannelSpecifics,
-      payload: 'Erdenet24',
+      payload: payload.toString(),
     );
-    switch (role) {
-      case "user":
-        _userCtx.userActionHandler(action, payload, context);
-        break;
-      case "store":
-        _storeCtx.storeActionHandler(action, payload, context);
-        break;
-      case "driver":
-        _driverCtx.driverActionHandler(action, payload, context);
-        break;
-      default:
-        break;
-    }
   }
 }

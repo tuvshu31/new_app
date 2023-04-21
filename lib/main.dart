@@ -58,22 +58,13 @@ import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage message, BuildContext context) async {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  notificationHandler(message.data, true, context);
+  NotificationService().showNotification(message.data, true);
 }
 
-Future<void> _firebaseMessagingForegroundHandler(
-    RemoteMessage message, BuildContext context) async {
-  notificationHandler(message.data, false, context);
-}
-
-void firebaseMessaging(context) {
-  FirebaseMessaging.onBackgroundMessage(
-      (message) => _firebaseMessagingBackgroundHandler(message, context));
-  FirebaseMessaging.onMessage.listen(
-      (message) => _firebaseMessagingForegroundHandler(message, context));
+Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
+  NotificationService().showNotification(message.data, false);
 }
 
 void main() async {
@@ -82,7 +73,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   NotificationService().initNotification();
-
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
   NotificationSettings settings =
       await FirebaseMessaging.instance.requestPermission(
     alert: true,
@@ -111,8 +103,6 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -131,13 +121,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
-    firebaseMessaging(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: NavigationService.navigatorKey,
+      navigatorKey: Get.key,
       title: "Erdenet24",
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,

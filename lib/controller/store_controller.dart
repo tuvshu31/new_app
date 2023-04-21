@@ -133,7 +133,7 @@ class StoreController extends GetxController {
   //   }
   // }
 
-  void storeActionHandler(action, payload, context) {
+  void storeActionHandler(action, payload) {
     if (action == "payment_success") {
     } else if (action == "sent") {
       playSound("incoming");

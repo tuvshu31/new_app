@@ -197,15 +197,23 @@ class UserController extends GetxController {
     );
   }
 
-  void userActionHandler(action, payload, context) {
+  @override
+  void onReady() {
+    super.onReady();
+  }
+
+  void userActionHandler(action, payload) {
     if (action == "payment_success") {
-      successOrderModal(context, () {
-        var body = {"orderStatus": "sent"};
-        updateOrder(payload["id"], body);
-        RestApiHelper.saveOrderId(payload["id"]);
-        _cartCtx.cartList.clear();
-        Get.off(() => const UserOrderActiveScreen());
-      });
+      // successOrderModal(
+      //   Get.context,
+      //   () async {
+      //     var body = {"orderStatus": "sent"};
+      //     updateOrder(payload["id"], body);
+      //     RestApiHelper.saveOrderId(payload["id"]);
+      //     _cartCtx.cartList.clear();
+      //     Get.off(() => const UserOrderActiveScreen());
+      //   },
+      // );
     } else if (action == "sent") {
       userActiveOrderChangeView(0);
     } else if (action == "received") {
