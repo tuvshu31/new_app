@@ -95,11 +95,12 @@ dependencies:
   connectivity_plus: ^3.0.3
   flutter_app_version_checker: ^0.3.2
   webview_flutter: ^4.0.7
-  firebase_core: ^2.8.0
-  firebase_messaging: ^14.3.0
   badges: ^3.0.3
-  flutter_local_notifications: ^8.2.0
-  flutter_fgbg: ^0.2.2
+  firebase_core: ^2.8.0
+  awesome_notifications: ^0.7.4+1
+  awesome_notifications_fcm: ^0.7.4+1
+  # firebase_messaging: ^14.3.0
+  # flutter_local_notifications: ^8.2.0
 
 dev_dependencies:
   flutter_test:

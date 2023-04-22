@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/navigation.dart';
 import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
@@ -36,7 +38,7 @@ import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
@@ -54,16 +56,56 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'firebase_options.dart';
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  notificationHandler(message.data, true);
+// @pragma('vm:entry-point')
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   await Firebase.initializeApp();
+//   log("Background message irj bn :)");
+//   notificationHandler(message.data, true);
+// }
+
+// Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
+//   log("Foreground message irj bn :)");
+//   notificationHandler(message.data, true);
+// }
+//  *********************************************
+///     REMOTE NOTIFICATION EVENTS
+///  *********************************************
+
+/// Use this method to execute on background when a silent data arrives
+/// (even while terminated)
+@pragma("vm:entry-point")
+Future<void> mySilentDataHandle(FcmSilentData silentData) async {
+  print('"SilentData": ${silentData.toString()}');
+
+  if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
+    print("BACKGROUND");
+  } else {
+    print("FOREGROUND");
+  }
+
+  // print("starting long task");
+  // await Future.delayed(Duration(seconds: 4));
+  // final url = Uri.parse("http://google.com");
+  // final re = await http.get(url);
+  // print(re.body);
+  // print("long task done");
 }
 
-Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  notificationHandler(message.data, true);
+/// Use this method to detect when a new fcm token is received
+@pragma("vm:entry-point")
+Future<void> myFcmTokenHandle(String token) async {
+  log("Fcm Token: $token");
+  var body = {"mapToken": token};
+  await RestApi().updateUser(RestApiHelper.getUserId(), body);
+}
+
+/// Use this method to detect when a new native token is received
+@pragma("vm:entry-point")
+Future<void> myNativeTokenHandle(String token) async {
+  log("Native Token: $token");
 }
 
 void main() async {
@@ -71,10 +113,32 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  NotificationService().initNotification();
-  NotificationService().requestPermission();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+  // NotificationService().initNotification();
+  // NotificationService().requestPermission();
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+
+  Future<void> initializeRemoteNotifications({required bool debug}) async {
+    await Firebase.initializeApp();
+    await AwesomeNotificationsFcm().initialize(
+      onFcmSilentDataHandle: mySilentDataHandle,
+      onFcmTokenHandle: myFcmTokenHandle,
+      onNativeTokenHandle: myNativeTokenHandle,
+      // This license key is necessary only to remove the watermark for
+      // push notifications in release mode. To know more about it, please
+      // visit http://awesome-notifications.carda.me#prices
+      licenseKeys: null,
+      debug: debug,
+    );
+    AwesomeNotifications().requestPermissionToSendNotifications();
+  }
+
+  initializeRemoteNotifications(debug: true);
+  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+    log("receivedAction: $receivedAction");
+  }
+
+  onActionReceivedMethod;
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
@@ -109,7 +173,6 @@ class _MyAppState extends State<MyApp> {
   final productCtrl = Get.put(ProductController(), permanent: true);
   final _loginCtx = Get.put(LoginController());
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
-
   @override
   void initState() {
     super.initState();

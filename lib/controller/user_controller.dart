@@ -205,6 +205,7 @@ class UserController extends GetxController {
   void userActionHandler(action, payload) {
     if (action == "payment_success") {
       var body = {"orderStatus": "sent"};
+      log(body.toString());
       updateOrder(payload["id"], body);
       RestApiHelper.saveOrderId(payload["id"]);
       _cartCtx.cartList.clear();

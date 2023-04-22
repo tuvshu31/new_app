@@ -136,6 +136,7 @@ class StoreController extends GetxController {
   void storeActionHandler(action, payload) {
     if (action == "payment_success") {
     } else if (action == "sent") {
+      log("Store sent action irj bn :)");
       playSound("incoming");
       showDialog(
           useSafeArea: true,
