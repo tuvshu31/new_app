@@ -15,6 +15,7 @@ import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
   final _cartCtrl = Get.put(CartController());
+  RxString userToken = "".obs;
   RxInt verifyCode = 0.obs;
   TextEditingController phoneController = TextEditingController();
 

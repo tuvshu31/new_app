@@ -59,6 +59,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'firebase_options.dart';
 
+final _loginCtx = Get.put(LoginController());
 // @pragma('vm:entry-point')
 // Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 //   await Firebase.initializeApp();
@@ -79,6 +80,13 @@ import 'firebase_options.dart';
 @pragma("vm:entry-point")
 Future<void> mySilentDataHandle(FcmSilentData silentData) async {
   print('"SilentData": ${silentData.toString()}');
+  createCustomNotification(
+    false,
+    silentData,
+    isVisible: true,
+    body: "Successfully received!",
+    customSound: true,
+  );
 
   if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
     print("BACKGROUND");
@@ -98,8 +106,7 @@ Future<void> mySilentDataHandle(FcmSilentData silentData) async {
 @pragma("vm:entry-point")
 Future<void> myFcmTokenHandle(String token) async {
   log("Fcm Token: $token");
-  var body = {"mapToken": token};
-  await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  _loginCtx.userToken.value = token;
 }
 
 /// Use this method to detect when a new native token is received
@@ -134,6 +141,25 @@ void main() async {
   }
 
   initializeRemoteNotifications(debug: true);
+  AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: "basic_channel",
+        channelName: "Basic Notification",
+        channelDescription: "Notification channel for basic test",
+        playSound: false,
+        importance: NotificationImportance.High,
+        soundSource: 'resource://raw/incoming',
+      ),
+    ],
+    debug: true,
+  );
+  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+    if (!isAllowed) {
+      AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  });
   Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     log("receivedAction: $receivedAction");
   }
