@@ -72,65 +72,89 @@ List notificationData = [
     "role": "user",
     "action": "payment_success",
     "description": "Захиалгын төлбөр амжилттай төлөгдлөө",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "sent",
     "description": "Захиалгыг хүлээн авлаа",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "sent",
     "description": "Захиалгыг хүлээн авлаа",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "received",
     "description": "Таны захиалгыг хүлээн авлаа",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "preparing",
     "description": "Таны захиалгыг бэлтгэж эхэллээ",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "delivering",
     "description": "Таны захиалга хүргэлтэнд гарлаа",
+    "showNotification": true
   },
   {
     "role": "user",
     "action": "delivered",
     "description": "Таны захиалга амжилттай хүргэгдлээ",
+    "showNotification": true
   },
   {
     "role": "store",
     "action": "sent",
     "description": "Шинэ захиалга ирлээ",
+    "showNotification": true
   },
   {
     "role": "store",
     "action": "received",
     "description": "Захиалгыг хүлээн авлаа",
+    "showNotification": true
   },
   {
     "role": "store",
     "action": "driverAccepted",
     "description": "Жолооч дуудлага хүлээн авлаа",
+    "showNotification": true
   },
   {
     "role": "store",
     "action": "delivering",
     "description": "Хүргэлтэнд гарлаа",
+    "showNotification": true
   },
   {
     "role": "store",
     "action": "delivered",
     "description": "Хүргэлт амжилттай",
+    "showNotification": true
   },
   {
     "role": "driver",
     "action": "new_order",
     "description": "Шинэ захиалга ирлээ",
+    "showNotification": true
   },
 ];
+String notificationDescription(role, action) {
+  Map result = notificationData
+      .firstWhere((e) => e["role"] == role && e["action"] == action);
+  return result["description"];
+}
+
+bool notificationShow(role, action) {
+  Map result = notificationData
+      .firstWhere((e) => e["role"] == role && e["action"] == action);
+  return result["showNotification"];
+}

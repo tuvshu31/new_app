@@ -55,16 +55,15 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  NotificationService().showNotification(message.data, true);
+  notificationHandler(message.data, true);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  NotificationService().showNotification(message.data, false);
+  notificationHandler(message.data, true);
 }
 
 void main() async {
@@ -73,18 +72,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   NotificationService().initNotification();
+  NotificationService().requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
@@ -101,6 +91,9 @@ void main() async {
     },
   );
 }
+
+final GlobalKey<NavigatorState> navigatorKey =
+    GlobalKey(debugLabel: "Main Navigator");
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -126,7 +119,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: Get.key,
+      navigatorKey: navigatorKey,
       title: "Erdenet24",
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,

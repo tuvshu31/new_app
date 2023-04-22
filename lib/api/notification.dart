@@ -1,6 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
@@ -11,6 +16,26 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 final _userCtx = Get.put(UserController());
 final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
+
+void notificationHandler(Map data, bool isBackground) {
+  var payload = jsonDecode(data["data"]);
+  var role = payload["role"];
+  var action = payload["action"];
+  var isBckNotification = isBackground;
+  var description = notificationDescription(role, action);
+  var showNotification = notificationShow(role, action);
+  log("payload: $payload");
+  log("role: $role");
+  log("action: $action");
+  log("isBckNotification: $isBckNotification");
+  log("description: $description");
+  log("showNotification: $showNotification");
+
+  if (showNotification) {
+    NotificationService().showNotification(description);
+    Get.offNamed(userOrdersActiveScreenRoute);
+  }
+}
 
 class NotificationService {
   static final NotificationService _notificationService =
@@ -60,14 +85,19 @@ class NotificationService {
     });
   }
 
-  Future<void> showNotification(Map payload, bool isBackground) async {
-    log(payload.toString());
-    log(isBackground.toString());
-    // var data = jsonDecode(payload["data"]);
-    // var role = payload["role"];
-    // var action = payload["action"];
-    // var description = notificationData
-    //     .firstWhere((e) => e["role"] == role && e["action"] == action);
+  Future<void> requestPermission() async {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+  }
+
+  Future<void> showNotification(String description) async {
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
       'erdenet24_channel',
@@ -94,10 +124,8 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.show(
       0,
       "Erdenet24",
-      // description["description"],
-      "Hello",
+      description,
       platformChannelSpecifics,
-      payload: payload.toString(),
     );
   }
 }
