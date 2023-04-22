@@ -33,7 +33,19 @@ void notificationHandler(Map data, bool isBackground) {
 
   if (showNotification) {
     NotificationService().showNotification(description);
-    Get.offNamed(userOrdersActiveScreenRoute);
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, payload);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, payload);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, payload);
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -67,22 +79,7 @@ class NotificationService {
       iOS: initializationSettingsIOS,
     );
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (payload) async {
-      log("payload: $payload");
-      // switch (role) {
-      //   case "user":
-      //     _userCtx.userActionHandler(action, payload);
-      //     break;
-      //   case "store":
-      //     _storeCtx.storeActionHandler(action, payload);
-      //     break;
-      //   case "driver":
-      //     _driverCtx.driverActionHandler(action, payload);
-      //     break;
-      //   default:
-      //     break;
-      // }
-    });
+        onSelectNotification: (payload) async {});
   }
 
   Future<void> requestPermission() async {
