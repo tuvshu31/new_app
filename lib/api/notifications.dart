@@ -9,6 +9,7 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -66,30 +67,35 @@ final _driverCtx = Get.put(DriverController());
 //   }
 // }
 
-void createCustomNotification(
-  isBackground,
-  payload, {
-  bool isVisible = false,
-  bool isCall = false,
-  String title = "Erdenet24",
-  String body = "",
-  bool customSound = false,
-}) {
+void notificationHandler(silentData) {
+  var data = silentData.data["data"];
+  var payload = jsonDecode(data);
+  var role = payload["role"] ?? "";
+  var action = payload["action"] ?? "";
+  var orderId = payload["orderId"] ?? "";
+  var isBackground =
+      silentData.createdLifeCycle == NotificationLifeCycle.Background;
+  var notifInfo = notificationData.firstWhere(
+    (element) => element["role"] == role && element["action"] == action,
+  );
+  var body = notifInfo["body"];
+  var type = notifInfo["type"];
+  var visible = notifInfo["visible"];
+
   AwesomeNotifications().createNotification(
     content: NotificationContent(
-      displayOnForeground: isVisible,
-      displayOnBackground: isVisible,
+      displayOnForeground: true,
+      displayOnBackground: true,
       criticalAlert: true,
-      progress: 32,
-      category: isBackground
-          ? (isCall ? NotificationCategory.Call : NotificationCategory.Message)
+      category: type == "call"
+          ? NotificationCategory.Call
           : NotificationCategory.Message,
-      customSound: 'resource://raw/incoming',
+      customSound: type == "call" ? 'resource://raw/incoming' : "",
       id: 1,
       channelKey: "basic_channel",
-      title: title,
+      title: "Erdenet24",
       body: body,
-      // payload: Map<String, String>.from(payload),
+      payload: silentData.data,
     ),
   );
 }
@@ -100,8 +106,23 @@ class NotificationController {
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
     log("onNotificationCreatedMethod");
-    var data = jsonDecode(receivedNotification.payload!["data"]!);
-    // handleNotifications(data);
+    var data = receivedNotification.payload!["data"];
+    var payload = jsonDecode(data!);
+    var role = payload["role"];
+    var action = payload["action"];
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, payload);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, payload);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, payload);
+        break;
+      default:
+        break;
+    }
   }
 
   /// Use this method to detect every time that a new notification is displayed

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
@@ -33,6 +34,7 @@ class DriverMainScreen extends StatefulWidget {
 class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
   final _networkCtx = Get.put(NetWorkController());
+  final _loginCtx = Get.put(LoginController());
   final GlobalKey<SlideActionState> key = GlobalKey();
   TextEditingController driverApproveCodeCtrl = TextEditingController();
 
@@ -55,7 +57,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    // saveUserToken();
+    _loginCtx.getFirebaseMessagingToken();
     _networkCtx.checkNetworkAccess(context);
     _driverCtx.fetchDriverInfo();
   }

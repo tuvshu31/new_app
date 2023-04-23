@@ -77,22 +77,10 @@ final _loginCtx = Get.put(LoginController());
 
 /// Use this method to execute on background when a silent data arrives
 /// (even while terminated)
+/// //Background message handler
 @pragma("vm:entry-point")
 Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-  print('"SilentData": ${silentData.toString()}');
-  createCustomNotification(
-    false,
-    silentData,
-    isVisible: true,
-    body: "Successfully received!",
-    customSound: true,
-  );
-
-  if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
-    print("BACKGROUND");
-  } else {
-    print("FOREGROUND");
-  }
+  notificationHandler(silentData);
 
   // print("starting long task");
   // await Future.delayed(Duration(seconds: 4));
@@ -106,7 +94,6 @@ Future<void> mySilentDataHandle(FcmSilentData silentData) async {
 @pragma("vm:entry-point")
 Future<void> myFcmTokenHandle(String token) async {
   log("Fcm Token: $token");
-  _loginCtx.userToken.value = token;
 }
 
 /// Use this method to detect when a new native token is received
@@ -148,7 +135,7 @@ void main() async {
         channelKey: "basic_channel",
         channelName: "Basic Notification",
         channelDescription: "Notification channel for basic test",
-        playSound: false,
+        playSound: true,
         importance: NotificationImportance.High,
         soundSource: 'resource://raw/incoming',
       ),
@@ -160,9 +147,19 @@ void main() async {
       AwesomeNotifications().requestPermissionToSendNotifications();
     }
   });
+  //FOreground
   Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     log("receivedAction: $receivedAction");
   }
+
+  AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod);
 
   onActionReceivedMethod;
 

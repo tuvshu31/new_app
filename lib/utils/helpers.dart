@@ -67,94 +67,116 @@ Future<void> makePhoneCall(String phoneNumber) async {
   await launchUrl(launchUri);
 }
 
-List notificationData = [
+List<Map<String, dynamic>> notificationData = [
   {
     "role": "user",
     "action": "payment_success",
-    "description": "Захиалгын төлбөр амжилттай төлөгдлөө",
-    "showNotification": true
+    "body": "Захиалгын төлбөр амжилттай төлөгдлөө",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "sent",
-    "description": "Захиалгыг хүлээн авлаа",
-    "showNotification": true
+    "body": "Захиалгыг хүлээн авлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "sent",
-    "description": "Захиалгыг хүлээн авлаа",
-    "showNotification": true
+    "body": "Захиалгыг хүлээн авлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "received",
-    "description": "Таны захиалгыг хүлээн авлаа",
-    "showNotification": true
+    "body": "Таны захиалгыг хүлээн авлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "preparing",
-    "description": "Таны захиалгыг бэлтгэж эхэллээ",
-    "showNotification": true
+    "body": "Таны захиалгыг бэлтгэж эхэллээ",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "delivering",
-    "description": "Таны захиалга хүргэлтэнд гарлаа",
-    "showNotification": true
+    "body": "Таны захиалга хүргэлтэнд гарлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "user",
     "action": "delivered",
-    "description": "Таны захиалга амжилттай хүргэгдлээ",
-    "showNotification": true
+    "body": "Таны захиалга амжилттай хүргэгдлээ",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "store",
     "action": "sent",
-    "description": "Шинэ захиалга ирлээ",
-    "showNotification": true
+    "body": "Шинэ захиалга ирлээ",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "store",
     "action": "received",
-    "description": "Захиалгыг хүлээн авлаа",
-    "showNotification": true
+    "body": "Захиалгыг хүлээн авлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "store",
     "action": "driverAccepted",
-    "description": "Жолооч дуудлага хүлээн авлаа",
-    "showNotification": true
+    "body": "Жолооч дуудлага хүлээн авлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "store",
     "action": "delivering",
-    "description": "Хүргэлтэнд гарлаа",
-    "showNotification": true
+    "body": "Хүргэлтэнд гарлаа",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "store",
     "action": "delivered",
-    "description": "Хүргэлт амжилттай",
-    "showNotification": true
+    "body": "Хүргэлт амжилттай",
+    "visible": true,
+    "type": "message",
   },
   {
     "role": "driver",
     "action": "new_order",
-    "description": "Шинэ захиалга ирлээ",
-    "showNotification": true
+    "body": "Шинэ захиалга ирлээ",
+    "visible": true,
+    "type": "message",
   },
 ];
-String notificationDescription(role, action) {
-  Map result = notificationData
-      .firstWhere((e) => e["role"] == role && e["action"] == action);
-  return result["description"];
+String notifRole(payload) {
+  var role = notificationData.firstWhere((element) =>
+      element["role"] == payload["role"] &&
+      element["action"] == payload["action"])["role"];
+  return role;
 }
 
-bool notificationShow(role, action) {
-  Map result = notificationData
-      .firstWhere((e) => e["role"] == role && e["action"] == action);
-  return result["showNotification"];
+String notifType(payload) {
+  var role = notificationData.firstWhere((element) =>
+      element["role"] == payload["role"] &&
+      element["action"] == payload["action"])["type"];
+  return role;
+}
+
+String notifBody(payload) {
+  var role = notificationData.firstWhere((element) =>
+      element["role"] == payload["role"] &&
+      element["action"] == payload["action"])["body"];
+  return role;
 }

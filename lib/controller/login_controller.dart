@@ -5,6 +5,7 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:flutter_material_pickers/main.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,7 +16,6 @@ import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
   final _cartCtrl = Get.put(CartController());
-  RxString userToken = "".obs;
   RxInt verifyCode = 0.obs;
   TextEditingController phoneController = TextEditingController();
 
@@ -48,5 +48,22 @@ class LoginController extends GetxController {
     _checker.checkUpdate().then((value) {
       log(value.toString());
     });
+  }
+
+  Future<String> getFirebaseMessagingToken() async {
+    String firebaseAppToken = '';
+    if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
+      try {
+        firebaseAppToken =
+            await AwesomeNotificationsFcm().requestFirebaseAppToken();
+        var body = {"mapToken": firebaseAppToken};
+        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+      } catch (exception) {
+        debugPrint('$exception');
+      }
+    } else {
+      debugPrint('Firebase is not available on this project');
+    }
+    return firebaseAppToken;
   }
 }

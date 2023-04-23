@@ -32,21 +32,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void initState() {
     super.initState();
     _cartCtrl.getUserProducts();
-    saveUserToken();
     _userCtx.getOrders();
-  }
-
-  void saveUserToken() async {
-    var body = {"mapToken": _loginCtx.userToken.value};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    // await FirebaseMessaging.instance.deleteToken();
-    // final fcmToken = await FirebaseMessaging.instance.getToken();
-    // var body = {"mapToken": fcmToken};
-    // await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    // FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    //   var body = {"mapToken": newToken};
-    //   await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    // });
+    _loginCtx.getFirebaseMessagingToken();
   }
 
   @override

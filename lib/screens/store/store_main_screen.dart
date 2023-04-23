@@ -28,13 +28,14 @@ class StoreMainScreen extends StatefulWidget {
 
 class _StoreMainScreenState extends State<StoreMainScreen> {
   final _storeCtx = Get.put(StoreController());
-  final _loginCtrl = Get.put(LoginController());
+  final _loginCtx = Get.put(LoginController());
   final _networkCtx = Get.put(NetWorkController());
 
   @override
   void initState() {
     super.initState();
     // saveUserToken();
+    _loginCtx.getFirebaseMessagingToken();
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
   }
@@ -84,7 +85,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                           _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                           _listTile(IconlyLight.login, "Аппаас гарах", () {
                             logOutModal(context, () {
-                              _loginCtrl.logout();
+                              _loginCtx.logout();
                             });
                           })
                         ],
