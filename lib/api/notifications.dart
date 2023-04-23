@@ -68,6 +68,7 @@ final _driverCtx = Get.put(DriverController());
 // }
 
 void notificationHandler(silentData) {
+  log("silentData: $silentData");
   var data = silentData.data["data"];
   var payload = jsonDecode(data);
   var role = payload["role"] ?? "";
