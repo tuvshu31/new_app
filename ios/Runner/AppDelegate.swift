@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import GoogleMaps
 import FirebaseCore
+import awesome_notifications
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
