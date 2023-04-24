@@ -3,7 +3,7 @@ import Flutter
 import GoogleMaps
 import FirebaseCore
 import awesome_notifications
-import shared_preferences_ios
+import shared_preferences_foundation
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
