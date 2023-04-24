@@ -68,36 +68,38 @@ final _driverCtx = Get.put(DriverController());
 // }
 
 void notificationHandler(silentData) {
-  log("silentData: $silentData");
-  var data = silentData.data["data"];
-  var payload = jsonDecode(data);
-  var role = payload["role"] ?? "";
-  var action = payload["action"] ?? "";
-  var orderId = payload["orderId"] ?? "";
-  var isBackground =
-      silentData.createdLifeCycle == NotificationLifeCycle.Background;
-  var notifInfo = notificationData.firstWhere(
-    (element) => element["role"] == role && element["action"] == action,
-  );
-  var body = notifInfo["body"];
-  var type = notifInfo["type"];
-  var visible = notifInfo["visible"];
+  // log("silentData: $silentData");
+  // var data = silentData.data["data"];
+  // var payload = jsonDecode(data);
+  // var role = payload["role"] ?? "";
+  // var action = payload["action"] ?? "";
+  // var orderId = payload["orderId"] ?? "";
+  // var isBackground =
+  //     silentData.createdLifeCycle == NotificationLifeCycle.Background;
+  // var notifInfo = notificationData.firstWhere(
+  //   (element) => element["role"] == role && element["action"] == action,
+  // );
+  // var body = notifInfo["body"];
+  // var type = notifInfo["type"];
+  // var visible = notifInfo["visible"];
 
   AwesomeNotifications().createNotification(
     content: NotificationContent(
-      displayOnForeground: true,
-      displayOnBackground: true,
-      criticalAlert: true,
-      category: type == "call"
-          ? NotificationCategory.Call
-          : NotificationCategory.Message,
-      customSound: type == "call" ? 'resource://raw/incoming' : "",
-      id: 1,
-      channelKey: "basic_channel",
-      title: "Erdenet24",
-      body: body,
-      payload: silentData.data,
-    ),
+        displayOnForeground: true,
+        displayOnBackground: true,
+        criticalAlert: true,
+        category: NotificationCategory.Message,
+        // category: type == "call"
+        //     ? NotificationCategory.Call
+        //     : NotificationCategory.Message,
+        // customSound: type == "call" ? 'resource://raw/incoming' : "",
+        id: 1,
+        channelKey: "basic_channel",
+        title: "Erdenet24",
+        // body: body,
+        body: "AMjilttai holbogdloo"
+        // payload: silentData.data,
+        ),
   );
 }
 

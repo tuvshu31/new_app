@@ -80,7 +80,7 @@ final _loginCtx = Get.put(LoginController());
 /// //Background message handler
 @pragma("vm:entry-point")
 Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-  // notificationHandler(silentData);
+  notificationHandler(silentData);
   log("mySilentDataHandle: $silentData");
 
   // print("starting long task");
