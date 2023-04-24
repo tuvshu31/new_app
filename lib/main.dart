@@ -59,110 +59,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'firebase_options.dart';
 
-final _loginCtx = Get.put(LoginController());
-// @pragma('vm:entry-point')
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
-//   log("Background message irj bn :)");
-//   notificationHandler(message.data, true);
-// }
-
-// Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-//   log("Foreground message irj bn :)");
-//   notificationHandler(message.data, true);
-// }
-//  *********************************************
-///     REMOTE NOTIFICATION EVENTS
-///  *********************************************
-
-/// Use this method to execute on background when a silent data arrives
-/// (even while terminated)
-/// //Background message handler
-@pragma("vm:entry-point")
-Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-  notificationHandler(silentData);
-  log("mySilentDataHandle: $silentData");
-
-  // print("starting long task");
-  // await Future.delayed(Duration(seconds: 4));
-  // final url = Uri.parse("http://google.com");
-  // final re = await http.get(url);
-  // print(re.body);
-  // print("long task done");
-}
-
-/// Use this method to detect when a new fcm token is received
-@pragma("vm:entry-point")
-Future<void> myFcmTokenHandle(String token) async {
-  log("Fcm Token: $token");
-}
-
-/// Use this method to detect when a new native token is received
-@pragma("vm:entry-point")
-Future<void> myNativeTokenHandle(String token) async {
-  log("Native Token: $token");
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // NotificationService().initNotification();
-  // NotificationService().requestPermission();
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
-  Future<void> initializeRemoteNotifications({required bool debug}) async {
-    await Firebase.initializeApp();
-    await AwesomeNotificationsFcm().initialize(
-      onFcmSilentDataHandle: mySilentDataHandle,
-      onFcmTokenHandle: myFcmTokenHandle,
-      onNativeTokenHandle: myNativeTokenHandle,
-      // This license key is necessary only to remove the watermark for
-      // push notifications in release mode. To know more about it, please
-      // visit http://awesome-notifications.carda.me#prices
-      licenseKeys: null,
-      debug: debug,
-    );
-    AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-
-  initializeRemoteNotifications(debug: true);
-  AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: "basic_channel",
-        channelName: "Basic Notification",
-        channelDescription: "Notification channel for basic test",
-        playSound: true,
-        importance: NotificationImportance.High,
-        soundSource: 'resource://raw/incoming',
-      ),
-    ],
-    debug: true,
-  );
-  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-    if (!isAllowed) {
-      AwesomeNotifications().requestPermissionToSendNotifications();
-    }
-  });
-  //FOreground
-  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    log("receivedAction: $receivedAction");
-  }
-
-  AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod:
-          NotificationController.onNotificationCreatedMethod,
-      onNotificationDisplayedMethod:
-          NotificationController.onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod:
-          NotificationController.onDismissActionReceivedMethod);
-
-  onActionReceivedMethod;
+  NotificationController.initializeRemoteNotificationsFcm(debug: true);
+  NotificationController.initializeRemoteNotifications(debug: true);
+  NotificationController.setNotificationListeners();
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
@@ -201,6 +106,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
+    NotificationController.askNotificationPermission();
   }
 
   @override

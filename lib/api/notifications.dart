@@ -103,7 +103,7 @@ void notificationHandler(silentData) {
   );
 }
 
-class NotificationController {
+class NotificationControlle {
   /// Use this method to detect when a new notification or a schedule is created
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
