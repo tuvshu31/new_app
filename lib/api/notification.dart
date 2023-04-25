@@ -19,6 +19,7 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
     print('"SilentData": ${silentData.toString()}');
+    createNotification();
 
     if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
       print("bg");
@@ -61,6 +62,27 @@ class NotificationController {
         ),
       ],
       debug: debug,
+    );
+  }
+
+  static Future<void> createNotification() async {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+          displayOnForeground: true,
+          displayOnBackground: true,
+          criticalAlert: true,
+          category: NotificationCategory.Message,
+          // category: type == "call"
+          //     ? NotificationCategory.Call
+          //     : NotificationCategory.Message,
+          // customSound: type == "call" ? 'resource://raw/incoming' : "",
+          id: 1,
+          channelKey: "basic_channel",
+          title: "Erdenet24",
+          // body: body,
+          body: "AMjilttai holbogdloo"
+          // payload: silentData.data,
+          ),
     );
   }
 

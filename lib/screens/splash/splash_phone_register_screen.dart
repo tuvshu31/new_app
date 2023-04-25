@@ -41,16 +41,23 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
     } else {
       _loginCtrl.verifyCode.value = random6digit();
     }
-    dynamic authCode = await RestApi().sendAuthCode(
-        _loginCtrl.phoneController.text,
-        _loginCtrl.verifyCode.value.toString());
+    //OTP ajillahgui bga uyd
+
     Get.back();
-    if (authCode[0]["Result"] == "SUCCESS") {
-      Get.toNamed(splashOtpScreenRoute);
-    } else {
-      errorSnackBar(
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
-    }
+    Get.toNamed(splashOtpScreenRoute);
+
+    //OTP ajillaj bga uyd
+
+    // dynamic authCode = await RestApi().sendAuthCode(
+    //     _loginCtrl.phoneController.text,
+    //     _loginCtrl.verifyCode.value.toString());
+    // Get.back();
+    // if (authCode[0]["Result"] == "SUCCESS") {
+    //   Get.toNamed(splashOtpScreenRoute);
+    // } else {
+    //   errorSnackBar(
+    //       "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+    // }
   }
 
   @override
