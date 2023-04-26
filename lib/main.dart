@@ -67,7 +67,6 @@ void main() async {
 
   NotificationController.initializeRemoteNotificationsFcm(debug: true);
   NotificationController.initializeRemoteNotifications(debug: true);
-  NotificationController.setNotificationListeners();
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
@@ -107,6 +106,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loginCtx.checkVersion(context);
     NotificationController.askNotificationPermission();
+    NotificationController.setNotificationListeners();
   }
 
   @override
