@@ -66,7 +66,7 @@ class NotificationController {
   }
 
   static Future<void> createNotification() async {
-    AwesomeNotifications().createNotification(
+    await AwesomeNotifications().createNotification(
       content: NotificationContent(
           displayOnForeground: true,
           displayOnBackground: true,
