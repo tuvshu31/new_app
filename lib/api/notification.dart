@@ -28,7 +28,7 @@ class NotificationController {
 
   @pragma("vm:entry-point")
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-    log("silentData: $silentData");
+    print("silentData: $silentData");
     var data = silentData.data!["data"];
     var payload = jsonDecode(data!);
     var role = payload["role"] ?? "";
