@@ -2,7 +2,7 @@ import UIKit
 import Flutter
 import GoogleMaps
 import awesome_notifications
-import shared_preferences_ios
+import shared_preferences_foundation
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -18,7 +18,7 @@ import shared_preferences_ios
       SwiftAwesomeNotificationsPlugin.setPluginRegistrantCallback { registry in          
           SwiftAwesomeNotificationsPlugin.register(
             with: registry.registrar(forPlugin: "io.flutter.plugins.awesomenotifications.AwesomeNotificationsPlugin")!)          
-          FLTSharedPreferencesPlugin.register(
+          SharedPreferencesPlugin.register(
             with: registry.registrar(forPlugin: "io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin")!)
       }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
