@@ -98,12 +98,12 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                             children: [
                               CustomInkWell(
                                 onTap: () {
-                                  // _count[index]["count"] > 0
-                                  //     ? Get.toNamed(
-                                  //         userCategoryProductsScreenRoute,
-                                  //         arguments: _data[index])
-                                  //     : () {};
-                                  NotificationController.createNotification();
+                                  _count[index]["count"] > 0
+                                      ? Get.toNamed(
+                                          userCategoryProductsScreenRoute,
+                                          arguments: _data[index])
+                                      : () {};
+                                  // NotificationController.createNotification();
                                 },
                                 borderRadius: BorderRadius.circular(50),
                                 child: Container(
