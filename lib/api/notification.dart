@@ -165,6 +165,24 @@ class NotificationController {
   static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
     // Your code goes here
+    log("onNotificationDisplayedMethod");
+    var data = receivedNotification.payload!["data"];
+    var payload = jsonDecode(data!);
+    var role = payload["role"];
+    var action = payload["action"];
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, payload);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, payload);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, payload);
+        break;
+      default:
+        break;
+    }
   }
 
   /// Use this method to detect if the user dismissed a notification
