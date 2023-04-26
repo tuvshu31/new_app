@@ -138,10 +138,9 @@ class NotificationController {
 
   /// Use this method to detect when a new notification or a schedule is created
   @pragma("vm:entry-point")
-  static Future<void> onNotificationCreatedMethod(
+  static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
     // Your code goes here
-    log("onNotificationCreatedMethod");
     var data = receivedNotification.payload!["data"];
     var payload = jsonDecode(data!);
     var role = payload["role"];
@@ -162,9 +161,11 @@ class NotificationController {
   }
 
   /// Use this method to detect every time that a new notification is displayed
+
   @pragma("vm:entry-point")
-  static Future<void> onNotificationDisplayedMethod(
+  static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
+    log("onNotificationCreatedMethod");
     // Your code goes here
   }
 
