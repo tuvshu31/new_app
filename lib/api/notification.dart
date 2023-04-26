@@ -66,11 +66,12 @@ class NotificationController {
   }
 
   static Future<void> createNotification() async {
+    log("Notification Irj bn");
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
           displayOnForeground: true,
           displayOnBackground: true,
-          criticalAlert: true,
+          // criticalAlert: true,
           category: NotificationCategory.Message,
           // category: type == "call"
           //     ? NotificationCategory.Call
