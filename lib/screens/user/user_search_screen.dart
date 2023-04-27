@@ -100,16 +100,11 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                             children: [
                               CustomInkWell(
                                 onTap: () {
-                                  // _count[index]["count"] > 0
-                                  //     ? Get.toNamed(
-                                  //         userCategoryProductsScreenRoute,
-                                  //         arguments: _data[index])
-                                  //     : () {};
-                                  Noti.showBigTextNotification(
-                                      title: "Hello",
-                                      body: "Bolchloo",
-                                      fln: flutterLocalNotificationsPlugin);
-                                  // NotificationController.createNotification();
+                                  _count[index]["count"] > 0
+                                      ? Get.toNamed(
+                                          userCategoryProductsScreenRoute,
+                                          arguments: _data[index])
+                                      : () {};
                                 },
                                 borderRadius: BorderRadius.circular(50),
                                 child: Container(
