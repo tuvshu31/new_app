@@ -28,6 +28,9 @@ class NotificationController {
 
   @pragma("vm:entry-point")
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
+    AwesomeNotificationsFcm().printError();
+    AwesomeNotificationsFcm().isFirebaseAvailable;
+    AwesomeNotificationsFcm().printInfo();
     // print("silentData: $silentData");
     // var data = silentData.data!["data"];
     // var payload = jsonDecode(data!);
@@ -129,7 +132,7 @@ class NotificationController {
   static Future<void> setNotificationListeners() async {
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
-      // onNotificationCreatedMethod: onNotificationCreatedMethod,
+      onNotificationCreatedMethod: onNotificationCreatedMethod,
       onNotificationDisplayedMethod: onNotificationDisplayedMethod,
       onDismissActionReceivedMethod: onDismissActionReceivedMethod,
     );
