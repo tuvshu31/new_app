@@ -1,8 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+
+final _userCtx = Get.put(UserController());
+final _storeCtx = Get.put(StoreController());
+final _driverCtx = Get.put(DriverController());
 
 class Noti {
   static Future initialize(
@@ -38,15 +47,29 @@ class Noti {
   }
 
   static Future<void> handleNotifications(message, isBackground) async {
-    log(message.data.toString());
-    var payload = message.data;
-    var info = jsonDecode(payload);
-    var role = info["role"];
-    var action = info["action"];
+    var payload = jsonDecode(message.data["data"]);
+    var role = payload["role"];
+    var action = payload["action"];
+    var notifInfo = notificationData.firstWhere(
+        (element) => element["role"] == role && element["action"] == action);
+
+    switch (role) {
+      case "user":
+        _userCtx.userActionHandler(action, payload);
+        break;
+      case "store":
+        _storeCtx.storeActionHandler(action, payload);
+        break;
+      case "driver":
+        _driverCtx.driverActionHandler(action, payload);
+        break;
+      default:
+        break;
+    }
 
     showBigTextNotification(
-        title: "Hello",
-        body: "Background Notification",
+        title: "Erdenet24",
+        body: notifInfo["body"],
         fln: flutterLocalNotificationsPlugin);
   }
 }
