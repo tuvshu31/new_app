@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:Erdenet24/main.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Noti {
@@ -31,5 +35,18 @@ class Noti {
         android: androidPlatformChannelSpecifics,
         iOS: const DarwinNotificationDetails());
     await fln.show(0, title, body, not);
+  }
+
+  static Future<void> handleNotifications(message, isBackground) async {
+    log(message.data.toString());
+    var payload = message.data;
+    var info = jsonDecode(payload);
+    var role = info["role"];
+    var action = info["action"];
+
+    showBigTextNotification(
+        title: "Hello",
+        body: "Background Notification",
+        fln: flutterLocalNotificationsPlugin);
   }
 }

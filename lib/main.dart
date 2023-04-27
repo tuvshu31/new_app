@@ -63,20 +63,12 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  // switchNotifications(message.data, true);
-  Noti.showBigTextNotification(
-      title: "Hello",
-      body: "Background Notification",
-      fln: flutterLocalNotificationsPlugin);
+  Noti.handleNotifications(message, true);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
   log(message.data.toString());
-  Noti.showBigTextNotification(
-      title: "Hello",
-      body: "Foreground Notification",
-      fln: flutterLocalNotificationsPlugin);
-  // switchNotifications(message.data, false);
+  Noti.handleNotifications(message, false);
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
