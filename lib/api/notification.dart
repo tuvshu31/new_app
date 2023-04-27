@@ -31,6 +31,7 @@ class NotificationController {
     AwesomeNotificationsFcm().printError();
     AwesomeNotificationsFcm().isFirebaseAvailable;
     AwesomeNotificationsFcm().printInfo();
+
     // print("silentData: $silentData");
     // var data = silentData.data!["data"];
     // var payload = jsonDecode(data!);
