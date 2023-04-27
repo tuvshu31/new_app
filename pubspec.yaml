@@ -96,9 +96,8 @@ dependencies:
   webview_flutter: ^4.0.7
   badges: ^3.0.3
   firebase_core: ^2.8.0
-  awesome_notifications: ^0.7.4+1
-  awesome_notifications_fcm: ^0.7.4+1
-  shared_preferences: ^2.1.0
+  firebase_messaging: ^14.4.1
+  flutter_local_notifications: ^14.0.0
   # firebase_messaging: ^14.3.0
   # flutter_local_notifications: ^8.2.0
 

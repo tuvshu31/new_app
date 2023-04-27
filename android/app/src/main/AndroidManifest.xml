@@ -44,10 +44,10 @@
                 <category android:name="android.intent.category.DEFAULT" /> 
             </intent-filter>
         </activity>
-        <receiver 
+        <!-- <receiver 
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
             android:exported="true">   
-        </receiver>
+        </receiver> -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

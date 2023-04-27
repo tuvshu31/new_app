@@ -29,6 +29,13 @@
             {
               "client_id": "210886616950-s18abqhfqrjaokh6goh2s4tejlcvnaj4.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "210886616950-em5b39op6rl7dschukoml5pse3l89p73.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "mn.et24"
+              }
             }
           ]
         }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/navigation.dart';
 import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
@@ -38,8 +39,9 @@ import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -56,17 +58,27 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // switchNotifications(message.data, true);
+}
+
+Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
+  log(message.data.toString());
+  // switchNotifications(message.data, false);
+}
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  NotificationController.initializeRemoteNotificationsFcm(debug: true);
-  NotificationController.initializeRemoteNotifications(debug: true);
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
@@ -105,8 +117,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
-    NotificationController.askNotificationPermission();
-    NotificationController.setNotificationListeners();
+    // NotificationController.askNotificationPermission();
+    // NotificationController.setNotificationListeners();
+    FirebaseMessaging.instance.requestPermission();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+    Noti.initialize(flutterLocalNotificationsPlugin);
   }
 
   @override
