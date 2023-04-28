@@ -21,6 +21,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 final _cartCtx = Get.put(CartController());
 
 class UserController extends GetxController {
+  Rx<bool> isAppBackground = false.obs;
+  Rx<AppLifecycleState> appStatus = AppLifecycleState.paused.obs;
   Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
@@ -199,19 +201,19 @@ class UserController extends GetxController {
 
   @override
   void onReady() {
+    log("onReady");
     super.onReady();
   }
 
-  void userActionHandler(action, payload) {
+  void userActionHandler(action, payload, isBackground) {
     if (action == "payment_success") {
       var body = {"orderStatus": "sent"};
-      log(body.toString());
       updateOrder(payload["id"], body);
       RestApiHelper.saveOrderId(payload["id"]);
       _cartCtx.cartList.clear();
-      Get.off(() => const UserOrderActiveScreen());
+      Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
-      userActiveOrderChangeView(0);
+      // userActiveOrderChangeView(0);
     } else if (action == "received") {
       userActiveOrderChangeView(1);
     } else if (action == "preparing") {

@@ -7,6 +7,7 @@ import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/navigation.dart';
 import 'package:Erdenet24/api/notification.dart';
 import 'package:Erdenet24/api/notifications.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
@@ -63,16 +64,18 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  Noti.handleNotifications(message, true);
+  handleNotifications(message, true);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
   log(message.data.toString());
-  Noti.handleNotifications(message, false);
+  handleNotifications(message, true);
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> navigatorKey =
+    GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,9 +99,6 @@ void main() async {
   );
 }
 
-final GlobalKey<NavigatorState> navigatorKey =
-    GlobalKey(debugLabel: "Main Navigator");
-
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -112,6 +112,7 @@ class _MyAppState extends State<MyApp> {
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
   final _loginCtx = Get.put(LoginController());
+  final _userCtx = Get.put(UserController());
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
   @override
   void initState() {
@@ -122,6 +123,8 @@ class _MyAppState extends State<MyApp> {
     FirebaseMessaging.instance.requestPermission();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+    FirebaseMessaging.onMessageOpenedApp
+        .listen(_firebaseMessagingBackgroundHandler);
     Noti.initialize(flutterLocalNotificationsPlugin);
   }
 

@@ -93,6 +93,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       log(orderBody.toString());
       dynamic orderResponse = await RestApi().createOrder(orderBody);
       dynamic orderData = Map<String, dynamic>.from(orderResponse);
+
       if (orderData["success"]) {
         Get.back();
         Get.offAndToNamed(

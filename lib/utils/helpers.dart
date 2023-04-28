@@ -160,6 +160,7 @@ List<Map<String, dynamic>> notificationData = [
     "type": "message",
   },
 ];
+List testNumbersToGetOrderNotifications = ["98080064, 99921312,"];
 String notifRole(payload) {
   var role = notificationData.firstWhere((element) =>
       element["role"] == payload["role"] &&

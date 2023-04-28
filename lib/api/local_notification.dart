@@ -6,6 +6,9 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +24,9 @@ class Noti {
     var iOSInitialize = const DarwinInitializationSettings();
     var initializationsSettings =
         InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
-    await flutterLocalNotificationsPlugin.initialize(initializationsSettings);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationsSettings,
+    );
   }
 
   static Future showBigTextNotification(
@@ -33,7 +38,7 @@ class Noti {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         const AndroidNotificationDetails(
       'you_can_name_it_whatever1',
-      'channel_name',
+      'erdenet24_channel',
       playSound: true,
       // sound: RawResourceAndroidNotificationSound('incoming'),
       importance: Importance.max,
@@ -45,31 +50,30 @@ class Noti {
         iOS: const DarwinNotificationDetails());
     await fln.show(0, title, body, not);
   }
+}
 
-  static Future<void> handleNotifications(message, isBackground) async {
-    var payload = jsonDecode(message.data["data"]);
-    var role = payload["role"];
-    var action = payload["action"];
-    var notifInfo = notificationData.firstWhere(
-        (element) => element["role"] == role && element["action"] == action);
+Future<void> handleNotifications(message, isBackground) async {
+  var payload = jsonDecode(message.data["data"]);
+  var role = payload["role"];
+  var action = payload["action"];
+  var notifInfo = notificationData.firstWhere(
+      (element) => element["role"] == role && element["action"] == action);
 
-    switch (role) {
-      case "user":
-        _userCtx.userActionHandler(action, payload);
-        break;
-      case "store":
-        _storeCtx.storeActionHandler(action, payload);
-        break;
-      case "driver":
-        _driverCtx.driverActionHandler(action, payload);
-        break;
-      default:
-        break;
-    }
-
-    showBigTextNotification(
-        title: "Erdenet24",
-        body: notifInfo["body"],
-        fln: flutterLocalNotificationsPlugin);
+  Noti.showBigTextNotification(
+      title: "Erdenet24",
+      body: notifInfo["body"],
+      fln: flutterLocalNotificationsPlugin);
+  switch (role) {
+    case "user":
+      _userCtx.userActionHandler(action, payload, isBackground);
+      break;
+    case "store":
+      _storeCtx.storeActionHandler(action, payload);
+      break;
+    case "driver":
+      _driverCtx.driverActionHandler(action, payload);
+      break;
+    default:
+      break;
   }
 }

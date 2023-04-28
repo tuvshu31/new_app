@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -21,9 +22,10 @@ class UserOrderPaymentScreen extends StatefulWidget {
   State<UserOrderPaymentScreen> createState() => _UserOrderPaymentScreenState();
 }
 
-class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
+class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen>
+    with WidgetsBindingObserver {
   final _incoming = Get.arguments;
-
+  final _userCtx = Get.put(UserController());
   PageController pageController = PageController(initialPage: 0);
 
   List bankList = [];
@@ -31,9 +33,34 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     setState(() {
       bankList = _incoming['data']['urls'];
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        log("app in resumed");
+        break;
+      case AppLifecycleState.inactive:
+        log("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        log("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        log("app in detached");
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _launchUrl(url) async {
