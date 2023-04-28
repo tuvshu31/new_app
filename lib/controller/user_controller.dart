@@ -200,8 +200,15 @@ class UserController extends GetxController {
   }
 
   @override
+  void onInit() {
+    log("onInit");
+    super.onInit();
+  }
+
+  @override
   void onReady() {
     log("onReady");
+
     super.onReady();
   }
 
