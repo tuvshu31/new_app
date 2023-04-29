@@ -18,7 +18,7 @@ import shared_preferences_foundation
   // if #available(iOS 10.0, *) {
   //       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
   //     }
-   Awesome Notification Setup
+  //  Awesome Notification Setup
       SwiftAwesomeNotificationsPlugin.setPluginRegistrantCallback { registry in       
           SwiftAwesomeNotificationsPlugin.register(
             with: registry.registrar(forPlugin: "io.flutter.plugins.awesomenotifications.AwesomeNotificationsPlugin")!)          
