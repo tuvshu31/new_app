@@ -199,21 +199,9 @@ class UserController extends GetxController {
     );
   }
 
-  @override
-  void onInit() {
-    log("onInit");
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    log("onReady");
-
-    super.onReady();
-  }
-
-  void userActionHandler(action, payload, isBackground) {
+  void userActionHandler(action, payload) {
     if (action == "payment_success") {
+      log("userActionHandler");
       var body = {"orderStatus": "sent"};
       updateOrder(payload["id"], body);
       RestApiHelper.saveOrderId(payload["id"]);

@@ -40,9 +40,9 @@ import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -64,16 +64,13 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  handleNotifications(message, true);
+  handleNotifications(message.data, true);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  log(message.data.toString());
-  handleNotifications(message, true);
+  handleNotifications(message.data, false);
 }
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
@@ -85,6 +82,29 @@ void main() async {
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
+  FirebaseMessaging.instance.requestPermission();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+
+  AwesomeNotifications().initialize(
+      // set the icon to null if you want to use the default app icon
+      null,
+      [
+        NotificationChannel(
+            channelGroupKey: 'basic_channel_group',
+            channelKey: 'basic_channel',
+            channelName: 'Basic notifications',
+            channelDescription: 'Notification channel for basic tests',
+            defaultColor: Color(0xFF0002),
+            ledColor: Colors.white)
+      ],
+      // Channel groups are only visual and are not required
+      channelGroups: [
+        NotificationChannelGroup(
+            channelGroupKey: 'basic_channel_group',
+            channelGroupName: 'Basic group')
+      ],
+      debug: true);
   if (Platform.isAndroid) {
     GeolocatorAndroid.registerWith();
   } else if (Platform.isIOS) {
@@ -114,18 +134,20 @@ class _MyAppState extends State<MyApp> {
   final _loginCtx = Get.put(LoginController());
   final _userCtx = Get.put(UserController());
   //Login hiisen hereglegchiin token.g database deer hadgalj avah
+
+  // Only after at least the action method is set, the notification events are delivered
+
   @override
   void initState() {
     super.initState();
     _loginCtx.checkVersion(context);
     // NotificationController.askNotificationPermission();
     // NotificationController.setNotificationListeners();
-    FirebaseMessaging.instance.requestPermission();
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
-    FirebaseMessaging.onMessageOpenedApp
-        .listen(_firebaseMessagingBackgroundHandler);
-    Noti.initialize(flutterLocalNotificationsPlugin);
+    // Noti.initialize(flutterLocalNotificationsPlugin);
+    AwesomeNotifications().setListeners(
+      onNotificationCreatedMethod: Noti.onNotificationCreatedMethod,
+      onActionReceivedMethod: Noti.onActionReceivedMethod,
+    );
   }
 
   @override
