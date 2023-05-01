@@ -48,24 +48,13 @@ class LoginController extends GetxController {
   }
 
   void getFirebaseMessagingToken() async {
+    await FirebaseMessaging.instance.deleteToken();
     final fcmToken = await FirebaseMessaging.instance.getToken();
-    if (fcmToken != null) {
-      log(fcmToken);
-      var body = {"mapToken": fcmToken};
+    var body = {"mapToken": fcmToken};
+    await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      var body = {"mapToken": newToken};
       await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    }
-    // if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
-    //   try {
-    //     firebaseAppToken =
-    //         await AwesomeNotificationsFcm().requestFirebaseAppToken();
-    //     var body = {"mapToken": firebaseAppToken};
-    //     await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    //   } catch (exception) {
-    //     debugPrint('$exception');
-    //   }
-    // } else {
-    //   debugPrint('Firebase is not available on this project');
-    // }
-    // return firebaseAppToken;
+    });
   }
 }
