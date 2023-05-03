@@ -33,7 +33,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     super.initState();
     _cartCtrl.getUserProducts();
     _userCtx.getOrders();
-    _loginCtx.getFirebaseMessagingToken();
+    _loginCtx.getFirebaseMessagingToken(context);
   }
 
   @override

@@ -144,6 +144,7 @@ class _MyAppState extends State<MyApp> {
     // NotificationController.askNotificationPermission();
     // NotificationController.setNotificationListeners();
     // Noti.initialize(flutterLocalNotificationsPlugin);
+
     AwesomeNotifications().setListeners(
       onNotificationCreatedMethod: Noti.onNotificationCreatedMethod,
       onActionReceivedMethod: Noti.onActionReceivedMethod,

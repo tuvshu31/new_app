@@ -3,12 +3,16 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../api/restapi_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:panara_dialogs/panara_dialogs.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
@@ -41,13 +45,57 @@ class LoginController extends GetxController {
 
   final _checker = AppVersionChecker();
 
-  Future<void> checkVersion(context) async {
+  void checkVersion(context) {
     _checker.checkUpdate().then((value) {
       log(value.toString());
+      value.canUpdate
+          ? showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return WillPopScope(
+                  onWillPop: () async => false,
+                  child: AlertDialog(
+                    // title: Text('Анхааруулга'),
+                    content: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CustomText(text: "Анхааруулга"),
+                          SizedBox(height: 24),
+                          CustomText(
+                              fontSize: 12,
+                              textAlign: TextAlign.justify,
+                              text:
+                                  "Аппликейшнд нэмэлт өөрчлөлт орсон тул шинэчлэлт хийх шаардлагатай. Хэрэв шинэчлэлт хийгээгүй тохиолдолд аппликейшнийг бүрэн ашиглах боломжгүйг анхаарна уу.")
+                        ],
+                      ),
+                    ),
+                    actionsAlignment: MainAxisAlignment.center,
+                    actions: <Widget>[
+                      Container(
+                        width: Get.width * .4,
+                        margin: const EdgeInsets.only(bottom: 24),
+                        child: CustomButton(
+                          onPressed: () async {
+                            final Uri url = Uri.parse(value.appURL!);
+                            await launchUrl(url);
+                          },
+                          text: "Шинэчлэх",
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            )
+          : null;
     });
   }
 
-  void getFirebaseMessagingToken() async {
+  void getFirebaseMessagingToken(context) async {
+    checkVersion(context);
     await FirebaseMessaging.instance.deleteToken();
     final fcmToken = await FirebaseMessaging.instance.getToken();
     var body = {"mapToken": fcmToken};

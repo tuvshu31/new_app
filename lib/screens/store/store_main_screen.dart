@@ -35,7 +35,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   void initState() {
     super.initState();
     // saveUserToken();
-    _loginCtx.getFirebaseMessagingToken();
+    _loginCtx.getFirebaseMessagingToken(context);
     _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
   }

@@ -1057,6 +1057,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  panara_dialogs:
+    dependency: "direct main"
+    description:
+      name: panara_dialogs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   path:
     dependency: transitive
     description:
