@@ -1,6 +1,7 @@
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geolocator/geolocator.dart';
@@ -523,4 +524,32 @@ void driverDeliveryCodeApproveDialog(
       hintText: "4 оронтой код оруулна уу",
     ),
   );
+}
+
+void showAwesomDialog(context) {
+  AwesomeDialog(
+    context: context,
+    animType: AnimType.scale,
+    dialogType: DialogType.info,
+    customHeader: Container(
+      padding: const EdgeInsets.all(12),
+      child: Image.asset(
+        "assets/images/png/app/exclamation.png",
+      ),
+    ),
+    body: Column(
+      children: const [
+        Text("Анхааруулга"),
+        Text(
+          'If the body is specified, then title and description will be ignored, this allows to 											further customize the dialogue.',
+          style: TextStyle(fontStyle: FontStyle.italic),
+        ),
+      ],
+    ),
+    title: 'This is Ignored',
+    desc: 'This is also Ignored',
+    btnOkOnPress: () {},
+    btnOkColor: Colors.redAccent,
+    btnOkText: "Шинэчлэх",
+  ).show();
 }

@@ -1,14 +1,12 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/notification.dart';
+import 'dart:developer';
+
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:get/get.dart';
@@ -40,24 +38,25 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
       _loginCtrl.verifyCode.value = 111111;
     } else {
       _loginCtrl.verifyCode.value = random6digit();
+      log(_loginCtrl.verifyCode.value.toString());
     }
     //OTP ajillahgui bga uyd
 
-    // Get.back();
-    // Get.toNamed(splashOtpScreenRoute);
+    Get.back();
+    Get.toNamed(splashOtpScreenRoute);
 
     //OTP ajillaj bga uyd
 
-    dynamic authCode = await RestApi().sendAuthCode(
-        _loginCtrl.phoneController.text,
-        _loginCtrl.verifyCode.value.toString());
-    Get.back();
-    if (authCode[0]["Result"] == "SUCCESS") {
-      Get.toNamed(splashOtpScreenRoute);
-    } else {
-      errorSnackBar(
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
-    }
+    // dynamic authCode = await RestApi().sendAuthCode(
+    //     _loginCtrl.phoneController.text,
+    //     _loginCtrl.verifyCode.value.toString());
+    // Get.back();
+    // if (authCode[0]["Result"] == "SUCCESS") {
+    //   Get.toNamed(splashOtpScreenRoute);
+    // } else {
+    //   errorSnackBar(
+    //       "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+    // }
   }
 
   @override

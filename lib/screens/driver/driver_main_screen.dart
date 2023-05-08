@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_active_info_view.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-// import 'package:awesome_notifications/awesome_notifications.dart';
+
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
@@ -76,7 +74,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
             body: Stack(
               children: [
                 const DriverScreenMapView(),
-                const DriverActiveInfoView(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
