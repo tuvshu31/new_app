@@ -252,6 +252,7 @@ class DriverController extends GetxController {
 
   void finishDelivery() {
     RestApiHelper.saveOrderId(0);
+    RestApiHelper.saveOrderStep(0);
     RestApiHelper.saveOrderInfo({});
     orderList.clear();
     driverPayments.clear();
@@ -263,9 +264,6 @@ class DriverController extends GetxController {
   }
 
   Future<void> checkIfDriverKilled() async {
-    log(RestApiHelper.getOrderId().toString());
-    log(RestApiHelper.getOrderInfo().toString());
-
     if (RestApiHelper.getOrderId() != 0) {
       if (RestApiHelper.getOrderInfo().isEmpty) {
         log("blank");
@@ -278,7 +276,7 @@ class DriverController extends GetxController {
       if (RestApiHelper.getOrderInfo().isNotEmpty) {
         log("notBlank");
         deliveryInfo.value = RestApiHelper.getOrderInfo();
-        step.value = 2;
+        step.value = RestApiHelper.getOrderStep();
       }
     }
   }

@@ -180,17 +180,20 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                       _driverCtx.stopwatch.value.start();
                                       _driverCtx.step.value += 1;
                                     } else if (_driverCtx.step.value == 2) {
+                                      RestApiHelper.saveOrderStep(2);
                                       RestApiHelper.saveOrderInfo(
                                           _driverCtx.deliveryInfo);
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 3) {
+                                      RestApiHelper.saveOrderStep(3);
                                       _driverCtx.updateOrder({
                                         "orderStatus": "delivering",
                                       });
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 4) {
+                                      RestApiHelper.saveOrderStep(4);
                                       driverApproveCodeCtrl.clear();
                                       driverDeliveryCodeApproveDialog(
                                         context,
