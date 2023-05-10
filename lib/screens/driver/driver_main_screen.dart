@@ -139,8 +139,11 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                 ),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   _driverCtx.step.value == 0 && _driverCtx.lastDelivery.isEmpty
-                      ? steps[0]
-                      : steps[_driverCtx.step.value],
+                      ? Container()
+                      : _driverCtx.step.value == 0 &&
+                              _driverCtx.lastDelivery.isNotEmpty
+                          ? step0()
+                          : steps[_driverCtx.step.value],
                   _driverCtx.step.value != 0
                       ? Builder(
                           builder: (context) {

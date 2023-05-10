@@ -68,7 +68,7 @@ Future<void> handleNotifications(message, isBackground) async {
       category: NotificationCategory.Message,
       displayOnBackground: true,
       displayOnForeground: true,
-      locked: true,
+      locked: false,
     ),
   );
 }

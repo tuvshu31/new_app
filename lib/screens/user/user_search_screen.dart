@@ -1,15 +1,6 @@
 import 'dart:convert';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/api/notification.dart';
-import 'package:Erdenet24/api/notifications.dart';
-import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +12,6 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:panara_dialogs/panara_dialogs.dart';
 
 class UserSearchScreen extends StatefulWidget {
   final dynamic leadingOnTap;
