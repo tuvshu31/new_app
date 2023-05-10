@@ -209,7 +209,7 @@ class UserController extends GetxController {
       userActiveOrderChangeView(3);
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      // userActiveOrderChangeView(0);
+      userActiveOrderChangeView(0);
       RestApiHelper.saveOrderId(0);
       Get.off(() => const UserHomeScreen());
     } else {}

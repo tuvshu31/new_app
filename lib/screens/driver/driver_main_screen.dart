@@ -60,6 +60,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     _driverCtx.fetchDriverInfo(context);
     _driverCtx.fetchDriverOrders();
     _driverCtx.fetchDriverPayments();
+    _driverCtx.checkIfDriverKilled();
   }
 
   @override
@@ -68,21 +69,24 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
       () => SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-          child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: MyColors.white,
-            drawer: driverDrawer(context),
-            appBar: _appBar(),
-            body: Stack(
-              children: [
-                const DriverScreenMapView(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    bottomSheets(),
-                  ],
-                ),
-              ],
+          child: WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              resizeToAvoidBottomInset: true,
+              backgroundColor: MyColors.white,
+              drawer: driverDrawer(context),
+              appBar: _appBar(),
+              body: Stack(
+                children: [
+                  const DriverScreenMapView(),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      bottomSheets(),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -171,9 +175,13 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                         "deliveryDriverId":
                                             RestApiHelper.getUserId().toString()
                                       });
+                                      RestApiHelper.saveOrderId(int.parse(
+                                          _driverCtx.deliveryInfo["id"]));
                                       _driverCtx.stopwatch.value.start();
                                       _driverCtx.step.value += 1;
                                     } else if (_driverCtx.step.value == 2) {
+                                      RestApiHelper.saveOrderInfo(
+                                          _driverCtx.deliveryInfo);
                                       _driverCtx.step.value += 1;
                                       log(_driverCtx.step.value.toString());
                                     } else if (_driverCtx.step.value == 3) {

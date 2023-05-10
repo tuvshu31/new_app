@@ -67,6 +67,7 @@ class DriverController extends GetxController {
   void fetchDriverOrders() async {
     var query = {
       "deliveryDriverId": RestApiHelper.getUserId(),
+      "orderStatus": "delivered"
     };
     dynamic res = await RestApi().getOrders(query);
     dynamic data = Map<String, dynamic>.from(res);
@@ -85,7 +86,10 @@ class DriverController extends GetxController {
   }
 
   void fetchDriverPayments() async {
-    var body = {"deliveryDriverId": RestApiHelper.getUserId()};
+    var body = {
+      "deliveryDriverId": RestApiHelper.getUserId(),
+      "orderStatus": "delivered"
+    };
     dynamic res = await RestApi().driverPayments(body);
     dynamic data = Map<String, dynamic>.from(res);
     if (data["success"]) {
@@ -247,6 +251,8 @@ class DriverController extends GetxController {
   }
 
   void finishDelivery() {
+    RestApiHelper.saveOrderId(0);
+    RestApiHelper.saveOrderInfo({});
     orderList.clear();
     driverPayments.clear();
     fetchDriverOrders();
@@ -254,6 +260,27 @@ class DriverController extends GetxController {
     step.value = 0;
     removeMarker("store");
     deliveryInfo.clear();
+  }
+
+  Future<void> checkIfDriverKilled() async {
+    log(RestApiHelper.getOrderId().toString());
+    log(RestApiHelper.getOrderInfo().toString());
+
+    if (RestApiHelper.getOrderId() != 0) {
+      if (RestApiHelper.getOrderInfo().isEmpty) {
+        log("blank");
+        step.value = 0;
+        var body = {"orderStatus": "canceled"};
+        int id = RestApiHelper.getOrderId();
+        dynamic response = await RestApi().updateOrder(id, body);
+        dynamic d = Map<String, dynamic>.from(response);
+      }
+      if (RestApiHelper.getOrderInfo().isNotEmpty) {
+        log("notBlank");
+        deliveryInfo.value = RestApiHelper.getOrderInfo();
+        step.value = 2;
+      }
+    }
   }
 
   void getDistance(LatLng driver, LatLng store) async {

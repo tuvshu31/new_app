@@ -32,7 +32,7 @@ class StoreController extends GetxController {
 
   void startTimer(Duration i) {
     prepDurationList.add(i);
-    countdownTimer = Timer.periodic(Duration(seconds: 1), (_) {
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       const reduceSecondsBy = 1;
       final seconds = prepDurationList.last.inSeconds - reduceSecondsBy;
       if (seconds < 0) {
@@ -84,54 +84,6 @@ class StoreController extends GetxController {
   void updateOrder(int id, dynamic body) async {
     await RestApi().updateOrder(id, body);
   }
-
-  // void storeNotifications(action, payload, isBackground) {
-  //   if (action == "payment_success") {
-  //   } else if (action == "sent") {
-  //     createCustomNotification(
-  //       isBackground,
-  //       payload,
-  //       isVisible: true,
-  //       customSound: false,
-  //       isCall: true,
-  //       body: "Шинэ захиалга ирлээ",
-  //     );
-  //   } else if (action == "received") {
-  //   } else if (action == "driverAccepted") {
-  //     Get.back();
-  //     driverAccepted.value = true;
-  //     createCustomNotification(
-  //       isBackground,
-  //       payload,
-  //       isVisible: true,
-  //       customSound: false,
-  //       isCall: false,
-  //       body: "Жолооч дуудлага хүлээн авлаа",
-  //     );
-  //   } else if (action == "preparing") {
-  //   } else if (action == "delivering") {
-  //     createCustomNotification(
-  //       isBackground,
-  //       payload,
-  //       isVisible: true,
-  //       customSound: false,
-  //       isCall: false,
-  //       body: "Хүргэлтэнд гарлаа",
-  //     );
-  //   } else if (action == "delivered") {
-  //     driverAccepted.value = false;
-  //     createCustomNotification(
-  //       isBackground,
-  //       payload,
-  //       isVisible: true,
-  //       customSound: false,
-  //       isCall: false,
-  //       body: "Хүргэлт амжилттай",
-  //     );
-  //   } else {
-  //     log(payload.toString());
-  //   }
-  // }
 
   void storeActionHandler(action, payload) {
     if (action == "payment_success") {
@@ -240,12 +192,16 @@ class StoreController extends GetxController {
       }
       filterOrders(0);
     } else if (action == "delivered") {
+      driverAccepted.value = false;
       for (dynamic i in storeOrderList) {
         if (i["id"] == payload["id"]) {
           i["orderStatus"] = "delivered";
         }
       }
       filterOrders(0);
+    } else if (action == "canceled") {
+      log("driverCanceledshuuuuuu");
+      driverAccepted.value = false;
     } else {}
   }
 }

@@ -8,6 +8,7 @@ class RestApiHelper {
   static const String kOrderId = "ORDER_ID";
   static const String kOrderStep = "ORDER_STEP";
   static const String kNotification = "NOTIFICATION";
+  static const String kOrderInfo = "ORDER_INFO";
 
   // Login хийсэн хэрэглэгчийн ID-г хадлагах, авах
   static void saveUserId(int id) => authBox?.put(kUserId, id);
@@ -22,6 +23,11 @@ class RestApiHelper {
   static void saveOrderStep(int orderStep) =>
       authBox?.put(kOrderStep, orderStep);
   static int getOrderStep() => authBox?.get(kOrderStep, defaultValue: 0);
+
+  // Хүргэлтэнд явж буй жолоочийн захиалгын мэдээллииг хадгалж авах
+  static void saveOrderInfo(Map orderInfo) =>
+      authBox?.put(kOrderInfo, orderInfo);
+  static Map getOrderInfo() => authBox?.get(kOrderInfo, defaultValue: {});
 
   /// Notification
   static void saveNotificationId(int value) =>

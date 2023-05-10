@@ -147,6 +147,13 @@ List<Map<String, dynamic>> notificationData = [
   },
   {
     "role": "store",
+    "action": "canceled",
+    "body": "Жолооч дуудлагаа цуцаллаа",
+    "visible": true,
+    "type": "message",
+  },
+  {
+    "role": "store",
     "action": "delivered",
     "body": "Хүргэлт амжилттай",
     "visible": true,
