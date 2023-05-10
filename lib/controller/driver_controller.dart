@@ -24,9 +24,14 @@ class DriverController extends GetxController {
   RxMap remoteMessageData = {}.obs;
   RxMap deliveryInfo = {}.obs;
   RxString fcmToken = "".obs;
+  RxMap lastDelivery = {}.obs;
+  RxString todayDate = "".obs;
   RxList driverInfo = [].obs;
+  RxList driverPayments = [].obs;
+  RxInt todaysDeliveryCount = 0.obs;
+  RxList orderList = [].obs;
   Rx<Stopwatch> stopwatch = Stopwatch().obs;
-  RxInt fakeOrderCount = 0.obs;
+
   RxString fakeDeliveryTimer = "".obs;
 
   //=========================Map states==================================
@@ -57,6 +62,40 @@ class DriverController extends GetxController {
         .animateCamera(CameraUpdate.newCameraPosition(currentCameraPosition));
     markerRotation.value = position.heading;
     addDriverMarker();
+  }
+
+  void fetchDriverOrders() async {
+    var query = {
+      "deliveryDriverId": RestApiHelper.getUserId(),
+    };
+    dynamic res = await RestApi().getOrders(query);
+    dynamic data = Map<String, dynamic>.from(res);
+    if (data["success"]) {
+      orderList.value = data["data"];
+
+      todayDate.value = DateTime.now().toString().substring(0, 10);
+      List todayOrders = [];
+      for (var element in orderList) {
+        if (element["orderTime"].substring(0, 10) == todayDate.value) {
+          todayOrders.add(element);
+        }
+      }
+      lastDelivery.value = todayOrders.isNotEmpty ? todayOrders.last : {};
+    }
+  }
+
+  void fetchDriverPayments() async {
+    var body = {"deliveryDriverId": RestApiHelper.getUserId()};
+    dynamic res = await RestApi().driverPayments(body);
+    dynamic data = Map<String, dynamic>.from(res);
+    if (data["success"]) {
+      driverPayments.value = data["deliveryCountByDate"];
+      for (var element in driverPayments) {
+        if (element["date"] == DateTime.now().toString().substring(0, 10)) {
+          todaysDeliveryCount.value = element["count"];
+        }
+      }
+    }
   }
 
   void addDriverMarker() async {
@@ -159,7 +198,7 @@ class DriverController extends GetxController {
         getPositionStream();
         startActiveTimer(10800, context);
       } else {
-        stopActiveTimer();
+        // stopActiveTimer();
         stopSound();
       }
       var body = {"isOpen": value};
@@ -169,11 +208,15 @@ class DriverController extends GetxController {
     }
   }
 
-  void fetchDriverInfo() async {
+  void fetchDriverInfo(context) async {
     dynamic response = await RestApi().getDriver(RestApiHelper.getUserId());
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       driverInfo.value = d["data"];
+      isOnline.value = d["data"][0]["isOpen"];
+      if (isOnline.value) {
+        turnOnOff(true, context);
+      }
     }
   }
 
@@ -181,7 +224,6 @@ class DriverController extends GetxController {
     dynamic user =
         await RestApi().updateDriver(RestApiHelper.getUserId(), body);
     dynamic data = Map<String, dynamic>.from(user);
-    log(data.toString());
   }
 
   void cancelNewDelivery() async {
@@ -205,6 +247,16 @@ class DriverController extends GetxController {
   }
 
   void finishDelivery() {
+    lastDelivery.clear();
+    lastDelivery.value = deliveryInfo;
+    orderList.add(deliveryInfo);
+    for (var element in driverPayments) {
+      if (element == DateTime.now().toString().substring(0, 10)) {
+        element["count"]++;
+      }
+    }
+    deliveryInfo["storeName"];
+    todaysDeliveryCount.value++;
     step.value = 0;
     removeMarker("store");
     deliveryInfo.clear();

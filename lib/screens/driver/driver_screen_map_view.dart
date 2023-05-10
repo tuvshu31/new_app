@@ -66,7 +66,7 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
                           ),
                           subtitle: CustomText(
                               text: convertToCurrencyFormat(
-                            _driverCtx.fakeOrderCount.value * 3000,
+                            _driverCtx.todaysDeliveryCount.value * 3000,
                             locatedAtTheEnd: true,
                             toInt: true,
                           )),

@@ -70,7 +70,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     var orderId = int.parse(("$storeId" "$randomNumber"));
     var qpayBody = {
       "sender_invoice_no": orderId.toString(),
-      "amount": _cartCtx.total,
+      // "amount": _cartCtx.total,
+      "amount": 50,
     };
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
@@ -89,7 +90,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
         "kod": kod.text,
         "products": _cartCtx.cartList,
       };
-      log(orderBody.toString());
+      log("orderBody: $orderBody");
       dynamic orderResponse = await RestApi().createOrder(orderBody);
       dynamic orderData = Map<String, dynamic>.from(orderResponse);
 

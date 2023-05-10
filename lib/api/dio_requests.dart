@@ -148,6 +148,12 @@ class RestApi {
         .sendRequest('users/drivers/assignDriver', Method.post, body, {});
   }
 
+  //Логин хийсэн жолоочийн төлбөрийн мэдээллийг авах
+  Future driverPayments(dynamic body) async {
+    return DioClient()
+        .sendRequest('users/drivers/driverPayments', Method.get, body, {});
+  }
+
   //Захиалгын мэдээлэл өөрчлөх
   Future updateOrder(int id, dynamic body) async {
     return DioClient().sendRequest('orders/$id', Method.put, body, {});

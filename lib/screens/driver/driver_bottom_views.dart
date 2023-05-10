@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -39,58 +40,64 @@ Widget step0() {
           color: MyColors.black,
           borderRadius: BorderRadius.circular(50),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyColors.primary,
+        child: Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MyColors.primary,
+                      ),
+                      child: Icon(
+                        IconlyLight.wallet,
+                        color: MyColors.white,
+                      ),
                     ),
-                    child: Icon(
-                      IconlyLight.wallet,
+                    CustomText(
                       color: MyColors.white,
-                    ),
-                  ),
-                  CustomText(
-                    color: MyColors.white,
-                    text: convertToCurrencyFormat(
-                      int.parse("3000"),
-                      locatedAtTheEnd: true,
-                      toInt: true,
-                    ),
-                  )
-                ],
+                      text: convertToCurrencyFormat(
+                        int.parse("3000"),
+                        locatedAtTheEnd: true,
+                        toInt: true,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyColors.primary,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MyColors.primary,
+                      ),
+                      child: Icon(
+                        IconlyLight.time_circle,
+                        color: MyColors.white,
+                      ),
                     ),
-                    child: Icon(
-                      IconlyLight.time_circle,
+                    CustomText(
+                      fontSize: 10,
                       color: MyColors.white,
-                    ),
-                  ),
-                  CustomText(
-                    color: MyColors.white,
-                    text: "3:24 мин",
-                  )
-                ],
+                      text: formatedTime(
+                          timeInSecond: int.parse(_driverCtx
+                                  .lastDelivery["deliveryDuration"]) ??
+                              0),
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       )
     ],
@@ -102,6 +109,23 @@ Widget step1() {
     () => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        Container(
+          margin: EdgeInsets.only(bottom: Get.height * .03),
+          child: TimeCircularCountdown(
+            countdownRemainingColor: MyColors.primary,
+            unit: CountdownUnit.second,
+            textStyle: const TextStyle(
+              color: MyColors.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+            countdownTotal: 30,
+            onUpdated: (unit, remainingTime) {},
+            onFinished: () {
+              _driverCtx.cancelNewDelivery();
+            },
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(

@@ -57,7 +57,9 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     super.initState();
     _loginCtx.getFirebaseMessagingToken(context);
     _networkCtx.checkNetworkAccess(context);
-    _driverCtx.fetchDriverInfo();
+    _driverCtx.fetchDriverInfo(context);
+    _driverCtx.fetchDriverOrders();
+    _driverCtx.fetchDriverPayments();
   }
 
   @override
@@ -77,7 +79,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    countDownTimer(),
                     bottomSheets(),
                   ],
                 ),
@@ -124,30 +125,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
     );
   }
 
-  Widget countDownTimer() {
-    return Obx(
-      () => _driverCtx.step.value == 1
-          ? Container(
-              margin: EdgeInsets.only(bottom: Get.height * .03),
-              child: TimeCircularCountdown(
-                countdownRemainingColor: MyColors.primary,
-                unit: CountdownUnit.second,
-                textStyle: const TextStyle(
-                  color: MyColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-                countdownTotal: 30,
-                onUpdated: (unit, remainingTime) {},
-                onFinished: () {
-                  _driverCtx.cancelNewDelivery();
-                },
-              ),
-            )
-          : Container(),
-    );
-  }
-
   Widget bottomSheets() {
     return Obx(
       () => _driverCtx.isOnline.value
@@ -161,7 +138,9 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  steps[_driverCtx.step.value],
+                  _driverCtx.step.value == 0 && _driverCtx.lastDelivery.isEmpty
+                      ? steps[0]
+                      : steps[_driverCtx.step.value],
                   _driverCtx.step.value != 0
                       ? Builder(
                           builder: (context) {
@@ -228,8 +207,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                             _driverCtx.deliveryInfo.clear();
                                             _driverCtx.storeLocation.refresh();
                                             _driverCtx.step.value += 1;
-                                            _driverCtx.fakeOrderCount.value +=
-                                                1;
                                           } else {
                                             errorSnackBar(
                                                 "Захиалгын код буруу байна",

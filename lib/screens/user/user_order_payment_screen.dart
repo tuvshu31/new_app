@@ -22,8 +22,7 @@ class UserOrderPaymentScreen extends StatefulWidget {
   State<UserOrderPaymentScreen> createState() => _UserOrderPaymentScreenState();
 }
 
-class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen>
-    with WidgetsBindingObserver {
+class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   final _incoming = Get.arguments;
   final _userCtx = Get.put(UserController());
   PageController pageController = PageController(initialPage: 0);
@@ -33,34 +32,10 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+
     setState(() {
       bankList = _incoming['data']['urls'];
     });
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        log("app in resumed");
-        break;
-      case AppLifecycleState.inactive:
-        log("app in inactive");
-        break;
-      case AppLifecycleState.paused:
-        log("app in paused");
-        break;
-      case AppLifecycleState.detached:
-        log("app in detached");
-        break;
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   Future<void> _launchUrl(url) async {
