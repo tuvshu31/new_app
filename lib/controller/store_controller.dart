@@ -228,6 +228,7 @@ class StoreController extends GetxController {
     } else if (action == "received") {
     } else if (action == "driverAccepted") {
       Get.back();
+      driverAccepted.value = true;
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       // Get.back();
