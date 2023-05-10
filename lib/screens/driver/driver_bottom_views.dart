@@ -91,7 +91,7 @@ Widget step0() {
                       text: formatedTime(
                           timeInSecond: int.parse(_driverCtx
                                   .lastDelivery["deliveryDuration"]) ??
-                              0),
+                              _driverCtx.deliveryInfo["deliveryTime"]),
                     )
                   ],
                 ),

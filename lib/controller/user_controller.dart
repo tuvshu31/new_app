@@ -208,7 +208,7 @@ class UserController extends GetxController {
       _cartCtx.cartList.clear();
       Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
-      // userActiveOrderChangeView(0);
+      userActiveOrderChangeView(0);
     } else if (action == "received") {
       userActiveOrderChangeView(1);
     } else if (action == "preparing") {
@@ -218,7 +218,7 @@ class UserController extends GetxController {
       userActiveOrderChangeView(3);
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      userActiveOrderChangeView(0);
+      // userActiveOrderChangeView(0);
       RestApiHelper.saveOrderId(0);
       Get.off(() => const UserHomeScreen());
     } else {}

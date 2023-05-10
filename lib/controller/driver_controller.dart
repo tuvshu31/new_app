@@ -247,16 +247,10 @@ class DriverController extends GetxController {
   }
 
   void finishDelivery() {
-    lastDelivery.clear();
-    lastDelivery.value = deliveryInfo;
-    orderList.add(deliveryInfo);
-    for (var element in driverPayments) {
-      if (element == DateTime.now().toString().substring(0, 10)) {
-        element["count"]++;
-      }
-    }
-    deliveryInfo["storeName"];
-    todaysDeliveryCount.value++;
+    orderList.clear();
+    driverPayments.clear();
+    fetchDriverOrders();
+    fetchDriverPayments();
     step.value = 0;
     removeMarker("store");
     deliveryInfo.clear();

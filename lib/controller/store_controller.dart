@@ -227,10 +227,10 @@ class StoreController extends GetxController {
           });
     } else if (action == "received") {
     } else if (action == "driverAccepted") {
-      log("driverAccepted");
+      Get.back();
     } else if (action == "preparing") {
     } else if (action == "delivering") {
-      Get.back();
+      // Get.back();
       for (dynamic i in storeOrderList) {
         if (i["id"] == payload["id"]) {
           log("orderStatus: ${i["id"]}");
