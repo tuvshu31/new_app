@@ -114,7 +114,7 @@ class DriverController extends GetxController {
 
     MarkerId markerId = const MarkerId("driver");
     final Uint8List markerIcon =
-        await getBytesFromAsset('assets/images/png/app/driver.png', 100);
+        await getBytesFromAsset('assets/images/png/app/driver.png', 50);
     Marker marker = Marker(
       markerId: markerId,
       position: initialPosition.value,
