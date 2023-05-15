@@ -96,7 +96,6 @@ class LoginController extends GetxController {
 
   void getFirebaseMessagingToken(context) async {
     checkVersion(context);
-    await FirebaseMessaging.instance.deleteToken();
     final fcmToken = await FirebaseMessaging.instance.getToken();
     var body = {"mapToken": fcmToken};
     await RestApi().updateUser(RestApiHelper.getUserId(), body);

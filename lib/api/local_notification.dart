@@ -8,6 +8,7 @@ import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -58,17 +59,23 @@ Future<void> handleNotifications(message, isBackground) async {
   );
 
   AwesomeNotifications().createNotification(
-    content: NotificationContent(
-      payload: Map<String, String>.from(message),
-      id: 10,
-      channelKey: 'basic_channel',
-      title: 'Erdenet24',
-      body: notif["body"],
-      actionType: ActionType.Default,
-      category: NotificationCategory.Message,
-      displayOnBackground: true,
-      displayOnForeground: true,
-      locked: false,
-    ),
-  );
+      content: NotificationContent(
+        payload: Map<String, String>.from(message),
+        id: 10,
+        channelKey: 'basic_channel',
+        title: 'Erdenet24',
+        body: notif["body"],
+        actionType: ActionType.Default,
+        category: NotificationCategory.Message,
+        displayOnBackground: true,
+        displayOnForeground: true,
+        locked: false,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          label: 'TEST',
+          enabled: true,
+          key: 'test',
+        )
+      ]);
 }

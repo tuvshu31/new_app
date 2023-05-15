@@ -41,6 +41,7 @@ const String storeProductsEditProductRoute = '/storeProductsEditProductRoute';
 const String storeProductsPreviewScreenRoute =
     '/storeProductsPreviewScreenRoute';
 const String storeSettingsScreenRoute = '/storeSettingsScreenRoute';
+const String storeIncomingCallScreenRoute = "/storeIncomingCallScreenRoute";
 //Driver screen routes
 const String driverMainScreenRoute = '/driverMainScreenRoute';
 const String driverDrawerScreenRoute = '/driverDrawerScreenRoute';
