@@ -19,10 +19,6 @@ class RestApiHelper {
   // Login хийсэн хэрэглэгчийн захиалга хийсэн эсэсхийг-г хадлагах, авах
   static void saveOrderId(int orderId) => authBox?.put(kOrderId, orderId);
   static int getOrderId() => authBox?.get(kOrderId, defaultValue: 0);
-  // Идэвхтэй захиалгын алхамыг хадгалах, авах
-  static void saveOrderStep(int orderStep) =>
-      authBox?.put(kOrderStep, orderStep);
-  static int getOrderStep() => authBox?.get(kOrderStep, defaultValue: 0);
 
   // Хүргэлтэнд явж буй жолоочийн захиалгын мэдээллииг хадгалж авах
   static void saveOrderInfo(Map orderInfo) =>

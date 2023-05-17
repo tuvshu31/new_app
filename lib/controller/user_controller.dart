@@ -23,6 +23,7 @@ class UserController extends GetxController {
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
+  RxInt activeStep = 0.obs;
 
   void getOrders() async {
     loading.value = true;
@@ -121,11 +122,9 @@ class UserController extends GetxController {
     log(d.toString());
   }
 
-  void userActiveOrderChangeView(int activeStep) {
-    RestApiHelper.saveOrderStep(activeStep);
-    // activeOrderStep.value = activeStep;
+  void userActiveOrderChangeView() {
     activeOrderPageController.value.animateToPage(
-      activeStep,
+      activeStep.value,
       duration: const Duration(milliseconds: 500),
       curve: Curves.bounceInOut,
     );
@@ -140,17 +139,19 @@ class UserController extends GetxController {
       _cartCtx.cartList.clear();
       Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
-      userActiveOrderChangeView(0);
     } else if (action == "received") {
-      userActiveOrderChangeView(1);
+      activeStep.value = 0;
+      userActiveOrderChangeView();
     } else if (action == "preparing") {
+      activeStep.value = 2;
       getCurrentOrderInfo(RestApiHelper.getOrderId());
-      userActiveOrderChangeView(2);
+      userActiveOrderChangeView();
     } else if (action == "delivering") {
-      userActiveOrderChangeView(3);
+      activeStep.value = 3;
+      userActiveOrderChangeView();
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      userActiveOrderChangeView(0);
+      userActiveOrderChangeView();
       RestApiHelper.saveOrderId(0);
       Get.off(() => const UserHomeScreen());
     } else {}

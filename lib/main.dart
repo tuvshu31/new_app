@@ -126,8 +126,6 @@ class _MyAppState extends State<MyApp> {
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
   final _loginCtx = Get.put(LoginController());
-  final _userCtx = Get.put(UserController());
-  //Login hiisen hereglegchiin token.g database deer hadgalj avah
 
   // Only after at least the action method is set, the notification events are delivered
 

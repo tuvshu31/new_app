@@ -1,4 +1,3 @@
-import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   void initState() {
     super.initState();
     // saveUserToken();
-    _userCtx.getCurrentOrderInfo(RestApiHelper.getOrderId());
+    _userCtx.getCurrentOrderInfo(1412);
     // _userCtx.userOrderList[0];
   }
 
@@ -42,8 +41,16 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     super.dispose();
   }
 
+  String getFormattedTime() {
+    DateTime now = DateTime.now();
+    String hour = now.hour.toString().padLeft(2, '0');
+    String minute = now.minute.toString().padLeft(2, '0');
+    String second = now.second.toString().padLeft(2, '0');
+    return "$hour:$minute:$second";
+  }
+
   _percent() {
-    switch (RestApiHelper.getOrderStep()) {
+    switch (_userCtx.activeStep.value) {
       case 0:
         return .01;
       case 1:
@@ -112,7 +119,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   List<Widget> _buildRowList() {
     List<Widget> lines = [];
     statusList.asMap().forEach((index, value) {
-      bool active = index + 1 == RestApiHelper.getOrderStep();
+      bool active = index + 1 == _userCtx.activeStep.value;
       lines.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +131,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
           const SizedBox(height: 4),
           active
               ? CustomText(
-                  text: _userCtx.userOrderList[0]["orderTime"],
+                  text: getFormattedTime(),
                   color: MyColors.gray,
                   fontSize: 10,
                 )
@@ -167,7 +174,7 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                         )
                       ],
                     ),
-                    trailing: RestApiHelper.getOrderStep() == 2 &&
+                    trailing: _userCtx.activeStep.value == 2 &&
                             !_userCtx.loading.value
                         ? CircularCountDownTimer(
                             width: 50,
