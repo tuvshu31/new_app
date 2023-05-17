@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'dart:developer';
@@ -116,16 +114,9 @@ class DriverController extends GetxController {
           .asUint8List();
     }
 
-    int iconSize = 100;
-    if (Platform.isAndroid) {
-      iconSize = 100;
-    } else if (Platform.isIOS) {
-      iconSize = 50;
-    }
-
     MarkerId markerId = const MarkerId("driver");
     final Uint8List markerIcon =
-        await getBytesFromAsset('assets/images/png/app/driver.png', iconSize);
+        await getBytesFromAsset('assets/images/png/app/driver.png', 100);
     Marker marker = Marker(
       markerId: markerId,
       position: initialPosition.value,
