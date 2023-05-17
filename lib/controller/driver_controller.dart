@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -44,6 +47,7 @@ class DriverController extends GetxController {
       Completer<GoogleMapController>().obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
   final _networkCtx = Get.put(NetWorkController());
+  final _loginCtx = Get.put(LoginController());
 
   //=========================Map controllers==================================
   void getUserLocation() async {
@@ -112,9 +116,16 @@ class DriverController extends GetxController {
           .asUint8List();
     }
 
+    int iconSize = 100;
+    if (Platform.isAndroid) {
+      iconSize = 100;
+    } else if (Platform.isIOS) {
+      iconSize = 50;
+    }
+
     MarkerId markerId = const MarkerId("driver");
     final Uint8List markerIcon =
-        await getBytesFromAsset('assets/images/png/app/driver.png', 50);
+        await getBytesFromAsset('assets/images/png/app/driver.png', iconSize);
     Marker marker = Marker(
       markerId: markerId,
       position: initialPosition.value,
@@ -196,6 +207,7 @@ class DriverController extends GetxController {
     if (_networkCtx.hasNetwork.value) {
       isOnline.value = value;
       if (value == true) {
+        _loginCtx.getFirebaseMessagingToken(context);
         playSound("engine_start");
         getUserLocation();
         getPositionStream();
