@@ -38,7 +38,9 @@ class DioClient {
       Response<String> response = await dio.request(
         path,
         data: body,
-        options: Options(method: _getMethodName(_method)),
+        options: Options(
+            method: _getMethodName(_method),
+            headers: {"content-Type": 'application/x-www-form-urlencoded'}),
         queryParameters: queryParam,
       );
 
