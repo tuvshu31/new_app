@@ -1,7 +1,8 @@
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geolocator/geolocator.dart';
@@ -410,8 +411,12 @@ void loadingDialog(BuildContext context) async {
       return Transform.scale(
         scale: curve,
         child: const Center(
-          child: CircularProgressIndicator(
+          // child: CircularProgressIndicator(
+          //   color: MyColors.white,
+          // ),
+          child: CupertinoActivityIndicator(
             color: MyColors.white,
+            radius: 16,
           ),
         ),
       );

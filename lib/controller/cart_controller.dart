@@ -74,7 +74,6 @@ class CartController extends GetxController {
       Get.back();
       if (res["success"]) {
         savedList.add(product["id"]);
-
         successSnackBar("Амжилттай хадгалагдлаа", 2, context);
       } else {
         errorSnackBar("Алдаа гарлаа", 2, context);

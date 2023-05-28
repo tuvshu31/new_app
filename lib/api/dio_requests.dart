@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/dio_message.dart';
 
@@ -39,6 +41,11 @@ class RestApi {
   //Хэрэглэгч бүх бараануудыг авах
   Future getProducts(dynamic query) async {
     return DioClient().sendRequest('products', Method.get, [], query);
+  }
+
+  //Хэрэглэгч бараануудыг хайж авах
+  Future searchProducts(dynamic body) async {
+    return DioClient().sendRequest('products/search', Method.get, body, {});
   }
 
   //Дэлгүүр бүх бараануудыг авах

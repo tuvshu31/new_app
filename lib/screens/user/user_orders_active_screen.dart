@@ -1,4 +1,4 @@
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 

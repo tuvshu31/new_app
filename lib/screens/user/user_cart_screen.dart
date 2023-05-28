@@ -90,12 +90,12 @@ class _UserCartScreenState extends State<UserCartScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 GestureDetector(
-                                  onTap: () => Get.toNamed(
-                                    userProductScreenRoute,
-                                    arguments: {
-                                      "data": data,
-                                    },
-                                  ),
+                                  // onTap: () => Get.toNamed(
+                                  //   // userProductScreenRoute,
+                                  //   arguments: {
+                                  //     "data": data,
+                                  //   },
+                                  // ),
                                   child: Hero(
                                     tag: data,
                                     transitionOnUserGestures: true,

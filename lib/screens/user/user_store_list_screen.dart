@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/widgets/products.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
@@ -123,10 +122,12 @@ class _UserStoreListScreenState extends State<UserStoreListScreen> {
                       height: Get.height * .13,
                       child: CustomInkWell(
                         onTap: () {
-                          Get.to(
-                            const UserStoreProducts(),
-                            arguments: storeList[index],
-                          );
+                          Get.to(UserProductsScreen(
+                            title: data["name"],
+                            typeId: data["category"],
+                            storeId: data["id"],
+                            navType: NavType.store,
+                          ));
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

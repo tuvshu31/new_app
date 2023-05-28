@@ -1,4 +1,4 @@
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';

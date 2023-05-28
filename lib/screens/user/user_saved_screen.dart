@@ -5,7 +5,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:Erdenet24/widgets/products.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';

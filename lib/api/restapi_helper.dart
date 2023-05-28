@@ -9,6 +9,7 @@ class RestApiHelper {
   static const String kOrderStep = "ORDER_STEP";
   static const String kNotification = "NOTIFICATION";
   static const String kOrderInfo = "ORDER_INFO";
+  static const String kSearchHistory = "SEARCH_HISTORY";
 
   // Login хийсэн хэрэглэгчийн ID-г хадлагах, авах
   static void saveUserId(int id) => authBox?.put(kUserId, id);
@@ -30,4 +31,10 @@ class RestApiHelper {
       authBox?.put(kNotification, value);
   static int getNotificationId() =>
       authBox?.get(kNotification, defaultValue: 0);
+
+  // Хайлтын түлхүүр үгүүдийг хадгалах
+  static void saveSearchHistory(List searchHistory) =>
+      authBox?.put(kSearchHistory, searchHistory);
+  static List getSearchHistory() =>
+      authBox?.get(kSearchHistory, defaultValue: []);
 }

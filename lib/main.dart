@@ -17,7 +17,6 @@ import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_product_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_preview_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
-import 'package:Erdenet24/screens/user/user_category_products_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
@@ -31,8 +30,6 @@ import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
-import 'package:Erdenet24/screens/user/user_store_products_screen.dart';
-import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -45,9 +42,8 @@ import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
-import 'package:Erdenet24/screens/user/user_subcategory_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_search_main_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/screens/user/user_search_bar_screen.dart';
 import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -162,8 +158,6 @@ class _MyAppState extends State<MyApp> {
             const SplashPhoneRegisterScreen(),
         userHomeScreenRoute: (context) => const UserHomeScreen(),
         userCartScreenRoute: (context) => const UserCartScreen(),
-        userCategoryProductsScreenRoute: (context) =>
-            const UserCategoryProductScreen(),
         userNavigationDrawerScreenRoute: (context) =>
             const UserNavigationDrawerScreen(),
         userCartAddressInfoScreenRoute: (context) =>
@@ -171,7 +165,8 @@ class _MyAppState extends State<MyApp> {
         userOrderPaymentScreenRoute: (context) =>
             const UserOrderPaymentScreen(),
         userOrdersActiveScreenRoute: (context) => const UserOrderActiveScreen(),
-        userProductScreenRoute: (context) => const UserProductScreen(),
+        userProductDetailScreenRoute: (context) =>
+            const UserProductDetailScreen(),
         userProfileAddressEditScreenRoute: (context) =>
             const UserProfileAddressEditScreen(),
         userProfileHelpScreenRoute: (context) => const UserProfileHelpScreen(),
@@ -182,12 +177,9 @@ class _MyAppState extends State<MyApp> {
         userProfileScreenRoute: (context) => const UserProfileScreen(),
         userQrScanScreenRoute: (context) => const UserQRScanScreen(),
         userSavedScreenRoute: (context) => const UserSavedScreen(),
-        userSearchMainScreenRoute: (context) => const UserSearchMainScreen(),
+        userSearchBarScreenRoute: (context) => const UserSearchBarScreenRoute(),
         userSearchScreenRoute: (context) => const UserSearchScreen(),
         userStoreListScreenRoute: (context) => const UserStoreListScreen(),
-        userStoreProductsScreenRoute: (context) => const UserStoreProducts(),
-        userSubCategoryProductsScreenRoute: (context) =>
-            const UserSubCategoryProductsScreen(),
         storeMainScreenRoute: (context) => const StoreMainScreen(),
         storeOrdersScreenRoute: (context) => const StoreOrdersScreen(),
         storeProductsCreateProductScreenRoute: (context) =>
