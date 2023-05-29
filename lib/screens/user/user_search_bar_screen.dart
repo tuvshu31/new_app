@@ -34,9 +34,9 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     setState(() {});
   }
 
-  void saveSearchHistory(String text) {
-    if (!searchHistory.contains(text)) {
-      searchHistory.add(text);
+  void saveSearchHistory(Map searchedItem) {
+    if (!searchHistory.contains(searchedItem)) {
+      searchHistory.add(searchedItem);
     }
     setState(() {});
   }
@@ -83,6 +83,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
               leadingWidth: 56,
               leading: CustomInkWell(
                 onTap: () {
+                  RestApiHelper.saveSearchHistory(searchHistory);
                   Get.back();
                 },
                 child: const SizedBox(
@@ -154,9 +155,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                         ),
                         cursorColor: MyColors.primary,
                         cursorWidth: 1,
-                        onSubmitted: (value) {
-                          saveSearchHistory(value);
-                        },
+                        onSubmitted: (value) {},
                         onChanged: (value) {
                           searchProducts(value);
                           isSearching = value.isNotEmpty ? true : false;
@@ -216,7 +215,9 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                   var item = searchSuggestions[index];
                   return CustomInkWell(
                     borderRadius: BorderRadius.zero,
-                    onTap: () {},
+                    onTap: () {
+                      saveSearchHistory(item);
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 6, horizontal: 12),
@@ -274,41 +275,69 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
   }
 
   Widget _previousSearchList() {
-    return Wrap(
-      children: List<Widget>.generate(
-        searchHistory.length,
-        (int index) {
+    return Expanded(
+      child: ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        itemCount: searchHistory.length,
+        itemBuilder: (context, index) {
+          var item = searchHistory[index];
           return Container(
-            margin: const EdgeInsets.only(right: 12, bottom: 6),
-            padding: const EdgeInsets.only(left: 12),
-            decoration: BoxDecoration(
-                color: MyColors.fadedGrey,
-                borderRadius: BorderRadius.circular(25)),
+            padding: const EdgeInsets.only(top: 6, left: 12, bottom: 6),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CustomText(
-                  text: searchHistory[index],
-                  fontSize: 12,
-                  isLowerCase: true,
-                ),
-                IconButton(
-                  splashColor: Colors.transparent,
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    deleteSearchHistory(index);
-                  },
-                  icon: const Icon(
-                    Icons.close,
-                    size: 16,
-                    color: MyColors.gray,
+                Container(
+                  width: Get.width * .07,
+                  height: Get.width * .07,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                )
+                  clipBehavior: Clip.hardEdge,
+                  child: Image.network(
+                    "${URL.AWS}/products/${item["id"]}/small/1.png",
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        child: Image(
+                          image: AssetImage("assets/images/png/no_image.png"),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.fadedGrey,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const CupertinoActivityIndicator(),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                    width: Get.width * .7,
+                    child: CustomText(
+                      text: item["name"],
+                      overflow: TextOverflow.ellipsis,
+                    )),
+                GestureDetector(
+                  onTap: () {
+                    searchHistory.remove(item);
+                    setState(() {});
+                  },
+                  child: const Icon(
+                    Icons.close_rounded,
+                  ),
+                ),
               ],
             ),
           );
         },
-      ).toList(),
+      ),
     );
   }
 }
