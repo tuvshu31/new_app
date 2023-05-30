@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -12,6 +10,8 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
+
+enum SearchType { word, product, store }
 
 class UserSearchBarScreenRoute extends StatefulWidget {
   const UserSearchBarScreenRoute({super.key});
@@ -35,7 +35,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
   }
 
   void saveSearchHistory(Map searchedItem) {
-    if (!searchHistory.contains(searchedItem)) {
+    if (searchHistory.any((element) => element["id"] != searchedItem["id"])) {
       searchHistory.add(searchedItem);
     }
     setState(() {});
@@ -216,7 +216,19 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                   return CustomInkWell(
                     borderRadius: BorderRadius.zero,
                     onTap: () {
-                      saveSearchHistory(item);
+                      // saveSearchHistory(item);
+                      log(searchHistory.length.toString());
+                      item["searchType"] = SearchType.word;
+                      if (!searchHistory
+                          .any((element) => element["id"] == item['id'])) {
+                        searchHistory.add(item);
+                        log(searchHistory.toString());
+                      } else {
+                        searchHistory.removeWhere(
+                            (element) => element["id"] == item["id"]);
+                        searchHistory.add(item);
+                        log(searchHistory.toString());
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -276,67 +288,72 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
 
   Widget _previousSearchList() {
     return Expanded(
-      child: ListView.builder(
-        physics: const BouncingScrollPhysics(),
-        itemCount: searchHistory.length,
-        itemBuilder: (context, index) {
-          var item = searchHistory[index];
-          return Container(
-            padding: const EdgeInsets.only(top: 6, left: 12, bottom: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: Get.width * .07,
-                  height: Get.width * .07,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          reverse: true,
+          shrinkWrap: true,
+          itemCount: searchHistory.length,
+          itemBuilder: (context, index) {
+            var item = searchHistory[index];
+            return Container(
+              padding: const EdgeInsets.only(top: 6, left: 12, bottom: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: Get.width * .07,
+                    height: Get.width * .07,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Image.network(
+                      "${URL.AWS}/products/${item["id"]}/small/1.png",
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox(
+                          child: Image(
+                            image: AssetImage("assets/images/png/no_image.png"),
+                          ),
+                        );
+                      },
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.fadedGrey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const CupertinoActivityIndicator(),
+                        );
+                      },
+                    ),
                   ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Image.network(
-                    "${URL.AWS}/products/${item["id"]}/small/1.png",
-                    errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox(
-                        child: Image(
-                          image: AssetImage("assets/images/png/no_image.png"),
-                        ),
-                      );
+                  const SizedBox(width: 12),
+                  SizedBox(
+                      width: Get.width * .7,
+                      child: CustomText(
+                        text: item["name"],
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                  GestureDetector(
+                    onTap: () {
+                      searchHistory.remove(item);
+                      setState(() {});
                     },
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.fadedGrey,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const CupertinoActivityIndicator(),
-                      );
-                    },
+                    child: const Icon(
+                      Icons.close_rounded,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                    width: Get.width * .7,
-                    child: CustomText(
-                      text: item["name"],
-                      overflow: TextOverflow.ellipsis,
-                    )),
-                GestureDetector(
-                  onTap: () {
-                    searchHistory.remove(item);
-                    setState(() {});
-                  },
-                  child: const Icon(
-                    Icons.close_rounded,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
