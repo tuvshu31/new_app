@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/cupertino.dart';

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';

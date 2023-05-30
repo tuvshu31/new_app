@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/header.dart';
@@ -12,26 +13,24 @@ import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-
-enum NavType { none, category, store }
 
 class UserProductsScreen extends StatefulWidget {
   final int typeId;
   final int storeId;
   final String title;
-  final String search;
   int categoryId;
   final int visibility;
+  final bool isFromSeachBar;
+  final dynamic searchObject;
   final NavType navType;
 
   UserProductsScreen({
     Key? key,
-    this.search = "",
     this.typeId = 0,
     this.storeId = 0,
+    this.isFromSeachBar = false,
+    this.searchObject,
     required this.navType,
     this.categoryId = 0,
     this.visibility = 1,
@@ -56,8 +55,12 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   @override
   void initState() {
     super.initState();
-    callCategories();
-    callProducts();
+    if (widget.isFromSeachBar) {
+      searchProducts(widget.searchObject);
+    } else {
+      callCategories();
+      callProducts();
+    }
     handleScroller();
   }
 
@@ -100,7 +103,6 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
       "categoryId": widget.categoryId,
       "store": widget.storeId,
       "visibility": widget.visibility,
-      "search": widget.search,
     };
     query.removeWhere((key, value) => value == 0 || value == "");
     dynamic response = await RestApi().getProducts(query);
@@ -130,6 +132,10 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
       tabItems = [...items, ...data];
       setState(() {});
     }
+  }
+
+  void searchProducts(searchObect) {
+    log(searchObect);
   }
 
   void changeTab(int index) {
