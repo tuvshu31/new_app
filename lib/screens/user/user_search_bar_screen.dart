@@ -67,6 +67,20 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     setState(() {});
   }
 
+  void addToSearchHistory(Map obj, SearchType searchType) {
+    obj["searchType"] = searchType;
+    String value = "id";
+    if (searchType == SearchType.product) {
+      value = "id";
+    } else if (searchType == SearchType.word) {
+      value = "name";
+    }
+    if (searchHistory.any((element) => element[value] == obj[value])) {
+      searchHistory.removeWhere((element) => element[value] == obj[value]);
+    }
+    searchHistory.add(obj);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -155,7 +169,14 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                         ),
                         cursorColor: MyColors.primary,
                         cursorWidth: 1,
-                        onSubmitted: (value) {},
+                        onSubmitted: (value) {
+                          var item = {
+                            "searchType": SearchType.word,
+                            "name": value,
+                            "id": null
+                          };
+                          addToSearchHistory(item, SearchType.word);
+                        },
                         onChanged: (value) {
                           searchProducts(value);
                           isSearching = value.isNotEmpty ? true : false;
@@ -207,7 +228,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     return fetchinSuggestions && searchSuggestions.isEmpty
         ? const Center(child: CupertinoActivityIndicator())
         : !fetchinSuggestions && searchSuggestions.isEmpty
-            ? const CustomLoadingIndicator(text: "Хайлт олдсонгүй")
+            ? Container()
             : ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: searchSuggestions.length,
@@ -216,19 +237,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                   return CustomInkWell(
                     borderRadius: BorderRadius.zero,
                     onTap: () {
-                      // saveSearchHistory(item);
-                      log(searchHistory.length.toString());
-                      item["searchType"] = SearchType.word;
-                      if (!searchHistory
-                          .any((element) => element["id"] == item['id'])) {
-                        searchHistory.add(item);
-                        log(searchHistory.toString());
-                      } else {
-                        searchHistory.removeWhere(
-                            (element) => element["id"] == item["id"]);
-                        searchHistory.add(item);
-                        log(searchHistory.toString());
-                      }
+                      addToSearchHistory(item, SearchType.product);
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -309,29 +318,39 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     clipBehavior: Clip.hardEdge,
-                    child: Image.network(
-                      "${URL.AWS}/products/${item["id"]}/small/1.png",
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox(
-                          child: Image(
-                            image: AssetImage("assets/images/png/no_image.png"),
-                          ),
-                        );
-                      },
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.fadedGrey,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const CupertinoActivityIndicator(),
-                        );
-                      },
-                    ),
+                    child: item["searchType"] == SearchType.word
+                        ? const Icon(
+                            IconlyLight.search,
+                            size: 18,
+                            color: MyColors.gray,
+                          )
+                        : item["searchType"] == SearchType.product
+                            ? Image.network(
+                                "${URL.AWS}/products/${item["id"]}/small/1.png",
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const SizedBox(
+                                    child: Image(
+                                      image: AssetImage(
+                                          "assets/images/png/no_image.png"),
+                                    ),
+                                  );
+                                },
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: MyColors.fadedGrey,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const CupertinoActivityIndicator(),
+                                  );
+                                },
+                              )
+                            : Container(),
                   ),
                   const SizedBox(width: 12),
                   SizedBox(
