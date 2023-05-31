@@ -194,7 +194,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                         onSubmitted: (value) {
                           var item = {
                             "name": value,
-                            "search": "word",
+                            "type": "word",
                           };
                           saveAsHistoryAndNavigate(item);
                         },
@@ -261,10 +261,16 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                             child: Row(
                               children: [
                                 item["type"] == "word"
-                                    ? const Icon(
-                                        IconlyLight.search,
-                                        size: 18,
-                                        color: MyColors.gray,
+                                    ? SizedBox(
+                                        width: Get.width * .07,
+                                        height: Get.width * .07,
+                                        child: const Center(
+                                          child: Icon(
+                                            IconlyLight.search,
+                                            size: 18,
+                                            color: MyColors.gray,
+                                          ),
+                                        ),
                                       )
                                     : CustomImage(
                                         width: Get.width * .07,

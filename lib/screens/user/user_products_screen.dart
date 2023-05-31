@@ -135,7 +135,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   }
 
   void searchProducts(searchObect) {
-    log(searchObect);
+    log(searchObect.toString());
   }
 
   void changeTab(int index) {
