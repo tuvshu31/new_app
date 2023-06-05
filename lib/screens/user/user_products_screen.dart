@@ -135,7 +135,14 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   }
 
   void searchProducts(searchObect) {
-    log(searchObect.toString());
+    log(searchObect["type"].toString());
+    var searchType= searchObect["type"];
+    if(searchObect["type"]=="word"){
+      fetchWordProducts();
+    }
+    else if(searchObect["type"]=="product"){
+      fetch
+    }
   }
 
   void changeTab(int index) {
