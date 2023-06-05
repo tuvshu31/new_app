@@ -137,6 +137,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   void searchProducts(searchObect) {
     log(searchObect["type"].toString());
     var searchType= searchObect["type"];
+    searchProducts
     if(searchObect["type"]=="word"){
       fetchWordProducts();
     }
