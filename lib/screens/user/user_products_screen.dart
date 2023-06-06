@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -134,16 +135,27 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     }
   }
 
-  void searchProducts(searchObect) {
-    log(searchObect["type"].toString());
-    var searchType= searchObect["type"];
-    searchProducts
-    if(searchObect["type"]=="word"){
-      fetchWordProducts();
+  Future<void> searchProducts(searchObect) async {
+    fetchingProducts = true;
+    var type = searchObect["type"];
+    var body = {"type": type};
+    if (type == "word") {
+      body["keyWord"] = searchObect["name"];
+    } else if (type == "product") {
+      body["productId"] = searchObect["id"];
+    } else if (type == "store") {
+      body["storeId"] = searchObect["id"];
     }
-    else if(searchObect["type"]=="product"){
-      fetch
+    dynamic response = await RestApi().getSearchResults(body);
+    dynamic productResponse = Map<String, dynamic>.from(response);
+    products = products + productResponse["data"];
+    if (productResponse["data"].length <
+        productResponse["pagination"]["limit"]) {
+      hasMoreProducts = false;
     }
+    totalProducts = productResponse["pagination"]["count"];
+    fetchingProducts = false;
+    setState(() {});
   }
 
   void changeTab(int index) {

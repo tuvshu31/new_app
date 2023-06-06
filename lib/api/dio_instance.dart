@@ -39,8 +39,9 @@ class DioClient {
         path,
         data: body,
         options: Options(
-            method: _getMethodName(_method),
-            headers: {"content-Type": 'application/x-www-form-urlencoded'}),
+          method: _getMethodName(_method),
+          // headers: {"content-Type": 'application/x-www-form-urlencoded'},
+        ),
         queryParameters: queryParam,
       );
 

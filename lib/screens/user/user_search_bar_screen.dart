@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,21 +48,11 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
 
   void searchProducts(String text) async {
     fetchinSuggestions = true;
-    var headers = {'Content-Type': 'application/json'};
-    var request = http.Request(
-        'GET', Uri.parse('http://3.35.52.56:8000/products/search'));
-    request.body = json.encode({"keyWord": text});
-    request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 200) {
-      var data = await response.stream.bytesToString();
-      var res = json.decode(data);
-      searchSuggestions.clear();
-      searchSuggestions = res["data"];
-      setState(() {});
-    } else {
-      print(response.reasonPhrase);
-    }
+    var body = {"keyWord": text};
+    dynamic response = await RestApi().searchProducts(body);
+    dynamic data = Map<String, dynamic>.from(response);
+    searchSuggestions.clear();
+    searchSuggestions = data["data"];
     fetchinSuggestions = false;
     setState(() {});
   }

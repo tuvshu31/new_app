@@ -48,6 +48,12 @@ class RestApi {
     return DioClient().sendRequest('products/search', Method.get, body, {});
   }
 
+  //Хайсан бараануудыг авах
+  Future getSearchResults(dynamic body) async {
+    return DioClient()
+        .sendRequest('products/getSearchResults', Method.get, body, {});
+  }
+
   //Дэлгүүр бүх бараануудыг авах
   Future getStoreProducts(dynamic query) async {
     return DioClient().sendRequest('products/store', Method.get, [], query);
