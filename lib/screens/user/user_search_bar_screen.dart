@@ -1,6 +1,5 @@
-import 'dart:convert';
+import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +10,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
 
 class UserSearchBarScreenRoute extends StatefulWidget {
   const UserSearchBarScreenRoute({super.key});
@@ -70,14 +68,19 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
 
   void saveAsHistoryAndNavigate(obj) {
     addToSearchHistory(obj);
-    Get.to(
-      () => UserProductsScreen(
-        navType: NavType.none,
-        title: "Бүтээгдэхүүн",
-        isFromSeachBar: true,
-        searchObject: obj,
-      ),
-    );
+    log(obj.toString());
+    var query = {};
+    if (obj["type"] == "product") {
+      // query[""]
+    }
+    // Get.to(
+    //   () => UserProductsScreen(
+    //     navType: NavType.none,
+    //     title: "Бүтээгдэхүүн",
+    //     isFromSeachBar: true,
+    //     searchObject: obj,
+    //   ),
+    // );
     Future.delayed(const Duration(milliseconds: 300), () {
       searchController.clear();
       isSearching = false;

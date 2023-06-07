@@ -45,7 +45,8 @@ class RestApi {
 
   //Хэрэглэгч бараануудыг хайж авах
   Future searchProducts(dynamic body) async {
-    return DioClient().sendRequest('products/search', Method.get, body, {});
+    return DioClient()
+        .sendRequest('products/getSearchSuggessions', Method.get, body, {});
   }
 
   //Хайсан бараануудыг авах

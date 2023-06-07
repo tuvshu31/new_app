@@ -105,7 +105,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
       "store": widget.storeId,
       "visibility": widget.visibility,
     };
-    query.removeWhere((key, value) => value == 0 || value == "");
+    query.removeWhere((key, value) => value == 0);
     dynamic response = await RestApi().getProducts(query);
     dynamic productResponse = Map<String, dynamic>.from(response);
     products = products + productResponse["data"];
@@ -113,7 +113,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
         productResponse["pagination"]["limit"]) {
       hasMoreProducts = false;
     }
-    totalProducts = productResponse["pagination"]["count"];
+    totalProducts = productResponse["pagination"]["total"];
     fetchingProducts = false;
     setState(() {});
   }
@@ -221,9 +221,8 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                         notification.metrics.extentAfter) /
                     height)
                 .round();
-            setState(() {
-              _scrolledProducts = position;
-            });
+            _scrolledProducts = position;
+            setState(() {});
 
             return true;
           },
