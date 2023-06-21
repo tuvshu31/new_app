@@ -5,6 +5,7 @@ import 'package:Erdenet24/controller/product_controller.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
@@ -134,14 +135,11 @@ class _UserStoreListScreenState extends State<UserStoreListScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                                width: Get.width * .25,
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12)),
-                                child: CachedImage(
-                                    image:
-                                        "${URL.AWS}/users/${data["id"]}/small/1.png")),
+                            CustomImage(
+                              width: Get.width * .25,
+                              height: Get.width * .25,
+                              url: "${URL.AWS}/users/${data["id"]}/small/1.png",
+                            ),
                             SizedBox(width: Get.width * .045),
                             Expanded(
                               child: SizedBox(

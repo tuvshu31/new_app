@@ -6,14 +6,14 @@ class CustomShimmer extends StatelessWidget {
   final double width;
   final double height;
   final bool isCircle;
-  final bool isRoundedCircle;
-  const CustomShimmer(
-      {Key? key,
-      required this.width,
-      required this.height,
-      this.isRoundedCircle = false,
-      this.isCircle = false})
-      : super(key: key);
+  final double borderRadius;
+  const CustomShimmer({
+    Key? key,
+    required this.width,
+    required this.height,
+    this.borderRadius = 12,
+    this.isCircle = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class CustomShimmer extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          borderRadius: isRoundedCircle ? BorderRadius.circular(12) : null,
+          borderRadius: BorderRadius.circular(borderRadius),
           color: Colors.white,
           shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
         ),

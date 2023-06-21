@@ -1,6 +1,5 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -76,7 +75,6 @@ class _CustomListItemsState extends State<CustomListItems> {
                       child: CustomShimmer(
                         width: double.infinity,
                         height: Get.height * .03,
-                        isRoundedCircle: true,
                       ),
                     );
                   } else {

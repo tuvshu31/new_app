@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/widgets/cart.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:badges/badges.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -41,7 +44,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       _data = _incoming["data"];
       _isSaved = _cartCtrl.savedList.contains(_data["id"]);
     });
-    print(_data["otherInfo"].length);
     imgCount();
   }
 
@@ -55,170 +57,343 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => CustomHeader(
-        customActions: IconButton(
-          icon: badges.Badge(
-            badgeAnimation: BadgeAnimation.scale(),
-            position: BadgePosition.custom(top: -12, end: -8),
-            badgeContent: CustomText(
-              text: _cartCtrl.cartList.length.toString(),
-              color: MyColors.white,
-            ),
-            child: Icon(
-              IconlyLight.buy,
-              color: MyColors.black,
-              size: 20,
-            ),
-          ),
-          onPressed: () {
-            Get.back();
-            Get.back();
-            _navCtrl.onItemTapped(2);
-          },
-        ),
-        title: "Бүтээгдэхүүн",
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Hero(
-                    transitionOnUserGestures: true,
-                    tag: _data,
-                    child: CarouselSlider(
-                        options: CarouselOptions(
-                          enableInfiniteScroll: false,
-                          initialPage: 0,
-                          aspectRatio: 1,
-                          viewportFraction: 1,
-                          scrollPhysics: const BouncingScrollPhysics(),
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              scrollIndex = index + 1;
-                            });
-                          },
-                        ),
-                        items: list
-                            .map((item) => CachedImage(
-                                image:
-                                    "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
-                            .toList()),
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Hero(
+                  transitionOnUserGestures: true,
+                  tag: _data,
+                  child: CarouselSlider(
+                      options: CarouselOptions(
+                        enableInfiniteScroll: false,
+                        initialPage: 0,
+                        aspectRatio: 1,
+                        viewportFraction: 1,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            scrollIndex = index + 1;
+                          });
+                        },
+                      ),
+                      items: list
+                          .map((item) => CachedImage(
+                              image:
+                                  "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
+                          .toList()),
+                ),
+                Positioned(
+                  bottom: 12,
+                  right: 24,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                        color: MyColors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(25)),
+                    child: CustomText(
+                      text: "$scrollIndex/${list.length}",
+                      color: MyColors.white,
+                    ),
                   ),
-                  list.length > 1
-                      ? Positioned(
-                          bottom: 12,
-                          right: 24,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                                color: MyColors.black.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(25)),
-                            child: CustomText(
-                              text: "$scrollIndex/${list.length}",
-                              color: MyColors.white,
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).viewPadding.top + 12,
+                  left: 24,
+                  child: CustomInkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: MyColors.white,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: const Icon(
+                        IconlyLight.arrow_left,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).viewPadding.top + 12,
+                  right: 24,
+                  child: CustomInkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: MyColors.white,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: CustomCart(count: 10),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CustomImage(
+                        width: 24,
+                        height: 24,
+                        url: "${URL.AWS}/users/${_data["store"]}/small/1.png",
+                      ),
+                      const SizedBox(width: 8),
+                      CustomText(
+                        text: "${_data["storeName"]}",
+                        fontSize: 15,
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              IconlyLight.arrow_right_2,
+                              size: 20,
                             ),
-                          ),
-                        )
-                      : Container()
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  CustomText(
+                    text: "${_data["name"]}",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 8),
+                  CustomText(
+                    text: convertToCurrencyFormat(
+                        double.parse("${_data["price"]}"),
+                        toInt: true,
+                        locatedAtTheEnd: true),
+                    fontSize: 14,
+                  ),
+                  const SizedBox(height: 8),
+                  const SizedBox(height: 8),
+                  CustomText(
+                    textAlign: TextAlign.justify,
+                    color: MyColors.gray,
+                    fontSize: 12,
+                    text:
+                        "Монголын Алт (МАК) ХХК-ийн Бодлогын зөвлөлийн дарга Б.Нямтайшир Эдийн засгийн сэтгүүлч, шинжээчдийн клубийн гишүүдтэй уулзан, хүнд аж үйлдвэрийн салбарт хэрэгжүүлэхээр төлөвлөж буй төслүүдийн талаар мэдээлэл өгч, сэтгүүлчдийн асуултад хариулсан юм.",
+                  )
                 ],
               ),
-              Container(
-                margin: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      text: "${_data["name"]}",
-                    ),
-                    const SizedBox(height: 8),
-                    CustomText(
-                      text: convertToCurrencyFormat(
-                          double.parse("${_data["price"]}"),
-                          toInt: true,
-                          locatedAtTheEnd: true),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    const SizedBox(height: 24),
-                    const MySeparator(color: MyColors.grey),
-                    const SizedBox(height: 24),
-                    _data["otherInfo"].isNotEmpty
-                        ? ListView.separated(
-                            separatorBuilder: (context, index) {
-                              return const SizedBox(height: 12);
-                            },
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: _data["otherInfo"].length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var data = Map<String, dynamic>.from(
-                                  _data["otherInfo"][index]);
-                              var key = removeBracket(data.keys.toString());
-                              var value = removeBracket(data.values.toString());
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(child: CustomText(text: "$key:")),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                      child: CustomText(
-                                    text: value,
-                                  ))
-                                ],
-                              );
-                            },
-                          )
-                        : Container(),
-                    SizedBox(height: Get.height * .1)
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        bottomSheet: Container(
-          width: Get.width,
-          height: Get.height * .09,
-          color: MyColors.white,
-          padding: EdgeInsets.symmetric(horizontal: Get.width * .03),
-          child: Row(
-            children: [
-              Expanded(
-                child: CustomButton(
-                  isActive: !_isSaved,
-                  onPressed: () {
-                    _cartCtrl.saveProduct(_data, context);
-                    _isSaved = !_isSaved;
-                    setState(() {});
-                  },
-                  text: _isSaved ? "Хадгалсан" : "Хадгалах",
-                  textColor: MyColors.primary,
-                  elevation: 0,
-                  bgColor: MyColors.fadedGrey,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: CustomButton(
-                  onPressed: () {
-                    _cartCtrl.addProduct(_data, context);
-                    Get.back();
-                  },
-                  text: "Сагсанд нэмэх",
-                  textColor: MyColors.white,
-                  elevation: 0,
-                ),
-              ),
-            ],
-          ),
+            )
+
+            // _data["otherInfo"].isNotEmpty
+            //     ? ListView.separated(
+            //         separatorBuilder: (context, index) {
+            //           return const SizedBox(height: 12);
+            //         },
+            //         physics: const NeverScrollableScrollPhysics(),
+            //         shrinkWrap: true,
+            //         itemCount: _data["otherInfo"].length,
+            //         itemBuilder: (BuildContext context, int index) {
+            //           var data =
+            //               Map<String, dynamic>.from(_data["otherInfo"][index]);
+            //           var key = removeBracket(data.keys.toString());
+            //           var value = removeBracket(data.values.toString());
+            //           return Row(
+            //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //             children: [
+            //               Expanded(child: CustomText(text: "$key:")),
+            //               const SizedBox(width: 12),
+            //               Expanded(
+            //                   child: CustomText(
+            //                 text: value,
+            //               ))
+            //             ],
+            //           );
+            //         },
+            //       )
+            //     : Container(),
+          ],
         ),
       ),
     );
+    // return Obx(
+    //   () => CustomHeader(
+    //     customActions: IconButton(
+    //       icon: badges.Badge(
+    //         badgeAnimation: BadgeAnimation.scale(),
+    //         position: BadgePosition.custom(top: -12, end: -8),
+    //         badgeContent: CustomText(
+    //           text: _cartCtrl.cartList.length.toString(),
+    //           color: MyColors.white,
+    //         ),
+    //         child: Icon(
+    //           IconlyLight.buy,
+    //           color: MyColors.black,
+    //           size: 20,
+    //         ),
+    //       ),
+    //       onPressed: () {
+    //         Get.back();
+    //         Get.back();
+    //         _navCtrl.onItemTapped(2);
+    //       },
+    //     ),
+    //     title: "Бүтээгдэхүүн",
+    //     body: SingleChildScrollView(
+    //       physics: const BouncingScrollPhysics(),
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.start,
+    //         children: [
+    //           Stack(
+    //             children: [
+    //               Hero(
+    //                 transitionOnUserGestures: true,
+    //                 tag: _data,
+    //                 child: CarouselSlider(
+    //                     options: CarouselOptions(
+    //                       enableInfiniteScroll: false,
+    //                       initialPage: 0,
+    //                       aspectRatio: 1,
+    //                       viewportFraction: 1,
+    //                       scrollPhysics: const BouncingScrollPhysics(),
+    //                       onPageChanged: (index, reason) {
+    //                         setState(() {
+    //                           scrollIndex = index + 1;
+    //                         });
+    //                       },
+    //                     ),
+    //                     items: list
+    //                         .map((item) => CachedImage(
+    //                             image:
+    //                                 "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
+    //                         .toList()),
+    //               ),
+    //               list.length > 1
+    //                   ? Positioned(
+    //                       bottom: 12,
+    //                       right: 24,
+    //                       child: Container(
+    //                         padding: const EdgeInsets.symmetric(
+    //                             horizontal: 12, vertical: 4),
+    //                         decoration: BoxDecoration(
+    //                             color: MyColors.black.withOpacity(0.5),
+    //                             borderRadius: BorderRadius.circular(25)),
+    //                         child: CustomText(
+    //                           text: "$scrollIndex/${list.length}",
+    //                           color: MyColors.white,
+    //                         ),
+    //                       ),
+    //                     )
+    //                   : Container()
+    //             ],
+    //           ),
+    //           Container(
+    //             margin: const EdgeInsets.all(24),
+    //             child: Column(
+    //               crossAxisAlignment: CrossAxisAlignment.start,
+    //               children: [
+    //                 CustomText(
+    //                   text: "${_data["name"]}",
+    //                 ),
+    //                 const SizedBox(height: 8),
+    //                 CustomText(
+    //                   text: convertToCurrencyFormat(
+    //                       double.parse("${_data["price"]}"),
+    //                       toInt: true,
+    //                       locatedAtTheEnd: true),
+    //                   fontSize: 14,
+    //                   fontWeight: FontWeight.bold,
+    //                 ),
+    //                 const SizedBox(height: 24),
+    //                 const MySeparator(color: MyColors.grey),
+    //                 const SizedBox(height: 24),
+    //                 _data["otherInfo"].isNotEmpty
+    //                     ? ListView.separated(
+    //                         separatorBuilder: (context, index) {
+    //                           return const SizedBox(height: 12);
+    //                         },
+    //                         physics: const NeverScrollableScrollPhysics(),
+    //                         shrinkWrap: true,
+    //                         itemCount: _data["otherInfo"].length,
+    //                         itemBuilder: (BuildContext context, int index) {
+    //                           var data = Map<String, dynamic>.from(
+    //                               _data["otherInfo"][index]);
+    //                           var key = removeBracket(data.keys.toString());
+    //                           var value = removeBracket(data.values.toString());
+    //                           return Row(
+    //                             mainAxisAlignment:
+    //                                 MainAxisAlignment.spaceBetween,
+    //                             children: [
+    //                               Expanded(child: CustomText(text: "$key:")),
+    //                               const SizedBox(width: 12),
+    //                               Expanded(
+    //                                   child: CustomText(
+    //                                 text: value,
+    //                               ))
+    //                             ],
+    //                           );
+    //                         },
+    //                       )
+    //                     : Container(),
+    //                 SizedBox(height: Get.height * .1)
+    //               ],
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //     bottomSheet: Container(
+    //       width: Get.width,
+    //       height: Get.height * .09,
+    //       color: MyColors.white,
+    //       padding: EdgeInsets.symmetric(horizontal: Get.width * .03),
+    //       child: Row(
+    //         children: [
+    //           Expanded(
+    //             child: CustomButton(
+    //               isActive: !_isSaved,
+    //               onPressed: () {
+    //                 _cartCtrl.saveProduct(_data, context);
+    //                 _isSaved = !_isSaved;
+    //                 setState(() {});
+    //               },
+    //               text: _isSaved ? "Хадгалсан" : "Хадгалах",
+    //               textColor: MyColors.primary,
+    //               elevation: 0,
+    //               bgColor: MyColors.fadedGrey,
+    //             ),
+    //           ),
+    //           const SizedBox(width: 12),
+    //           Expanded(
+    //             child: CustomButton(
+    //               onPressed: () {
+    //                 _cartCtrl.addProduct(_data, context);
+    //                 Get.back();
+    //               },
+    //               text: "Сагсанд нэмэх",
+    //               textColor: MyColors.white,
+    //               elevation: 0,
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
 

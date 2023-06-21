@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -6,7 +5,9 @@ import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -191,21 +192,23 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
               ),
-              child: TabBar(
-                onTap: (index) {
-                  changeTab(index);
-                },
-                isScrollable: true,
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  color: MyColors.fadedGrey,
-                ),
-                labelColor: MyColors.primary,
-                unselectedLabelColor: Colors.black,
-                tabs: tabItems.map<Widget>((e) {
-                  return Tab(text: e["name"]);
-                }).toList(),
-              ),
+              child: tabItems.isEmpty
+                  ? _tabShimmer()
+                  : TabBar(
+                      onTap: (index) {
+                        changeTab(index);
+                      },
+                      isScrollable: true,
+                      indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: MyColors.fadedGrey,
+                      ),
+                      labelColor: MyColors.primary,
+                      unselectedLabelColor: Colors.black,
+                      tabs: tabItems.map<Widget>((e) {
+                        return Tab(text: e["name"]);
+                      }).toList(),
+                    ),
             ),
           )
         : null;
@@ -279,44 +282,13 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                   },
                 ),
                 child: Hero(
-                    transitionOnUserGestures: true,
-                    tag: data,
-                    child: Container(
+                  transitionOnUserGestures: true,
+                  tag: data,
+                  child: CustomImage(
                       width: (Get.width - 36) / 2,
                       height: (Get.width - 36) / 2,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                        "${URL.AWS}/products/${data["id"]}/large/1.png",
-                        errorBuilder: (context, error, stackTrace) {
-                          return SizedBox(
-                            width: (Get.width - 36) / 2,
-                            height: (Get.width - 36) / 2,
-                            child: const Image(
-                              image:
-                                  AssetImage("assets/images/png/no_image.png"),
-                            ),
-                          );
-                        },
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Container(
-                            width: (Get.width - 36) / 2,
-                            height: (Get.width - 36) / 2,
-                            decoration: BoxDecoration(
-                              color: MyColors.fadedGrey,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const CupertinoActivityIndicator(),
-                          );
-                        },
-                      ),
-                    )),
+                      url: "${URL.AWS}/products/${data["id"]}/large/1.png"),
+                ),
               ),
               Expanded(
                 child: Column(
@@ -339,44 +311,48 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
               ),
             ],
           ),
-          Positioned(
-            left: 12,
-            top: 12,
-            child: Row(
-              children: [
-                Container(
-                  width: Get.width * .07,
-                  height: Get.width * .07,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.network(
-                    "${URL.AWS}/users/${data["store"]}/small/1.png",
-                    fit: BoxFit.fill,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return Shimmer.fromColors(
-                        baseColor: MyColors.fadedGrey,
-                        highlightColor: MyColors.grey.withOpacity(0.3),
-                        child: Container(
-                          width: Get.width * .07,
-                          height: Get.width * .07,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _storeLogo(int.parse(data["store"]))
         ],
+      ),
+    );
+  }
+
+  Widget _tabShimmer() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+      ],
+    );
+  }
+
+  Widget _storeLogo(int storeId) {
+    return Positioned(
+      left: 12,
+      top: 12,
+      child: CustomImage(
+        width: Get.width * .07,
+        height: Get.width * .07,
+        url: "${URL.AWS}/users/$storeId/small/1.png",
       ),
     );
   }
@@ -494,6 +470,5 @@ Widget subtitle(bool loading, int total, String type) {
       : CustomShimmer(
           width: Get.width * .15,
           height: 16,
-          isRoundedCircle: true,
         );
 }

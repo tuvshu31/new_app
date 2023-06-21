@@ -191,12 +191,13 @@ void userOrdersDetailView(context, data) {
                               contentPadding: EdgeInsets.zero,
                               minLeadingWidth: Get.width * .15,
                               leading: Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: CachedImage(
-                                      image:
-                                          "${URL.AWS}/products/${product["id"]}/small/1.png")),
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: CachedImage(
+                                    image:
+                                        "${URL.AWS}/products/${product["id"]}/small/1.png"),
+                              ),
                               title: CustomText(
                                 text: product["name"],
                                 fontSize: 14,

@@ -18,10 +18,6 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
-import 'package:Erdenet24/screens/store/store_orders_screen.dart';
-import 'package:Erdenet24/screens/store/store_settings_screen.dart';
-import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
-import 'package:lottie/lottie.dart';
 
 class StoreMainScreen extends StatefulWidget {
   const StoreMainScreen({Key? key}) : super(key: key);

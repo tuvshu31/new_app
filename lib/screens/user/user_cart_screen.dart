@@ -1,19 +1,18 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:iconly/iconly.dart';
+import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
 
 class UserCartScreen extends StatefulWidget {
   const UserCartScreen({Key? key}) : super(key: key);
@@ -250,6 +249,8 @@ class _UserCartScreenState extends State<UserCartScreen> {
                                         child: IconButton(
                                             splashColor: Colors.transparent,
                                             onPressed: () {
+                                              print(data["quantity"]);
+                                              print(data["available"]);
                                               data["quantity"] ==
                                                       int.parse(
                                                           data["available"])

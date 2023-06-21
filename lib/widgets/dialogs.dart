@@ -1,17 +1,13 @@
-import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
-import 'package:app_settings/app_settings.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
+import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:Erdenet24/utils/styles.dart';
-// import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/widgets/textfield.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:curved_progress_bar/curved_progress_bar.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 
 // final player = AudioCache();
 String message = "Hello";
@@ -403,6 +399,7 @@ void loadingDialog(BuildContext context) async {
     context: context,
     barrierLabel: "",
     barrierDismissible: false,
+    transitionDuration: const Duration(milliseconds: 400),
     pageBuilder: (ctx, a1, a2) {
       return Container();
     },
@@ -410,18 +407,23 @@ void loadingDialog(BuildContext context) async {
       var curve = Curves.bounceInOut.transform(a1.value);
       return Transform.scale(
         scale: curve,
-        child: const Center(
-          // child: CircularProgressIndicator(
-          //   color: MyColors.white,
-          // ),
-          child: CupertinoActivityIndicator(
-            color: MyColors.white,
-            radius: 16,
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(Get.width * .09),
+            child: const CurvedCircularProgressIndicator(
+              strokeWidth: 5,
+              animationDuration: Duration(seconds: 1),
+              backgroundColor: MyColors.background,
+              color: MyColors.primary,
+            ),
           ),
         ),
       );
     },
-    transitionDuration: const Duration(milliseconds: 400),
   );
 }
 

@@ -89,8 +89,8 @@ class _CustomButtonState extends State<CustomButton> {
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
-              color: MyColors.primary,
-              strokeWidth: 1,
+              color: MyColors.white,
+              strokeWidth: 2,
             ),
           )
         : Text(

@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:get/get.dart';
@@ -151,7 +149,6 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                   ? CustomShimmer(
                                       width: Get.width * .2,
                                       height: 14,
-                                      isRoundedCircle: true,
                                     )
                                   : CustomText(
                                       text: _count.isNotEmpty

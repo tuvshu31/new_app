@@ -89,9 +89,8 @@ Widget step0() {
                       fontSize: 10,
                       color: MyColors.white,
                       text: formatedTime(
-                          timeInSecond: int.parse(_driverCtx
-                                  .lastDelivery["deliveryDuration"]) ??
-                              _driverCtx.deliveryInfo["deliveryTime"]),
+                          timeInSecond: int.parse(
+                              _driverCtx.lastDelivery["deliveryDuration"])),
                     )
                   ],
                 ),

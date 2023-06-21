@@ -56,7 +56,8 @@ class LoginController extends GetxController {
                 return WillPopScope(
                   onWillPop: () async => false,
                   child: AlertDialog(
-                    // title: Text('Анхааруулга'),
+                    title:
+                        IconButton(onPressed: () {}, icon: Icon(Icons.close)),
                     content: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(

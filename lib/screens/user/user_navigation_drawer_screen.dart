@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/cupertino.dart';
@@ -145,7 +146,6 @@ class _UserNavigationDrawerScreenState
                                 ? CustomShimmer(
                                     width: Get.width * .2,
                                     height: 14,
-                                    isRoundedCircle: true,
                                   )
                                 : CustomText(
                                     text: _selectedIndex == 0
@@ -187,13 +187,12 @@ class _UserNavigationDrawerScreenState
         CustomShimmer(
           width: Get.width * .15,
           height: Get.width * .15,
-          isCircle: true,
+          borderRadius: 50,
         ),
         const SizedBox(height: 8),
         CustomShimmer(
           width: Get.width * .2,
           height: 12,
-          isRoundedCircle: true,
         )
       ],
     );
@@ -203,39 +202,23 @@ class _UserNavigationDrawerScreenState
     return Column(
       children: [
         CustomInkWell(
-          onTap: () {
-            Get.to(
-              UserProductsScreen(
-                navType: NavType.none,
-                title: item["name"],
-                typeId: item["parentId"],
-                categoryId: item["id"],
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(50),
-          child: SizedBox(
-            width: Get.width * .15,
-            child: Image.network(
-              "${URL.AWS}/categories/${item['image']}",
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                }
-                return Container(
-                  width: Get.width * .15,
-                  height: Get.width * .15,
-                  decoration: BoxDecoration(
-                    color: MyColors.fadedGrey,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const CupertinoActivityIndicator(),
-                );
-              },
-            ),
-          ),
-        ),
+            onTap: () {
+              Get.to(
+                UserProductsScreen(
+                  navType: NavType.none,
+                  title: item["name"],
+                  typeId: item["parentId"],
+                  categoryId: item["id"],
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(50),
+            child: CustomImage(
+              width: Get.width * .15,
+              height: Get.width * .15,
+              url: "${URL.AWS}/categories/${item['image']}",
+              radius: 50,
+            )),
         const SizedBox(height: 4),
         SizedBox(
           width: Get.width * .3,

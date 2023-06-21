@@ -103,6 +103,7 @@ dependencies:
   blurry: ^1.4.2
   awesome_dialog: ^3.0.2
   add_to_cart_animation: ^2.0.3
+  curved_progress_bar: ^1.0.2
 
   # flutter_local_notifications: ^14.0.0
   # firebase_messaging: ^14.3.0

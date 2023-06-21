@@ -16,19 +16,17 @@ class MyShimmers {
           CustomShimmer(
             width: Get.width * .2,
             height: Get.width * .2,
-            isCircle: true,
+            borderRadius: 50,
           ),
           const SizedBox(height: 4),
           CustomShimmer(
             width: Get.width * .2,
             height: 12,
-            isRoundedCircle: true,
           ),
           const SizedBox(height: 4),
           CustomShimmer(
             width: Get.width * .2,
             height: 12,
-            isRoundedCircle: true,
           )
         ],
       ),
@@ -44,7 +42,6 @@ class MyShimmers {
           CustomShimmer(
             width: Get.width * .25,
             height: Get.width * .25,
-            isRoundedCircle: true,
           ),
           SizedBox(width: Get.width * .045),
           Expanded(
@@ -55,22 +52,18 @@ class MyShimmers {
               const CustomShimmer(
                 width: double.infinity,
                 height: 14,
-                isRoundedCircle: true,
               ),
               CustomShimmer(
                 width: Get.width * .3,
                 height: 14,
-                isRoundedCircle: true,
               ),
               CustomShimmer(
                 width: Get.width * .45,
                 height: 14,
-                isRoundedCircle: true,
               ),
               CustomShimmer(
                 width: Get.width * .5,
                 height: 14,
-                isRoundedCircle: true,
               )
             ],
           )),
@@ -97,17 +90,14 @@ class MyShimmers {
                   CustomShimmer(
                     width: Get.width * .8,
                     height: 12,
-                    isRoundedCircle: true,
                   ),
                   CustomShimmer(
                     width: Get.width * .4,
                     height: 12,
-                    isRoundedCircle: true,
                   ),
                   CustomShimmer(
                     width: Get.width * .8,
                     height: 12,
-                    isRoundedCircle: true,
                   ),
                 ],
               ),
@@ -151,7 +141,6 @@ class MyShimmers {
         return const CustomShimmer(
           width: double.infinity,
           height: double.infinity,
-          isRoundedCircle: true,
         );
       },
     );
@@ -175,12 +164,11 @@ class MyShimmers {
             leading: const CustomShimmer(
               width: 40,
               height: 40,
-              isCircle: true,
+              borderRadius: 50,
             ),
             title: CustomShimmer(
               width: Get.width * .65,
               height: 14,
-              isRoundedCircle: true,
             ),
           );
         });
