@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class SplashProminentDisclosure extends StatefulWidget {
   const SplashProminentDisclosure({super.key});
@@ -34,60 +36,65 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
-      customActions: Container(),
+      customActions: Row(
+        children: [
+          CustomInkWell(
+            borderRadius: BorderRadius.circular(50),
+            onTap: () {
+              Get.toNamed(_route);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: MyColors.fadedGrey,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.close_rounded,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
       customLeading: Container(),
       customTitle: Container(),
       body: Container(
         margin: const EdgeInsets.all(24),
         child: Column(
           children: [
-            SizedBox(height: Get.height * .2),
+            SizedBox(height: Get.height * .05),
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                  color: MyColors.fadedGrey, shape: BoxShape.circle),
-              child: Image(
-                image:
-                    const AssetImage("assets/images/png/app/google-maps.png"),
-                width: Get.width * .1,
+                color: MyColors.fadedGrey,
+                shape: BoxShape.circle,
+              ),
+              child: Lottie.asset(
+                'assets/json/location.json',
+                height: Get.width * .6,
+                width: Get.width * .6,
               ),
             ),
-            SizedBox(height: Get.height * .05),
-            CustomText(
-              text: "Та байршилаа асаана уу",
-              fontSize: 20,
+            SizedBox(height: Get.height * .1),
+            const CustomText(
+              text: "Байршил заагчаа асаана уу",
+              fontSize: 18,
             ),
             SizedBox(height: Get.height * .03),
-            CustomText(
+            const CustomText(
               textAlign: TextAlign.center,
               text:
-                  "Захиалга хийгдэхийн тулд таны байршилыг тодорхойлох шаардлагатай бөгөөд мөн захиалгын хүргэлтийн мэдээллээ хянах боломжтой болно.",
+                  "Захиалга хийгдэхийн тулд таны байршилыг тодорхойлох шаардлагатай.",
               color: MyColors.gray,
             ),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        text: "Татгалзах",
-                        textColor: MyColors.gray,
-                        onPressed: () {
-                          Get.toNamed(_route);
-                        },
-                        bgColor: MyColors.white,
-                        elevation: 0,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: CustomButton(
-                        onPressed: requestPermission,
-                        text: "Асаах",
-                      ),
-                    ),
-                  ],
+                child: CustomButton(
+                  onPressed: requestPermission,
+                  text: "Асаах",
+                  elevation: 0,
                 ),
               ),
             ),

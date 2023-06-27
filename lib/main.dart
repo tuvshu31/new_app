@@ -34,6 +34,7 @@ import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dropdown_alert/dropdown_alert.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -146,7 +147,14 @@ class _MyAppState extends State<MyApp> {
       title: "Erdenet24",
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,
-      theme: ThemeData(fontFamily: 'Nunito'),
+      theme: ThemeData(
+        fontFamily: 'Nunito',
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+
+      builder: (context, child) => Stack(
+        children: [child!, const DropdownAlert()],
+      ),
       routes: <String, WidgetBuilder>{
         splashMainScreenRoute: (context) => const SplashMainScreen(),
         splashOtpScreenRoute: (context) => const SplashOtpScreen(),

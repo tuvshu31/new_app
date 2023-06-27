@@ -196,3 +196,12 @@ String formatedTime({required int timeInSecond}) {
   String second = sec.toString().length <= 1 ? "0$sec" : "$sec";
   return "$minute мин $second сек";
 }
+
+List reversedArray(List myList) {
+  for (var i = 0; i < myList.length / 2; i++) {
+    var temp = myList[i];
+    myList[i] = myList[myList.length - 1 - i];
+    myList[myList.length - 1 - i] = temp;
+  }
+  return myList;
+}

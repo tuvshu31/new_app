@@ -52,14 +52,13 @@ class _UserStoreListScreenState extends State<UserStoreListScreen> {
 
   void getStores() async {
     loading = true;
-    var query = {"role": "store", "category": categoryId, "isOpen": 1};
+    var query = {"role": "store", "category": categoryId};
     query.removeWhere((key, value) => value == 0);
     dynamic response = await RestApi().getUsers(query);
     dynamic d = Map<String, dynamic>.from(response);
     loading = false;
     if (d["success"]) {
-      log(d["data"].toString());
-      storeList = d["data"].where((x) => x["isOpen"] == true).toList();
+      storeList = d["data"].where((x) => x["name"] != "Тест").toList();
     }
 
     setState(() {});
@@ -135,10 +134,34 @@ class _UserStoreListScreenState extends State<UserStoreListScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CustomImage(
-                              width: Get.width * .25,
-                              height: Get.width * .25,
-                              url: "${URL.AWS}/users/${data["id"]}/small/1.png",
+                            Stack(
+                              children: [
+                                CustomImage(
+                                  width: Get.width * .25,
+                                  height: Get.width * .25,
+                                  url:
+                                      "${URL.AWS}/users/${data["id"]}/small/1.png",
+                                ),
+                                !data["isOpen"]
+                                    ? Container(
+                                        width: Get.width * .25,
+                                        height: Get.width * .25,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Colors.black.withOpacity(0.6),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            "Хаалттай",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
                             ),
                             SizedBox(width: Get.width * .045),
                             Expanded(

@@ -58,30 +58,30 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
   }
 
   void submit() async {
-    loadingDialog(context);
-    if (imageListBefore != _helpCtrl.chosenImage.toString()) {
-      if (imageListBefore != [].toString()) {
-        await RestApi().deleteImage("users", _user["id"]);
-      }
-      await RestApi()
-          .uploadImage("users", _user["id"], File(_helpCtrl.chosenImage[0]));
-    }
+    // loadingDialog(context);
+    // if (imageListBefore != _helpCtrl.chosenImage.toString()) {
+    //   if (imageListBefore != [].toString()) {
+    //     await RestApi().deleteImage("users", _user["id"]);
+    //   }
+    //   await RestApi()
+    //       .uploadImage("users", _user["id"], File(_helpCtrl.chosenImage[0]));
+    // }
 
-    var body = {
-      "id": _user["id"],
-      "name": storeName.text,
-      "phone": phoneNumber.text,
-      "description": description.text,
-    };
-    dynamic product = await RestApi().updateUser(_user["id"], body);
-    dynamic data = Map<String, dynamic>.from(product);
-    if (data["success"]) {
-      Get.back();
-      successSnackBar("Амжилттай засагдлаа", 2, context);
-    } else {
-      Get.back();
-      errorSnackBar("Алдаа гарлаа", 2, context);
-    }
+    // var body = {
+    //   "id": _user["id"],
+    //   "name": storeName.text,
+    //   "phone": phoneNumber.text,
+    //   "description": description.text,
+    // };
+    // dynamic product = await RestApi().updateUser(_user["id"], body);
+    // dynamic data = Map<String, dynamic>.from(product);
+    // if (data["success"]) {
+    //   Get.back();
+    //   successSnackBar("Амжилттай засагдлаа", 2, context);
+    // } else {
+    //   Get.back();
+    //   errorSnackBar("Алдаа гарлаа", 2, context);
+    // }
     Get.back();
   }
 

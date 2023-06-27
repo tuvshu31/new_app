@@ -11,14 +11,15 @@ void successSnackBar(String text, int duration, dynamic context) {
   showToast(
     text,
     context: context,
-    backgroundColor: MyColors.fadedGreen,
+    backgroundColor: MyColors.black.withOpacity(0.5),
     shapeBorder: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(25),
     ),
-    textStyle: const TextStyle(color: MyColors.green),
-    animation: StyledToastAnimation.slideFromTop,
+    textStyle: const TextStyle(color: MyColors.white),
+    animation: StyledToastAnimation.scale,
     reverseAnimation: StyledToastAnimation.fade,
-    position: const StyledToastPosition(align: Alignment.topCenter, offset: 20),
+    position:
+        const StyledToastPosition(align: Alignment.bottomCenter, offset: 100),
     duration: Duration(seconds: duration),
     animDuration: const Duration(seconds: 1),
     curve: Curves.fastLinearToSlowEaseIn,

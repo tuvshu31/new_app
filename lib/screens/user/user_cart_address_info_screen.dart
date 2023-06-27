@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -11,7 +12,6 @@ import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
-import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:flutter/material.dart';
@@ -32,10 +32,12 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
   final _navCtrl = Get.put(NavigationController());
   bool isPhoneOk = false;
   bool isAddressOk = false;
+  dynamic _user = [];
+  bool showPriceDetails = false;
   TextEditingController phone = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController kod = TextEditingController();
-  dynamic _user = [];
+
   @override
   void initState() {
     super.initState();
@@ -70,8 +72,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     var orderId = int.parse(("$storeId" "$randomNumber"));
     var qpayBody = {
       "sender_invoice_no": orderId.toString(),
-      "amount": _cartCtx.total,
-      // "amount": 50,
+      // "amount": _cartCtx.total,
+      "amount": 50,
     };
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
@@ -90,7 +92,6 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
         "kod": kod.text,
         "products": _cartCtx.cartList,
       };
-      log("orderBody: $orderBody");
       dynamic orderResponse = await RestApi().createOrder(orderBody);
       dynamic orderData = Map<String, dynamic>.from(orderResponse);
 
@@ -108,147 +109,189 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => CustomHeader(
-          customActions: Container(),
-          title: "Захиалгын мэдээлэл",
-          bottomSheet: _bottomSheet(),
-          body: _user.isNotEmpty
-              ? Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CustomText(text: "Утасны дугаар"),
-                      const SizedBox(height: 12),
-                      CustomTextField(
-                        hintText: "99359024",
-                        controller: phone,
-                        maxLength: 8,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (val) {
-                          setState(() {
-                            isPhoneOk = val.isNotEmpty;
-                          });
-                        },
+    return CustomHeader(
+      customActions: Container(),
+      title: "Захиалгын мэдээлэл",
+      bottomSheet: Container(
+        width: Get.width,
+        height: Get.height * .09,
+        color: MyColors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Center(
+          child: CustomButton(
+            isActive: isPhoneOk && isAddressOk,
+            onPressed: () {
+              // createInvoiceAndOrder();
+              showPriceDetails = true;
+              setState(() {});
+            },
+            text: "Үргэлжлүүлэх",
+            textColor: MyColors.white,
+            elevation: 0,
+          ),
+        ),
+      ),
+      body: _user.isNotEmpty
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CustomText(
+                    text: "Утасны дугаар",
+                    color: MyColors.gray,
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextField(
+                    hintText: "9935*****",
+                    controller: phone,
+                    maxLength: 8,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
+                    onChanged: (val) {
+                      setState(() {
+                        isPhoneOk = val.isNotEmpty;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  const CustomText(
+                    text: "Хүргүүлэх хаяг",
+                    color: MyColors.gray,
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextField(
+                    hintText: "3-24-р байр, 9 давхарт 1165 тоот",
+                    controller: address,
+                    textInputAction: TextInputAction.next,
+                    onChanged: (val) {
+                      setState(() {
+                        isAddressOk = val.isNotEmpty;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: const [
+                      CustomText(
+                        text: "Орцны код",
+                        color: MyColors.gray,
                       ),
-                      const SizedBox(height: 12),
-                      const CustomText(text: "Хүргүүлэх хаяг"),
-                      const SizedBox(height: 12),
-                      CustomTextField(
-                        hintText: "3-24-р байр, 9 давхарт 1165 тоот",
-                        controller: address,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (val) {
-                          setState(() {
-                            isAddressOk = val.isNotEmpty;
-                          });
-                        },
+                      CustomText(
+                        text: " /Заавал биш/",
+                        fontSize: 12,
+                        color: MyColors.gray,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextField(
+                    hintText: "#1234",
+                    controller: kod,
+                    textInputAction: TextInputAction.done,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        IconlyLight.info_circle,
+                        color: MyColors.grey,
+                        size: 24,
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: const [
-                          CustomText(text: "Орцны код "),
-                          CustomText(
-                            text: "/Заавал биш/",
+                      SizedBox(width: 12),
+                      Flexible(
+                        child: CustomText(
                             fontSize: 12,
+                            textAlign: TextAlign.justify,
                             color: MyColors.gray,
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      CustomTextField(
-                        hintText: "#1234",
-                        controller: kod,
-                        textInputAction: TextInputAction.done,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            IconlyLight.info_circle,
-                            color: MyColors.gray,
-                            size: 16,
-                          ),
-                          SizedBox(width: 12),
-                          Flexible(
-                            child: CustomText(
-                                fontSize: 12,
-                                textAlign: TextAlign.justify,
-                                color: MyColors.gray,
-                                text:
-                                    "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
-                          )
-                        ],
+                            text:
+                                "Хүргэлт хүлээн авах мэдээллээ дэлгэрэнгүй оруулна уу. Хүргэлтийн мэдээллийг буруу оруулсан тохиолдолд хүргэлтийн төлбөр нэмэгдэж тооцогдохыг анхаарна уу"),
                       ),
                     ],
                   ),
-                )
-              : MyShimmers().userPage(),
-        ));
+                  showPriceDetails ? _priceDetails() : Container()
+                ],
+              ),
+            )
+          : MyShimmers().userPage(),
+    );
   }
 
-  Widget _bottomSheet() {
-    return Container(
-      width: Get.width,
-      height: Get.height * .27,
-      padding: const EdgeInsets.all(12),
-      color: MyColors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          MySeparator(color: MyColors.grey),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CustomText(text: "Захиалгын үнэ:"),
-              CustomText(
-                text: convertToCurrencyFormat(
-                  _cartCtx.subTotal,
-                  toInt: true,
-                  locatedAtTheEnd: true,
+  Widget _priceDetails() {
+    return Expanded(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(
+                  text: "Барааны үнэ:",
+                  color: MyColors.gray,
                 ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(text: "Хүргэлтийн үнэ:"),
-              CustomText(
-                text: convertToCurrencyFormat(
-                  _cartCtx.deliveryCost,
-                  toInt: true,
-                  locatedAtTheEnd: true,
+                CustomText(
+                  text: convertToCurrencyFormat(
+                    _cartCtx.subTotal,
+                    toInt: true,
+                    locatedAtTheEnd: true,
+                  ),
+                  color: MyColors.gray,
+                )
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(
+                  text: "Хүргэлтийн төлбөр:",
+                  color: MyColors.gray,
                 ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(text: "Нийт үнэ:"),
-              CustomText(
-                text: convertToCurrencyFormat(
-                  _cartCtx.total,
-                  toInt: true,
-                  locatedAtTheEnd: true,
-                ),
-              )
-            ],
-          ),
-          SizedBox(height: Get.height * .03),
-          CustomButton(
-            text: "Төлбөр төлөх",
-            isActive: isPhoneOk && isAddressOk,
-            onPressed: () {
-              createInvoiceAndOrder();
-            },
-          )
-        ],
+                CustomText(
+                  text: convertToCurrencyFormat(
+                    _cartCtx.deliveryCost,
+                    toInt: true,
+                    locatedAtTheEnd: true,
+                  ),
+                  color: MyColors.gray,
+                )
+              ],
+            ),
+            const SizedBox(height: 12),
+            const DottedLine(
+              direction: Axis.horizontal,
+              alignment: WrapAlignment.center,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: MyColors.grey,
+              dashRadius: 0.0,
+              dashGapLength: 4.0,
+              dashGapColor: Colors.transparent,
+              dashGapRadius: 0.0,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomText(text: "Нийт үнэ:"),
+                CustomText(
+                  text: convertToCurrencyFormat(
+                    _cartCtx.total,
+                    toInt: true,
+                    locatedAtTheEnd: true,
+                  ),
+                  color: MyColors.black,
+                )
+              ],
+            ),
+            SizedBox(height: Get.height * .1),
+          ],
+        ),
       ),
     );
   }

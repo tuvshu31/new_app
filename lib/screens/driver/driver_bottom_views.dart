@@ -7,7 +7,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:iconly/iconly.dart';
 import 'package:slide_countdown/slide_countdown.dart';
@@ -183,7 +182,7 @@ Widget step1() {
             ),
           ),
         ),
-        const MySeparator(color: MyColors.grey),
+        const Divider(),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: ListTile(

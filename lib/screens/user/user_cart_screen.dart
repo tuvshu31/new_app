@@ -2,9 +2,14 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter_dropdown_alert/alert_controller.dart';
+import 'package:flutter_dropdown_alert/dropdown_alert.dart';
+import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +18,8 @@ import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class UserCartScreen extends StatefulWidget {
   const UserCartScreen({Key? key}) : super(key: key);
@@ -98,19 +105,11 @@ class _UserCartScreenState extends State<UserCartScreen> {
                                   child: Hero(
                                     tag: data,
                                     transitionOnUserGestures: true,
-                                    child: Container(
+                                    child: CustomImage(
                                       width: Get.width * .25,
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                      // child: _imageHandler(data),
-                                      child: Image.network(errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return const Image(
-                                            image: AssetImage(
-                                                "assets/images/png/no_image.png"));
-                                      }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                                      height: Get.width * .25,
+                                      url:
+                                          "${URL.AWS}/products/${data["id"]}/small/1.png",
                                     ),
                                   ),
                                 ),
@@ -249,8 +248,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                                         child: IconButton(
                                             splashColor: Colors.transparent,
                                             onPressed: () {
-                                              print(data["quantity"]);
-                                              print(data["available"]);
                                               data["quantity"] ==
                                                       int.parse(
                                                           data["available"])
@@ -321,7 +318,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
                     text: convertToCurrencyFormat(_cartCtrl.total,
                         toInt: true, locatedAtTheEnd: true),
                   ),
-                  CustomText(
+                  const CustomText(
                     text: "Дэлгэрэнгүй",
                     fontSize: 12,
                     color: MyColors.gray,
@@ -349,46 +346,74 @@ class _UserCartScreenState extends State<UserCartScreen> {
   }
 
   void _showPriceDetails() {
-    Get.bottomSheet(Container(
-      height: Get.height * .2,
-      decoration: const BoxDecoration(
-        color: MyColors.white,
-      ),
+    Get.bottomSheet(SafeArea(
+      bottom: true,
+      maintainBottomViewPadding: true,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: Get.width * .03),
-        padding: EdgeInsets.symmetric(horizontal: Get.width * .05),
+        padding: EdgeInsets.all(Get.width * .06),
+        decoration: const BoxDecoration(
+          color: MyColors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(12),
+            topRight: Radius.circular(12),
+          ),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomText(text: "Барааны үнэ:"),
+                const CustomText(
+                  text: "Барааны үнэ:",
+                  color: MyColors.gray,
+                ),
                 CustomText(
-                    text: convertToCurrencyFormat(
-                  _cartCtrl.subTotal,
-                  toInt: true,
-                  locatedAtTheEnd: true,
-                ))
+                  text: convertToCurrencyFormat(
+                    _cartCtrl.subTotal,
+                    toInt: true,
+                    locatedAtTheEnd: true,
+                  ),
+                  color: MyColors.gray,
+                )
               ],
             ),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomText(text: "Хүргэлтийн төлбөр:"),
+                const CustomText(
+                  text: "Хүргэлтийн төлбөр:",
+                  color: MyColors.gray,
+                ),
                 CustomText(
-                    text: convertToCurrencyFormat(
-                  _cartCtrl.deliveryCost,
-                  toInt: true,
-                  locatedAtTheEnd: true,
-                ))
+                  text: convertToCurrencyFormat(
+                    _cartCtrl.deliveryCost,
+                    toInt: true,
+                    locatedAtTheEnd: true,
+                  ),
+                  color: MyColors.gray,
+                )
               ],
             ),
-            MySeparator(color: MyColors.grey),
+            const SizedBox(height: 12),
+            const DottedLine(
+              direction: Axis.horizontal,
+              alignment: WrapAlignment.center,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: MyColors.grey,
+              dashRadius: 0.0,
+              dashGapLength: 4.0,
+              dashGapColor: Colors.transparent,
+              dashGapRadius: 0.0,
+            ),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomText(text: "Нийт үнэ:"),
+                const CustomText(text: "Нийт үнэ:"),
                 CustomText(
                   text: convertToCurrencyFormat(
                     _cartCtrl.total,
@@ -396,7 +421,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                     locatedAtTheEnd: true,
                   ),
                   color: MyColors.black,
-                  fontWeight: FontWeight.bold,
                 )
               ],
             )
@@ -404,59 +428,5 @@ class _UserCartScreenState extends State<UserCartScreen> {
         ),
       ),
     ));
-  }
-
-  Widget _imageHandler(data) {
-    if (data["storeClosed"]) {
-      return Stack(
-        children: [
-          Image.network(errorBuilder: (context, error, stackTrace) {
-            return const Image(
-                image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: MyColors.black.withOpacity(0.5)),
-              child: const Center(
-                  child: CustomText(
-                text: "Дэлгүүр хаасан",
-                textAlign: TextAlign.center,
-                color: MyColors.white,
-                fontSize: 14,
-              )),
-            ),
-          ),
-        ],
-      );
-    } else if (!data["visible"]) {
-      return Stack(
-        children: [
-          Image.network(errorBuilder: (context, error, stackTrace) {
-            return const Image(
-                image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/${data["id"]}/small/1.png"),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: MyColors.black.withOpacity(0.5)),
-              child: Center(
-                  child: CustomText(
-                text: "Дууссан",
-                textAlign: TextAlign.center,
-                color: MyColors.white,
-                fontSize: 14,
-              )),
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Image.network(errorBuilder: (context, error, stackTrace) {
-        return const Image(image: AssetImage("assets/images/png/no_image.png"));
-      }, "${URL.AWS}/products/${data["id"]}/small/1.png");
-    }
   }
 }

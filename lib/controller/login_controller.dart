@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/restapi_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:panara_dialogs/panara_dialogs.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
@@ -37,9 +36,9 @@ class LoginController extends GetxController {
     var isEnabled = await Geolocator.checkPermission();
     if (isEnabled == LocationPermission.always ||
         isEnabled == LocationPermission.whileInUse) {
-      Get.offAndToNamed(route);
+      Get.offAllNamed(route);
     } else {
-      Get.offAndToNamed(splashProminentDisclosureScreenRoute, arguments: route);
+      Get.offAllNamed(splashProminentDisclosureScreenRoute, arguments: route);
     }
   }
 

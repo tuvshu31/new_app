@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/card_ribbon.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
@@ -41,42 +40,45 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
       withTabBar: true,
       title: "Захиалгууд",
       customActions: Container(),
-      body: Column(
-        children: [
-          DefaultTabController(
-            length: 3,
-            initialIndex: 0,
-            child: TabBar(
-              onTap: ((value) {
-                _storeCtx.filterOrders(value);
-                pageController.animateToPage(
-                  value,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.bounceInOut,
-                );
-              }),
-              labelColor: MyColors.primary,
-              unselectedLabelColor: MyColors.black,
-              indicatorColor: MyColors.primary,
-              tabs: const [
-                Tab(text: "Шинэ"),
-                Tab(text: "Хүргэлтэнд"),
-                Tab(text: "Хүргэсэн"),
-              ],
+      body: Align(
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            DefaultTabController(
+              length: 3,
+              initialIndex: 0,
+              child: TabBar(
+                onTap: ((value) {
+                  _storeCtx.filterOrders(value);
+                  pageController.animateToPage(
+                    value,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.bounceInOut,
+                  );
+                }),
+                labelColor: MyColors.primary,
+                unselectedLabelColor: MyColors.black,
+                indicatorColor: MyColors.primary,
+                tabs: const [
+                  Tab(text: "Шинэ"),
+                  Tab(text: "Хүргэлтэнд"),
+                  Tab(text: "Хүргэсэн"),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: pageController,
-              children: [
-                _storeOdersListView(),
-                _storeOdersListView(),
-                _storeOdersListView(),
-              ],
+            Expanded(
+              child: PageView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: pageController,
+                children: [
+                  _storeOdersListView(),
+                  _storeOdersListView(),
+                  _storeOdersListView(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -86,7 +88,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
       () => _storeCtx.filteredOrderList.isEmpty
           ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
           : ListView.separated(
-              padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
+              padding: const EdgeInsets.all(12),
               separatorBuilder: (context, index) {
                 return const SizedBox(height: 7);
               },
@@ -94,59 +96,157 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
               itemCount: _storeCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
                 var data = _storeCtx.filteredOrderList[index];
-                return GestureDetector(
-                  onTap: (() {
-                    storeOrdersToDeliveryView(context, data);
-                  }),
-                  child: Card(
-                    elevation: 1,
-                    margin: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListTile(
-                      title: CustomText(
-                        text: "Захиалга: #${data["orderId"]}",
-                        fontSize: 14,
-                      ),
-                      subtitle: CustomText(
-                        text: data["orderTime"],
-                        fontSize: 12,
-                      ),
-                      // trailing: CustomText(text: data["prepDuration"]),
-                      trailing: data["orderStatus"] == "preparing"
-                          ? CircularCountDownTimer(
-                              width: 40,
-                              height: 40,
-                              duration: int.parse(data["prepDuration"]) * 60,
-                              timeFormatterFunction:
-                                  (defaultFormatterFunction, duration) {
-                                if (duration.inSeconds == 0) {
-                                  return "0";
-                                } else {
-                                  return Function.apply(
-                                      defaultFormatterFunction, [duration]);
-                                }
-                              },
-                              fillColor: MyColors.primary,
-                              ringColor: MyColors.black,
-                              strokeCap: StrokeCap.round,
-                              textStyle: const TextStyle(
-                                fontSize: 8.0,
-                              ),
-                            )
-                          : CustomText(
-                              text: convertToCurrencyFormat(
-                                double.parse(data["storeTotalAmount"]),
-                                locatedAtTheEnd: true,
-                                toInt: true,
-                              ),
-                            ),
-                    ),
-                  ),
-                );
+                return data["orderStatus"] == "received"
+                    ? _newOrder(data)
+                    : data["orderStatus"] == "preparing"
+                        ? _preparing(data)
+                        : _noTrailing(data);
               },
             ),
+    );
+  }
+
+  Widget _newOrder(data) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: (() {
+        showOrdersSetTimeView(context, data);
+      }),
+      child: Stack(
+        children: [
+          Card(
+            elevation: 1,
+            margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListTile(
+              title: CustomText(
+                text: "Захиалга: #${data["orderId"]}",
+                fontSize: 12,
+              ),
+              subtitle: CustomText(
+                text: data["orderTime"],
+                fontSize: 12,
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomText(
+                    text: convertToCurrencyFormat(
+                      double.parse(data["storeTotalAmount"]),
+                      locatedAtTheEnd: true,
+                      toInt: true,
+                    ),
+                    fontSize: 16,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: MyColors.primary.withOpacity(0.9),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(8),
+                  bottomLeft: Radius.circular(6),
+                ),
+              ),
+              child: const Center(
+                child: Text(
+                  "Шинэ захиалга",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _preparing(data) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: (() {
+        storeOrdersToDelivery(context, data);
+      }),
+      child: Card(
+        elevation: 1,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ListTile(
+          title: CustomText(
+            text: "Захиалга: #${data["orderId"]}",
+            fontSize: 12,
+          ),
+          subtitle: CustomText(
+            text: data["orderTime"],
+            fontSize: 12,
+          ),
+          trailing: CircularCountDownTimer(
+            width: 40,
+            height: 40,
+            duration: int.parse(data["prepDuration"]) * 60,
+            timeFormatterFunction: (defaultFormatterFunction, duration) {
+              if (duration.inSeconds == 0) {
+                return "0";
+              } else {
+                return Function.apply(defaultFormatterFunction, [duration]);
+              }
+            },
+            fillColor: MyColors.primary,
+            ringColor: MyColors.black,
+            strokeCap: StrokeCap.round,
+            textStyle: const TextStyle(
+              fontSize: 10.0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _noTrailing(data) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: (() {
+        storeOrdersToDelivery(context, data);
+      }),
+      child: Card(
+        elevation: 1,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ListTile(
+          title: CustomText(
+            text: "Захиалга: #${data["orderId"]}",
+            fontSize: 12,
+          ),
+          subtitle: CustomText(
+            text: data["orderTime"],
+            fontSize: 12,
+          ),
+          trailing: CustomText(
+            text: convertToCurrencyFormat(
+              double.parse(data["storeTotalAmount"]),
+              locatedAtTheEnd: true,
+              toInt: true,
+            ),
+            fontSize: 16,
+          ),
+        ),
+      ),
     );
   }
 }

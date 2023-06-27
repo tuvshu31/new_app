@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
+import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                           _listTile(IconlyLight.chart, "Захиалгууд", () {
                             Get.toNamed(storeOrdersScreenRoute);
                           }),
-                          _divider(),
                           _listTile(IconlyLight.setting, "Тохиргоо", () {
                             Get.toNamed(storeSettingsScreenRoute);
                           }),
@@ -122,20 +122,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                 ),
               ),
       ),
-    );
-  }
-
-  Widget _divider() {
-    return Column(
-      children: [
-        SizedBox(height: Get.height * .01),
-        Container(
-          width: double.infinity,
-          height: 1,
-          color: MyColors.background,
-        ),
-        SizedBox(height: Get.height * .01),
-      ],
     );
   }
 

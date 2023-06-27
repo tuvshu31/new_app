@@ -1,5 +1,8 @@
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -235,44 +238,6 @@ void logOutModal(dynamic context, dynamic onTap) {
       ));
 }
 
-void loginTypeModal(dynamic context, dynamic onTap) {
-  // QuickAlert.show(
-  //     context: context,
-  //     animType: QuickAlertAnimType.slideInDown,
-  //     widget: Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         RadioListTile(
-  //             value: () {},
-  //             groupValue: () {},
-  //             onChanged: (val) {},
-  //             title: CustomText(text: "Хэрэглэгч")),
-  //         RadioListTile(
-  //             value: () {},
-  //             groupValue: () {},
-  //             onChanged: (val) {},
-  //             title: CustomText(text: "Байгууллага"))
-  //       ],
-  //     ),
-  //     title: "Нэвтрэх төрлөө сонгоно уу",
-  //     confirmBtnColor: MyColors.warning,
-  //     type: QuickAlertType.confirm,
-  //     showCancelBtn: true,
-  //     cancelBtnText: "Болих",
-  //     onConfirmBtnTap: onTap,
-  //     confirmBtnText: "Гарах",
-  //     cancelBtnTextStyle: TextStyle(
-  //       fontSize: 14,
-  //       color: MyColors.gray,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //     confirmBtnTextStyle: TextStyle(
-  //       color: MyColors.white,
-  //       fontSize: 14,
-  //       fontWeight: FontWeight.bold,
-  //     ));
-}
-
 void changeLeftOverCount(
     dynamic context, dynamic data, dynamic controller, dynamic onTap) {
   QuickAlert.show(
@@ -323,21 +288,6 @@ void changeLeftOverCount(
         ),
       ],
     ),
-    // onConfirmBtnTap: () async {
-    // await QuickAlert.show(
-    //   context: context,
-    //   type: QuickAlertType.error,
-    //   text: 'Please input something',
-    // );
-
-    // Navigator.pop(context);
-    // await Future.delayed(const Duration(milliseconds: 1000));
-    // await QuickAlert.show(
-    //   context: context,
-    //   type: QuickAlertType.success,
-    //   text: "Phone number '$message' has been saved!.",
-    // );
-    // },
   );
 }
 
@@ -419,6 +369,92 @@ void loadingDialog(BuildContext context) async {
               animationDuration: Duration(seconds: 1),
               backgroundColor: MyColors.background,
               color: MyColors.primary,
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void warningDialog(BuildContext context, String text) async {
+  showGeneralDialog(
+    context: context,
+    barrierLabel: "",
+    barrierDismissible: false,
+    transitionDuration: const Duration(milliseconds: 400),
+    pageBuilder: (ctx, a1, a2) {
+      return Container();
+    },
+    transitionBuilder: (ctx, a1, a2, child) {
+      var curve = Curves.bounceInOut.transform(a1.value);
+      return Transform.scale(
+        scale: curve,
+        child: Center(
+          child: Container(
+            width: Get.width,
+            margin: EdgeInsets.all(Get.width * .09),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.only(
+              right: Get.width * .09,
+              left: Get.width * .09,
+              top: Get.height * .04,
+              bottom: Get.height * .03,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    IconlyBold.info_circle,
+                    size: Get.width * .15,
+                    color: Colors.amber,
+                  ),
+                  SizedBox(height: Get.height * .02),
+                  Text(
+                    "Анхааруулга",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: MyColors.gray,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: Get.height * .02),
+                  Text(
+                    text,
+                    style: TextStyle(),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: Get.height * .04),
+                  CustomInkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      width: Get.width * .3,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: MyColors.fadedGrey,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "OK",
+                          style: TextStyle(
+                            color: MyColors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

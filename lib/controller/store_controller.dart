@@ -1,23 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/notifications.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/main.dart';
-import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
-import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/text.dart';
-// import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:circular_countdown/circular_countdown.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:slide_to_act/slide_to_act.dart';
-
-final _storeCtx = Get.put(StoreController());
 
 class StoreController extends GetxController {
   RxList storeOrderList = [].obs;
@@ -29,6 +18,23 @@ class StoreController extends GetxController {
   Timer? countdownTimer;
   RxList prepDurationList = [].obs;
   RxBool driverAccepted = false.obs;
+
+  final player = AudioPlayer();
+
+  void playSound(type, {bool loop = false}) async {
+    player.play(AssetSource("sounds/$type.wav"), volume: 100);
+    if (loop) {
+      player.onPlayerComplete.listen((event) {
+        player.play(
+          AssetSource("sounds/$type.wav"),
+        );
+      });
+    }
+  }
+
+  void stopSound() async {
+    player.stop();
+  }
 
   void startTimer(Duration i) {
     prepDurationList.add(i);
@@ -55,7 +61,7 @@ class StoreController extends GetxController {
         await RestApi().getStoreOrders(RestApiHelper.getUserId(), {});
     dynamic data2 = Map<String, dynamic>.from(res2);
     if (data2["success"]) {
-      storeOrderList.value = data2["data"];
+      storeOrderList.value = reversedArray(data2["data"]);
     }
     fetching.value = false;
   }
@@ -72,13 +78,23 @@ class StoreController extends GetxController {
 
   void filterOrders(int value) {
     filteredOrderList.clear();
-    String type = value == 0
-        ? "preparing"
-        : value == 1
-            ? "delivering"
-            : "delivered";
-    filteredOrderList.value =
-        storeOrderList.where((p0) => p0["orderStatus"] == type).toList();
+    if (value == 0) {
+      filteredOrderList.value = storeOrderList
+          .where((p0) =>
+              p0["orderStatus"] == "received" ||
+              p0["orderStatus"] == "preparing")
+          .toList();
+    }
+    if (value == 1) {
+      filteredOrderList.value = storeOrderList
+          .where((p0) => p0["orderStatus"] == "delivering")
+          .toList();
+    }
+    if (value == 2) {
+      filteredOrderList.value = storeOrderList
+          .where((p0) => p0["orderStatus"] == "delivered")
+          .toList();
+    }
   }
 
   void updateOrder(int id, dynamic body) async {
@@ -88,105 +104,16 @@ class StoreController extends GetxController {
   void storeActionHandler(action, payload) {
     if (action == "payment_success") {
     } else if (action == "sent") {
-      log("Store sent action irj bn :)");
-      playSound("incoming");
-      showDialog(
-          useSafeArea: true,
-          context: Get.context!,
-          barrierDismissible: false,
-          builder: (context) {
-            return FractionallySizedBox(
-              heightFactor: 0.5,
-              child: Container(
-                margin: const EdgeInsets.all(12),
-                child: Material(
-                  borderRadius: BorderRadius.circular(12),
-                  child: SafeArea(
-                    minimum: const EdgeInsets.symmetric(vertical: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 12),
-                          child: CustomText(
-                            text: "Шинэ захиалга ирлээ!",
-                          ),
-                        ),
-                        TimeCircularCountdown(
-                          diameter: Get.width * .3,
-                          countdownRemainingColor: MyColors.primary,
-                          unit: CountdownUnit.second,
-                          textStyle: const TextStyle(
-                            color: MyColors.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                          countdownTotal: 60,
-                          onUpdated: (unit, remainingTime) {},
-                          onFinished: () {},
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 24),
-                          height: 70,
-                          child: Builder(
-                            builder: (contexts) {
-                              final GlobalKey<SlideActionState> key =
-                                  GlobalKey();
-                              return SlideAction(
-                                height: 70,
-                                outerColor: MyColors.black,
-                                innerColor: MyColors.primary,
-                                elevation: 0,
-                                key: key,
-                                submittedIcon: const Icon(
-                                  FontAwesomeIcons.check,
-                                  color: MyColors.white,
-                                ),
-                                onSubmit: () {
-                                  Future.delayed(
-                                      const Duration(milliseconds: 300), () {
-                                    key.currentState!.reset();
-                                    stopSound();
-                                    // AwesomeNotifications().dismiss(1);
-                                    Get.back();
-                                    showOrdersSetTimeView(context, payload);
-                                    var body = {"orderStatus": "received"};
-                                    _storeCtx.updateOrder(payload["id"], body);
-                                  });
-                                },
-                                alignment: Alignment.centerRight,
-                                sliderButtonIcon: const Icon(
-                                  Icons.double_arrow_rounded,
-                                  color: MyColors.white,
-                                ),
-                                child: const Text(
-                                  "Баталгаажуулах",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          });
+      saveIcomingOrder(navigatorKey.currentContext, payload);
+      showIncomingOrderDialog(navigatorKey.currentContext);
     } else if (action == "received") {
     } else if (action == "driverAccepted") {
       Get.back();
       driverAccepted.value = true;
     } else if (action == "preparing") {
     } else if (action == "delivering") {
-      // Get.back();
       for (dynamic i in storeOrderList) {
         if (i["id"] == payload["id"]) {
-          log("orderStatus: ${i["id"]}");
           i["orderStatus"] = "delivering";
         }
       }
@@ -200,7 +127,6 @@ class StoreController extends GetxController {
       }
       filterOrders(0);
     } else if (action == "canceled") {
-      log("driverCanceledshuuuuuu");
       driverAccepted.value = false;
     } else {}
   }

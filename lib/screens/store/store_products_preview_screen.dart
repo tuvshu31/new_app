@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/separator.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +86,7 @@ class _StoreProductsPreviewScreenState
                     fontWeight: FontWeight.bold,
                   ),
                   const SizedBox(height: 24),
-                  const MySeparator(color: MyColors.grey),
+                  const Divider(),
                   const SizedBox(height: 24),
                   _incoming["otherInfo"].isNotEmpty
                       ? ListView.separated(

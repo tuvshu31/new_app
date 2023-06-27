@@ -319,10 +319,10 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   Widget _tabShimmer() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         CustomShimmer(
-          width: Get.width * .2,
+          width: Get.width * .15,
           height: 46,
           borderRadius: 50,
         ),
