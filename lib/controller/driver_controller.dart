@@ -44,7 +44,6 @@ class DriverController extends GetxController {
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
-  final _networkCtx = Get.put(NetWorkController());
   final _loginCtx = Get.put(LoginController());
 
   //=========================Map controllers==================================
@@ -195,23 +194,19 @@ class DriverController extends GetxController {
 
   //=========================Driver controllers==================================
   void turnOnOff(value, context) async {
-    if (_networkCtx.hasNetwork.value) {
-      isOnline.value = value;
-      if (value == true) {
-        _loginCtx.getFirebaseMessagingToken(context);
-        playSound("engine_start");
-        getUserLocation();
-        getPositionStream();
-        startActiveTimer(10800, context);
-      } else {
-        // stopActiveTimer();
-        stopSound();
-      }
-      var body = {"isOpen": value};
-      updateDriverInfo(body);
+    isOnline.value = value;
+    if (value == true) {
+      _loginCtx.getFirebaseMessagingToken(context);
+      playSound("engine_start");
+      getUserLocation();
+      getPositionStream();
+      startActiveTimer(10800, context);
     } else {
-      _networkCtx.showNetworkSnackbar(context);
+      // stopActiveTimer();
+      stopSound();
     }
+    var body = {"isOpen": value};
+    updateDriverInfo(body);
   }
 
   void fetchDriverInfo(context) async {

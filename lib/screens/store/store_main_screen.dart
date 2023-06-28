@@ -30,14 +30,12 @@ class StoreMainScreen extends StatefulWidget {
 class _StoreMainScreenState extends State<StoreMainScreen> {
   final _storeCtx = Get.put(StoreController());
   final _loginCtx = Get.put(LoginController());
-  final _networkCtx = Get.put(NetWorkController());
 
   @override
   void initState() {
     super.initState();
     // saveUserToken();
     _loginCtx.getFirebaseMessagingToken(context);
-    _networkCtx.checkNetworkAccess(context);
     _storeCtx.fetchStoreInfo();
   }
 
@@ -172,28 +170,24 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         trackColor: MyColors.background,
         activeColor: MyColors.black,
         onChanged: (value) {
-          if (_networkCtx.hasNetwork.value) {
-            closeStoreModal(
-              context,
-              "Дэлгүүрээ ${isOpen ? "хаах уу?" : "нээх үү?"}",
-              isOpen
-                  ? "Дэлгүүрээ хааснаар дэлгүүрийн мэдээлэл болон бараанууд аппликейшн дээр харагдахгүй болохыг анхаарна уу"
-                  : "Дэлгүүрээ нээснээр дэлгүүрийн бараанууд хэрэглэгчидэд харагдаж, цагийн хуваарын дагуу захиалга хийх боломжтой болохыг анхаарна уу",
-              isOpen ? "Хаах" : "Нээх",
-              () {
-                Get.back();
-                _storeCtx.storeInfo["isOpen"] = value;
-                var body = {"isOpen": value};
-                _storeCtx.updateStoreInfo(
-                    body,
-                    context,
-                    isOpen ? "Дэлгүүр хаагдлаа" : "Дэлгүүр нээгдлээ",
-                    "Алдаа гарлаа");
-              },
-            );
-          } else {
-            _networkCtx.showNetworkSnackbar(context);
-          }
+          closeStoreModal(
+            context,
+            "Дэлгүүрээ ${isOpen ? "хаах уу?" : "нээх үү?"}",
+            isOpen
+                ? "Дэлгүүрээ хааснаар дэлгүүрийн мэдээлэл болон бараанууд аппликейшн дээр харагдахгүй болохыг анхаарна уу"
+                : "Дэлгүүрээ нээснээр дэлгүүрийн бараанууд хэрэглэгчидэд харагдаж, цагийн хуваарын дагуу захиалга хийх боломжтой болохыг анхаарна уу",
+            isOpen ? "Хаах" : "Нээх",
+            () {
+              Get.back();
+              _storeCtx.storeInfo["isOpen"] = value;
+              var body = {"isOpen": value};
+              _storeCtx.updateStoreInfo(
+                  body,
+                  context,
+                  isOpen ? "Дэлгүүр хаагдлаа" : "Дэлгүүр нээгдлээ",
+                  "Алдаа гарлаа");
+            },
+          );
         },
       ),
     );

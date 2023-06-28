@@ -5,11 +5,7 @@ import 'package:Erdenet24/widgets/dialogs.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:flutter_dropdown_alert/alert_controller.dart';
-import 'package:flutter_dropdown_alert/dropdown_alert.dart';
-import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +14,6 @@ import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class UserCartScreen extends StatefulWidget {
   const UserCartScreen({Key? key}) : super(key: key);

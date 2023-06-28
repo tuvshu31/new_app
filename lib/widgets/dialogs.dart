@@ -90,26 +90,6 @@ void warningModal(String text, int duration, dynamic context) {
   );
 }
 
-void errorModal(String text, int duration, dynamic context) {
-  QuickAlert.show(
-    context: context,
-    animType: QuickAlertAnimType.slideInDown,
-    widget: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CustomText(
-          textAlign: TextAlign.center,
-          text: "Туршилтын хувилбар тул захиалга хийгдэхгүйг анхаарна уу",
-          fontSize: 14,
-        )
-      ],
-    ),
-    title: "Уучлаарай...",
-    confirmBtnColor: MyColors.warning,
-    type: QuickAlertType.error,
-  );
-}
-
 void customModal(String text, int duration, dynamic context) {
   QuickAlert.show(
     context: context,
@@ -144,26 +124,6 @@ void customModal(String text, int duration, dynamic context) {
         text: "Phone number '$message' has been saved!.",
       );
     },
-  );
-}
-
-void loadingModal(String text, int duration, dynamic context) {
-  QuickAlert.show(
-    context: context,
-    animType: QuickAlertAnimType.slideInDown,
-    widget: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CustomText(
-          textAlign: TextAlign.center,
-          text: "Туршилтын хувилбар тул захиалга хийгдэхгүйг анхаарна уу",
-          fontSize: 14,
-        )
-      ],
-    ),
-    title: "Уучлаарай...",
-    confirmBtnColor: MyColors.warning,
-    type: QuickAlertType.loading,
   );
 }
 

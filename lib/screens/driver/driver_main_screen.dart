@@ -31,7 +31,6 @@ class DriverMainScreen extends StatefulWidget {
 
 class _DriverMainScreenState extends State<DriverMainScreen> {
   final _driverCtx = Get.put(DriverController());
-  final _networkCtx = Get.put(NetWorkController());
   final _loginCtx = Get.put(LoginController());
   final GlobalKey<SlideActionState> key = GlobalKey();
   TextEditingController driverApproveCodeCtrl = TextEditingController();
@@ -56,7 +55,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   void initState() {
     super.initState();
     _loginCtx.getFirebaseMessagingToken(context);
-    _networkCtx.checkNetworkAccess(context);
     _driverCtx.fetchDriverInfo(context);
     _driverCtx.fetchDriverOrders();
     _driverCtx.fetchDriverPayments();

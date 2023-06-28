@@ -146,11 +146,14 @@ class CustomTextField extends StatefulWidget {
   final dynamic focusNode;
   final dynamic textInputAction;
   final dynamic onSubmitted;
+  final String errorText;
+  final dynamic onEditingComplete;
 
   const CustomTextField(
       {Key? key,
       this.hintText = "",
       this.onSubmitted,
+      this.onEditingComplete,
       this.maxLength = 100,
       this.focusNode,
       this.suffixButton,
@@ -163,6 +166,7 @@ class CustomTextField extends StatefulWidget {
       this.obscureText,
       this.iconColor = MyColors.black,
       this.leadingIcon = IconlyLight.search,
+      this.errorText = "",
       this.autoFocus = false});
 
   @override
@@ -170,18 +174,15 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  String _searchText = '';
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        // color: MyColors.fadedGrey,
+        borderRadius: BorderRadius.circular(50),
         border: Border.all(
-          width: 0.7,
-          color: MyColors.grey,
+          width: 1,
+          color: widget.errorText.isEmpty ? MyColors.grey : MyColors.primary,
         ),
       ),
       child: TextField(
@@ -228,7 +229,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
         cursorColor: MyColors.primary,
         cursorWidth: 1,
         onChanged: (value) {
-          _searchText = value;
           if (widget.onChanged != null) widget.onChanged!(value);
           setState(() {});
         },

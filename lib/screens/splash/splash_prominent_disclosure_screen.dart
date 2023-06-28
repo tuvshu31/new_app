@@ -21,8 +21,7 @@ class SplashProminentDisclosure extends StatefulWidget {
 class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
   void requestPermission() async {
     await Geolocator.requestPermission().then((value) {
-      log(value.toString());
-      Get.toNamed(_route);
+      Get.offAllNamed(_route);
     });
   }
 
@@ -41,7 +40,7 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
           CustomInkWell(
             borderRadius: BorderRadius.circular(50),
             onTap: () {
-              Get.toNamed(_route);
+              Get.offAllNamed(_route);
             },
             child: Container(
               padding: const EdgeInsets.all(8),

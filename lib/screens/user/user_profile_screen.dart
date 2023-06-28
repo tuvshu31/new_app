@@ -79,14 +79,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ),
                       ),
                     ),
-                    _divider(),
                     _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
                       Get.to(() => const UserProfileAddressEditScreen());
                     }),
                     _listTile(IconlyLight.chart, "Захиалгууд", () {
                       Get.to(() => const UserProfileOrdersScreen());
                     }),
-                    _divider(),
                     _listTile(IconlyLight.info_circle, "Тусламж", () {
                       Get.to(() => const UserProfileHelpScreen());
                     }),
@@ -116,20 +114,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               )
             : MyShimmers().userPage());
-  }
-
-  Widget _divider() {
-    return Column(
-      children: [
-        SizedBox(height: Get.height * .01),
-        Container(
-          width: double.infinity,
-          height: 1,
-          color: MyColors.background,
-        ),
-        SizedBox(height: Get.height * .01),
-      ],
-    );
   }
 
   Widget _listTile(IconData icon, String title, dynamic onTap) {

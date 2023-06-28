@@ -1,7 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
+import 'package:Erdenet24/controller/network_controller.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' as GetCTX;
 
 enum Method { get, post, put, delete }
 
@@ -34,6 +38,11 @@ class DioClient {
     dynamic body,
     Map<String, dynamic>? queryParam,
   ) async {
+    bool hasInternet =
+        await _isConnectedToNetwork(checkServerConnection: false);
+    if (!hasInternet) {
+      showNetworkErrorSnackbar();
+    }
     try {
       Response<String> response = await dio.request(
         path,
@@ -80,6 +89,35 @@ class DioClient {
       if (e is DioError) {
         print(e);
       }
+    }
+  }
+
+  Future<bool> _isConnectedToNetwork({
+    String? url,
+    bool checkServerConnection = false,
+  }) async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return checkServerConnection
+          ? await _isConnectedToServer(url ?? 'google.com')
+          : true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return checkServerConnection
+          ? await _isConnectedToServer(url ?? 'google.com')
+          : true;
+    }
+    return false;
+  }
+
+  Future<bool> _isConnectedToServer(String url) async {
+    try {
+      final result = await InternetAddress.lookup(url);
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+      return false;
+    } on SocketException catch (_) {
+      return false;
     }
   }
 }
