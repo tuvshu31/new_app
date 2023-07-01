@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
 import 'package:Erdenet24/screens/store/store_products_preview_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -105,9 +106,9 @@ class _StoreProductsCreateProductScreenState
     refreshPage();
     Get.back();
     if (data["success"]) {
-      successSnackBar("Амжилттай хадгалагдлаа", 2, context);
+      customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 2);
     } else {
-      errorSnackBar("Алдаа гарлаа", 2, context);
+      customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
     }
   }
 

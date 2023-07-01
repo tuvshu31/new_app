@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/dio_message.dart';
+import 'package:Erdenet24/utils/enums.dart';
 
 class RestApi {
   static final RestApi _singleton = RestApi._internal();

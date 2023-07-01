@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -60,7 +61,7 @@ class CartController extends GetxController {
       if (res["success"]) {
         savedList.remove(product["id"]);
       } else {
-        errorSnackBar("Алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
       }
     } else {
       dynamic response = await RestApi().saveUserProduct(body);
@@ -68,9 +69,9 @@ class CartController extends GetxController {
       Get.back();
       if (res["success"]) {
         savedList.add(product["id"]);
-        successSnackBar("Амжилттай хадгалагдлаа", 2, context);
+        customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 2);
       } else {
-        errorSnackBar("Алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
       }
     }
   }

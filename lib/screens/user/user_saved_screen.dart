@@ -1,6 +1,7 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -56,7 +57,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
           _cartCtrl.savedList.remove(data["id"]);
         });
       } else {
-        errorSnackBar("Барааг устгахад алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Барааг устгахад алдаа гарлаа", 2);
       }
     }
   }

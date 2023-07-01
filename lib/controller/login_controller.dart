@@ -2,8 +2,10 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
@@ -15,20 +17,23 @@ import 'package:flutter/material.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
-  final _cartCtrl = Get.put(CartController());
+  final _cartCtx = Get.put(CartController());
   RxInt verifyCode = 0.obs;
   TextEditingController phoneController = TextEditingController();
+  final _navCtx = Get.put(NavigationController());
 
   //Хэрэглэгч системээс гарах
   void logout() async {
+    Get.back();
+    CustomDialogs().showLoadingDialog();
     var body = {"mapToken": ""};
     await RestApi().updateUser(RestApiHelper.getUserId(), body);
-
     RestApiHelper.saveUserId(0);
     RestApiHelper.saveUserRole("");
     RestApiHelper.saveOrderId(0);
-
-    _cartCtrl.savedList.clear();
+    _navCtx.onItemTapped(0);
+    _cartCtx.savedList.clear();
+    Get.back();
     Get.offAll(() => const SplashPhoneRegisterScreen());
   }
 

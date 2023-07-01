@@ -1,5 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -50,11 +51,11 @@ class _UserProfilePhoneEditScreenState
     dynamic response = Map<String, dynamic>.from(authCode);
     Get.back();
     if (response["success"]) {
-      successSnackBar("Амжилттай хадгалагдлаа", 3, context);
+      customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 3);
       Get.back();
     } else {
-      errorSnackBar(
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+      customSnackbar(DialogType.error,
+          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
       Get.back();
     }
   }

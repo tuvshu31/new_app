@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/controller/network_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 
@@ -11,7 +11,6 @@ import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/cupertino.dart';
 import 'package:slide_to_act/slide_to_act.dart';
-import 'package:circular_countdown/circular_countdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:Erdenet24/controller/driver_controller.dart';
@@ -217,10 +216,8 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
                                             _driverCtx.storeLocation.refresh();
                                             _driverCtx.step.value += 1;
                                           } else {
-                                            errorSnackBar(
-                                                "Захиалгын код буруу байна",
-                                                3,
-                                                context);
+                                            customSnackbar(DialogType.error,
+                                                "Захиалгын код буруу байна", 3);
                                           }
                                         },
                                       );

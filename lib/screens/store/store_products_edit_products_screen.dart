@@ -1,5 +1,6 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
@@ -52,9 +53,9 @@ class _StoreProductsEditProductsScreenState
     dynamic data = Map<String, dynamic>.from(product);
     Get.back();
     if (data["success"]) {
-      successSnackBar("Амжилттай засагдлаа", 2, context);
+      customSnackbar(DialogType.success, "Амжилттай засагдлаа", 2);
     } else {
-      errorSnackBar("Үл мэдэгдэх алдаа гарлаа", 2, context);
+      customSnackbar(DialogType.error, "Үл мэдэгдэх алдаа гарлаа", 2);
     }
   }
 
@@ -65,15 +66,13 @@ class _StoreProductsEditProductsScreenState
     Get.back();
     if (product != null) {
       if (data["success"]) {
-        successSnackBar("Амжилттай устгалаа", 2, context);
+        customSnackbar(DialogType.success, "Амжилттай устгалаа", 2);
       } else {
-        errorSnackBar("Үл мэдэгдэх алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Үл мэдэгдэх алдаа гарлаа", 2);
       }
     } else {
-      errorSnackBar(
-          "Уучлаарай энэ бараа захиалагдсан тул устгах боломжгүй байна",
-          3,
-          context);
+      customSnackbar(DialogType.error,
+          "Уучлаарай энэ бараа захиалагдсан тул устгах боломжгүй байна", 3);
     }
   }
 

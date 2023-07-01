@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -60,8 +61,8 @@ void storeOrdersToDelivery(context, data) {
           notifyToDrivers(context, data);
         } else {
           Get.back();
-          errorSnackBar(
-              "Хүргэлтийн жолооч ирж байгаа тул түр хүлээнэ үү", 4, context);
+          customSnackbar(DialogType.error,
+              "Хүргэлтийн жолооч ирж байгаа тул түр хүлээнэ үү", 4);
         }
       },
     );

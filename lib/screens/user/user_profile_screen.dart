@@ -1,3 +1,4 @@
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -89,7 +90,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Get.to(() => const UserProfileHelpScreen());
                     }),
                     _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
-                      accountDeleteModal(context, () async {
+                      CustomDialogs().showAccountDeleteDialog(() async {
                         CustomDialogs().showLoadingDialog();
                         dynamic response = await RestApi()
                             .deleteUser(RestApiHelper.getUserId());
@@ -98,10 +99,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         if (d["success"]) {
                           _loginCtx.logout();
                         } else {
-                          errorSnackBar(
-                              "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
-                              3,
-                              context);
+                          customSnackbar(
+                            DialogType.error,
+                            "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
+                            3,
+                          );
                         }
                       });
                     }),

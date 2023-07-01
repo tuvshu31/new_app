@@ -6,8 +6,8 @@ class DioMessage {
   Dio dio = Dio(
     BaseOptions(
       baseUrl: 'https://api.messagepro.mn/',
-      connectTimeout: Duration(minutes: 2),
-      receiveTimeout: Duration(minutes: 1),
+      connectTimeout: const Duration(minutes: 2),
+      receiveTimeout: const Duration(minutes: 1),
     ),
   );
 

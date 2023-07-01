@@ -1,3 +1,4 @@
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -62,11 +63,11 @@ class _UserProfileAddressEditScreenState
     dynamic response = Map<String, dynamic>.from(authCode);
     Get.back();
     if (response["success"]) {
-      successSnackBar("Амжилттай хадгалагдлаа", 3, context);
+      customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 3);
       Get.back();
     } else {
-      errorSnackBar(
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+      customSnackbar(DialogType.error,
+          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
       Get.back();
     }
   }

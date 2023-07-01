@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -68,8 +69,8 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
         startTimer();
       });
     } else {
-      errorSnackBar(
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2, context);
+      customSnackbar(DialogType.error,
+          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
     }
   }
 
@@ -119,7 +120,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
       }
     } else {
       Get.back();
-      errorSnackBar("Баталгаажуулах код буруу байна", 2, context);
+      customSnackbar(DialogType.error, "Баталгаажуулах код буруу байна", 2);
     }
   }
 

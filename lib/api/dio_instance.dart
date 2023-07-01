@@ -1,13 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
-import 'package:Erdenet24/controller/network_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart' as GetCTX;
-
-enum Method { get, post, put, delete }
 
 class DioClient {
   Dio dio = Dio(
@@ -41,7 +38,7 @@ class DioClient {
     bool hasInternet =
         await _isConnectedToNetwork(checkServerConnection: false);
     if (!hasInternet) {
-      showNetworkErrorSnackbar();
+      CustomDialogs().showNetworkErrorDialog(() {});
     }
     try {
       Response<String> response = await dio.request(

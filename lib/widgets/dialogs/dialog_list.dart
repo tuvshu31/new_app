@@ -10,8 +10,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_bodies.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 
-enum DialogType { success, warning, error }
-
 Color _getDialogColors(DialogType dialogType) {
   switch (dialogType) {
     case DialogType.error:
@@ -19,7 +17,8 @@ Color _getDialogColors(DialogType dialogType) {
     case DialogType.warning:
       return Colors.amber;
     case DialogType.success:
-      return Colors.green;
+    default:
+      return Colors.red;
   }
 }
 
@@ -31,6 +30,8 @@ String _getDialogTitle(DialogType dialogType) {
       return "Анхааруулга";
     case DialogType.success:
       return "Амжилттай";
+    default:
+      return "Уучлаарай";
   }
 }
 
@@ -116,6 +117,20 @@ class CustomDialogs {
     customDialog(
       DialogType.warning,
       showLogoutDialogBody(onPressed),
+    );
+  }
+
+  void showAccountDeleteDialog(dynamic onPressed) {
+    customDialog(
+      DialogType.warning,
+      showAccountDeleteDialogBody(onPressed),
+    );
+  }
+
+  void showNetworkErrorDialog(dynamic onPressed) {
+    customDialog(
+      DialogType.error,
+      showNetworkErrorDialogBody(onPressed),
     );
   }
 }
@@ -297,42 +312,42 @@ void delvieryCostWarningModal(dynamic context, dynamic onTap) {
       ));
 }
 
-void accountDeleteModal(dynamic context, dynamic onTap) {
-  QuickAlert.show(
-      context: context,
-      animType: QuickAlertAnimType.slideInDown,
-      widget: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          SizedBox(height: 8),
-          CustomText(
-            textAlign: TextAlign.center,
-            text:
-                "Бүртгэлээ устгаснаар таны бүх мэдээлэл апликейшн дээрээс устгагдахыг анхаарна уу",
-            fontSize: 14,
-            color: MyColors.gray,
-          )
-        ],
-      ),
-      title: "Бүртгэлээ устгах уу?",
-      confirmBtnColor: MyColors.warning,
-      type: QuickAlertType.info,
-      showCancelBtn: true,
-      onCancelBtnTap: Get.back,
-      cancelBtnText: "Болих",
-      onConfirmBtnTap: onTap,
-      confirmBtnText: "Устгах",
-      cancelBtnTextStyle: TextStyle(
-        fontSize: 14,
-        color: MyColors.gray,
-        fontWeight: FontWeight.bold,
-      ),
-      confirmBtnTextStyle: TextStyle(
-        color: MyColors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-      ));
-}
+// void accountDeleteModal(dynamic context, dynamic onTap) {
+//   QuickAlert.show(
+//       context: context,
+//       animType: QuickAlertAnimType.slideInDown,
+//       widget: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: const [
+//           SizedBox(height: 8),
+//           CustomText(
+//             textAlign: TextAlign.center,
+//             text:
+//                 "Бүртгэлээ устгаснаар таны бүх мэдээлэл апликейшн дээрээс устгагдахыг анхаарна уу",
+//             fontSize: 14,
+//             color: MyColors.gray,
+//           )
+//         ],
+//       ),
+//       title: "Бүртгэлээ устгах уу?",
+//       confirmBtnColor: MyColors.warning,
+//       type: QuickAlertType.info,
+//       showCancelBtn: true,
+//       onCancelBtnTap: Get.back,
+//       cancelBtnText: "Болих",
+//       onConfirmBtnTap: onTap,
+//       confirmBtnText: "Устгах",
+//       cancelBtnTextStyle: TextStyle(
+//         fontSize: 14,
+//         color: MyColors.gray,
+//         fontWeight: FontWeight.bold,
+//       ),
+//       confirmBtnTextStyle: TextStyle(
+//         color: MyColors.white,
+//         fontSize: 14,
+//         fontWeight: FontWeight.bold,
+//       ));
+// }
 
 void driverDeliveryCodeApproveDialog(
     dynamic context, TextEditingController controller, dynamic onTap) {

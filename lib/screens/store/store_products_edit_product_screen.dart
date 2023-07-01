@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/help_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -103,9 +104,9 @@ class _StoreProductsEditProductScreenState
       }
       if (data["success"]) {
         Get.back();
-        successSnackBar("Амжилттай засагдлаа", 2, context);
+        customSnackbar(DialogType.success, "Амжилттай засагдлаа", 2);
       } else {
-        errorSnackBar("Алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
       }
     } else {
       generateOtherInfo();
@@ -121,9 +122,9 @@ class _StoreProductsEditProductScreenState
       dynamic data = Map<String, dynamic>.from(product);
       if (data["success"]) {
         Get.back();
-        successSnackBar("Амжилттай засагдлаа", 2, context);
+        customSnackbar(DialogType.success, "Амжилттай засагдлаа", 2);
       } else {
-        errorSnackBar("Алдаа гарлаа", 2, context);
+        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
       }
     }
     Get.back();

@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -70,9 +71,9 @@ class StoreController extends GetxController {
     dynamic user = await RestApi().updateUser(RestApiHelper.getUserId(), body);
     dynamic data = Map<String, dynamic>.from(user);
     if (data["success"]) {
-      successSnackBar(successMsg, 2, context);
+      customSnackbar(DialogType.success, successMsg, 2);
     } else {
-      errorSnackBar(errorMsg, 2, context);
+      customSnackbar(DialogType.error, errorMsg, 2);
     }
   }
 

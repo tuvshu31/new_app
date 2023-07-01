@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -50,8 +51,8 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
       if (authCode[0]["Result"] == "SUCCESS") {
         Get.toNamed(splashOtpScreenRoute);
       } else {
-        errorSnackBar("Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу",
-            2, context);
+        customSnackbar(DialogType.error,
+            "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
       }
     }
   }
