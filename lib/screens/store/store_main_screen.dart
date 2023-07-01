@@ -14,7 +14,7 @@ import 'package:iconly/iconly.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
@@ -82,9 +82,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                           }),
                           _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                           _listTile(IconlyLight.login, "Аппаас гарах", () {
-                            logOutModal(context, () {
-                              _loginCtx.logout();
-                            });
+                            // logOutModal(context, () {
+                            //   _loginCtx.logout();
+                            // });
                           })
                         ],
                       ),

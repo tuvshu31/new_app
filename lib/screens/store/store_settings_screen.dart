@@ -6,7 +6,7 @@ import 'package:Erdenet24/controller/help_controller.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image_picker.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -58,7 +58,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
   }
 
   void submit() async {
-    // loadingDialog(context);
+    // CustomDialogs().showLoadingDialog();
     // if (imageListBefore != _helpCtrl.chosenImage.toString()) {
     //   if (imageListBefore != [].toString()) {
     //     await RestApi().deleteImage("users", _user["id"]);

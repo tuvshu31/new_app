@@ -12,7 +12,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -56,7 +56,6 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   }
 
   void resetTimer() async {
-    loadingDialog(context);
     _loginCtx.verifyCode.value = random6digit();
 
     dynamic authCode = await RestApi().sendAuthCode(
@@ -80,7 +79,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   }
 
   void submit() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     dynamic response =
         await RestApi().checkUser(_loginCtx.phoneController.text);
     dynamic data = Map<String, dynamic>.from(response);

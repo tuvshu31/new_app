@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/network_controller.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 
 import 'package:get/get.dart';

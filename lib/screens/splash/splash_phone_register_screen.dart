@@ -6,7 +6,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -35,7 +35,7 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
   }
 
   void sendOTP() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     if (_loginCtrl.phoneController.text == "99681828") {
       _loginCtrl.verifyCode.value = 111111;
       Get.back();

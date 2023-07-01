@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
 
@@ -21,7 +21,7 @@ void showOrdersSetTimeView(context, data) {
       () {
         Future.delayed(const Duration(milliseconds: 300), () {
           slideActionKey.currentState!.reset();
-          loadingDialog(context);
+          CustomDialogs().showLoadingDialog();
           var body = {
             "orderStatus": "preparing",
             "prepDuration": _storeCtx.prepDuration.value.toString(),
@@ -78,7 +78,7 @@ void notifyToDrivers(context, data) {
 }
 
 void saveIcomingOrder(context, data) {
-  loadingDialog(context);
+  CustomDialogs().showLoadingDialog();
   AwesomeNotifications().dismiss(1);
   var body = {"orderStatus": "received"};
   _storeCtx.updateOrder(data["id"], body);

@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:add_to_cart_animation/add_to_cart_animation.dart';

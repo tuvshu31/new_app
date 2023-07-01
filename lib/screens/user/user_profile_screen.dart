@@ -7,7 +7,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
@@ -90,7 +90,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     }),
                     _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
                       accountDeleteModal(context, () async {
-                        loadingDialog(context);
+                        CustomDialogs().showLoadingDialog();
                         dynamic response = await RestApi()
                             .deleteUser(RestApiHelper.getUserId());
                         dynamic d = Map<String, dynamic>.from(response);
@@ -105,8 +105,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         }
                       });
                     }),
-                    _listTile(IconlyLight.login, "Аппаас гарах", () {
-                      logOutModal(context, () {
+                    _listTile(IconlyLight.login, "Системээс гарах", () {
+                      CustomDialogs().showLogoutDialog(() {
                         _loginCtx.logout();
                       });
                     })

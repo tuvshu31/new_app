@@ -6,7 +6,7 @@ import 'package:Erdenet24/controller/help_controller.dart';
 import 'package:Erdenet24/screens/store/store_products_preview_screen.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image_picker.dart';
 import 'package:Erdenet24/widgets/list_items.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -78,7 +78,7 @@ class _StoreProductsCreateProductScreenState
   }
 
   void submit() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     var query = {"id": RestApiHelper.getUserId()};
     dynamic userInfo = await RestApi().getUsers(query);
     dynamic res = Map<String, dynamic>.from(userInfo);

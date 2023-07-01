@@ -4,7 +4,7 @@ import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/loading.dart';
@@ -44,7 +44,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
   }
 
   void deleteProduct(dynamic data, context) async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     dynamic res = await RestApi().deleteUserProduct(
         {"userId": RestApiHelper.getUserId(), "productId": data['id']});
     Get.back();

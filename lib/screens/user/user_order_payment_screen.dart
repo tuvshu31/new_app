@@ -1,11 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -45,7 +40,7 @@ class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   }
 
   void navgiteToDeepLink(int index) async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     _launchUrl(Uri.parse(_incoming["data"]["urls"][index]["link"]));
     Get.back();
   }

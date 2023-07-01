@@ -1,10 +1,11 @@
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -29,7 +30,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
   final _cartCtrl = Get.put(CartController());
 
   void getUserProducts() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     dynamic response =
         await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
     dynamic d = Map<String, dynamic>.from(response);

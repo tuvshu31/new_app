@@ -6,7 +6,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
@@ -51,7 +51,7 @@ class _UserProfileAddressEditScreenState
   }
 
   void saveDeliveryInfo() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     var body = {
       "userPhone": phoneController.text,
       "userAddress": addressController.text,

@@ -5,7 +5,7 @@ import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/bottom_sheet.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -47,7 +47,7 @@ class _StoreProductsEditProductsScreenState
   }
 
   void productUpdateHelper(dynamic body) async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     dynamic product = await RestApi().updateProduct(body["id"], body);
     dynamic data = Map<String, dynamic>.from(product);
     Get.back();
@@ -59,7 +59,7 @@ class _StoreProductsEditProductsScreenState
   }
 
   void productDeleteHelper(dynamic body) async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     dynamic product = await RestApi().deleteProduct(body["id"]);
     dynamic data = Map<String, dynamic>.from(product);
     Get.back();
@@ -104,7 +104,7 @@ class _StoreProductsEditProductsScreenState
                   Get.back();
                   changeLeftOverCount(
                       context, _products[index], leftOverController, () {
-                    loadingDialog(context);
+                    CustomDialogs().showLoadingDialog();
                     if (leftOverController.text.isEmpty) {
                       Get.back();
                     } else {

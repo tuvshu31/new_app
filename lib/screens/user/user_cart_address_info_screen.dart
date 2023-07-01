@@ -14,7 +14,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:flutter/material.dart';
@@ -92,7 +92,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
   }
 
   void createInvoiceAndOrder() async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     int storeId = int.parse(_cartCtx.stores[0]);
     int randomNumber = random4digit();
     int userAndDriverCode = random4digit();
@@ -150,7 +150,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
               onPressed: () {
                 if (!showPriceDetails) {
                   FocusScope.of(context).unfocus();
-                  loadingDialog(context);
+                  CustomDialogs().showLoadingDialog();
                   Future.delayed(const Duration(seconds: 1), () {
                     Get.back();
                     showPriceDetails = true;

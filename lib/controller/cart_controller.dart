@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -21,10 +21,10 @@ class CartController extends GetxController {
     var n = storeList.indexWhere((e) => e == product["store"]);
     product["storeClosed"] = false;
     if (cartList.any((element) => element["store"] != product["store"])) {
-      warningDialog(
-        context,
-        "Сагсанд өөр 2 харилцагчийн бүтээгдэхүүн оруулах боломжгүй",
-      );
+      // warningDialog(
+      //   context,
+      //   "Сагсанд өөр 2 харилцагчийн бүтээгдэхүүн оруулах боломжгүй",
+      // );
     } else {
       storeList.add(product["store"]);
       if (i > -1) {
@@ -48,7 +48,7 @@ class CartController extends GetxController {
   void getUserInfo() async {}
 
   void saveProduct(product, context) async {
-    loadingDialog(context);
+    CustomDialogs().showLoadingDialog();
     var body = {
       "userId": RestApiHelper.getUserId(),
       "productId": product["id"]

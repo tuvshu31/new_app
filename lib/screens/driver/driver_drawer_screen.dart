@@ -4,7 +4,7 @@ import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
@@ -68,14 +68,13 @@ Widget driverDrawer(context) {
           _listTile(IconlyLight.wallet, "Төлбөр", () {
             Get.toNamed(driverPaymentsScreenRoute);
           }),
-          _listTile(
-              IconlyLight.logout,
-              "Аппаас гарах",
-              () => logOutModal(context, () async {
-                    var body = {"isOpen": 0};
-                    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-                    _loginCtx.logout();
-                  })),
+          _listTile(IconlyLight.logout, "Аппаас гарах", () {}
+              // () => logOutModal(() async {
+              //   // var body = {"isOpen": 0};
+              //   // await RestApi().updateUser(RestApiHelper.getUserId(), body);
+              //   // _loginCtx.logout();
+              // }),
+              ),
           const SizedBox(height: 18),
         ],
       ),
