@@ -1,8 +1,9 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -32,19 +33,8 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     setState(() {});
   }
 
-  void saveSearchHistory(Map searchedItem) {
-    if (searchHistory.any((element) => element["id"] != searchedItem["id"])) {
-      searchHistory.add(searchedItem);
-    }
-    setState(() {});
-  }
-
-  void deleteSearchHistory(int index) {
-    searchHistory.removeAt(index);
-    setState(() {});
-  }
-
   void searchProducts(String text) async {
+    isSearching = text.isNotEmpty ? true : false;
     fetchinSuggestions = true;
     var body = {"keyWord": text};
     dynamic response = await RestApi().searchProducts(body);
@@ -64,23 +54,19 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
       searchHistory.removeWhere((element) => element[value] == obj[value]);
     }
     searchHistory.add(obj);
+    RestApiHelper.saveSearchHistory(searchHistory);
   }
 
   void saveAsHistoryAndNavigate(obj) {
     addToSearchHistory(obj);
-    log(obj.toString());
-    var query = {};
-    if (obj["type"] == "product") {
-      // query[""]
-    }
-    // Get.to(
-    //   () => UserProductsScreen(
-    //     navType: NavType.none,
-    //     title: "Бүтээгдэхүүн",
-    //     isFromSeachBar: true,
-    //     searchObject: obj,
-    //   ),
-    // );
+    Get.to(
+      () => UserProductsScreen(
+        navType: NavType.none,
+        title: "Бүтээгдэхүүн",
+        isFromSeachBar: true,
+        searchObject: obj,
+      ),
+    );
     Future.delayed(const Duration(milliseconds: 300), () {
       searchController.clear();
       isSearching = false;
@@ -190,11 +176,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                           };
                           saveAsHistoryAndNavigate(item);
                         },
-                        onChanged: (value) {
-                          searchProducts(value);
-                          isSearching = value.isNotEmpty ? true : false;
-                          setState(() {});
-                        },
+                        onChanged: searchProducts,
                       ),
                     ),
                     isSearching
@@ -283,6 +265,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                           onTap: () {
                             searchHistory.remove(item);
                             setState(() {});
+                            RestApiHelper.saveSearchHistory(searchHistory);
                           },
                           child: const Icon(
                             Icons.close_rounded,

@@ -4,7 +4,10 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_bodies.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:add_to_cart_animation/add_to_cart_animation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -17,22 +20,12 @@ class CartController extends GetxController {
   RxInt cartItemCount = 0.obs;
 
   void addProduct(product, context) {
-    cartItemCount.value++;
+    cartItemCount++;
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
-    var n = storeList.indexWhere((e) => e == product["store"]);
-    product["storeClosed"] = false;
-    if (cartList.any((element) => element["store"] != product["store"])) {
-      // warningDialog(
-      //   context,
-      //   "Сагсанд өөр 2 харилцагчийн бүтээгдэхүүн оруулах боломжгүй",
-      // );
+    if (i > -1) {
+      cartList[i]["quantity"] += 1;
     } else {
-      storeList.add(product["store"]);
-      if (i > -1) {
-        cartList[i]["quantity"] += 1;
-      } else {
-        cartList.add({...product, "quantity": 1});
-      }
+      cartList.add({...product, "quantity": 1});
     }
     cartList.refresh();
   }
@@ -78,18 +71,20 @@ class CartController extends GetxController {
 
   void removeProduct(product, context) {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
+    cartItemCount = cartItemCount - cartList[i]["quantity"];
     cartList.removeAt(i);
+
     var n = storeList.indexWhere((e) => e == product["store"]);
     if (n > -1) {
       storeList.remove(product["store"]);
     }
     cartList.refresh();
-    storeList.refresh();
   }
 
   void increaseQuantity(product, context) {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
     cartList[i]["quantity"] += 1;
+    cartItemCount++;
     cartList.refresh();
   }
 
@@ -97,6 +92,7 @@ class CartController extends GetxController {
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
     if (cartList[i]["quantity"] > 1) {
       cartList[i]["quantity"] -= 1;
+      cartItemCount--;
     }
     cartList.refresh();
   }

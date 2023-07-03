@@ -15,37 +15,12 @@ class ProductController extends GetxController {
   var loading = false.obs;
   var onScrollShowHide = false.obs;
 
-  //Бараануудыг шүүж дуудах
-  void callProducts() async {
-    loading.value = true;
-    var query = {
-      "typeId": typeId.value,
-      "page": page.value,
-      "categoryId": categoryId.value,
-      "storeName": storeName.value,
-      "store": storeId.value,
-      "visibility": '1',
-      "search": search.value != 0 ? searchText.value : 0,
-    };
-
-    query.removeWhere((key, value) => value == 0 || value == "");
-    print(query);
-    dynamic products = await RestApi().getProducts(query);
-    dynamic p = Map<String, dynamic>.from(products);
-    total.value = p["pagination"]["count"];
-    if (p["data"].length < p["pagination"]["limit"]) {
-      hasMore.value = false;
-    }
-    data = data + p['data'];
-    loading.value = false;
-  }
-
   void changeTab(int index) {
     data.clear();
     page.value = 1;
     hasMore.value = true;
     categoryId.value = index;
-    callProducts();
+    // callProducts();
   }
 
   // static Future<CardItem> getRecentCreatedCard() async {

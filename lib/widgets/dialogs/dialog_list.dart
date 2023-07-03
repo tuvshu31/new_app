@@ -133,6 +133,13 @@ class CustomDialogs {
       showNetworkErrorDialogBody(onPressed),
     );
   }
+
+  void showSameStoreProductsDialog() {
+    customDialog(
+      DialogType.warning,
+      showSameStoreProductsDialogBody(),
+    );
+  }
 }
 
 void changeLeftOverCount(

@@ -57,12 +57,8 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.isFromSeachBar) {
-      searchProducts(widget.searchObject);
-    } else {
-      callCategories();
-      callProducts();
-    }
+    callCategories();
+    callProducts();
     handleScroller();
   }
 
@@ -99,14 +95,33 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   void callProducts() async {
     fetchingProducts = true;
+    String searchName = "";
+    int searchId = 0;
+    int storeId = widget.storeId;
+    if (widget.isFromSeachBar) {
+      var searchType = widget.searchObject["type"];
+      if (searchType == "word") {
+        searchName = widget.searchObject["name"];
+      }
+      if (searchType == "product") {
+        searchId = widget.searchObject["id"];
+      }
+      if (searchType == "store") {
+        storeId = widget.searchObject["id"];
+      }
+    }
     var query = {
       "page": page,
       "typeId": widget.typeId,
       "categoryId": widget.categoryId,
-      "store": widget.storeId,
+      "store": storeId,
       "visibility": widget.visibility,
+      "searchName": searchName.isNotEmpty ? searchName : 0,
+      "searchId": searchId,
     };
+
     query.removeWhere((key, value) => value == 0);
+    log(query.toString());
     dynamic response = await RestApi().getProducts(query);
     dynamic productResponse = Map<String, dynamic>.from(response);
     products = products + productResponse["data"];
@@ -147,14 +162,11 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     } else if (type == "store") {
       body["storeId"] = searchObect["id"];
     }
+    log(body.toString());
     dynamic response = await RestApi().getSearchResults(body);
     dynamic productResponse = Map<String, dynamic>.from(response);
-    products = products + productResponse["data"];
-    if (productResponse["data"].length <
-        productResponse["pagination"]["limit"]) {
-      hasMoreProducts = false;
-    }
-    totalProducts = productResponse["pagination"]["count"];
+    products = products + productResponse["products"];
+    hasMoreProducts = false;
     fetchingProducts = false;
     setState(() {});
   }

@@ -179,10 +179,24 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                                 alignment:
                                                     Alignment.centerLeft),
                                             onPressed: () {
-                                              storeClosed || notVisible
-                                                  ? null
-                                                  : _cartCtrl.addProduct(
+                                              if (storeClosed || notVisible) {
+                                              } else {
+                                                if (_cartCtrl.cartList.any(
+                                                    (element) =>
+                                                        element["store"] !=
+                                                        saved[index]
+                                                            ["store"])) {
+                                                  CustomDialogs()
+                                                      .showSameStoreProductsDialog();
+                                                } else {
+                                                  _cartCtrl.addProduct(
                                                       saved[index], context);
+                                                  customSnackbar(
+                                                      DialogType.success,
+                                                      "Сагсанд нэмэгдлээ",
+                                                      2);
+                                                }
+                                              }
                                             },
                                             icon: Icon(
                                               IconlyLight.buy,

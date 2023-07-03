@@ -1,8 +1,12 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:add_to_cart_animation/add_to_cart_animation.dart';
 import 'package:animated_digit/animated_digit.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -30,6 +34,8 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   final _incoming = Get.arguments;
   dynamic _data = [];
   bool _isSaved = false;
+  bool _isStoreOpen = false;
+  bool _checkingIfStoreClosed = false;
   int scrollIndex = 1;
   List<int> list = [1];
   String ports = "";
@@ -42,11 +48,12 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   GlobalKey<CartIconKey> cartKey = GlobalKey<CartIconKey>();
   final GlobalKey widgetKey = GlobalKey();
   late Function(GlobalKey) runAddToCartAnimation;
-  var _cartQuantityItems = 0;
 
   @override
   void initState() {
     super.initState();
+    checkIfStoreClosed();
+
     setState(() {
       _data = _incoming["data"];
       _isSaved = _cartCtrl.savedList.contains(_data["id"]);
@@ -61,6 +68,19 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     imgCount();
   }
 
+  void checkIfStoreClosed() async {
+    _checkingIfStoreClosed = true;
+    dynamic response =
+        await RestApi().getUser(int.parse(_incoming["data"]["store"]));
+    dynamic d = Map<String, dynamic>.from(response);
+
+    if (d["success"]) {
+      _isStoreOpen = d["data"]["isOpen"];
+    }
+    _checkingIfStoreClosed = false;
+    setState(() {});
+  }
+
   void imgCount() async {
     dynamic response = await RestApi().getProductImgCount(_data["id"]);
     dynamic d = Map<String, dynamic>.from(response);
@@ -71,8 +91,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
 
   void listClick(GlobalKey widgetKey) async {
     await runAddToCartAnimation(widgetKey);
-    await cartKey.currentState!
-        .runCartAnimation((++_cartQuantityItems).toString());
+    await cartKey.currentState!.runCartAnimation();
   }
 
   @override
@@ -239,36 +258,51 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.only(right: 24, left: 24, bottom: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        CustomImage(
-                          width: 24,
-                          height: 24,
-                          url: "${URL.AWS}/users/${_data["store"]}/small/1.png",
-                        ),
-                        const SizedBox(width: 8),
-                        CustomText(
-                          text: "${_data["storeName"]}",
-                          fontSize: 15,
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: const [
-                              Icon(
-                                IconlyLight.arrow_right_2,
-                                size: 20,
-                              ),
-                            ],
+                    CustomInkWell(
+                      borderRadius: BorderRadius.zero,
+                      onTap: () {
+                        Get.off(
+                          UserProductsScreen(
+                            navType: NavType.store,
+                            storeId: int.parse(_data["store"]),
+                            title: _data["storeName"],
                           ),
-                        )
-                      ],
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 24, bottom: 8),
+                        child: Row(
+                          children: [
+                            CustomImage(
+                              width: 24,
+                              height: 24,
+                              url:
+                                  "${URL.AWS}/users/${_data["store"]}/small/1.png",
+                            ),
+                            const SizedBox(width: 8),
+                            CustomText(
+                              text: "${_data["storeName"]}",
+                              fontSize: 15,
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: const [
+                                  Icon(
+                                    IconlyLight.arrow_right_2,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 8),
                     const Divider(),
                     const SizedBox(height: 8),
                     CustomText(
@@ -298,18 +332,37 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
           color: MyColors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Center(
-            child: CustomButton(
-              onPressed: () {
-                listClick(widgetKey);
-                Future.delayed(const Duration(milliseconds: 1700), () {
-                  _cartCtrl.addProduct(_data, context);
-                  setState(() {});
-                });
-              },
-              text: "Сагсанд нэмэх",
-              textColor: MyColors.white,
-              elevation: 0,
-            ),
+            child: _checkingIfStoreClosed
+                ? const CustomShimmer(
+                    width: double.infinity,
+                    height: 40,
+                    borderRadius: 50,
+                  )
+                : CustomButton(
+                    onPressed: () {
+                      if (_isStoreOpen) {
+                        if (_cartCtrl.cartList.any(
+                            (element) => element["store"] != _data["store"])) {
+                          CustomDialogs().showSameStoreProductsDialog();
+                        } else {
+                          listClick(widgetKey);
+                          Future.delayed(const Duration(milliseconds: 1600),
+                              () {
+                            _cartCtrl.addProduct(_data, context);
+                            setState(() {});
+                          });
+                        }
+                      } else {
+                        customSnackbar(
+                            DialogType.error, "Дэлгүүр хаасан байна", 3);
+                      }
+                    },
+                    text: "Сагсанд нэмэх",
+                    textColor: MyColors.white,
+                    elevation: 0,
+                    bgColor:
+                        _isStoreOpen ? MyColors.primary : MyColors.background,
+                  ),
           ),
         ),
       ),

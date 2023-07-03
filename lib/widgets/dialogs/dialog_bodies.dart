@@ -94,7 +94,7 @@ Widget showNetworkErrorDialogBody(dynamic onPressed) {
   return Column(
     children: [
       const Text(
-        "Интернэт холболт салсан байна",
+        "Интернэт холболтоо шалгана уу",
         textAlign: TextAlign.center,
       ),
       SizedBox(height: Get.height * .04),
@@ -102,6 +102,27 @@ Widget showNetworkErrorDialogBody(dynamic onPressed) {
         isFullWidth: false,
         elevation: 0,
         bgColor: Colors.red,
+        text: "OK",
+        onPressed: () {
+          Get.back();
+        },
+      ),
+    ],
+  );
+}
+
+Widget showSameStoreProductsDialogBody() {
+  return Column(
+    children: [
+      const Text(
+        "Сагсанд өөр 2 харилцагчийн бүтээгдэхүүн оруулах боломжгүй",
+        textAlign: TextAlign.center,
+      ),
+      SizedBox(height: Get.height * .04),
+      CustomButton(
+        isFullWidth: false,
+        elevation: 0,
+        bgColor: Colors.amber,
         text: "OK",
         onPressed: () {
           Get.back();
