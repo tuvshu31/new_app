@@ -4,10 +4,7 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_bodies.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:add_to_cart_animation/add_to_cart_animation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -38,8 +35,6 @@ class CartController extends GetxController {
     closedStoreList.value = d["closedStoreList"];
     print(d);
   }
-
-  void getUserInfo() async {}
 
   void saveProduct(product, context) async {
     CustomDialogs().showLoadingDialog();

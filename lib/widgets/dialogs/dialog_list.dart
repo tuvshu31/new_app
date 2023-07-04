@@ -140,6 +140,14 @@ class CustomDialogs {
       showSameStoreProductsDialogBody(),
     );
   }
+
+  void showNotAvailableProductsDialog(
+      List availableZeroProducts, dynamic onPressed) {
+    customDialog(
+      DialogType.error,
+      showNotAvailableProductsDialogBody(availableZeroProducts, onPressed),
+    );
+  }
 }
 
 void changeLeftOverCount(

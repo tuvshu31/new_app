@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -26,37 +29,88 @@ class UserCartScreen extends StatefulWidget {
 class _UserCartScreenState extends State<UserCartScreen> {
   int userId = RestApiHelper.getUserId();
   dynamic closedStoreList = [];
-  bool productsAreOk = true;
+  bool productsAreOk = false;
+  List availableZeroProducts = [];
+  List notSufficientProducts = [];
   final _cartCtrl = Get.put(CartController());
 
   void getUserProducts() async {
+    // dynamic response =
+    //     await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
+    // dynamic d = Map<String, dynamic>.from(response);
+    // if (d["success"]) {
+    //   setState(() {
+    //     closedStoreList = d["closedStoreList"];
+    //   });
+    //   if (closedStoreList.isNotEmpty) {
+    //     for (var element in _cartCtrl.cartList) {
+    //       closedStoreList.any((e) => e == int.parse(element["store"]))
+    //           ? element["storeClosed"] = true
+    //           : element["storeClosed"] = false;
+    //     }
+    //   }
+    // }
+  }
+
+  //Сагсанд тэг үлдэгдэлтэй, эсвэл үлдэгдэл хүрэлцэхгүй бараанууд байгаа эсэхийг шалгаж байна
+  Future<void> checkProductsAvailabilityAndNavigate() async {
     CustomDialogs().showLoadingDialog();
-    dynamic response =
-        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      setState(() {
-        closedStoreList = d["closedStoreList"];
-      });
-      if (closedStoreList.isNotEmpty) {
-        for (var element in _cartCtrl.cartList) {
-          closedStoreList.any((e) => e == int.parse(element["store"]))
-              ? element["storeClosed"] = true
-              : element["storeClosed"] = false;
-        }
-      }
-      // productsAreOk = !_cartCtrl.cartList.any((element) =>
-      //     element["storeOpen"] == false || element["visibility"] == false);
-      // if (productsAreOk) {
-      //   Get.to(() => const Order());
-      // } else {
-      //   errorSnackBar("Худалдан авах боломжгүй бараанууд байна", 4, context);
-      // }
+    List productIdList = [];
+    for (var element in _cartCtrl.cartList) {
+      productIdList.add(element["id"]);
     }
-    var query = {"id": []};
+    var query = {"id": productIdList};
     dynamic products = await RestApi().getProducts(query);
-    dynamic productResponse = Map<String, dynamic>.from(products);
-    Get.back();
+    dynamic response = Map<String, dynamic>.from(products);
+    if (response["success"]) {
+      List data = response["data"];
+      availableZeroProducts = data.where((element) {
+        if (element["available"] != null) {
+          return int.parse(element["available"]) <= 0;
+        } else {
+          return false;
+        }
+      }).toList();
+      if (availableZeroProducts.isEmpty) {
+        Get.back();
+        Get.to(() => const UserCartAddressInfoScreen());
+      } else {
+        Get.back();
+        void removeFromCart() {
+          availableZeroProducts.forEach(((element) {
+            var product =
+                _cartCtrl.cartList.firstWhere((a) => a["id"] == element["id"]);
+            _cartCtrl.removeProduct(product, context);
+          }));
+          Get.back();
+          customSnackbar(DialogType.success, "Сагснаас хасагдлаа", 3);
+        }
+
+        CustomDialogs().showNotAvailableProductsDialog(
+          availableZeroProducts,
+          removeFromCart,
+        );
+      }
+      // notSufficientProducts = data.where((element) {
+      //   var product =
+      //       _cartCtrl.cartList.firstWhere((i) => i["id"] == element["id"]);
+      //   if (element["available"] != null) {
+      //     return int.parse(element["available"]) < product["quantity"];
+      //   } else {
+      //     return false;
+      //   }
+      // }).toList();
+    }
+
+    setState(() {});
+  }
+
+  bool _canIncreaseCount(int count, int available) {
+    if (available >= count) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override
@@ -243,21 +297,23 @@ class _UserCartScreenState extends State<UserCartScreen> {
                                         child: IconButton(
                                             splashColor: Colors.transparent,
                                             onPressed: () {
-                                              data["quantity"] ==
-                                                      int.parse(
-                                                          data["available"])
-                                                  ? null
-                                                  : _cartCtrl.increaseQuantity(
-                                                      data, context);
+                                              if (_canIncreaseCount(
+                                                  data["quantity"],
+                                                  int.parse(
+                                                      data["available"]))) {
+                                                _cartCtrl.increaseQuantity(
+                                                    data, context);
+                                              }
                                             },
                                             icon: Icon(
                                               Icons.add,
                                               size: 16,
-                                              color: data["quantity"] ==
+                                              color: _canIncreaseCount(
+                                                      data["quantity"],
                                                       int.parse(
-                                                          data["available"])
-                                                  ? MyColors.gray
-                                                  : MyColors.black,
+                                                          data["available"]))
+                                                  ? MyColors.black
+                                                  : MyColors.gray,
                                             )),
                                       ),
                                       CustomText(
@@ -325,10 +381,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
           ),
           Expanded(
             child: CustomButton(
-              onPressed: () {
-                // getUserProducts();
-                Get.to(() => const UserCartAddressInfoScreen());
-              },
+              onPressed: checkProductsAvailabilityAndNavigate,
               isFullWidth: false,
               text: "Төлбөр төлөх",
               textColor: MyColors.white,
