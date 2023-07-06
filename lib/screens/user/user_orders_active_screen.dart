@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
@@ -252,10 +253,18 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
           physics: const NeverScrollableScrollPhysics(),
           controller: _userCtx.activeOrderPageController.value,
           children: [
-            const Image(
-                image: AssetImage("assets/images/png/app/Banner2.webp")),
-            const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
-            const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+            CustomImage(
+                width: Get.width,
+                height: Get.width * .6,
+                url: "${URL.AWS}/banner/1.webp"),
+            CustomImage(
+                width: Get.width,
+                height: Get.width * .6,
+                url: "${URL.AWS}/banner/2.webp"),
+            CustomImage(
+                width: Get.width,
+                height: Get.width * .6,
+                url: "${URL.AWS}/banner/3.webp"),
             GoogleMap(
               scrollGesturesEnabled: false,
               zoomControlsEnabled: false,

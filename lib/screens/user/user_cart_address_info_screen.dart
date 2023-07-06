@@ -228,7 +228,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                               address.clear();
                               isAddressOk = false;
                               isApartment = selectedLocation["isApartment"];
-                              selectedLocation["deliveryPrice"];
+                              _cartCtx.deliveryPrice.value =
+                                  selectedLocation["deliveryPrice"];
                               isLocationOk = true;
                               setState(() {});
                             }),
