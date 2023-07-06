@@ -68,13 +68,11 @@ Widget driverDrawer(context) {
           _listTile(IconlyLight.wallet, "Төлбөр", () {
             Get.toNamed(driverPaymentsScreenRoute);
           }),
-          _listTile(IconlyLight.logout, "Аппаас гарах", () {}
-              // () => logOutModal(() async {
-              //   // var body = {"isOpen": 0};
-              //   // await RestApi().updateUser(RestApiHelper.getUserId(), body);
-              //   // _loginCtx.logout();
-              // }),
-              ),
+          _listTile(IconlyLight.logout, "Аппаас гарах", () {
+            CustomDialogs().showLogoutDialog(() {
+              _loginCtx.logout();
+            });
+          }),
           const SizedBox(height: 18),
         ],
       ),

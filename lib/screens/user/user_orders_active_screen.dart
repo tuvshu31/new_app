@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -26,9 +28,12 @@ class UserOrderActiveScreen extends StatefulWidget {
 }
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
-  final _userCtx = Get.put(UserController());
-  int activerOrderId = 0;
+  int _activerOrderId = 0;
+  Map _orderInfo = {};
+  bool _fetchingOrderInfo = false;
   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
+
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
@@ -39,13 +44,35 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   }
 
   Future<void> getActiveOrderIdAndOrderInfo() async {
-    dynamic response = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      activerOrderId = d["data"]["activeOrder"];
-      setState(() {});
+    _fetchingOrderInfo = true;
+    dynamic user = await RestApi().getUser(RestApiHelper.getUserId());
+    dynamic userResponse = Map<String, dynamic>.from(user);
+    if (userResponse["success"]) {
+      _activerOrderId = userResponse["data"]["activeOrder"];
     }
-    _userCtx.getCurrentOrderInfo(activerOrderId);
+    var body = {"id": _activerOrderId};
+    dynamic order = await RestApi().getOrders(body);
+    dynamic orderResponse = Map<String, dynamic>.from(order);
+    if (orderResponse["success"]) {
+      _orderInfo = orderResponse["data"][0];
+    }
+    String action = _orderInfo["orderStatus"];
+    if (action == "sent") {
+    } else if (action == "received") {
+      _userCtx.activeStep.value = 0;
+      _userCtx.userActiveOrderChangeView();
+    } else if (action == "preparing") {
+      _userCtx.prepDuration.value = int.parse(_orderInfo["prepDuration"]);
+      _userCtx.activeStep.value = 2;
+      _userCtx.userActiveOrderChangeView();
+    } else if (action == "delivering") {
+      _userCtx.activeStep.value = 3;
+      _userCtx.userActiveOrderChangeView();
+    } else if (action == "delivered") {
+      _userCtx.userActiveOrderChangeView();
+    } else {}
+    _fetchingOrderInfo = false;
+    setState(() {});
   }
 
   String getFormattedTime() {
@@ -56,25 +83,12 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
     return "$hour:$minute:$second";
   }
 
-  _percent() {
-    switch (_userCtx.activeStep.value) {
-      case 0:
-        return .01;
-      case 1:
-        return .25;
-      case 2:
-        return .5;
-      case 3:
-        return 1.0;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
       child: Obx(
-        () => _userCtx.userOrderList.isEmpty
+        () => _fetchingOrderInfo
             ? _loadingLogo()
             : CustomHeader(
                 withTabBar: true,
@@ -109,7 +123,15 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
             alignment: MainAxisAlignment.center,
             barRadius: const Radius.circular(12),
             lineHeight: 8.0,
-            percent: _percent(),
+            percent: _userCtx.activeStep.value == 0
+                ? .01
+                : _userCtx.activeStep.value == 1
+                    ? .25
+                    : _userCtx.activeStep.value == 2
+                        ? .5
+                        : _userCtx.activeStep.value == 3
+                            ? 1.0
+                            : 0,
             progressColor: MyColors.primary,
             curve: Curves.bounceIn,
           ),
@@ -160,7 +182,9 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
               color: MyColors.fadedGrey,
             ),
             CustomInkWell(
-              onTap: () => userActiveOrderDetailView(context),
+              onTap: () {
+                userActiveOrderDetailView(_orderInfo);
+              },
               borderRadius: BorderRadius.zero,
               child: SizedBox(
                 height: Get.height * .09,
@@ -172,38 +196,38 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
                       children: [
                         CustomText(
                             text:
-                                "Захиалгаа авах код: ${_userCtx.userOrderList[0]["userAndDriverCode"]}"),
+                                "Захиалгаа авах код: ${_orderInfo["userAndDriverCode"] ?? 0000}"),
                         const SizedBox(height: 4),
                         CustomText(
-                          text: _userCtx.userOrderList[0]["orderTime"],
+                          text: _orderInfo["orderTime"] ??
+                              DateTime.now().toString(),
                           color: MyColors.gray,
                           fontSize: 10,
                         )
                       ],
                     ),
-                    trailing: _userCtx.activeStep.value == 2 &&
-                            !_userCtx.loading.value
-                        ? CircularCountDownTimer(
-                            width: 50,
-                            height: 50,
-                            isReverse: true,
-                            duration: int.parse(
-                                    _userCtx.userOrderList[0]["prepDuration"]) *
-                                60,
-                            timeFormatterFunction:
-                                (defaultFormatterFunction, duration) {
-                              if (duration.inSeconds == 0) {
-                                return "0";
-                              } else {
-                                return Function.apply(
-                                    defaultFormatterFunction, [duration]);
-                              }
-                            },
-                            fillColor: MyColors.primary,
-                            ringColor: MyColors.black,
-                            strokeCap: StrokeCap.round,
-                            textStyle: const TextStyle(
-                              fontSize: 8.0,
+                    trailing: _userCtx.activeStep.value == 2
+                        ? Obx(
+                            () => CircularCountDownTimer(
+                              width: 50,
+                              height: 50,
+                              isReverse: true,
+                              duration: _userCtx.prepDuration.value * 60,
+                              timeFormatterFunction:
+                                  (defaultFormatterFunction, duration) {
+                                if (duration.inSeconds == 0) {
+                                  return "0";
+                                } else {
+                                  return Function.apply(
+                                      defaultFormatterFunction, [duration]);
+                                }
+                              },
+                              fillColor: MyColors.primary,
+                              ringColor: MyColors.black,
+                              strokeCap: StrokeCap.round,
+                              textStyle: const TextStyle(
+                                fontSize: 8.0,
+                              ),
                             ),
                           )
                         : const Icon(IconlyLight.arrow_right_2),
@@ -288,12 +312,10 @@ class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   }
 }
 
-void userActiveOrderDetailView(context) {
-  final userCtx = Get.put(UserController());
-  var productInfo = userCtx.userOrderList[0];
+void userActiveOrderDetailView(Map orderInfo) {
   showModalBottomSheet(
     backgroundColor: MyColors.white,
-    context: context,
+    context: Get.context!,
     isScrollControlled: true,
     builder: (context) {
       return FractionallySizedBox(
@@ -310,7 +332,7 @@ void userActiveOrderDetailView(context) {
                   color: MyColors.gray,
                 ),
                 CustomText(
-                  text: productInfo["orderId"].toString(),
+                  text: orderInfo["orderId"].toString(),
                   fontSize: 16,
                   color: MyColors.black,
                 ),
@@ -324,9 +346,9 @@ void userActiveOrderDetailView(context) {
                     );
                   },
                   shrinkWrap: true,
-                  itemCount: productInfo["products"].length,
+                  itemCount: orderInfo["products"].length,
                   itemBuilder: (context, index) {
-                    var product = productInfo["products"][index];
+                    var product = orderInfo["products"][index];
                     return Container(
                         height: Get.height * .09,
                         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -370,7 +392,7 @@ void userActiveOrderDetailView(context) {
                       leading: const CustomText(text: "Нийт үнэ:"),
                       trailing: CustomText(
                         text: convertToCurrencyFormat(
-                          int.parse(productInfo["totalAmount"]),
+                          int.parse(orderInfo["totalAmount"]),
                           toInt: true,
                           locatedAtTheEnd: true,
                         ),

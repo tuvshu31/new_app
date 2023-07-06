@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -11,9 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -110,18 +106,19 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     var orderId = int.parse(("$storeId" "$randomNumber"));
     var qpayBody = {
       "sender_invoice_no": orderId.toString(),
-      // "amount": _cartCtx.total,
-      "amount": 50,
+      "amount": _cartCtx.total,
+      // "amount": 50,
     };
     dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
     if (qpayResponse != null) {
       dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
+      var storeId = _cartCtx.cartList[0]["store"];
       if (qpayData["success"]) {
         var orderBody = {
           "orderId": orderId,
           "userAndDriverCode": userAndDriverCode,
           "userId": RestApiHelper.getUserId(),
-          "storeId1": _cartCtx.stores.isNotEmpty ? _cartCtx.stores[0] : null,
+          "storeId1": storeId,
           "address": "${selectedLocation["locationName"]} - ${address.text}",
           "orderStatus": "notPaid",
           "totalAmount": _cartCtx.total,
@@ -231,8 +228,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                               address.clear();
                               isAddressOk = false;
                               isApartment = selectedLocation["isApartment"];
-                              _cartCtx.deliveryPrice.value =
-                                  selectedLocation["deliveryPrice"];
+                              selectedLocation["deliveryPrice"];
                               isLocationOk = true;
                               setState(() {});
                             }),

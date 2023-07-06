@@ -75,9 +75,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
                           }),
                           _listTile(IconlyLight.info_circle, "Тусламж", () {}),
                           _listTile(IconlyLight.login, "Аппаас гарах", () {
-                            // logOutModal(context, () {
-                            //   _loginCtx.logout();
-                            // });
+                            CustomDialogs().showLogoutDialog(() {
+                              _loginCtx.logout();
+                            });
                           })
                         ],
                       ),
@@ -172,6 +172,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
             isOpen ? "Хаах" : "Нээх",
             () {
               Get.back();
+              if (value == true) {
+                _loginCtx.getFirebaseMessagingToken(context);
+              }
               _storeCtx.storeInfo["isOpen"] = value;
               var body = {"isOpen": value};
               _storeCtx.updateStoreInfo(

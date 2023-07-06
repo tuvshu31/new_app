@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/controller/cart_controller.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +14,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 final _cartCtx = Get.put(CartController());
+final _navCtx = Get.put(NavigationController());
 
 class UserController extends GetxController {
   Rx<bool> isAppBackground = false.obs;
@@ -20,6 +22,7 @@ class UserController extends GetxController {
   Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
+  RxInt prepDuration = 1.obs;
   RxBool loading = false.obs;
   RxDouble markerRotation = 0.0.obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
@@ -39,16 +42,17 @@ class UserController extends GetxController {
     loading.value = false;
   }
 
-  void getCurrentOrderInfo(int orderId) async {
-    loading.value = true;
-    var body = {"id": orderId};
-    dynamic response = await RestApi().getOrders(body);
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      userOrderList.value = d["data"];
-    }
-    loading.value = false;
-  }
+  // void getCurrentOrderInfo(int orderId) async {
+  //   loading.value = true;
+  //   var body = {"id": orderId};
+  //   dynamic response = await RestApi().getOrders(body);
+  //   dynamic d = Map<String, dynamic>.from(response);
+  //   if (d["success"]) {
+  //     userOrderList.value = d["data"];
+  //     log("userOrderList: $userOrderList");
+  //   }
+  //   loading.value = false;
+  // }
 
   void filterOrders(String status) {
     filteredOrderList.value =
@@ -140,38 +144,38 @@ class UserController extends GetxController {
     );
   }
 
-  Future<void> saveActiveOrderId(int id) async {
+  Future<void> saveActiveOrderIdAndNavigate(int id, String screen) async {
     var body = {"activeOrder": id};
     dynamic response =
         await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    dynamic d = Map<String, dynamic>.from(response);
-    log(d.toString());
+    if (response != null) {
+      Get.offAllNamed(screen);
+    }
   }
 
   void userActionHandler(action, payload) {
     if (action == "payment_success") {
       var body = {"orderStatus": "sent"};
       updateOrder(payload["id"], body);
-      saveActiveOrderId(payload["id"]);
-      getCurrentOrderInfo(payload["id"]);
+      saveActiveOrderIdAndNavigate(payload["id"], userOrdersActiveScreenRoute);
       _cartCtx.cartList.clear();
-      Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
     } else if (action == "received") {
       activeStep.value = 0;
       userActiveOrderChangeView();
     } else if (action == "preparing") {
       activeStep.value = 2;
-      // getCurrentOrderInfo(RestApiHelper.getOrderId());
       userActiveOrderChangeView();
+      prepDuration.value = int.parse(payload["prepDuration"]);
+      log(prepDuration.value.toString());
     } else if (action == "delivering") {
       activeStep.value = 3;
       userActiveOrderChangeView();
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
       userActiveOrderChangeView();
-      RestApiHelper.saveOrderId(0);
-      Get.off(() => const UserHomeScreen());
+      saveActiveOrderIdAndNavigate(0, userHomeScreenRoute);
+      _navCtx.onItemTapped(0);
     } else {}
   }
 }

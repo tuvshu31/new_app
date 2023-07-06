@@ -52,9 +52,7 @@ void storeOrdersToDelivery(context, data) {
           var body = {
             "orderId": data['orderId'],
             'canceledDrivers': [],
-            "forTest": false
           };
-          log(body.toString());
           dynamic response = await RestApi().assignDriver(body);
           dynamic d = Map<String, dynamic>.from(response);
           Get.back();
