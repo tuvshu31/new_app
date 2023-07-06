@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -53,7 +54,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   void initState() {
     super.initState();
     checkIfStoreClosed();
-
+    _isProductSaved();
     setState(() {
       _data = _incoming["data"];
       _isSaved = _cartCtrl.savedList.contains(_data["id"]);
@@ -66,6 +67,18 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       }
     });
     imgCount();
+  }
+
+  void _isProductSaved() async {
+    dynamic response =
+        await RestApi().getUserProducts(RestApiHelper.getUserId(), {
+      "page": "1",
+    });
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"]) {
+      _isSaved = d["savedProductsIdList"].contains(_data["id"]);
+      setState(() {});
+    }
   }
 
   void checkIfStoreClosed() async {
@@ -164,7 +177,9 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _topButton(
-                            () => Get.back(),
+                            () {
+                              Get.back();
+                            },
                             const Padding(
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
@@ -177,15 +192,22 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                             children: [
                               _topButton(
                                 () {
-                                  Get.back();
+                                  _cartCtrl.saveProduct(_data, context);
+                                  _isSaved = !_isSaved;
+                                  setState(() {});
                                 },
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    IconlyBold.star,
-                                    size: 20,
-                                    color: Colors.amber,
-                                  ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: _isSaved
+                                      ? const Icon(
+                                          IconlyBold.star,
+                                          size: 20,
+                                          color: Colors.amber,
+                                        )
+                                      : const Icon(
+                                          IconlyLight.star,
+                                          size: 20,
+                                        ),
                                 ),
                               ),
                               SizedBox(width: Get.width * .05),
@@ -343,7 +365,16 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                       if (_isStoreOpen) {
                         if (_cartCtrl.cartList.any(
                             (element) => element["store"] != _data["store"])) {
-                          CustomDialogs().showSameStoreProductsDialog();
+                          CustomDialogs().showSameStoreProductsDialog(() {
+                            _cartCtrl.emptyTheTrash();
+                            Get.back();
+                            listClick(widgetKey);
+                            Future.delayed(const Duration(milliseconds: 1600),
+                                () {
+                              _cartCtrl.addProduct(_data, context);
+                              setState(() {});
+                            });
+                          });
                         } else {
                           listClick(widgetKey);
                           Future.delayed(const Duration(milliseconds: 1600),
@@ -354,7 +385,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                         }
                       } else {
                         customSnackbar(
-                            DialogType.error, "Дэлгүүр хаасан байна", 3);
+                            DialogType.error, "Байгууллага хаасан байна", 2);
                       }
                     },
                     text: "Сагсанд нэмэх",

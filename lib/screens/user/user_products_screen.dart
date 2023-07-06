@@ -7,8 +7,6 @@ import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +50,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   bool scrollShowHide = false;
   List products = [];
   List tabItems = [];
+  List closedStoreList = [];
   ScrollController scrollController = ScrollController();
 
   @override
@@ -121,10 +120,11 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     };
 
     query.removeWhere((key, value) => value == 0);
-    log(query.toString());
     dynamic response = await RestApi().getProducts(query);
     dynamic productResponse = Map<String, dynamic>.from(response);
+
     products = products + productResponse["data"];
+    closedStoreList = productResponse["closed"];
     if (productResponse["data"].length <
         productResponse["pagination"]["limit"]) {
       hasMoreProducts = false;
@@ -323,6 +323,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
               ),
             ],
           ),
+          _storeClosedFlag(closedStoreList.contains(int.parse(data["store"]))),
           _storeLogo(int.parse(data["store"]))
         ],
       ),
@@ -355,6 +356,29 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
         ),
       ],
     );
+  }
+
+  Widget _storeClosedFlag(bool isStoreClosed) {
+    return isStoreClosed
+        ? Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "Хаалттай",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          )
+        : Container();
   }
 
   Widget _storeLogo(int storeId) {

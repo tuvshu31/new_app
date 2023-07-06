@@ -134,10 +134,10 @@ class CustomDialogs {
     );
   }
 
-  void showSameStoreProductsDialog() {
+  void showSameStoreProductsDialog(dynamic onPressed) {
     customDialog(
       DialogType.warning,
-      showSameStoreProductsDialogBody(),
+      showSameStoreProductsDialogBody(onPressed),
     );
   }
 

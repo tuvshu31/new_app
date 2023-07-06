@@ -1,3 +1,4 @@
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
@@ -26,19 +27,25 @@ class UserOrderActiveScreen extends StatefulWidget {
 
 class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
   final _userCtx = Get.put(UserController());
+  int activerOrderId = 0;
   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
 
   @override
   void initState() {
     super.initState();
-    // saveUserToken();
-    _userCtx.getCurrentOrderInfo(1412);
-    // _userCtx.userOrderList[0];
+    Future.delayed(Duration.zero, () {
+      getActiveOrderIdAndOrderInfo();
+    });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Future<void> getActiveOrderIdAndOrderInfo() async {
+    dynamic response = await RestApi().getUser(RestApiHelper.getUserId());
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"]) {
+      activerOrderId = d["data"]["activeOrder"];
+      setState(() {});
+    }
+    _userCtx.getCurrentOrderInfo(activerOrderId);
   }
 
   String getFormattedTime() {

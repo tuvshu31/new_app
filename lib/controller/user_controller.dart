@@ -46,7 +46,6 @@ class UserController extends GetxController {
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       userOrderList.value = d["data"];
-      log("userOrderLists: $userOrderList");
     }
     loading.value = false;
   }
@@ -141,12 +140,20 @@ class UserController extends GetxController {
     );
   }
 
+  Future<void> saveActiveOrderId(int id) async {
+    var body = {"activeOrder": id};
+    dynamic response =
+        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+    dynamic d = Map<String, dynamic>.from(response);
+    log(d.toString());
+  }
+
   void userActionHandler(action, payload) {
     if (action == "payment_success") {
-      log("userActionHandler");
       var body = {"orderStatus": "sent"};
       updateOrder(payload["id"], body);
-      RestApiHelper.saveOrderId(payload["id"]);
+      saveActiveOrderId(payload["id"]);
+      getCurrentOrderInfo(payload["id"]);
       _cartCtx.cartList.clear();
       Get.offNamed(userOrdersActiveScreenRoute);
     } else if (action == "sent") {
@@ -155,7 +162,7 @@ class UserController extends GetxController {
       userActiveOrderChangeView();
     } else if (action == "preparing") {
       activeStep.value = 2;
-      getCurrentOrderInfo(RestApiHelper.getOrderId());
+      // getCurrentOrderInfo(RestApiHelper.getOrderId());
       userActiveOrderChangeView();
     } else if (action == "delivering") {
       activeStep.value = 3;

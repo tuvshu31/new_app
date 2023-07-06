@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/controller/login_controller.dart';
@@ -28,21 +30,24 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
     });
   }
 
-  void handleInitialRoute() {
+  Future<void> handleInitialRoute() async {
     if (RestApiHelper.getUserId() != 0) {
+      //Login hiisen hereglegch bn gsn ug
       if (RestApiHelper.getUserRole() == "store") {
         Get.offAllNamed(storeMainScreenRoute);
       } else if (RestApiHelper.getUserRole() == "driver") {
         _loginCtx.navigateToScreen(driverMainScreenRoute, context);
       } else if (RestApiHelper.getUserRole() == "user") {
-        if (RestApiHelper.getOrderId() != 0) {
+        dynamic response = await RestApi().getUser(RestApiHelper.getUserId());
+        dynamic d = Map<String, dynamic>.from(response);
+        if (d["success"] && d["data"]["activeOrder"] != null) {
           Get.offAllNamed(userOrdersActiveScreenRoute);
         } else {
-          // showLocationDisclosureScreen(context);
           _loginCtx.navigateToScreen(userHomeScreenRoute, context);
         }
       }
     } else {
+      //Login hiigeegui hereglegch bn gsn ug
       setState(() {
         stayOnScreen = true;
       });

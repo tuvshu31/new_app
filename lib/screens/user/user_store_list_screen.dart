@@ -58,7 +58,8 @@ class _UserStoreListScreenState extends State<UserStoreListScreen> {
     dynamic d = Map<String, dynamic>.from(response);
     loading = false;
     if (d["success"]) {
-      storeList = d["data"].where((x) => x["name"] != "Тест").toList();
+      // storeList = d["data"].where((x) => x["name"] != "Тест").toList();
+      storeList = d["data"];
     }
 
     setState(() {});

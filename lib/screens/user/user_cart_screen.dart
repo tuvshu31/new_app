@@ -436,7 +436,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
                 ),
                 CustomText(
                   text: convertToCurrencyFormat(
-                    _cartCtrl.deliveryCost,
+                    _cartCtrl.deliveryPrice.value,
                     toInt: true,
                     locatedAtTheEnd: true,
                   ),

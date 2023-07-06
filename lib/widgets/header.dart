@@ -1,9 +1,9 @@
+import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
@@ -65,12 +65,8 @@ class CustomHeader extends StatefulWidget {
 
 class _CustomHeaderState extends State<CustomHeader>
     with SingleTickerProviderStateMixin {
-  final _navCtrl = Get.put(NavigationController());
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  final _navCtx = Get.put(NavigationController());
+  final _cartCtx = Get.put(CartController());
 
   @override
   Widget build(BuildContext context) {
@@ -84,16 +80,13 @@ class _CustomHeaderState extends State<CustomHeader>
             backgroundColor: MyColors.white,
             appBar: AppBar(
               leadingWidth: widget.leadingWidth.toDouble(),
-              leading:
-                  _leading(widget.customLeading, widget.isMainPage, _navCtrl),
+              leading: _leading(widget.customLeading, widget.isMainPage),
               backgroundColor: MyColors.white,
               elevation: widget.appBarElevation.toDouble(),
               centerTitle: widget.centerTitle,
               titleSpacing: 0,
               title: _title(widget.customTitle, widget.title, widget.subtitle),
-              actions: [
-                _actions(widget.customActions, widget.actionIcon, _navCtrl)
-              ],
+              actions: [_actions(widget.customActions, widget.actionIcon)],
               bottom: widget.tabBar,
             ),
             bottomSheet: widget.bottomSheet,
@@ -104,57 +97,80 @@ class _CustomHeaderState extends State<CustomHeader>
     );
   }
 
-  Widget _actions(dynamic customActions, IconData icon, dynamic controller) {
+  Widget _actions(dynamic customActions, IconData icon) {
     return SizedBox(
       width: 56,
       child: Center(
-        child: customActions ??
-            CustomInkWell(
-              onTap: () {
-                controller.onItemTapped(2);
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Icon(
-                icon,
-                size: 20,
-                color: MyColors.black,
-              ),
-            ),
-      ),
+          child: customActions ??
+              Stack(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                      _navCtx.onItemTapped(2);
+                    },
+                    icon: Icon(
+                      icon,
+                      size: 20,
+                      color: MyColors.black,
+                    ),
+                  ),
+                  Obx(
+                    () => Positioned(
+                      top: 6,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.red,
+                        ),
+                        child: Text(
+                          _cartCtx.cartItemCount.value.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )),
     );
   }
-}
 
-Widget _leading(dynamic customLeading, bool mainPage, dynamic controller) {
-  return customLeading ??
-      CustomInkWell(
-        onTap: () {
-          mainPage ? controller.onItemTapped(0) : Get.back();
-        },
-        child: const SizedBox(
-          height: double.infinity,
-          width: double.infinity,
-          child: Icon(
-            // FontAwesomeIcons.longArrowAltLeft,
-            IconlyLight.arrow_left,
-            color: MyColors.black,
-            size: 20,
+  Widget _leading(dynamic customLeading, bool mainPage) {
+    return customLeading ??
+        CustomInkWell(
+          onTap: () {
+            mainPage ? _navCtx.onItemTapped(0) : Get.back();
+          },
+          child: const SizedBox(
+            height: double.infinity,
+            width: double.infinity,
+            child: Icon(
+              // FontAwesomeIcons.longArrowAltLeft,
+              IconlyLight.arrow_left,
+              color: MyColors.black,
+              size: 20,
+            ),
           ),
-        ),
-      );
-}
+        );
+  }
 
-Widget _title(dynamic customTitle, String title, dynamic subtitle) {
-  return customTitle ??
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomText(
-            text: title,
-            fontSize: 16,
-            color: MyColors.black,
-          ),
-          subtitle ?? Container()
-        ],
-      );
+  Widget _title(dynamic customTitle, String title, dynamic subtitle) {
+    return customTitle ??
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              text: title,
+              fontSize: 16,
+              color: MyColors.black,
+            ),
+            subtitle ?? Container()
+          ],
+        );
+  }
 }

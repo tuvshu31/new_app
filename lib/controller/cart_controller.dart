@@ -15,6 +15,7 @@ class CartController extends GetxController {
   var savedList = [].obs;
   var closedStoreList = [].obs;
   RxInt cartItemCount = 0.obs;
+  RxInt deliveryPrice = 3000.obs;
 
   void addProduct(product, context) {
     cartItemCount++;
@@ -33,7 +34,6 @@ class CartController extends GetxController {
     dynamic d = Map<String, dynamic>.from(response);
     savedList.value = d["savedProductsIdList"];
     closedStoreList.value = d["closedStoreList"];
-    print(d);
   }
 
   void saveProduct(product, context) async {
@@ -62,6 +62,11 @@ class CartController extends GetxController {
         customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
       }
     }
+  }
+
+  void emptyTheTrash() {
+    cartList.clear();
+    cartItemCount.value = 0;
   }
 
   void removeProduct(product, context) {
@@ -98,7 +103,7 @@ class CartController extends GetxController {
     return formattedDate;
   }
 
-  get deliveryCost => 3000;
+  get deliveryCost => deliveryPrice.value;
   get stores => storeList;
   get saved => savedList;
   get products => cartList;

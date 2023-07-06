@@ -112,7 +112,7 @@ Widget showNetworkErrorDialogBody(dynamic onPressed) {
   );
 }
 
-Widget showSameStoreProductsDialogBody() {
+Widget showSameStoreProductsDialogBody(dynamic onPressed) {
   return Column(
     children: [
       const Text(
@@ -120,14 +120,27 @@ Widget showSameStoreProductsDialogBody() {
         textAlign: TextAlign.center,
       ),
       SizedBox(height: Get.height * .04),
-      CustomButton(
-        isFullWidth: false,
-        elevation: 0,
-        bgColor: Colors.amber,
-        text: "OK",
-        onPressed: () {
-          Get.back();
-        },
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomButton(
+            isFullWidth: false,
+            onPressed: Get.back,
+            bgColor: Colors.white,
+            text: "Хаах",
+            elevation: 0,
+            textColor: Colors.black,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: CustomButton(
+              elevation: 0,
+              bgColor: Colors.amber,
+              text: "Сагс хоослох",
+              onPressed: onPressed,
+            ),
+          ),
+        ],
       ),
     ],
   );

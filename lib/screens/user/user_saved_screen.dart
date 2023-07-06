@@ -133,9 +133,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText(
-                                    text: storeClosed
-                                        ? "Store closed"
-                                        : saved[index]["name"],
+                                    text: saved[index]["storeName"],
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   CustomText(
@@ -187,7 +185,17 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                                         saved[index]
                                                             ["store"])) {
                                                   CustomDialogs()
-                                                      .showSameStoreProductsDialog();
+                                                      .showSameStoreProductsDialog(
+                                                          () {
+                                                    Get.back();
+                                                    _cartCtrl.emptyTheTrash();
+                                                    _cartCtrl.addProduct(
+                                                        saved[index], context);
+                                                    customSnackbar(
+                                                        DialogType.success,
+                                                        "Сагсанд нэмэгдлээ",
+                                                        2);
+                                                  });
                                                 } else {
                                                   _cartCtrl.addProduct(
                                                       saved[index], context);
@@ -275,7 +283,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                   color: MyColors.black.withOpacity(0.5)),
               child: Center(
                   child: CustomText(
-                text: "Дэлгүүр \ хаасан",
+                text: "Хаалттай",
                 textAlign: TextAlign.center,
                 color: MyColors.white,
                 fontSize: 14,

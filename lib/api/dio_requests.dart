@@ -223,4 +223,9 @@ class RestApi {
     return DioClient()
         .sendRequest('payment/createInvoice', Method.post, body, {});
   }
+
+  //Байршлуудын мэдээлэл авах
+  Future getLocations() async {
+    return DioClient().sendRequest('locations', Method.get, [], {});
+  }
 }
