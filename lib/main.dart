@@ -172,7 +172,6 @@ class _MyAppState extends State<MyApp> {
             const UserCartAddressInfoScreen(),
         userOrderPaymentScreenRoute: (context) =>
             const UserOrderPaymentScreen(),
-        userOrdersActiveScreenRoute: (context) => const UserOrderActiveScreen(),
         userProductDetailScreenRoute: (context) =>
             const UserProductDetailScreen(),
         userProfileAddressEditScreenRoute: (context) =>

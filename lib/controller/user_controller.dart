@@ -2,9 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/user_home_screen.dart';
-import 'package:Erdenet24/utils/routes.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,18 +38,6 @@ class UserController extends GetxController {
     }
     loading.value = false;
   }
-
-  // void getCurrentOrderInfo(int orderId) async {
-  //   loading.value = true;
-  //   var body = {"id": orderId};
-  //   dynamic response = await RestApi().getOrders(body);
-  //   dynamic d = Map<String, dynamic>.from(response);
-  //   if (d["success"]) {
-  //     userOrderList.value = d["data"];
-  //     log("userOrderList: $userOrderList");
-  //   }
-  //   loading.value = false;
-  // }
 
   void filterOrders(String status) {
     filteredOrderList.value =
@@ -103,6 +88,18 @@ class UserController extends GetxController {
     markers[markerId] = marker;
   }
 
+  String statusText(int step) {
+    return step == 1
+        ? "Хүлээн авсан"
+        : step == 2
+            ? "Бэлдэж байна"
+            : step == 3
+                ? "Хүргэж байна"
+                : step == 4
+                    ? "Хүргэсэн"
+                    : "";
+  }
+
   void onCameraMove(CameraPosition cameraPosition) {
     if (markers.isNotEmpty) {
       MarkerId markerId = const MarkerId("driver");
@@ -144,20 +141,11 @@ class UserController extends GetxController {
     );
   }
 
-  Future<void> saveActiveOrderIdAndNavigate(int id, String screen) async {
-    var body = {"activeOrder": id};
-    dynamic response =
-        await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    if (response != null) {
-      Get.offAllNamed(screen);
-    }
-  }
-
   void userActionHandler(action, payload) {
     if (action == "payment_success") {
       var body = {"orderStatus": "sent"};
       updateOrder(payload["id"], body);
-      saveActiveOrderIdAndNavigate(payload["id"], userOrdersActiveScreenRoute);
+      // saveActiveOrderIdAndNavigate(payload["id"], userOrdersActiveScreenRoute);
       _cartCtx.cartList.clear();
     } else if (action == "sent") {
     } else if (action == "received") {
@@ -174,7 +162,6 @@ class UserController extends GetxController {
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
       userActiveOrderChangeView();
-      saveActiveOrderIdAndNavigate(0, userHomeScreenRoute);
       _navCtx.onItemTapped(0);
     } else {}
   }

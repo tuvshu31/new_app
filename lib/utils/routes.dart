@@ -12,7 +12,6 @@ const String userHomeScreenRoute = '/userHomeScreen';
 const String userNavigationDrawerScreenRoute =
     '/userNavigationDrawerScreenRoute';
 const String userOrderPaymentScreenRoute = '/userOrderPaymentScreenRoute';
-const String userOrdersActiveScreenRoute = '/userOrdersActiveScreenRoute';
 const String userProductDetailScreenRoute = '/userProductDetailScreenRoute';
 const String userProfileAddressEditScreenRoute =
     '/userProfileAddressEditScreenRoute';

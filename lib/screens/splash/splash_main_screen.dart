@@ -38,13 +38,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
       } else if (RestApiHelper.getUserRole() == "driver") {
         _loginCtx.navigateToScreen(driverMainScreenRoute, context);
       } else if (RestApiHelper.getUserRole() == "user") {
-        dynamic response = await RestApi().getUser(RestApiHelper.getUserId());
-        dynamic d = Map<String, dynamic>.from(response);
-        if (d["success"] && d["data"]["activeOrder"] != 0) {
-          Get.offAllNamed(userOrdersActiveScreenRoute);
-        } else {
-          _loginCtx.navigateToScreen(userHomeScreenRoute, context);
-        }
+        _loginCtx.navigateToScreen(userHomeScreenRoute, context);
       }
     } else {
       //Login hiigeegui hereglegch bn gsn ug

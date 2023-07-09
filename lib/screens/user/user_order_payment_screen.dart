@@ -19,7 +19,6 @@ class UserOrderPaymentScreen extends StatefulWidget {
 
 class _UserOrderPaymentScreenState extends State<UserOrderPaymentScreen> {
   final _incoming = Get.arguments;
-  final _userCtx = Get.put(UserController());
   PageController pageController = PageController(initialPage: 0);
 
   List bankList = [];
