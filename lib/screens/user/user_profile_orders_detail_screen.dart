@@ -1,21 +1,23 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconly/iconly.dart';
-import 'package:intl/intl.dart';
 
 class UserProfileOrdersDetailScreen extends StatefulWidget {
-  final dynamic data;
+  final int index;
   const UserProfileOrdersDetailScreen({
     super.key,
-    this.data,
+    this.index = 0,
   });
 
   @override
@@ -25,68 +27,67 @@ class UserProfileOrdersDetailScreen extends StatefulWidget {
 
 class _UserProfileOrdersDetailScreenState
     extends State<UserProfileOrdersDetailScreen> {
-  int currentStep = 1;
-
-  DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
   final _userCtx = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
-    return CustomHeader(
-      centerTitle: true,
-      customLeading: Container(),
-      customActions: IconButton(
-        onPressed: () {
-          Get.back();
-        },
-        icon: const Icon(
-          Icons.close_rounded,
-          color: Colors.black,
+    return Obx(
+      () => CustomHeader(
+        centerTitle: true,
+        customLeading: Container(),
+        customActions: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(
+            Icons.close_rounded,
+            color: Colors.black,
+          ),
         ),
-      ),
-      title: "Захиалга",
-      subtitle: Text(
-        "#${widget.data["orderId"] ?? "00000"}",
-        style: const TextStyle(
-          color: MyColors.gray,
-          fontSize: 12,
+        title: "Захиалга",
+        subtitle: Text(
+          "#${_userCtx.userOrderList[widget.index]["orderId"] ?? "00000"}",
+          style: const TextStyle(
+            color: MyColors.gray,
+            fontSize: 12,
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 12),
-            _stepper(currentStep),
-            const SizedBox(height: 12),
-            _divider(),
-            const SizedBox(height: 12),
-            _statusInfo(),
-            const SizedBox(height: 12),
-            _divider(),
-            const SizedBox(height: 12),
-            _addressInfo(),
-            const SizedBox(height: 12),
-            _divider(),
-            _productsInfoAndMap(),
-          ],
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 12),
+              _stepper(),
+              const SizedBox(height: 12),
+              _divider(),
+              const SizedBox(height: 12),
+              _statusInfo(),
+              const SizedBox(height: 12),
+              _divider(),
+              const SizedBox(height: 12),
+              _addressInfo(),
+              const SizedBox(height: 12),
+              _divider(),
+              _productsInfoAndMap(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  IconData statusIcon(int step) {
-    return step == 1
-        ? IconlyLight.bookmark
-        : step == 2
-            ? IconlyLight.time_circle
-            : step == 3
-                ? Icons.delivery_dining
-                : step == 4
-                    ? IconlyLight.shield_done
-                    : IconlyLight.bookmark;
-  }
+  // IconData statusIcon(int step) {
+  //   return step == 1
+  //       ? IconlyLight.bookmark
+  //       : step == 2
+  //           ? IconlyLight.time_circle
+  //           : step == 3
+  //               ? Icons.local_taxi_rounded
+  //               : step == 4
+  //                   ? Icons.done_all_rounded
+  //                   : IconlyLight.bookmark;
+  // }
 
   Widget _statusInfo() {
     return Container(
@@ -97,29 +98,55 @@ class _UserProfileOrdersDetailScreenState
           Row(
             children: [
               Icon(
-                statusIcon(currentStep),
+                statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])[
+                    "icon"],
                 color: MyColors.primary,
               ),
               const SizedBox(width: 12),
               CustomText(
                 text:
-                    "Захиалгыг ${_userCtx.statusText(currentStep).toLowerCase()}",
+                    "Захиалгыг ${statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])["text"].toLowerCase()}",
                 fontSize: 12,
                 color: MyColors.primary,
               ),
             ],
           ),
-          CustomText(
-            text: dateFormat.format(DateTime.now()),
-            color: MyColors.gray,
-            fontSize: 10,
-          )
+          statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])[
+                      "step"] ==
+                  2
+              ? CircularCountDownTimer(
+                  isReverse: true,
+                  width: 40,
+                  height: 40,
+                  duration: 3600,
+                  timeFormatterFunction: (defaultFormatterFunction, duration) {
+                    if (duration.inSeconds == 0) {
+                      return "0";
+                    } else {
+                      return Function.apply(
+                          defaultFormatterFunction, [duration]);
+                    }
+                  },
+                  fillColor: MyColors.primary,
+                  ringColor: MyColors.black,
+                  strokeCap: StrokeCap.round,
+                  textStyle: const TextStyle(
+                    fontSize: 10.0,
+                  ),
+                )
+              : CustomText(
+                  text: _userCtx.userOrderList[widget.index]["updatedAt"] ?? "",
+                  color: MyColors.gray,
+                  fontSize: 10,
+                )
         ],
       ),
     );
   }
 
-  Widget _stepper(int step) {
+  Widget _stepper() {
+    int step =
+        statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])["step"];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -198,7 +225,9 @@ class _UserProfileOrdersDetailScreenState
   }
 
   Widget _productsInfoAndMap() {
-    return currentStep == 3
+    return statusInfo(
+                _userCtx.userOrderList[widget.index]["orderStatus"])["step"] ==
+            3
         ? SizedBox(
             height: Get.height * .6,
             child: GoogleMap(
@@ -230,10 +259,12 @@ class _UserProfileOrdersDetailScreenState
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: widget.data["products"].length,
+                  itemCount:
+                      _userCtx.userOrderList[widget.index]["products"].length,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemBuilder: (context, index) {
-                    var product = widget.data["products"][index];
+                    var product =
+                        _userCtx.userOrderList[widget.index]["products"][index];
                     return Container(
                         height: Get.height * .09,
                         color: MyColors.white,
@@ -275,7 +306,9 @@ class _UserProfileOrdersDetailScreenState
                     ),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        double.parse(widget.data["storeTotalAmount"] ?? "0"),
+                        double.parse(_userCtx.userOrderList[widget.index]
+                                ["storeTotalAmount"] ??
+                            "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -293,7 +326,9 @@ class _UserProfileOrdersDetailScreenState
                     ),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        int.parse(widget.data["deliveryPrice"] ?? "0"),
+                        int.parse(_userCtx.userOrderList[widget.index]
+                                ["deliveryPrice"] ??
+                            "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -321,7 +356,9 @@ class _UserProfileOrdersDetailScreenState
                     const CustomText(text: "Нийт үнэ:"),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        int.parse(widget.data["totalAmount"] ?? "0"),
+                        int.parse(_userCtx.userOrderList[widget.index]
+                                ["totalAmount"] ??
+                            "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -336,6 +373,7 @@ class _UserProfileOrdersDetailScreenState
   }
 
   Widget _addressInfo() {
+    log(_userCtx.userOrderList[widget.index].toString());
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12),
       child: Column(
@@ -351,7 +389,7 @@ class _UserProfileOrdersDetailScreenState
                 color: MyColors.gray,
               ),
               CustomText(
-                text: widget.data["address"] ?? "",
+                text: _userCtx.userOrderList[widget.index]["address"] ?? "",
                 color: MyColors.gray,
                 fontSize: 12,
               ),
@@ -366,7 +404,7 @@ class _UserProfileOrdersDetailScreenState
                 color: MyColors.gray,
               ),
               CustomText(
-                text: widget.data["phone"] ?? "",
+                text: _userCtx.userOrderList[widget.index]["phone"] ?? "",
                 color: MyColors.gray,
                 fontSize: 12,
               ),

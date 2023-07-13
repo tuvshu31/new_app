@@ -205,3 +205,63 @@ List reversedArray(List myList) {
   }
   return myList;
 }
+
+Map statusInfo(String status) {
+  var obj = {};
+  if (status == "notPaid") {
+    obj = {
+      "text": 'Төлбөр төлөөгүй',
+      "step": 1,
+      "icon": Icons.money_off_rounded
+    };
+  } else if (status == "sent") {
+    obj = {
+      "text": 'Төлбөр төлсөн',
+      "step": 1,
+      "icon": Icons.attach_money_rounded,
+    };
+  } else if (status == "received") {
+    obj = {
+      "text": 'Баталгаажсан',
+      "step": 1,
+      "icon": Icons.approval,
+    };
+  } else if (status == "driverAccepted") {
+    obj = {
+      "text": 'Жолооч хүлээн авсан',
+      "step": 1,
+      "icon": Icons.drive_eta_rounded
+    };
+  } else if (status == "preparing") {
+    obj = {
+      "text": 'Бэлдэж байна',
+      "step": 2,
+      "icon": Icons.timelapse,
+    };
+  } else if (status == "delivering") {
+    obj = {
+      "text": 'Хүргэж байна',
+      "step": 3,
+      "icon": Icons.local_taxi,
+    };
+  } else if (status == "delivered") {
+    obj = {
+      "text": 'Хүргэсэн',
+      "step": 4,
+      "icon": Icons.done_all_rounded,
+    };
+  } else if (status == "canceled") {
+    obj = {
+      "text": 'Цуцалсан',
+      "step": 4,
+      "icon": Icons.cancel_outlined,
+    };
+  } else {
+    obj = {
+      "text": 'Error',
+      "step": 4,
+      "icon": Icons.error,
+    };
+  }
+  return obj;
+}

@@ -20,28 +20,39 @@ class UserController extends GetxController {
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
   RxInt prepDuration = 1.obs;
-  RxBool loading = false.obs;
+  RxBool fetchingOrderList = false.obs;
   RxDouble markerRotation = 0.0.obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
-  RxInt activeStep = 0.obs;
 
   void getOrders() async {
-    loading.value = true;
+    fetchingOrderList.value = true;
     var body = {"userId": RestApiHelper.getUserId()};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       userOrderList.value = d["data"];
     }
-    loading.value = false;
+    fetchingOrderList.value = false;
   }
 
-  void filterOrders(String status) {
-    filteredOrderList.value =
-        userOrderList.where((p0) => p0["orderStatus"] == status).toList();
+  void filterOrders(int value) {
+    if (value == 0) {
+      filteredOrderList.value = userOrderList
+          .where((p0) =>
+              p0["orderStatus"] != "delivered" &&
+              p0["orderStatus"] != "canceled")
+          .toList();
+    } else if (value == 1) {
+      filteredOrderList.value = userOrderList
+          .where((p0) => p0["orderStatus"] == "delivered")
+          .toList();
+    } else if (value == 2) {
+      filteredOrderList.value =
+          userOrderList.where((p0) => p0["orderStatus"] == "canceled").toList();
+    }
   }
 
   void fetchDriverPositionSctream(int driverId) {
@@ -88,18 +99,6 @@ class UserController extends GetxController {
     markers[markerId] = marker;
   }
 
-  String statusText(int step) {
-    return step == 1
-        ? "Хүлээн авсан"
-        : step == 2
-            ? "Бэлдэж байна"
-            : step == 3
-                ? "Хүргэж байна"
-                : step == 4
-                    ? "Хүргэсэн"
-                    : "";
-  }
-
   void onCameraMove(CameraPosition cameraPosition) {
     if (markers.isNotEmpty) {
       MarkerId markerId = const MarkerId("driver");
@@ -127,41 +126,29 @@ class UserController extends GetxController {
     });
   }
 
-  void updateOrder(int id, dynamic body) async {
-    dynamic response = await RestApi().updateOrder(id, body);
-    dynamic d = Map<String, dynamic>.from(response);
-    log(d.toString());
-  }
-
-  void userActiveOrderChangeView() {
-    activeOrderPageController.value.animateToPage(
-      activeStep.value,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.bounceInOut,
-    );
+  void changeOrderStatus(int id, String status) async {
+    int index = userOrderList.indexWhere((element) => element["id"] == id);
+    userOrderList[index]["orderStatus"] = status;
+    userOrderList.refresh();
+    update();
+    // dynamic response = await RestApi().updateOrder(id, body);
+    // dynamic d = Map<String, dynamic>.from(response);
   }
 
   void userActionHandler(action, payload) {
     if (action == "payment_success") {
-      var body = {"orderStatus": "sent"};
-      updateOrder(payload["id"], body);
-      // saveActiveOrderIdAndNavigate(payload["id"], userOrdersActiveScreenRoute);
       _cartCtx.cartList.clear();
     } else if (action == "sent") {
+      changeOrderStatus(payload["id"], action);
     } else if (action == "received") {
-      activeStep.value = 0;
-      userActiveOrderChangeView();
+      changeOrderStatus(payload["id"], action);
     } else if (action == "preparing") {
-      activeStep.value = 2;
-      userActiveOrderChangeView();
+      changeOrderStatus(payload["id"], action);
       prepDuration.value = int.parse(payload["prepDuration"]);
       log(prepDuration.value.toString());
     } else if (action == "delivering") {
-      activeStep.value = 3;
-      userActiveOrderChangeView();
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      userActiveOrderChangeView();
       _navCtx.onItemTapped(0);
     } else {}
   }

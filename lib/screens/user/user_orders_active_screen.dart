@@ -1,8 +1,4 @@
-// import 'dart:developer';
-
-// import 'package:Erdenet24/api/dio_requests.dart';
 // import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
-// import 'package:Erdenet24/widgets/image.dart';
 // import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 // import 'package:flutter/material.dart';
 
@@ -29,51 +25,20 @@
 // }
 
 // class _UserOrderActiveScreenState extends State<UserOrderActiveScreen> {
-//   int _activerOrderId = 0;
-//   Map _orderInfo = {};
-//   bool _fetchingOrderInfo = false;
-//   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
-
 //   final _userCtx = Get.put(UserController());
+//   List statusList = ["Баталгаажсан", "Бэлтгэж байна", 'Хүргэж байна'];
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     Future.delayed(Duration.zero, () {
-//       getActiveOrderIdAndOrderInfo();
-//     });
+//     // saveUserToken();
+//     _userCtx.getCurrentOrderInfo(1412);
+//     // _userCtx.userOrderList[0];
 //   }
 
-//   Future<void> getActiveOrderIdAndOrderInfo() async {
-//     _fetchingOrderInfo = true;
-//     dynamic user = await RestApi().getUser(RestApiHelper.getUserId());
-//     dynamic userResponse = Map<String, dynamic>.from(user);
-//     if (userResponse["success"]) {
-//       _activerOrderId = userResponse["data"]["activeOrder"];
-//     }
-//     var body = {"id": _activerOrderId};
-//     dynamic order = await RestApi().getOrders(body);
-//     dynamic orderResponse = Map<String, dynamic>.from(order);
-//     if (orderResponse["success"]) {
-//       _orderInfo = orderResponse["data"][0];
-//     }
-//     String action = _orderInfo["orderStatus"];
-//     if (action == "sent") {
-//     } else if (action == "received") {
-//       _userCtx.activeStep.value = 0;
-//       _userCtx.userActiveOrderChangeView();
-//     } else if (action == "preparing") {
-//       _userCtx.prepDuration.value = int.parse(_orderInfo["prepDuration"]);
-//       _userCtx.activeStep.value = 2;
-//       _userCtx.userActiveOrderChangeView();
-//     } else if (action == "delivering") {
-//       _userCtx.activeStep.value = 3;
-//       _userCtx.userActiveOrderChangeView();
-//     } else if (action == "delivered") {
-//       _userCtx.userActiveOrderChangeView();
-//     } else {}
-//     _fetchingOrderInfo = false;
-//     setState(() {});
+//   @override
+//   void dispose() {
+//     super.dispose();
 //   }
 
 //   String getFormattedTime() {
@@ -84,12 +49,25 @@
 //     return "$hour:$minute:$second";
 //   }
 
+//   _percent() {
+//     switch (_userCtx.activeStep.value) {
+//       case 0:
+//         return .01;
+//       case 1:
+//         return .25;
+//       case 2:
+//         return .5;
+//       case 3:
+//         return 1.0;
+//     }
+//   }
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return WillPopScope(
 //       onWillPop: () async => false,
 //       child: Obx(
-//         () => _fetchingOrderInfo
+//         () => _userCtx.userOrderList.isEmpty
 //             ? _loadingLogo()
 //             : CustomHeader(
 //                 withTabBar: true,
@@ -124,15 +102,7 @@
 //             alignment: MainAxisAlignment.center,
 //             barRadius: const Radius.circular(12),
 //             lineHeight: 8.0,
-//             percent: _userCtx.activeStep.value == 0
-//                 ? .01
-//                 : _userCtx.activeStep.value == 1
-//                     ? .25
-//                     : _userCtx.activeStep.value == 2
-//                         ? .5
-//                         : _userCtx.activeStep.value == 3
-//                             ? 1.0
-//                             : 0,
+//             percent: _percent(),
 //             progressColor: MyColors.primary,
 //             curve: Curves.bounceIn,
 //           ),
@@ -183,9 +153,7 @@
 //               color: MyColors.fadedGrey,
 //             ),
 //             CustomInkWell(
-//               onTap: () {
-//                 userActiveOrderDetailView(_orderInfo);
-//               },
+//               onTap: () => userActiveOrderDetailView(context),
 //               borderRadius: BorderRadius.zero,
 //               child: SizedBox(
 //                 height: Get.height * .09,
@@ -197,38 +165,38 @@
 //                       children: [
 //                         CustomText(
 //                             text:
-//                                 "Захиалгаа авах код: ${_orderInfo["userAndDriverCode"] ?? 0000}"),
+//                                 "Захиалгаа авах код: ${_userCtx.userOrderList[0]["userAndDriverCode"]}"),
 //                         const SizedBox(height: 4),
 //                         CustomText(
-//                           text: _orderInfo["orderTime"] ??
-//                               DateTime.now().toString(),
+//                           text: _userCtx.userOrderList[0]["orderTime"],
 //                           color: MyColors.gray,
 //                           fontSize: 10,
 //                         )
 //                       ],
 //                     ),
-//                     trailing: _userCtx.activeStep.value == 2
-//                         ? Obx(
-//                             () => CircularCountDownTimer(
-//                               width: 50,
-//                               height: 50,
-//                               isReverse: true,
-//                               duration: _userCtx.prepDuration.value * 60,
-//                               timeFormatterFunction:
-//                                   (defaultFormatterFunction, duration) {
-//                                 if (duration.inSeconds == 0) {
-//                                   return "0";
-//                                 } else {
-//                                   return Function.apply(
-//                                       defaultFormatterFunction, [duration]);
-//                                 }
-//                               },
-//                               fillColor: MyColors.primary,
-//                               ringColor: MyColors.black,
-//                               strokeCap: StrokeCap.round,
-//                               textStyle: const TextStyle(
-//                                 fontSize: 8.0,
-//                               ),
+//                     trailing: _userCtx.activeStep.value == 2 &&
+//                             !_userCtx.loading.value
+//                         ? CircularCountDownTimer(
+//                             width: 50,
+//                             height: 50,
+//                             isReverse: true,
+//                             duration: int.parse(
+//                                     _userCtx.userOrderList[0]["prepDuration"]) *
+//                                 60,
+//                             timeFormatterFunction:
+//                                 (defaultFormatterFunction, duration) {
+//                               if (duration.inSeconds == 0) {
+//                                 return "0";
+//                               } else {
+//                                 return Function.apply(
+//                                     defaultFormatterFunction, [duration]);
+//                               }
+//                             },
+//                             fillColor: MyColors.primary,
+//                             ringColor: MyColors.black,
+//                             strokeCap: StrokeCap.round,
+//                             textStyle: const TextStyle(
+//                               fontSize: 8.0,
 //                             ),
 //                           )
 //                         : const Icon(IconlyLight.arrow_right_2),
@@ -253,18 +221,10 @@
 //           physics: const NeverScrollableScrollPhysics(),
 //           controller: _userCtx.activeOrderPageController.value,
 //           children: [
-//             CustomImage(
-//                 width: Get.width,
-//                 height: Get.width * .6,
-//                 url: "${URL.AWS}/banner/1.webp"),
-//             CustomImage(
-//                 width: Get.width,
-//                 height: Get.width * .6,
-//                 url: "${URL.AWS}/banner/2.webp"),
-//             CustomImage(
-//                 width: Get.width,
-//                 height: Get.width * .6,
-//                 url: "${URL.AWS}/banner/3.webp"),
+//             const Image(
+//                 image: AssetImage("assets/images/png/app/Banner2.webp")),
+//             const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
+//             const Image(image: AssetImage("assets/images/png/app/banner1.jpg")),
 //             GoogleMap(
 //               scrollGesturesEnabled: false,
 //               zoomControlsEnabled: false,
@@ -321,10 +281,12 @@
 //   }
 // }
 
-// void userActiveOrderDetailView(Map orderInfo) {
+// void userActiveOrderDetailView(context) {
+//   final userCtx = Get.put(UserController());
+//   var productInfo = userCtx.userOrderList[0];
 //   showModalBottomSheet(
 //     backgroundColor: MyColors.white,
-//     context: Get.context!,
+//     context: context,
 //     isScrollControlled: true,
 //     builder: (context) {
 //       return FractionallySizedBox(
@@ -341,7 +303,7 @@
 //                   color: MyColors.gray,
 //                 ),
 //                 CustomText(
-//                   text: orderInfo["orderId"].toString(),
+//                   text: productInfo["orderId"].toString(),
 //                   fontSize: 16,
 //                   color: MyColors.black,
 //                 ),
@@ -355,9 +317,9 @@
 //                     );
 //                   },
 //                   shrinkWrap: true,
-//                   itemCount: orderInfo["products"].length,
+//                   itemCount: productInfo["products"].length,
 //                   itemBuilder: (context, index) {
-//                     var product = orderInfo["products"][index];
+//                     var product = productInfo["products"][index];
 //                     return Container(
 //                         height: Get.height * .09,
 //                         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -401,7 +363,7 @@
 //                       leading: const CustomText(text: "Нийт үнэ:"),
 //                       trailing: CustomText(
 //                         text: convertToCurrencyFormat(
-//                           int.parse(orderInfo["totalAmount"]),
+//                           int.parse(productInfo["totalAmount"]),
 //                           toInt: true,
 //                           locatedAtTheEnd: true,
 //                         ),

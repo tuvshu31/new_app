@@ -1,14 +1,13 @@
 import 'dart:developer';
 
-import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_orders_detail_screen.dart';
 import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -24,13 +23,14 @@ class UserProfileOrdersScreen extends StatefulWidget {
 }
 
 class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
+  int selectedTab = 0;
   final _userCtx = Get.put(UserController());
   PageController pageController = PageController();
 
   @override
   void initState() {
     super.initState();
-    _userCtx.filterOrders("delivered");
+    _userCtx.filterOrders(0);
   }
 
   @override
@@ -42,7 +42,7 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
       body: Column(
         children: [
           DefaultTabController(
-            length: 2,
+            length: 3,
             initialIndex: 0,
             child: TabBar(
               onTap: ((value) {
@@ -51,15 +51,17 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.bounceInOut,
                 );
-                var status = value == 0 ? "delivered" : "cancelled";
-                _userCtx.filterOrders(status);
+                _userCtx.filterOrders(value);
+                selectedTab = value;
+                setState(() {});
               }),
               labelColor: MyColors.primary,
               unselectedLabelColor: MyColors.black,
               indicatorColor: MyColors.primary,
               tabs: const [
-                Tab(text: "Хүргэж байгаа"),
+                Tab(text: "Шинэ"),
                 Tab(text: "Хүргэсэн"),
+                Tab(text: "Цуцалсан"),
               ],
             ),
           ),
@@ -68,6 +70,7 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
               physics: const NeverScrollableScrollPhysics(),
               controller: pageController,
               children: [
+                _userOrdersListWidget(),
                 _userOrdersListWidget(),
                 _userOrdersListWidget(),
               ],
@@ -80,7 +83,8 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
 
   Widget _userOrdersListWidget() {
     return Obx(
-      () => _userCtx.filteredOrderList.isEmpty
+      () => !_userCtx.fetchingOrderList.value &&
+              _userCtx.filteredOrderList.isEmpty
           ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
           : ListView.separated(
               separatorBuilder: (context, index) {
@@ -89,113 +93,181 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
               padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
-              itemCount: _userCtx.filteredOrderList.length,
+              itemCount: _userCtx.fetchingOrderList.value
+                  ? 8
+                  : _userCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
-                var data = _userCtx.filteredOrderList[index];
-                return _listItem(data);
+                return _userCtx.fetchingOrderList.value
+                    ? _listItemShimmer()
+                    : CustomInkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            useSafeArea: true,
+                            backgroundColor: MyColors.white,
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return UserProfileOrdersDetailScreen(
+                                index: index,
+                              );
+                            },
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Card(
+                              elevation: 1,
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                height: Get.height * .1,
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: Get.width * .5,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CustomImage(
+                                            width: Get.width * .1,
+                                            height: Get.width * .1,
+                                            url:
+                                                "${URL.AWS}/users/${_userCtx.filteredOrderList[index]["storeId1"]}/small/1.png",
+                                            radius: 50,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              _userCtx.filteredOrderList[index]
+                                                      ["storeName"] ??
+                                                  "",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+                                            convertToCurrencyFormat(
+                                              int.parse(_userCtx
+                                                      .filteredOrderList[index]
+                                                  ["totalAmount"]),
+                                              toInt: true,
+                                              locatedAtTheEnd: true,
+                                            ),
+                                          ),
+                                          Text(
+                                            _userCtx.filteredOrderList[index]
+                                                ["orderTime"],
+                                            style: const TextStyle(
+                                              color: MyColors.gray,
+                                              fontSize: 10,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 18,
+                                      color: MyColors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            selectedTab == 0
+                                ? Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          bottomRight: Radius.circular(8)),
+                                    ),
+                                    child: Text(
+                                      _userCtx.filteredOrderList[index]
+                                              ["orderStatus"]
+                                          .toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                      );
               },
             ),
     );
   }
 
-  Widget _listItem(data) {
-    log(data.toString());
-
-    return CustomInkWell(
-      onTap: () {
-        showModalBottomSheet(
-          useSafeArea: true,
-          backgroundColor: MyColors.white,
-          context: context,
-          isScrollControlled: true,
-          builder: (context) {
-            return UserProfileOrdersDetailScreen(
-              data: data,
-            );
-          },
-        );
-      },
-      child: Stack(
-        children: [
-          Card(
-            elevation: 1,
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              height: Get.height * .1,
+  Widget _listItemShimmer() {
+    return Card(
+      elevation: 1,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        height: Get.height * .1,
+        width: Get.width * .5,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: Get.width * .5,
               child: Row(
                 children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        CustomImage(
-                          width: Get.width * .1,
-                          height: Get.width * .1,
-                          url:
-                              "${URL.AWS}/users/${data["storeId1"]}/small/1.png",
-                          radius: 50,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          data["storeName"],
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    ),
+                  CustomShimmer(
+                    width: Get.width * .1,
+                    height: Get.width * .1,
+                    borderRadius: 50,
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          convertToCurrencyFormat(
-                            int.parse(data["totalAmount"]),
-                            toInt: true,
-                            locatedAtTheEnd: true,
-                          ),
-                        ),
-                        Text(
-                          data["orderTime"],
-                          style: const TextStyle(
-                            color: MyColors.gray,
-                            fontSize: 10,
-                          ),
-                        )
-                      ],
-                    ),
+                  const SizedBox(width: 12),
+                  CustomShimmer(
+                    width: Get.width * .3,
+                    height: 14,
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomShimmer(
+                    width: Get.width * .3,
+                    height: 14,
                   ),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 18,
-                    color: MyColors.black,
+                  CustomShimmer(
+                    width: Get.width * .3,
+                    height: 14,
                   ),
                 ],
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
-            ),
-            child: const Text(
-              "Хүлээн авсан",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
