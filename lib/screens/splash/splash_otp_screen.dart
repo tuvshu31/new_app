@@ -83,44 +83,48 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
     CustomDialogs().showLoadingDialog();
     dynamic response =
         await RestApi().checkUser(_loginCtx.phoneController.text);
-    dynamic data = Map<String, dynamic>.from(response);
+    if (response != null) {
+      dynamic data = Map<String, dynamic>.from(response);
 
-    if (data["success"] && _loginCtx.verifyCode.value == int.parse(pinCode)) {
-      Get.back();
-      if (data.length > 1) {
-        switch (data["role"]) {
-          case "admin":
-            putUserIntoBox(data["adminId"], "admin");
-            break;
-          case "manager":
-            putUserIntoBox(data["managerId"], "manager");
-            break;
-          case "store":
-            loginTypeBottomSheet(data["userId"], data["storeId"]);
-            break;
-          case "user":
-            putUserIntoBox(data["userId"], "user");
-            // showLocationDisclosureScreen(context);
-            _loginCtx.navigateToScreen(userHomeScreenRoute, context);
-            break;
-          case "driver":
-            putUserIntoBox(data["driverId"], "driver");
-            _loginCtx.navigateToScreen(driverMainScreenRoute, context);
-            break;
+      if (data["success"] && _loginCtx.verifyCode.value == int.parse(pinCode)) {
+        Get.back();
+        if (data.length > 1) {
+          switch (data["role"]) {
+            case "admin":
+              putUserIntoBox(data["adminId"], "admin");
+              break;
+            case "manager":
+              putUserIntoBox(data["managerId"], "manager");
+              break;
+            case "store":
+              loginTypeBottomSheet(data["userId"], data["storeId"]);
+              break;
+            case "user":
+              putUserIntoBox(data["userId"], "user");
+              _loginCtx.navigateToScreen(userHomeScreenRoute);
+              break;
+            case "driver":
+              putUserIntoBox(data["driverId"], "driver");
+              _loginCtx.navigateToScreen(driverMainScreenRoute);
+              break;
+          }
+        } else {
+          var body = {
+            "phone": _loginCtx.phoneController.text,
+            "role": "user",
+          };
+          dynamic response = await RestApi().registerUser(body);
+          dynamic data = Map<String, dynamic>.from(response);
+          putUserIntoBox(data["data"]["id"], "user");
+          Get.offAll(const UserHomeScreen());
         }
       } else {
-        var body = {
-          "phone": _loginCtx.phoneController.text,
-          "role": "user",
-        };
-        dynamic response = await RestApi().registerUser(body);
-        dynamic data = Map<String, dynamic>.from(response);
-        putUserIntoBox(data["data"]["id"], "user");
-        Get.offAll(const UserHomeScreen());
+        Get.back();
+        customSnackbar(DialogType.error, "Баталгаажуулах код буруу байна", 2);
       }
     } else {
       Get.back();
-      customSnackbar(DialogType.error, "Баталгаажуулах код буруу байна", 2);
+      customSnackbar(DialogType.error, "Error", 2);
     }
   }
 

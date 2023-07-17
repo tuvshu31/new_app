@@ -35,7 +35,7 @@ String _getDialogTitle(DialogType dialogType) {
   }
 }
 
-void customDialog(DialogType dialogType, Widget body) {
+void customDialog(DialogType dialogType, Widget body, {onWillPop = true}) {
   showGeneralDialog(
     context: Get.context!,
     barrierLabel: "",
@@ -46,44 +46,47 @@ void customDialog(DialogType dialogType, Widget body) {
     },
     transitionBuilder: (ctx, a1, a2, child) {
       var curve = Curves.bounceInOut.transform(a1.value);
-      return Transform.scale(
-        scale: curve,
-        child: Center(
-          child: Container(
-            width: Get.width,
-            margin: EdgeInsets.all(Get.width * .09),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-            ),
-            padding: EdgeInsets.only(
-              right: Get.width * .09,
-              left: Get.width * .09,
-              top: Get.height * .04,
-              bottom: Get.height * .03,
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    IconlyBold.info_circle,
-                    size: Get.width * .15,
-                    color: _getDialogColors(dialogType),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  Text(
-                    _getDialogTitle(dialogType),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.gray,
-                      fontSize: 16,
+      return WillPopScope(
+        onWillPop: () async => onWillPop,
+        child: Transform.scale(
+          scale: curve,
+          child: Center(
+            child: Container(
+              width: Get.width,
+              margin: EdgeInsets.all(Get.width * .09),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.only(
+                right: Get.width * .09,
+                left: Get.width * .09,
+                top: Get.height * .04,
+                bottom: Get.height * .03,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      IconlyBold.info_circle,
+                      size: Get.width * .15,
+                      color: _getDialogColors(dialogType),
                     ),
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  body,
-                ],
+                    SizedBox(height: Get.height * .02),
+                    Text(
+                      _getDialogTitle(dialogType),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.gray,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: Get.height * .02),
+                    body,
+                  ],
+                ),
               ),
             ),
           ),
@@ -146,6 +149,14 @@ class CustomDialogs {
     customDialog(
       DialogType.error,
       showNotAvailableProductsDialogBody(availableZeroProducts, onPressed),
+    );
+  }
+
+  void showNewVersionDialog(dynamic onPressed) {
+    customDialog(
+      DialogType.warning,
+      showNewVersionDialogBody(onPressed),
+      onWillPop: false,
     );
   }
 }

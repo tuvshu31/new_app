@@ -13,6 +13,15 @@ int random4digit() {
   return next.toInt();
 }
 
+int random3digit() {
+  var rnd = Random();
+  var next = rnd.nextDouble() * 1000;
+  while (next < 1000) {
+    next *= 10;
+  }
+  return next.toInt();
+}
+
 int random6digit() {
   var rnd = Random();
   var next = rnd.nextDouble() * 1000000;
@@ -212,55 +221,64 @@ Map statusInfo(String status) {
     obj = {
       "text": 'Төлбөр төлөөгүй',
       "step": 1,
-      "icon": Icons.money_off_rounded
+      "icon": Icons.money_off_rounded,
+      "longText": "Захиалгын төлбөр төлөөгүй"
     };
   } else if (status == "sent") {
     obj = {
       "text": 'Төлбөр төлсөн',
       "step": 1,
       "icon": Icons.attach_money_rounded,
+      "longText": "Захиалгын төлбөр төлсөн",
     };
   } else if (status == "received") {
     obj = {
       "text": 'Баталгаажсан',
       "step": 1,
-      "icon": Icons.approval,
+      "icon": Icons.list_alt,
+      "longText": "Захиалга баталгаажсан",
     };
   } else if (status == "driverAccepted") {
     obj = {
       "text": 'Жолооч хүлээн авсан',
       "step": 1,
-      "icon": Icons.drive_eta_rounded
+      "icon": Icons.drive_eta_rounded,
+      "longText": "Захиалгыг жолооч хүлээн авсан",
     };
   } else if (status == "preparing") {
     obj = {
       "text": 'Бэлдэж байна',
       "step": 2,
       "icon": Icons.timelapse,
+      "longText": "Захиалгыг бэлдэж байна",
     };
   } else if (status == "delivering") {
     obj = {
       "text": 'Хүргэж байна',
       "step": 3,
       "icon": Icons.local_taxi,
+      "longText": "Захиалгыг хүргэж байна",
     };
   } else if (status == "delivered") {
     obj = {
       "text": 'Хүргэсэн',
       "step": 4,
       "icon": Icons.done_all_rounded,
+      "longText": "Захиалгыг хүргэсэн",
     };
   } else if (status == "canceled") {
     obj = {
       "text": 'Цуцалсан',
       "step": 4,
       "icon": Icons.cancel_outlined,
+      "longText": "Захиалгыг цуцалсан",
     };
   } else {
     obj = {
       "text": 'Error',
       "step": 4,
       "icon": Icons.error,
+      "longText": "Алдаа гарлаа",
     };
   }
   return obj;

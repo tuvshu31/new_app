@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
@@ -8,6 +10,7 @@ import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashProminentDisclosure extends StatefulWidget {
@@ -19,10 +22,12 @@ class SplashProminentDisclosure extends StatefulWidget {
 }
 
 class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
+  final _loginCtx = Get.put(LoginController());
   void requestPermission() async {
     await Geolocator.requestPermission().then((value) {
       Get.offAllNamed(_route);
     });
+    _loginCtx.requestNotificationPermission(RestApiHelper.getUserRole());
   }
 
   final _route = Get.arguments;
@@ -41,6 +46,8 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
             borderRadius: BorderRadius.circular(50),
             onTap: () {
               Get.offAllNamed(_route);
+              _loginCtx
+                  .requestNotificationPermission(RestApiHelper.getUserRole());
             },
             child: Container(
               padding: const EdgeInsets.all(8),

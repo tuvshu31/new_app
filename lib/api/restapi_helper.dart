@@ -10,6 +10,7 @@ class RestApiHelper {
   static const String kNotification = "NOTIFICATION";
   static const String kOrderInfo = "ORDER_INFO";
   static const String kSearchHistory = "SEARCH_HISTORY";
+  static const String kSubscribeToFirebase = "SUBSCRIBE_TO_FIREBASE";
 
   // Login хийсэн хэрэглэгчийн ID-г хадлагах, авах
   static void saveUserId(int id) => authBox?.put(kUserId, id);
@@ -37,4 +38,10 @@ class RestApiHelper {
       authBox?.put(kSearchHistory, searchHistory);
   static List getSearchHistory() =>
       authBox?.get(kSearchHistory, defaultValue: []);
+
+  /// Firebase token
+  static void subscribeToFirebase() => authBox?.put(kSubscribeToFirebase, true);
+
+  static bool isSubscribedToFirebase() =>
+      authBox?.get(kSubscribeToFirebase, defaultValue: false);
 }

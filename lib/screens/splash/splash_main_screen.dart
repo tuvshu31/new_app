@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:Erdenet24/controller/login_controller.dart';
@@ -10,6 +12,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SplashMainScreen extends StatefulWidget {
   const SplashMainScreen({Key? key}) : super(key: key);
@@ -20,6 +23,7 @@ class SplashMainScreen extends StatefulWidget {
 
 class _SplashMainScreenState extends State<SplashMainScreen> {
   bool stayOnScreen = false;
+  final _checker = AppVersionChecker();
   final _loginCtx = Get.put(LoginController());
   @override
   void initState() {
@@ -31,14 +35,21 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
   }
 
   Future<void> handleInitialRoute() async {
-    if (RestApiHelper.getUserId() != 0) {
+    AppCheckerResult appCheckerResult = await _checker.checkUpdate();
+    if (!appCheckerResult.canUpdate) {
+      CustomDialogs().showNewVersionDialog(() async {
+        final Uri url = Uri.parse(appCheckerResult.appURL!);
+        await launchUrl(url);
+      });
+    } else if (RestApiHelper.getUserId() != 0) {
+      _loginCtx.listenToTokenChanges(RestApiHelper.getUserRole());
       //Login hiisen hereglegch bn gsn ug
       if (RestApiHelper.getUserRole() == "store") {
         Get.offAllNamed(storeMainScreenRoute);
       } else if (RestApiHelper.getUserRole() == "driver") {
-        _loginCtx.navigateToScreen(driverMainScreenRoute, context);
+        _loginCtx.navigateToScreen(driverMainScreenRoute);
       } else if (RestApiHelper.getUserRole() == "user") {
-        _loginCtx.navigateToScreen(userHomeScreenRoute, context);
+        _loginCtx.navigateToScreen(userHomeScreenRoute);
       }
     } else {
       //Login hiigeegui hereglegch bn gsn ug

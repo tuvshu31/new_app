@@ -218,14 +218,21 @@ class RestApi {
         .sendRequest('users/drivers/$driverId', Method.put, body, {});
   }
 
-  //Тухайн жолоочийн мэдээллийг засах
+  //Qpay-төлбөрөө төлөх
   Future qpayPayment(dynamic body) async {
     return DioClient()
-        .sendRequest('payment/createInvoice', Method.post, body, {});
+        .sendRequest('payment/createInvoice1', Method.post, body, {});
   }
 
   //Байршлуудын мэдээлэл авах
   Future getLocations() async {
     return DioClient().sendRequest('locations', Method.get, [], {});
+  }
+
+//Token-г subscribe хийх
+  Future subscribeToFirebase(String role, String token) async {
+    var body = {"role": role, "token": token};
+    return DioClient()
+        .sendRequest('firebase/subscribeToTopic', Method.put, body, {});
   }
 }

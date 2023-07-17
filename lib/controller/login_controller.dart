@@ -11,7 +11,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../api/restapi_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
@@ -21,13 +20,12 @@ class LoginController extends GetxController {
   RxInt verifyCode = 0.obs;
   TextEditingController phoneController = TextEditingController();
   final _navCtx = Get.put(NavigationController());
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   //Хэрэглэгч системээс гарах
   void logout() async {
     Get.back();
     CustomDialogs().showLoadingDialog();
-    var body = {"mapToken": ""};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
     RestApiHelper.saveUserId(0);
     RestApiHelper.saveUserRole("");
     RestApiHelper.saveOrderId(0);
@@ -37,7 +35,7 @@ class LoginController extends GetxController {
     Get.offAll(() => const SplashPhoneRegisterScreen());
   }
 
-  Future<void> navigateToScreen(String route, context) async {
+  Future<void> navigateToScreen(String route) async {
     var isEnabled = await Geolocator.checkPermission();
     if (isEnabled == LocationPermission.always ||
         isEnabled == LocationPermission.whileInUse) {
@@ -47,66 +45,47 @@ class LoginController extends GetxController {
     }
   }
 
-  final _checker = AppVersionChecker();
-
-  void checkVersion(context) {
-    _checker.checkUpdate().then((value) {
-      log(value.toString());
-      value.canUpdate
-          ? showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return WillPopScope(
-                  onWillPop: () async => false,
-                  child: AlertDialog(
-                    title:
-                        IconButton(onPressed: () {}, icon: Icon(Icons.close)),
-                    content: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CustomText(text: "Анхааруулга"),
-                          SizedBox(height: 24),
-                          CustomText(
-                              fontSize: 12,
-                              textAlign: TextAlign.justify,
-                              text:
-                                  "Аппликейшнд нэмэлт өөрчлөлт орсон тул шинэчлэлт хийх шаардлагатай. Хэрэв шинэчлэлт хийгээгүй тохиолдолд аппликейшнийг бүрэн ашиглах боломжгүйг анхаарна уу.")
-                        ],
-                      ),
-                    ),
-                    actionsAlignment: MainAxisAlignment.center,
-                    actions: <Widget>[
-                      Container(
-                        width: Get.width * .4,
-                        margin: const EdgeInsets.only(bottom: 24),
-                        child: CustomButton(
-                          onPressed: () async {
-                            final Uri url = Uri.parse(value.appURL!);
-                            await launchUrl(url);
-                          },
-                          text: "Шинэчлэх",
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            )
-          : null;
-    });
+  void requestNotificationPermission(String role) async {
+    NotificationSettings settings = await _messaging.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // _messaging.subscribeToTopic('mass-msg');
+      bool isSubscribed = RestApiHelper.isSubscribedToFirebase();
+      if (!isSubscribed) {
+        _messaging.getToken().then((token) async {
+          if (token != null) {
+            var body = {"mapToken": token};
+            await RestApi().updateUser(RestApiHelper.getUserId(), body);
+            dynamic response = await RestApi().subscribeToFirebase(role, token);
+            if (response != null) {
+              dynamic d = Map<String, dynamic>.from(response);
+              if (d["success"]) {
+                RestApiHelper.subscribeToFirebase();
+              }
+            }
+          }
+        });
+      }
+    } else {
+      _messaging.getToken().then((token) async {
+        if (token != null) {
+          var body = {"mapToken": token};
+          await RestApi().updateUser(RestApiHelper.getUserId(), body);
+        }
+      });
+    }
   }
 
-  void getFirebaseMessagingToken(context) async {
-    checkVersion(context);
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    var body = {"mapToken": fcmToken};
-    await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+  void listenToTokenChanges(String role) {
+    _messaging.onTokenRefresh.listen((newToken) async {
       var body = {"mapToken": newToken};
       await RestApi().updateUser(RestApiHelper.getUserId(), body);
+      dynamic response = await RestApi().subscribeToFirebase(role, newToken);
+      if (response != null) {
+        dynamic d = Map<String, dynamic>.from(response);
+        if (d["success"]) {
+          RestApiHelper.subscribeToFirebase();
+        }
+      }
     });
   }
 }

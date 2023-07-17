@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
@@ -98,41 +99,48 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
     setState(() {});
   }
 
-  void createInvoiceAndOrder() async {
-    CustomDialogs().showLoadingDialog();
-    int storeId = int.parse(_cartCtx.cartList[0]["store"]);
-    int randomNumber = random4digit();
-    int userAndDriverCode = random4digit();
-    var orderId = int.parse(("$storeId" "$randomNumber"));
-    var qpayBody = {
-      "sender_invoice_no": orderId.toString(),
-      "amount": _cartCtx.total,
-      // "amount": 50,
-    };
-    dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
-    if (qpayResponse != null) {
-      dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
-      var storeId = _cartCtx.cartList[0]["store"];
-      if (qpayData["success"]) {
-        var orderBody = {
-          "orderId": orderId,
-          "userAndDriverCode": userAndDriverCode,
-          "userId": RestApiHelper.getUserId(),
-          "storeId1": storeId,
-          "address": "${selectedLocation["locationName"]} - ${address.text}",
-          "orderStatus": "notPaid",
-          "totalAmount": _cartCtx.total,
-          "storeTotalAmount": _cartCtx.subTotal.toString(),
-          "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
-          "phone": phone.text,
-          "kod": kod.text,
-          "products": _cartCtx.cartList,
-        };
-        dynamic orderResponse = await RestApi().createOrder(orderBody);
-        dynamic orderData = Map<String, dynamic>.from(orderResponse);
+  int orderIdGenerator(int storeId) {
+    String currentDate = DateFormat('dd-MM').format(DateTime.now());
+    String date = currentDate.replaceAll("-", "");
+    int randomDigit = random6digit();
+    String orderString = "$storeId$randomDigit";
+    int orderId = int.parse(orderString);
+    return orderId;
+  }
 
-        if (orderData["success"]) {
-          Get.back();
+  void createOrderAndInvoice() async {
+    CustomDialogs().showLoadingDialog();
+    //create order
+    int storeId = int.parse(_cartCtx.cartList[0]["store"]);
+    int orderId = orderIdGenerator(storeId);
+    var orderBody = {
+      "orderId": orderId,
+      "userAndDriverCode": random4digit(),
+      "userId": RestApiHelper.getUserId(),
+      "storeId1": storeId,
+      "address": "${selectedLocation["locationName"]} - ${address.text}",
+      "orderStatus": "notPaid",
+      "totalAmount": _cartCtx.total,
+      "storeTotalAmount": _cartCtx.subTotal.toString(),
+      "orderTime": DateFormat('yyyy-MM-dd kk:mm:ss').format(DateTime.now()),
+      "phone": phone.text,
+      "kod": kod.text,
+      "products": _cartCtx.cartList,
+    };
+    dynamic orderResponse = await RestApi().createOrder(orderBody);
+    if (orderResponse != null) {
+      var id = orderResponse["data"]["id"];
+      //create invoice
+      var qpayBody = {
+        "sender_invoice_no": id.toString(),
+        // "amount": _cartCtx.total,
+        "amount": 50,
+      };
+      dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
+      Get.back();
+      if (qpayResponse != null) {
+        dynamic qpayData = Map<String, dynamic>.from(qpayResponse);
+        if (qpayData["success"]) {
           Get.offAndToNamed(
             userOrderPaymentScreenRoute,
             arguments: {
@@ -140,6 +148,9 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             },
           );
         }
+      } else {
+        customSnackbar(DialogType.error,
+            "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу", 2);
       }
     } else {
       Get.back();
@@ -171,7 +182,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                     setState(() {});
                   });
                 } else {
-                  createInvoiceAndOrder();
+                  createOrderAndInvoice();
                 }
               },
               text: showPriceDetails ? "Төлбөр төлөх" : "Үргэлжлүүлэх",

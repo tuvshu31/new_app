@@ -27,8 +27,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   void initState() {
     super.initState();
-    // saveUserToken();
-    _loginCtx.getFirebaseMessagingToken(context);
     _storeCtx.fetchStoreInfo();
   }
 
@@ -172,9 +170,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
             isOpen ? "Хаах" : "Нээх",
             () {
               Get.back();
-              if (value == true) {
-                _loginCtx.getFirebaseMessagingToken(context);
-              }
+              if (value == true) {}
               _storeCtx.storeInfo["isOpen"] = value;
               var body = {"isOpen": value};
               _storeCtx.updateStoreInfo(

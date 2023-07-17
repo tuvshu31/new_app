@@ -194,7 +194,6 @@ class DriverController extends GetxController {
   void turnOnOff(value, context) async {
     isOnline.value = value;
     if (value == true) {
-      _loginCtx.getFirebaseMessagingToken(context);
       playSound("engine_start");
       getUserLocation();
       getPositionStream();

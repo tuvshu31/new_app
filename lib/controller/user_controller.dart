@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/user/user_profile_orders_detail_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_orders_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/utils/styles.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_countdown_timer/countdown_controller.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -19,9 +24,10 @@ class UserController extends GetxController {
   Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
-  RxInt prepDuration = 1.obs;
   RxBool fetchingOrderList = false.obs;
+  RxInt prepDuration = 1.obs;
   RxDouble markerRotation = 0.0.obs;
+  RxMap selectedOrder = {}.obs;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}.obs;
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
@@ -34,6 +40,7 @@ class UserController extends GetxController {
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       userOrderList.value = d["data"];
+      filterOrders(0);
     }
     fetchingOrderList.value = false;
   }
@@ -41,9 +48,12 @@ class UserController extends GetxController {
   void filterOrders(int value) {
     if (value == 0) {
       filteredOrderList.value = userOrderList
-          .where((p0) =>
-              p0["orderStatus"] != "delivered" &&
-              p0["orderStatus"] != "canceled")
+          .where(
+            (p0) =>
+                p0["orderStatus"] != "delivered" &&
+                p0["orderStatus"] != "canceled" &&
+                p0["orderStatus"] != "notPaid",
+          )
           .toList();
     } else if (value == 1) {
       filteredOrderList.value = userOrderList
@@ -127,29 +137,50 @@ class UserController extends GetxController {
   }
 
   void changeOrderStatus(int id, String status) async {
-    int index = userOrderList.indexWhere((element) => element["id"] == id);
-    userOrderList[index]["orderStatus"] = status;
-    userOrderList.refresh();
-    update();
-    // dynamic response = await RestApi().updateOrder(id, body);
-    // dynamic d = Map<String, dynamic>.from(response);
+    log(id.toString());
+    log(status);
+    int filteredIndex =
+        filteredOrderList.indexWhere((element) => element["id"] == id);
+    filteredOrderList[filteredIndex]["orderStatus"] = status;
+    int notFilteredIndex =
+        userOrderList.indexWhere((element) => element["id"] == id);
+    userOrderList[notFilteredIndex]["orderStatus"] = status;
+    if (id == selectedOrder["id"]) {
+      selectedOrder["orderStatus"] = status;
+    }
   }
 
   void userActionHandler(action, payload) {
-    if (action == "payment_success") {
+    log(payload.toString());
+    if (action == "sent") {
       _cartCtx.cartList.clear();
-    } else if (action == "sent") {
-      changeOrderStatus(payload["id"], action);
+      _cartCtx.cartItemCount.value = 0;
+      _navCtx.onItemTapped(4);
+      Get.offNamed(userProfileOrdersScreenRoute);
+      selectedOrder.value = payload;
+      showOrderDetails();
     } else if (action == "received") {
       changeOrderStatus(payload["id"], action);
     } else if (action == "preparing") {
-      changeOrderStatus(payload["id"], action);
       prepDuration.value = int.parse(payload["prepDuration"]);
-      log(prepDuration.value.toString());
+      changeOrderStatus(payload["id"], action);
     } else if (action == "delivering") {
+      changeOrderStatus(payload["id"], action);
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      _navCtx.onItemTapped(0);
+      changeOrderStatus(payload["id"], action);
     } else {}
+  }
+
+  void showOrderDetails() {
+    showModalBottomSheet(
+      useSafeArea: true,
+      backgroundColor: MyColors.white,
+      context: Get.context!,
+      isScrollControlled: true,
+      builder: (context) {
+        return const UserProfileOrdersDetailScreen();
+      },
+    );
   }
 }

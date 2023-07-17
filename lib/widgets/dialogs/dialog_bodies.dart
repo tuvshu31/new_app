@@ -146,6 +146,24 @@ Widget showSameStoreProductsDialogBody(dynamic onPressed) {
   );
 }
 
+Widget showNewVersionDialogBody(dynamic onPressed) {
+  return Column(
+    children: [
+      const Text(
+        "Аппликейшнд нэмэлт өөрчлөлт орсон тул шинэчлэлт хийх шаардлагатай. Хэрэв шинэчлэлт хийгээгүй тохиолдолд аппликейшнийг бүрэн ашиглах боломжгүйг анхаарна уу.",
+        textAlign: TextAlign.center,
+      ),
+      SizedBox(height: Get.height * .04),
+      CustomButton(
+        elevation: 0,
+        bgColor: Colors.amber,
+        text: "Шинэчлэх",
+        onPressed: onPressed,
+      ),
+    ],
+  );
+}
+
 Widget showNotAvailableProductsDialogBody(
     List availableZeroProducts, dynamic onPressed) {
   return Column(

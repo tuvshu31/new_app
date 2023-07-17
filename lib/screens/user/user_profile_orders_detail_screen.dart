@@ -11,13 +11,10 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:iconly/iconly.dart';
 
 class UserProfileOrdersDetailScreen extends StatefulWidget {
-  final int index;
   const UserProfileOrdersDetailScreen({
     super.key,
-    this.index = 0,
   });
 
   @override
@@ -46,7 +43,7 @@ class _UserProfileOrdersDetailScreenState
         ),
         title: "Захиалга",
         subtitle: Text(
-          "#${_userCtx.userOrderList[widget.index]["orderId"] ?? "00000"}",
+          "#${_userCtx.selectedOrder["orderId"] ?? "00000"}",
           style: const TextStyle(
             color: MyColors.gray,
             fontSize: 12,
@@ -77,18 +74,6 @@ class _UserProfileOrdersDetailScreenState
     );
   }
 
-  // IconData statusIcon(int step) {
-  //   return step == 1
-  //       ? IconlyLight.bookmark
-  //       : step == 2
-  //           ? IconlyLight.time_circle
-  //           : step == 3
-  //               ? Icons.local_taxi_rounded
-  //               : step == 4
-  //                   ? Icons.done_all_rounded
-  //                   : IconlyLight.bookmark;
-  // }
-
   Widget _statusInfo() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -98,27 +83,24 @@ class _UserProfileOrdersDetailScreenState
           Row(
             children: [
               Icon(
-                statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])[
-                    "icon"],
+                statusInfo(_userCtx.selectedOrder["orderStatus"])["icon"],
                 color: MyColors.primary,
               ),
               const SizedBox(width: 12),
               CustomText(
-                text:
-                    "Захиалгыг ${statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])["text"].toLowerCase()}",
+                text: statusInfo(
+                    _userCtx.selectedOrder["orderStatus"])["longText"],
                 fontSize: 12,
                 color: MyColors.primary,
               ),
             ],
           ),
-          statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])[
-                      "step"] ==
-                  2
+          statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 2
               ? CircularCountDownTimer(
                   isReverse: true,
                   width: 40,
                   height: 40,
-                  duration: 3600,
+                  duration: _userCtx.prepDuration.value * 60,
                   timeFormatterFunction: (defaultFormatterFunction, duration) {
                     if (duration.inSeconds == 0) {
                       return "0";
@@ -131,11 +113,11 @@ class _UserProfileOrdersDetailScreenState
                   ringColor: MyColors.black,
                   strokeCap: StrokeCap.round,
                   textStyle: const TextStyle(
-                    fontSize: 10.0,
+                    fontSize: 8.0,
                   ),
                 )
               : CustomText(
-                  text: _userCtx.userOrderList[widget.index]["updatedAt"] ?? "",
+                  text: _userCtx.selectedOrder["updatedAt"] ?? "",
                   color: MyColors.gray,
                   fontSize: 10,
                 )
@@ -145,8 +127,7 @@ class _UserProfileOrdersDetailScreenState
   }
 
   Widget _stepper() {
-    int step =
-        statusInfo(_userCtx.userOrderList[widget.index]["orderStatus"])["step"];
+    int step = statusInfo(_userCtx.selectedOrder["orderStatus"])["step"];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -225,9 +206,7 @@ class _UserProfileOrdersDetailScreenState
   }
 
   Widget _productsInfoAndMap() {
-    return statusInfo(
-                _userCtx.userOrderList[widget.index]["orderStatus"])["step"] ==
-            3
+    return statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 3
         ? SizedBox(
             height: Get.height * .6,
             child: GoogleMap(
@@ -259,12 +238,10 @@ class _UserProfileOrdersDetailScreenState
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount:
-                      _userCtx.userOrderList[widget.index]["products"].length,
+                  itemCount: _userCtx.selectedOrder["products"].length,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemBuilder: (context, index) {
-                    var product =
-                        _userCtx.userOrderList[widget.index]["products"][index];
+                    var product = _userCtx.selectedOrder["products"][index];
                     return Container(
                         height: Get.height * .09,
                         color: MyColors.white,
@@ -306,9 +283,8 @@ class _UserProfileOrdersDetailScreenState
                     ),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        double.parse(_userCtx.userOrderList[widget.index]
-                                ["storeTotalAmount"] ??
-                            "0"),
+                        double.parse(
+                            _userCtx.selectedOrder["storeTotalAmount"] ?? "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -326,9 +302,8 @@ class _UserProfileOrdersDetailScreenState
                     ),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        int.parse(_userCtx.userOrderList[widget.index]
-                                ["deliveryPrice"] ??
-                            "0"),
+                        int.parse(
+                            _userCtx.selectedOrder["deliveryPrice"] ?? "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -356,9 +331,7 @@ class _UserProfileOrdersDetailScreenState
                     const CustomText(text: "Нийт үнэ:"),
                     CustomText(
                       text: convertToCurrencyFormat(
-                        int.parse(_userCtx.userOrderList[widget.index]
-                                ["totalAmount"] ??
-                            "0"),
+                        int.parse(_userCtx.selectedOrder["totalAmount"] ?? "0"),
                         toInt: true,
                         locatedAtTheEnd: true,
                       ),
@@ -373,7 +346,6 @@ class _UserProfileOrdersDetailScreenState
   }
 
   Widget _addressInfo() {
-    log(_userCtx.userOrderList[widget.index].toString());
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12),
       child: Column(
@@ -389,7 +361,7 @@ class _UserProfileOrdersDetailScreenState
                 color: MyColors.gray,
               ),
               CustomText(
-                text: _userCtx.userOrderList[widget.index]["address"] ?? "",
+                text: _userCtx.selectedOrder["address"] ?? "",
                 color: MyColors.gray,
                 fontSize: 12,
               ),
@@ -404,7 +376,7 @@ class _UserProfileOrdersDetailScreenState
                 color: MyColors.gray,
               ),
               CustomText(
-                text: _userCtx.userOrderList[widget.index]["phone"] ?? "",
+                text: _userCtx.selectedOrder["phone"] ?? "",
                 color: MyColors.gray,
                 fontSize: 12,
               ),

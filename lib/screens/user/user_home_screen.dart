@@ -1,6 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
@@ -32,9 +29,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   void initState() {
     super.initState();
+    _loginCtx.listenToTokenChanges("user");
     _cartCtrl.getUserProducts();
-    _userCtx.getOrders();
-    _loginCtx.getFirebaseMessagingToken(context);
   }
 
   @override

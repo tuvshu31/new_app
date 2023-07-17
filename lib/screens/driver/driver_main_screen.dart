@@ -53,7 +53,6 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
-    _loginCtx.getFirebaseMessagingToken(context);
     _driverCtx.fetchDriverInfo(context);
     _driverCtx.fetchDriverOrders();
     _driverCtx.fetchDriverPayments();

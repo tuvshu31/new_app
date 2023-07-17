@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -73,29 +74,29 @@ void main() async {
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
-  FirebaseMessaging.instance.requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
   AwesomeNotifications().initialize(
-      // set the icon to null if you want to use the default app icon
-      null,
-      [
-        NotificationChannel(
-            channelGroupKey: 'basic_channel_group',
-            channelKey: 'basic_channel',
-            channelName: 'Basic notifications',
-            channelDescription: 'Notification channel for basic tests',
-            defaultColor: Color(0xFF0002),
-            ledColor: Colors.white)
-      ],
-      // Channel groups are only visual and are not required
-      channelGroups: [
-        NotificationChannelGroup(
-            channelGroupKey: 'basic_channel_group',
-            channelGroupName: 'Basic group')
-      ],
-      debug: true);
+    // set the icon to null if you want to use the default app icon
+    'resource://drawable/res_notification_app_icon',
+    [
+      NotificationChannel(
+        channelGroupKey: 'basic_channel_group',
+        channelKey: 'basic_channel',
+        channelName: 'Basic notifications',
+        channelDescription: 'Notification channel for basic tests',
+        importance: NotificationImportance.High,
+      )
+    ],
+    // Channel groups are only visual and are not required
+    channelGroups: [
+      NotificationChannelGroup(
+          channelGroupKey: 'basic_channel_group',
+          channelGroupName: 'Basic group')
+    ],
+    debug: true,
+  );
   if (Platform.isAndroid) {
     GeolocatorAndroid.registerWith();
   } else if (Platform.isIOS) {
@@ -129,11 +130,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _loginCtx.checkVersion(context);
-    // NotificationController.askNotificationPermission();
-    // NotificationController.setNotificationListeners();
-    // Noti.initialize(flutterLocalNotificationsPlugin);
-
     AwesomeNotifications().setListeners(
       onNotificationCreatedMethod: Noti.onNotificationCreatedMethod,
       onActionReceivedMethod: Noti.onActionReceivedMethod,

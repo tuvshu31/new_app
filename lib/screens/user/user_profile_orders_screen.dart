@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/screens/user/user_profile_orders_detail_screen.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +27,8 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
   @override
   void initState() {
     super.initState();
-    _userCtx.filterOrders(0);
+    _userCtx.getOrders();
+    // _userCtx.filterOrders(0);
   }
 
   @override
@@ -83,8 +81,7 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
 
   Widget _userOrdersListWidget() {
     return Obx(
-      () => !_userCtx.fetchingOrderList.value &&
-              _userCtx.filteredOrderList.isEmpty
+      () => _userCtx.userOrderList.isEmpty && !_userCtx.fetchingOrderList.value
           ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
           : ListView.separated(
               separatorBuilder: (context, index) {
@@ -97,122 +94,109 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
                   ? 8
                   : _userCtx.filteredOrderList.length,
               itemBuilder: (context, index) {
-                return _userCtx.fetchingOrderList.value
-                    ? _listItemShimmer()
-                    : CustomInkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            useSafeArea: true,
-                            backgroundColor: MyColors.white,
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) {
-                              return UserProfileOrdersDetailScreen(
-                                index: index,
-                              );
-                            },
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Card(
-                              elevation: 1,
-                              margin: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                height: Get.height * .1,
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: Get.width * .5,
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          CustomImage(
-                                            width: Get.width * .1,
-                                            height: Get.width * .1,
-                                            url:
-                                                "${URL.AWS}/users/${_userCtx.filteredOrderList[index]["storeId1"]}/small/1.png",
-                                            radius: 50,
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Text(
-                                              _userCtx.filteredOrderList[index]
-                                                      ["storeName"] ??
-                                                  "",
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          )
-                                        ],
+                if (_userCtx.fetchingOrderList.value) {
+                  return _listItemShimmer();
+                } else {
+                  var item = _userCtx.filteredOrderList[index];
+                  return CustomInkWell(
+                    onTap: () {
+                      _userCtx.selectedOrder.value = item;
+                      _userCtx.showOrderDetails();
+                    },
+                    child: Stack(
+                      children: [
+                        Card(
+                          elevation: 1,
+                          margin: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            height: Get.height * .1,
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: Get.width * .5,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomImage(
+                                        width: Get.width * .1,
+                                        height: Get.width * .1,
+                                        url:
+                                            "${URL.AWS}/users/${item["storeId1"]}/small/1.png",
+                                        radius: 50,
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            convertToCurrencyFormat(
-                                              int.parse(_userCtx
-                                                      .filteredOrderList[index]
-                                                  ["totalAmount"]),
-                                              toInt: true,
-                                              locatedAtTheEnd: true,
-                                            ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          item["storeName"] ?? "",
+                                          style: const TextStyle(
+                                            fontSize: 12,
                                           ),
-                                          Text(
-                                            _userCtx.filteredOrderList[index]
-                                                ["orderTime"],
-                                            style: const TextStyle(
-                                              color: MyColors.gray,
-                                              fontSize: 10,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 18,
-                                      color: MyColors.black,
-                                    ),
-                                  ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            selectedTab == 0
-                                ? Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(8),
-                                          bottomRight: Radius.circular(8)),
-                                    ),
-                                    child: Text(
-                                      _userCtx.filteredOrderList[index]
-                                              ["orderStatus"]
-                                          .toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        convertToCurrencyFormat(
+                                          int.parse(item["totalAmount"]),
+                                          toInt: true,
+                                          locatedAtTheEnd: true,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : Container(),
-                          ],
+                                      Text(
+                                        item["orderTime"],
+                                        style: const TextStyle(
+                                          color: MyColors.gray,
+                                          fontSize: 10,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 18,
+                                  color: MyColors.black,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      );
+                        selectedTab == 0
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(8),
+                                      bottomRight: Radius.circular(8)),
+                                ),
+                                child: Text(
+                                  statusInfo(item["orderStatus"])["text"],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  );
+                }
               },
             ),
     );
