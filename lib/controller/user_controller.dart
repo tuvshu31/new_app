@@ -35,7 +35,7 @@ class UserController extends GetxController {
 
   void getOrders() async {
     fetchingOrderList.value = true;
-    var body = {"userId": RestApiHelper.getUserId()};
+    var body = {"userId": 25};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {

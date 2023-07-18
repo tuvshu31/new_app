@@ -74,6 +74,7 @@ void main() async {
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
+  FirebaseMessaging.instance.requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
