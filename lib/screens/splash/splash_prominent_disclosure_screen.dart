@@ -27,7 +27,6 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
     await Geolocator.requestPermission().then((value) {
       Get.offAllNamed(_route);
     });
-    _loginCtx.requestNotificationPermission(RestApiHelper.getUserRole());
   }
 
   final _route = Get.arguments;
@@ -46,8 +45,6 @@ class _SplashProminentDisclosureState extends State<SplashProminentDisclosure> {
             borderRadius: BorderRadius.circular(50),
             onTap: () {
               Get.offAllNamed(_route);
-              _loginCtx
-                  .requestNotificationPermission(RestApiHelper.getUserRole());
             },
             child: Container(
               padding: const EdgeInsets.all(8),

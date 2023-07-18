@@ -77,6 +77,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   void putUserIntoBox(int id, String type) async {
     RestApiHelper.saveUserId(id);
     RestApiHelper.saveUserRole(type);
+    _loginCtx.requestNotificationPermission(type);
   }
 
   void submit() async {

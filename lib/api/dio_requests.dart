@@ -169,7 +169,8 @@ class RestApi {
 
   //Захиалгын мэдээлэл өөрчлөх
   Future updateOrder(int id, dynamic body) async {
-    return DioClient().sendRequest('orders/$id', Method.put, body, {});
+    return DioClient()
+        .sendRequest('orders/updateOrder/$id', Method.put, body, {});
   }
 
   //Тухайн дэлгүүрийн захиалгыг авах

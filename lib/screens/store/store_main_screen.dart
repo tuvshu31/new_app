@@ -28,6 +28,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   void initState() {
     super.initState();
     _storeCtx.fetchStoreInfo();
+    _loginCtx.listenToTokenChanges("store");
   }
 
   @override

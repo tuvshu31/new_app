@@ -314,7 +314,7 @@ class DriverController extends GetxController {
   // }
 
   void driverActionHandler(action, payload) async {
-    if (action == "new_order") {
+    if (action == "preparing") {
       deliveryInfo.clear();
       deliveryInfo.value = payload;
       storeLocation.value = LatLng(

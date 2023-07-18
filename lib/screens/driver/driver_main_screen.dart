@@ -53,6 +53,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   @override
   void initState() {
     super.initState();
+    _loginCtx.listenToTokenChanges("driver");
     _driverCtx.fetchDriverInfo(context);
     _driverCtx.fetchDriverOrders();
     _driverCtx.fetchDriverPayments();

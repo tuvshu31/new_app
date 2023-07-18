@@ -40,6 +40,7 @@ class UserController extends GetxController {
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
       userOrderList.value = d["data"];
+      userOrderList.value = userOrderList.reversed.toList();
       filterOrders(0);
     }
     fetchingOrderList.value = false;
@@ -136,18 +137,26 @@ class UserController extends GetxController {
     });
   }
 
-  void changeOrderStatus(int id, String status) async {
-    log(id.toString());
-    log(status);
-    int filteredIndex =
-        filteredOrderList.indexWhere((element) => element["id"] == id);
-    filteredOrderList[filteredIndex]["orderStatus"] = status;
-    int notFilteredIndex =
-        userOrderList.indexWhere((element) => element["id"] == id);
-    userOrderList[notFilteredIndex]["orderStatus"] = status;
-    if (id == selectedOrder["id"]) {
+  void changeOrderStatus(Map payload) async {
+    int id = payload["id"];
+    String status = payload["orderStatus"];
+    if (userOrderList.any((e) => e["id"] == id)) {
+      int k = userOrderList.indexWhere((k) => k["id"] == id);
+      userOrderList[k]["orderStatus"] = status;
+    } else {
+      userOrderList.add(payload);
+    }
+    if (filteredOrderList.any((e) => e["id"] == id)) {
+      int i = filteredOrderList.indexWhere((e) => e["id"] == id);
+      filteredOrderList[i]["orderStatus"] = status;
+    } else {
+      filteredOrderList.add(payload);
+    }
+    if (selectedOrder.isNotEmpty && selectedOrder["id"] == id) {
       selectedOrder["orderStatus"] = status;
     }
+    userOrderList.refresh();
+    filteredOrderList.refresh();
   }
 
   void userActionHandler(action, payload) {
@@ -157,18 +166,19 @@ class UserController extends GetxController {
       _cartCtx.cartItemCount.value = 0;
       _navCtx.onItemTapped(4);
       Get.offNamed(userProfileOrdersScreenRoute);
+      changeOrderStatus(payload);
       selectedOrder.value = payload;
       showOrderDetails();
     } else if (action == "received") {
-      changeOrderStatus(payload["id"], action);
+      changeOrderStatus(payload);
     } else if (action == "preparing") {
       prepDuration.value = int.parse(payload["prepDuration"]);
-      changeOrderStatus(payload["id"], action);
+      changeOrderStatus(payload);
     } else if (action == "delivering") {
-      changeOrderStatus(payload["id"], action);
+      changeOrderStatus(payload);
       fetchDriverPositionSctream(int.parse(payload["deliveryDriverId"]));
     } else if (action == "delivered") {
-      changeOrderStatus(payload["id"], action);
+      changeOrderStatus(payload);
     } else {}
   }
 

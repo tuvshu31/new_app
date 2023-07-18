@@ -123,7 +123,6 @@ class _MyAppState extends State<MyApp> {
   final cartCtrl = Get.put(CartController(), permanent: true);
   final loginCtrl = Get.put(LoginController(), permanent: true);
   final productCtrl = Get.put(ProductController(), permanent: true);
-  final _loginCtx = Get.put(LoginController());
 
   // Only after at least the action method is set, the notification events are delivered
 

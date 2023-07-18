@@ -27,6 +27,7 @@ class _UserProfileOrdersScreenState extends State<UserProfileOrdersScreen> {
   @override
   void initState() {
     super.initState();
+
     _userCtx.getOrders();
     // _userCtx.filterOrders(0);
   }

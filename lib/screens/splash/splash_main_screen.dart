@@ -36,7 +36,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
 
   Future<void> handleInitialRoute() async {
     AppCheckerResult appCheckerResult = await _checker.checkUpdate();
-    if (!appCheckerResult.canUpdate) {
+    if (appCheckerResult.canUpdate) {
       CustomDialogs().showNewVersionDialog(() async {
         final Uri url = Uri.parse(appCheckerResult.appURL!);
         await launchUrl(url);

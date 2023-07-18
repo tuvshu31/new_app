@@ -170,7 +170,7 @@ List<Map<String, dynamic>> notificationData = [
   },
   {
     "role": "driver",
-    "action": "new_order",
+    "action": "preparing",
     "body": "Шинэ захиалга ирлээ",
     "visible": true,
     "type": "message",
