@@ -48,24 +48,17 @@ Future<void> handleNotifications(message, isBackground) async {
   var data = jsonDecode(info);
   var role = data["role"];
   var action = data["orderStatus"];
-  log(role);
-  log(action);
-  var storeName = data["products"][0]["storeName"] ?? "Erdenet24";
-  var bigPicture = data["bigPicture"] ??
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
-  String messageBody = notificationData.firstWhere(
-        (element) => element["action"] == action && element["role"] == role,
-      )["body"] ??
-      "";
 
   if (action == "promo") {
+    var bigPicture = data["bigPicture"] ??
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         payload: Map<String, String>.from(message),
         id: 10,
         channelKey: 'basic_channel',
-        title: role == "user" ? storeName ?? "Байгууллага" : "Erdenet24",
-        body: messageBody,
+        title: data["storeName"],
+        body: data["message"],
         notificationLayout: NotificationLayout.BigPicture,
         displayOnBackground: true,
         displayOnForeground: true,
@@ -76,6 +69,13 @@ Future<void> handleNotifications(message, isBackground) async {
       ),
     );
   } else {
+    var storeName = data["products"] != null
+        ? data["products"][0]["storeName"]
+        : "Erdenet24";
+    String messageBody = notificationData.firstWhere(
+          (element) => element["action"] == action && element["role"] == role,
+        )["body"] ??
+        "";
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         payload: Map<String, String>.from(message),

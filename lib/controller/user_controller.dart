@@ -184,7 +184,6 @@ class UserController extends GetxController {
 
   void showOrderDetails() {
     showModalBottomSheet(
-      useSafeArea: true,
       backgroundColor: MyColors.white,
       context: Get.context!,
       isScrollControlled: true,
