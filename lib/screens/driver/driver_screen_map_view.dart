@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
-import 'package:custom_marker/marker_icon.dart';
+// import 'package:custom_marker/marker_icon.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -22,11 +22,11 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
   }
 
   void markerIconGenerator() async {
-    markerIcon = await MarkerIcon.pictureAsset(
-      assetPath: "assets/images/png/app/driver.png",
-      width: 100,
-      height: 100,
-    );
+    // markerIcon = await MarkerIcon.pictureAsset(
+    //   assetPath: "assets/images/png/app/driver.png",
+    //   width: 100,
+    //   height: 100,
+    // );
     setState(() {});
   }
 

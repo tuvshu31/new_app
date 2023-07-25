@@ -358,13 +358,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  custom_marker:
-    dependency: "direct main"
-    description:
-      name: custom_marker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   custom_timer:
     dependency: "direct main"
     description:
@@ -538,13 +531,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_animarker:
-    dependency: "direct main"
-    description:
-      name: flutter_animarker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.2.0"
   flutter_animate:
     dependency: "direct main"
     description:
