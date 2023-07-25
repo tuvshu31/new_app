@@ -156,9 +156,23 @@ class RestApi {
   }
 
   //Шинэ захиалгын мэдээллийг жолооч руу илгээх
-  Future assignDriver(dynamic body) async {
+  Future assignDriver(int id) async {
     return DioClient()
-        .sendRequest('users/drivers/assignDriver', Method.post, body, {});
+        .sendRequest('users/drivers/assignDriver1?id=$id', Method.post, [], {});
+  }
+
+  //Жолооч захиалгыг хүлээн авах
+  Future acceptOrder(int id, int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/acceptOrder?id=$id&driverId=$driverId',
+        Method.post, [], {});
+  }
+
+  //Жолооч захиалгыг цуцлах
+  Future cancelOrder(int id, int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/cancelOrder?id=$id&driverId=$driverId',
+        Method.post, [], {});
   }
 
   //Логин хийсэн жолоочийн төлбөрийн мэдээллийг авах

@@ -126,6 +126,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       "phone": phone.text,
       "kod": kod.text,
       "products": _cartCtx.cartList,
+      "deliveryPrice": _cartCtx.deliveryPrice.value,
     };
     dynamic orderResponse = await RestApi().createOrder(orderBody);
     if (orderResponse != null) {
@@ -133,8 +134,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       //create invoice
       var qpayBody = {
         "sender_invoice_no": id.toString(),
-        // "amount": _cartCtx.total,
-        "amount": 50,
+        "amount": _cartCtx.total,
+        // "amount": 50,
       };
       dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
       Get.back();

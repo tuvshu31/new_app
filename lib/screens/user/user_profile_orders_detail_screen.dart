@@ -29,45 +29,50 @@ class _UserProfileOrdersDetailScreenState
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => CustomHeader(
-        centerTitle: true,
-        customLeading: Container(),
-        customActions: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(
-            Icons.close_rounded,
-            color: Colors.black,
-          ),
-        ),
-        title: "Захиалга",
-        subtitle: Text(
-          "#${_userCtx.selectedOrder["orderId"] ?? "00000"}",
-          style: const TextStyle(
-            color: MyColors.gray,
-            fontSize: 12,
-          ),
-        ),
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 12),
-              _stepper(),
-              const SizedBox(height: 12),
-              _divider(),
-              const SizedBox(height: 12),
-              _statusInfo(),
-              const SizedBox(height: 12),
-              _divider(),
-              const SizedBox(height: 12),
-              _addressInfo(),
-              const SizedBox(height: 12),
-              _divider(),
-              _productsInfoAndMap(),
-            ],
+      () => MediaQuery(
+        data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
+        child: SafeArea(
+          child: CustomHeader(
+            centerTitle: true,
+            customLeading: Container(),
+            customActions: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: const Icon(
+                Icons.close_rounded,
+                color: Colors.black,
+              ),
+            ),
+            title: "Захиалга",
+            subtitle: Text(
+              "#${_userCtx.selectedOrder["orderId"] ?? "00000"}",
+              style: const TextStyle(
+                color: MyColors.gray,
+                fontSize: 12,
+              ),
+            ),
+            body: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 12),
+                  _stepper(),
+                  const SizedBox(height: 12),
+                  _divider(),
+                  const SizedBox(height: 12),
+                  _statusInfo(),
+                  const SizedBox(height: 12),
+                  _divider(),
+                  const SizedBox(height: 12),
+                  _addressInfo(),
+                  const SizedBox(height: 12),
+                  _divider(),
+                  _productsInfoAndMap(),
+                ],
+              ),
+            ),
           ),
         ),
       ),

@@ -10,7 +10,7 @@ class DioClient {
   Dio dio = Dio(
     BaseOptions(
       // baseUrl: "http://192.168.32.1:8000/",
-      baseUrl: 'http://3.35.52.56:8000/',
+      baseUrl: 'https://www.e24api1215.com/',
       connectTimeout: Duration(minutes: 2),
       receiveTimeout: Duration(minutes: 1),
     ),
@@ -40,6 +40,7 @@ class DioClient {
     if (!hasInternet) {
       CustomDialogs().showNetworkErrorDialog(() {});
     }
+
     try {
       Response<String> response = await dio.request(
         path,

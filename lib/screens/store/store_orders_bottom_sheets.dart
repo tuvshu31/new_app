@@ -49,14 +49,12 @@ void storeOrdersToDelivery(context, data) {
       () async {
         slideActionKey.currentState!.reset();
         if (!_storeCtx.driverAccepted.value) {
-          var body = {
-            "orderId": data['orderId'],
-            'canceledDrivers': [],
-          };
-          dynamic response = await RestApi().assignDriver(body);
+          dynamic response = await RestApi().assignDriver(data["id"]);
           dynamic d = Map<String, dynamic>.from(response);
-          Get.back();
-          notifyToDrivers(context, data);
+          if (d["success"]) {
+            Get.back();
+            notifyToDrivers(context, data);
+          }
         } else {
           Get.back();
           customSnackbar(DialogType.error,

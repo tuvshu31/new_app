@@ -19,16 +19,16 @@ class Noti {
     // Your code goes here
     var payload = jsonDecode(receivedNotification.payload!["data"]!);
     var role = payload["role"];
-    var action = payload["orderStatus"];
+
     switch (role) {
       case "user":
-        _userCtx.userActionHandler(action, payload);
+        _userCtx.userActionHandler(payload);
         break;
       case "store":
-        _storeCtx.storeActionHandler(action, payload);
+        _storeCtx.storeActionHandler(payload);
         break;
       case "driver":
-        _driverCtx.driverActionHandler(action, payload);
+        _driverCtx.driverActionHandler(payload);
         break;
       default:
         break;

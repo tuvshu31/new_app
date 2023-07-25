@@ -439,24 +439,6 @@ void showAwesomDialog(context) {
 // final player = AudioCache();
 String message = "Hello";
 late AnimationController localAnimationController;
-void showLoadingDialog() {
-  WillPopScope(
-      onWillPop: () async => false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Material(
-            color: Colors.transparent,
-            child: Center(
-              child: SpinKitCircle(
-                color: MyColors.white,
-                size: 45,
-              ),
-            ),
-          ),
-        ],
-      ));
-}
 
 void successOrderModal(context, onTap) {
   // player.play("sounds/success_bell.wav");

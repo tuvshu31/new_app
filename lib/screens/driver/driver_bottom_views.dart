@@ -1,6 +1,14 @@
 import 'dart:developer';
-
-import 'package:circular_countdown/circular_countdown.dart';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/slide_button.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/text.dart';
@@ -9,38 +17,32 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:iconly/iconly.dart';
+import 'package:lottie/lottie.dart';
 import 'package:slide_countdown/slide_countdown.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 final _driverCtx = Get.put(DriverController());
-final player = AudioPlayer();
 
-void playSound(type) async {
-  player.play(AssetSource("sounds/$type.wav"));
-}
-
-void stopSound() async {
-  player.stop();
-}
-
-Widget step0() {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const CustomText(
-        text: "Сүүлийн хүргэлт:",
-        fontSize: 14,
-        color: MyColors.gray,
-      ),
-      const SizedBox(height: 24),
-      Container(
-        height: 70,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: MyColors.black,
-          borderRadius: BorderRadius.circular(50),
+Widget withoutOrderView() {
+  return Padding(
+    padding: const EdgeInsets.all(24.0),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const CustomText(
+          text: "Сүүлийн хүргэлт:",
+          fontSize: 14,
+          color: MyColors.gray,
         ),
-        child: Obx(
-          () => Row(
+        const SizedBox(height: 24),
+        Container(
+          height: 70,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: MyColors.black,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
@@ -87,132 +89,119 @@ Widget step0() {
                     CustomText(
                       fontSize: 10,
                       color: MyColors.white,
-                      text: formatedTime(
-                          timeInSecond: int.parse(
-                              _driverCtx.lastDelivery["deliveryDuration"])),
+                      text: formatedTime(timeInSecond: int.parse("23")),
                     )
                   ],
                 ),
               ),
             ],
           ),
-        ),
-      )
-    ],
-  );
-}
-
-Widget step1() {
-  return Obx(
-    () => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          margin: EdgeInsets.only(bottom: Get.height * .03),
-          child: TimeCircularCountdown(
-            countdownRemainingColor: MyColors.primary,
-            unit: CountdownUnit.second,
-            textStyle: const TextStyle(
-              color: MyColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
-            countdownTotal: 30,
-            onUpdated: (unit, remainingTime) {},
-            onFinished: () {
-              _driverCtx.cancelNewDelivery();
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      text: convertToCurrencyFormat(
-                        3000,
-                        toInt: true,
-                        locatedAtTheEnd: true,
-                      ),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    const SizedBox(height: 4),
-                    CustomText(
-                      text: _driverCtx.distanceAndDuration.value != ""
-                          ? _driverCtx.distanceAndDuration.value
-                          : "km",
-                      color: MyColors.gray,
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  _driverCtx.cancelNewDelivery();
-                },
-                icon: const Icon(Icons.close, size: 28),
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(
-                  "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
-            ),
-            title: CustomText(
-              text: _driverCtx.deliveryInfo["storeName"] ?? "no data",
-              fontSize: 16,
-            ),
-            subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["storeAddress"] ?? "no data",
-              fontSize: 12,
-            ),
-          ),
-        ),
-        const Divider(),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
-              backgroundColor: MyColors.white,
-              radius: 30,
-              child: Image(
-                width: 32,
-                image: AssetImage(
-                  "assets/images/png/app/home.png",
-                ),
-              ),
-            ),
-            title: CustomText(
-              text: _driverCtx.deliveryInfo["userAddress"] ?? "no data",
-              fontSize: 16,
-            ),
-            subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["userPhone"] ?? "no data",
-              fontSize: 12,
-            ),
-          ),
-        ),
+        )
       ],
     ),
   );
 }
 
-Widget step2() {
+Widget incomingNewOrderView() {
+  return Container(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            CustomInkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                _driverCtx.cancelOrder();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  color: MyColors.fadedGrey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text("Цуцлах"),
+              ),
+            )
+          ],
+        ),
+        SizedBox(height: Get.height * .03),
+        Stack(
+          children: [
+            CustomImage(
+              width: Get.width * .25,
+              height: Get.width * .25,
+              url:
+                  "${URL.AWS}/users/${_driverCtx.newOrderInfo["storeId1"]}/small/1.png",
+              radius: 100,
+            ),
+            CircularCountDownTimer(
+              isReverseAnimation: true,
+              isReverse: true,
+              strokeWidth: 8,
+              width: Get.width * .25,
+              height: Get.width * .25,
+              duration: 30,
+              isTimerTextShown: false,
+              fillColor: MyColors.primary,
+              ringColor: Colors.white,
+              strokeCap: StrokeCap.round,
+              onComplete: () {},
+            ),
+          ],
+        ),
+        SizedBox(height: Get.height * .03),
+        Text(
+          _driverCtx.newOrderInfo["storeName"] ?? "No data",
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+        Text(
+          _driverCtx.newOrderInfo["storeAddress"] ?? "No data",
+          style: TextStyle(
+            fontSize: 12,
+            color: MyColors.gray,
+          ),
+        ),
+        SizedBox(height: Get.height * .03),
+        Text(
+          convertToCurrencyFormat(
+            _driverCtx.newOrderInfo["deliveryPrice"] ?? 3000,
+            locatedAtTheEnd: true,
+            toInt: true,
+          ),
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: Get.height * .03),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.location_on_rounded,
+              size: 16,
+              color: MyColors.primary,
+            ),
+            const SizedBox(width: 12),
+            Text(_driverCtx.newOrderInfo["address"] ?? "No data"),
+          ],
+        ),
+        SizedBox(height: Get.height * .05),
+        CustomSlideButton(
+          text: "Зөвшөөрөх",
+          onSubmit: () {},
+        )
+      ],
+    ),
+  );
+}
+
+Widget arrivedAtStoreView() {
   return Obx(
     () => Column(
       mainAxisSize: MainAxisSize.min,
@@ -227,16 +216,16 @@ Widget step2() {
                   "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
             ),
             title: CustomText(
-              text: _driverCtx.deliveryInfo["storeName"],
+              text: _driverCtx.newOrderInfo["storeName"],
               fontSize: 16,
             ),
             subtitle: CustomText(
-              text: _driverCtx.deliveryInfo["storeAddress"],
+              text: _driverCtx.newOrderInfo["storeAddress"],
               fontSize: 12,
             ),
             trailing: GestureDetector(
               onTap: () {
-                makePhoneCall("+976-${_driverCtx.deliveryInfo["storePhone"]}");
+                makePhoneCall("+976-${_driverCtx.newOrderInfo["storePhone"]}");
               },
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -252,7 +241,7 @@ Widget step2() {
   );
 }
 
-Widget step3() {
+Widget receivedTheOrderView() {
   return Obx(
     () => Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -263,7 +252,7 @@ Widget step3() {
         ),
         const SizedBox(height: 12),
         CustomText(
-          text: _driverCtx.deliveryInfo["orderId"],
+          text: _driverCtx.newOrderInfo["orderId"],
           fontSize: 28,
         ),
         const SizedBox(height: 12),
@@ -277,7 +266,7 @@ Widget step3() {
   );
 }
 
-Widget step4() {
+Widget deliveredTheOrderView() {
   return Obx(
     () => Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -297,7 +286,7 @@ Widget step4() {
               ),
             ),
             title: CustomText(
-              text: _driverCtx.deliveryInfo["userAddress"],
+              text: _driverCtx.newOrderInfo["userAddress"],
               fontSize: 16,
             ),
             // subtitle: CustomText(
@@ -305,7 +294,7 @@ Widget step4() {
             //         "Захиалгын код: ${}"),
             trailing: GestureDetector(
               onTap: () {
-                makePhoneCall("+976-${_driverCtx.deliveryInfo["userPhone"]}");
+                makePhoneCall("+976-${_driverCtx.newOrderInfo["userPhone"]}");
               },
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -321,7 +310,7 @@ Widget step4() {
   );
 }
 
-Widget step5() {
+Widget finishedTheOrderView() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [

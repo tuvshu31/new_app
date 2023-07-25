@@ -35,7 +35,7 @@ class UserController extends GetxController {
 
   void getOrders() async {
     fetchingOrderList.value = true;
-    var body = {"userId": 25};
+    var body = {"userId": RestApiHelper.getUserId()};
     dynamic response = await RestApi().getOrders(body);
     dynamic d = Map<String, dynamic>.from(response);
     if (d["success"]) {
@@ -159,8 +159,8 @@ class UserController extends GetxController {
     filteredOrderList.refresh();
   }
 
-  void userActionHandler(action, payload) {
-    log(payload.toString());
+  void userActionHandler(payload) {
+    var action = payload["action"];
     if (action == "sent") {
       _cartCtx.cartList.clear();
       _cartCtx.cartItemCount.value = 0;

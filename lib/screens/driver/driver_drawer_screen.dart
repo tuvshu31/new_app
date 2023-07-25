@@ -1,5 +1,3 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
@@ -22,7 +20,7 @@ String generateDriverName(driverInfo) {
   return name;
 }
 
-Widget driverDrawer(context) {
+Widget driverDrawer() {
   return Obx(
     () => Drawer(
       child: ListView(
