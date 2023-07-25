@@ -19,7 +19,7 @@ class Noti {
     // Your code goes here
     var payload = jsonDecode(receivedNotification.payload!["data"]!);
     var role = payload["role"];
-
+    log(payload.toString());
     switch (role) {
       case "user":
         _userCtx.userActionHandler(payload);

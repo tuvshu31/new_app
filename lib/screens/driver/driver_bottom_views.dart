@@ -169,7 +169,7 @@ Widget incomingNewOrderView() {
         SizedBox(height: Get.height * .03),
         Text(
           convertToCurrencyFormat(
-            _driverCtx.newOrderInfo["deliveryPrice"] ?? 3000,
+            int.parse(_driverCtx.newOrderInfo["deliveryPrice"] ?? "3000"),
             locatedAtTheEnd: true,
             toInt: true,
           ),
@@ -194,7 +194,9 @@ Widget incomingNewOrderView() {
         SizedBox(height: Get.height * .05),
         CustomSlideButton(
           text: "Зөвшөөрөх",
-          onSubmit: () {},
+          onSubmit: () {
+            _driverCtx.acceptOrder();
+          },
         )
       ],
     ),

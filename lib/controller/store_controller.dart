@@ -83,7 +83,8 @@ class StoreController extends GetxController {
       filteredOrderList.value = storeOrderList
           .where((p0) =>
               p0["orderStatus"] == "received" ||
-              p0["orderStatus"] == "preparing")
+              p0["orderStatus"] == "preparing" ||
+              p0["orderStatus"] == "driverAccepted")
           .toList();
     }
     if (value == 1) {
