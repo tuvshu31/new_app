@@ -6,9 +6,9 @@ enum DialogType { success, warning, error }
 
 enum DriverStatus {
   withoutOrder,
-  incomingNewOrder,
-  arrivedAtStore,
-  receivedTheOrder,
-  deliveredTheOrder,
-  finishedTheOrder,
+  incoming,
+  arrived,
+  received,
+  delivered,
+  finished,
 }

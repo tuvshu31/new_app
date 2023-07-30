@@ -80,16 +80,16 @@ class _DriverMainScreenState extends State<DriverMainScreen>
   Widget _bottomViewsHandler(DriverStatus status) {
     if (status == DriverStatus.withoutOrder) {
       return withoutOrderView();
-    } else if (status == DriverStatus.incomingNewOrder) {
-      return incomingNewOrderView();
-    } else if (status == DriverStatus.arrivedAtStore) {
-      return arrivedAtStoreView();
-    } else if (status == DriverStatus.receivedTheOrder) {
-      return receivedTheOrderView();
-    } else if (status == DriverStatus.deliveredTheOrder) {
-      return deliveredTheOrderView();
-    } else if (status == DriverStatus.deliveredTheOrder) {
-      return deliveredTheOrderView();
+    } else if (status == DriverStatus.incoming) {
+      return incomingView();
+    } else if (status == DriverStatus.arrived) {
+      return arrivedView();
+    } else if (status == DriverStatus.received) {
+      return receivedView();
+    } else if (status == DriverStatus.delivered) {
+      return deliveredView();
+    } else if (status == DriverStatus.finished) {
+      return finishedView();
     } else {
       return withoutOrderView();
     }
@@ -167,7 +167,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
                       _driverCtx.animationController.reverse();
                     }
                   }
-                  setState(() {});
+                  // setState(() {});
                 }),
           ),
         ],

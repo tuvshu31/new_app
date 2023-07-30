@@ -102,7 +102,7 @@ Widget withoutOrderView() {
   );
 }
 
-Widget incomingNewOrderView() {
+Widget incomingView() {
   return Container(
     padding: const EdgeInsets.all(24),
     child: Column(
@@ -113,9 +113,7 @@ Widget incomingNewOrderView() {
           children: [
             CustomInkWell(
               borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                _driverCtx.cancelOrder();
-              },
+              onTap: _driverCtx.cancelOrder,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 decoration: BoxDecoration(
@@ -148,20 +146,20 @@ Widget incomingNewOrderView() {
               fillColor: MyColors.primary,
               ringColor: Colors.white,
               strokeCap: StrokeCap.round,
-              onComplete: () {},
+              onComplete: _driverCtx.cancelOrder,
             ),
           ],
         ),
         SizedBox(height: Get.height * .03),
         Text(
           _driverCtx.newOrderInfo["storeName"] ?? "No data",
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
           ),
         ),
         Text(
           _driverCtx.newOrderInfo["storeAddress"] ?? "No data",
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: MyColors.gray,
           ),
@@ -194,23 +192,21 @@ Widget incomingNewOrderView() {
         SizedBox(height: Get.height * .05),
         CustomSlideButton(
           text: "Зөвшөөрөх",
-          onSubmit: () {
-            _driverCtx.acceptOrder();
-          },
+          onSubmit: _driverCtx.acceptOrder,
         )
       ],
     ),
   );
 }
 
-Widget arrivedAtStoreView() {
+Widget arrivedView() {
   return Obx(
-    () => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ListTile(
+    () => Container(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const CircleAvatar(
               backgroundImage: NetworkImage(
@@ -218,11 +214,11 @@ Widget arrivedAtStoreView() {
                   "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
             ),
             title: CustomText(
-              text: _driverCtx.newOrderInfo["storeName"],
+              text: _driverCtx.newOrderInfo["storeName"] ?? "",
               fontSize: 16,
             ),
             subtitle: CustomText(
-              text: _driverCtx.newOrderInfo["storeAddress"],
+              text: _driverCtx.newOrderInfo["storeAddress"] ?? "",
               fontSize: 12,
             ),
             trailing: GestureDetector(
@@ -236,17 +232,22 @@ Widget arrivedAtStoreView() {
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 12)
-      ],
+          SizedBox(height: Get.height * .05),
+          CustomSlideButton(
+            text: "Ирлээ",
+            onSubmit: _driverCtx.arrived,
+          )
+        ],
+      ),
     ),
   );
 }
 
-Widget receivedTheOrderView() {
-  return Obx(
-    () => Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+Widget receivedView() {
+  return Container(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const CustomText(
           text: "Баталгаажуулах код:",
@@ -254,93 +255,122 @@ Widget receivedTheOrderView() {
         ),
         const SizedBox(height: 12),
         CustomText(
-          text: _driverCtx.newOrderInfo["orderId"],
-          fontSize: 28,
+          text: _driverCtx.newOrderInfo["orderId"].toString(),
+          fontSize: 24,
         ),
         const SizedBox(height: 12),
         SlideCountdownSeparated(
           duration: const Duration(minutes: 15),
           onDone: () {},
-        ),
-        const SizedBox(height: 24),
-      ],
-    ),
-  );
-}
-
-Widget deliveredTheOrderView() {
-  return Obx(
-    () => Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
-              backgroundColor: MyColors.white,
-              radius: 20,
-              child: Image(
-                width: 32,
-                image: AssetImage(
-                  "assets/images/png/app/home.png",
-                ),
-              ),
-            ),
-            title: CustomText(
-              text: _driverCtx.newOrderInfo["userAddress"],
-              fontSize: 16,
-            ),
-            // subtitle: CustomText(
-            //     text:
-            //         "Захиалгын код: ${}"),
-            trailing: GestureDetector(
-              onTap: () {
-                makePhoneCall("+976-${_driverCtx.newOrderInfo["userPhone"]}");
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Image(
-                    image: AssetImage("assets/images/png/app/phone-call.png")),
-              ),
+          width: 40,
+          height: 40,
+          textStyle: const TextStyle(color: Colors.white),
+          decoration: BoxDecoration(
+            color: MyColors.primary,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              width: 1,
+              color: MyColors.primary,
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: Get.height * .05),
+        CustomSlideButton(
+          text: "Хүлээн авсан",
+          onSubmit: _driverCtx.received,
+        )
       ],
     ),
   );
 }
 
-Widget finishedTheOrderView() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Image(
-        image: const AssetImage("assets/images/png/app/yes.png"),
-        width: Get.width * .3,
+Widget deliveredView() {
+  return Obx(
+    () => Container(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const CircleAvatar(
+                backgroundColor: MyColors.white,
+                radius: 20,
+                child: Image(
+                  width: 32,
+                  image: AssetImage(
+                    "assets/images/png/app/home.png",
+                  ),
+                ),
+              ),
+              title: CustomText(
+                text: _driverCtx.newOrderInfo["address"] ?? "",
+                fontSize: 16,
+              ),
+              subtitle: CustomText(
+                  text: "Орцны код: ${_driverCtx.newOrderInfo["kod"] ?? ""}"),
+              trailing: GestureDetector(
+                onTap: () {
+                  makePhoneCall("+976-${_driverCtx.newOrderInfo["phone"]}");
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Image(
+                      image:
+                          AssetImage("assets/images/png/app/phone-call.png")),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: Get.height * .05),
+          CustomSlideButton(
+            text: "Хүлээлгэн өгсөн",
+            onSubmit: _driverCtx.delivered,
+          )
+        ],
       ),
-      const SizedBox(height: 24),
-      const CustomText(
-        text: "Хүргэлт амжилттай",
-        fontSize: 16,
-      ),
-      const SizedBox(height: 8),
-      CustomText(
-        fontSize: 28,
-        text: convertToCurrencyFormat(
-          double.parse("3000"),
-          toInt: true,
-          locatedAtTheEnd: true,
+    ),
+  );
+}
+
+Widget finishedView() {
+  return Container(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image(
+          image: const AssetImage("assets/images/png/app/yes.png"),
+          width: Get.width * .3,
         ),
-      ),
-      const SizedBox(height: 8),
-      const CustomText(
-        text: "Орлого нэмэгдлээ",
-        fontSize: 12,
-        color: MyColors.gray,
-      ),
-      const SizedBox(height: 12),
-    ],
+        const SizedBox(height: 24),
+        const CustomText(
+          text: "Хүргэлт амжилттай",
+          fontSize: 16,
+        ),
+        const SizedBox(height: 8),
+        CustomText(
+          fontSize: 28,
+          text: convertToCurrencyFormat(
+            double.parse("3000"),
+            toInt: true,
+            locatedAtTheEnd: true,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const CustomText(
+          text: "Орлого нэмэгдлээ",
+          fontSize: 12,
+          color: MyColors.gray,
+        ),
+        SizedBox(height: Get.height * .05),
+        CustomSlideButton(
+          text: "Дуусгах",
+          onSubmit: _driverCtx.finished,
+        )
+      ],
+    ),
   );
 }

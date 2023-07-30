@@ -22,6 +22,7 @@ class DriverController extends GetxController {
   RxDouble driverRotation = 0.0.obs;
   Rx<DriverStatus> driverStatus = DriverStatus.withoutOrder.obs;
   late AnimationController animationController;
+  int driverId = RestApiHelper.getUserId();
 
   void playSound(type) async {
     player.play(AssetSource("sounds/$type.wav"));
@@ -90,23 +91,63 @@ class DriverController extends GetxController {
     dynamic data = Map<String, dynamic>.from(user);
   }
 
-  void cancelOrder() async {
-    stopSound();
+  void incoming() async {
     hideBottomView();
-    driverStatus.value = DriverStatus.withoutOrder;
-    var id = newOrderInfo["id"];
-    var driverId = RestApiHelper.getUserId();
-    dynamic res = await RestApi().cancelOrder(id, driverId);
-    log(res.toString());
-    newOrderInfo.clear();
+    driverStatus.value = DriverStatus.incoming;
     showBottomView();
   }
 
   void acceptOrder() async {
     stopSound();
     hideBottomView();
-    driverStatus.value = DriverStatus.arrivedAtStore;
-    await RestApi().acceptOrder(newOrderInfo["id"], RestApiHelper.getUserId());
+    driverStatus.value = DriverStatus.arrived;
+    var orderId = newOrderInfo["id"];
+    // await RestApi().acceptOrder(orderId, driverId);
+    showBottomView();
+  }
+
+  void cancelOrder() async {
+    stopSound();
+    hideBottomView();
+    // var orderId = newOrderInfo["id"];
+    // dynamic res = await RestApi().cancelOrder(orderId, driverId);
+    // log(res.toString());
+    driverStatus.value = DriverStatus.withoutOrder;
+    newOrderInfo.clear();
+    showBottomView();
+  }
+
+  void arrived() async {
+    hideBottomView();
+    driverStatus.value = DriverStatus.received;
+    var orderId = newOrderInfo["id"];
+    // await RestApi().arrived(orderId, driverId);
+    showBottomView();
+  }
+
+  void received() async {
+    hideBottomView();
+    driverStatus.value = DriverStatus.delivered;
+    var orderId = newOrderInfo["id"];
+    // await RestApi().arrived(orderId, driverId);
+    showBottomView();
+  }
+
+  void delivered() async {
+    hideBottomView();
+    driverStatus.value = DriverStatus.finished;
+    var orderId = newOrderInfo["id"];
+    // await RestApi().arrived(orderId, driverId);
+
+    showBottomView();
+  }
+
+  void finished() async {
+    hideBottomView();
+    driverStatus.value = DriverStatus.withoutOrder;
+    var orderId = newOrderInfo["id"];
+    // await RestApi().arrived(orderId, driverId);
+    newOrderInfo.clear();
     showBottomView();
   }
 
@@ -122,12 +163,20 @@ class DriverController extends GetxController {
   }
 
   void driverActionHandler(payload) async {
-    if (newOrderInfo.isEmpty) {
-      animationController.reverse();
-      newOrderInfo.value = payload;
-      driverStatus.value = DriverStatus.incomingNewOrder;
-      animationController.forward();
-      playSound("incoming");
+    if (payload["action"] == "available") {
+      int id = int.parse(payload["orderId"]);
+      int driverId = RestApiHelper.getUserId();
+      dynamic res = await RestApi().getNotifiedDrivers(id, driverId);
+      log(res.toString());
+      log(payload.toString());
+    } else {
+      if ((newOrderInfo.isEmpty)) {
+        animationController.reverse();
+        newOrderInfo.value = payload;
+        driverStatus.value = DriverStatus.incoming;
+        animationController.forward();
+        playSound("incoming");
+      }
     }
   }
 
@@ -136,7 +185,7 @@ class DriverController extends GetxController {
   }
 
   void showBottomView() {
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       animationController.forward();
     });
   }
