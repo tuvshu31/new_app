@@ -9,10 +9,10 @@ import 'package:dio/dio.dart';
 class DioClient {
   Dio dio = Dio(
     BaseOptions(
-      // baseUrl: "http://192.168.1.6:8000/",
+      // baseUrl: "http://192.168.8.5:8000/",
       baseUrl: 'https://www.e24api1215.com/',
-      connectTimeout: Duration(minutes: 2),
-      receiveTimeout: Duration(minutes: 1),
+      connectTimeout: const Duration(minutes: 2),
+      receiveTimeout: const Duration(minutes: 1),
     ),
   );
 

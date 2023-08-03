@@ -1,38 +1,28 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:get/get.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/styles.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 
 final _userCtx = Get.put(UserController());
 final _storeCtx = Get.put(StoreController());
 final _driverCtx = Get.put(DriverController());
 
-class Noti {
+class LocalNofitication {
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
-    // Your code goes here
     var payload = jsonDecode(receivedNotification.payload!["data"]!);
     var role = payload["role"];
-    log(payload.toString());
-    switch (role) {
-      case "user":
-        _userCtx.userActionHandler(payload);
-        break;
-      case "store":
-        _storeCtx.storeActionHandler(payload);
-        break;
-      case "driver":
-        _driverCtx.driverActionHandler(payload);
-        break;
-      default:
-        break;
-    }
+    if (role == "user") {
+      _userCtx.userActionHandler(payload);
+    } else if (role == "store") {
+      _storeCtx.storeActionHandler(payload);
+    } else if (role == "driver") {
+      _driverCtx.driverActionHandler(payload);
+    } else {}
   }
 
   @pragma("vm:entry-point")
@@ -42,56 +32,28 @@ class Noti {
   }
 }
 
-Future<void> handleNotifications(message, isBackground) async {
+Future<void> handleNotifications(message) async {
   var info = message["data"];
   var data = jsonDecode(info);
-  var role = data["role"];
-  var action = data["orderStatus"];
-  if (data["role"] == "driver") {
-    _driverCtx.driverActionHandler(data);
-  } else {
-    if (action == "promo") {
-      var bigPicture = data["bigPicture"] ??
-          "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          payload: Map<String, String>.from(message),
-          id: 10,
-          channelKey: 'basic_channel',
-          title: data["storeName"],
-          body: data["message"],
-          notificationLayout: NotificationLayout.BigPicture,
-          displayOnBackground: true,
-          displayOnForeground: true,
-          locked: false,
-          category: NotificationCategory.Message,
-          color: MyColors.primary,
-          bigPicture: bigPicture,
-        ),
-      );
-    } else {
-      var storeName = data["products"] != null
-          ? data["products"][0]["storeName"]
-          : "Erdenet24";
-      String messageBody = notificationData.firstWhere(
-            (element) => element["action"] == action && element["role"] == role,
-          )["body"] ??
-          "";
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          payload: Map<String, String>.from(message),
-          id: 10,
-          channelKey: 'basic_channel',
-          title: role == "user" ? storeName ?? "Байгууллага" : "Erdenet24",
-          body: messageBody,
-          notificationLayout: NotificationLayout.Default,
-          displayOnBackground: true,
-          displayOnForeground: true,
-          locked: false,
-          category: NotificationCategory.Message,
-          color: MyColors.primary,
-        ),
-      );
-    }
-  }
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      wakeUpScreen: true,
+      payload: Map<String, String>.from(message),
+      id: data["id"] ?? 1,
+      channelKey: 'basic_channel',
+      title: data["storeName"] ?? "Erdenet24",
+      body: data["text"],
+      notificationLayout: data["bigPicture"] != ""
+          ? NotificationLayout.BigPicture
+          : NotificationLayout.Default,
+      displayOnBackground: true,
+      displayOnForeground: true,
+      locked: false,
+      category: NotificationCategory.Message,
+      color: MyColors.primary,
+      largeIcon: data["largeIcon"] ?? "",
+      bigPicture: data["bigPicture"] ?? "",
+    ),
+  );
+  AwesomeNotifications().cancel(1);
 }

@@ -159,6 +159,14 @@ class CustomDialogs {
       onWillPop: false,
     );
   }
+
+  void showDriverAuthDialog(dynamic onPressed) {
+    customDialog(
+      DialogType.warning,
+      showNewVersionDialogBody(onPressed),
+      onWillPop: false,
+    );
+  }
 }
 
 void changeLeftOverCount(

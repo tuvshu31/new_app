@@ -93,13 +93,6 @@ List<Map<String, dynamic>> notificationData = [
   },
   {
     "role": "user",
-    "action": "sent",
-    "body": "Захиалгыг хүлээн авлаа",
-    "visible": true,
-    "type": "message",
-  },
-  {
-    "role": "user",
     "action": "received",
     "body": "Таны захиалгыг хүлээн авлаа",
     "visible": true,

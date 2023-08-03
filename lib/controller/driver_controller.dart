@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/enums.dart';
@@ -102,16 +103,19 @@ class DriverController extends GetxController {
     hideBottomView();
     driverStatus.value = DriverStatus.arrived;
     var orderId = newOrderInfo["id"];
-    // await RestApi().acceptOrder(orderId, driverId);
-    showBottomView();
+    CustomDialogs().showLoadingDialog();
+    dynamic res = await RestApi().acceptOrder(orderId, driverId);
+    Get.back();
+    if (res != null) {
+      showBottomView();
+    } else {
+      customSnackbar(DialogType.error, "Алдаа гарлаа", 3);
+    }
   }
 
   void cancelOrder() async {
     stopSound();
     hideBottomView();
-    // var orderId = newOrderInfo["id"];
-    // dynamic res = await RestApi().cancelOrder(orderId, driverId);
-    // log(res.toString());
     driverStatus.value = DriverStatus.withoutOrder;
     newOrderInfo.clear();
     showBottomView();
@@ -121,24 +125,36 @@ class DriverController extends GetxController {
     hideBottomView();
     driverStatus.value = DriverStatus.received;
     var orderId = newOrderInfo["id"];
-    // await RestApi().arrived(orderId, driverId);
-    showBottomView();
+    CustomDialogs().showLoadingDialog();
+    dynamic res = await RestApi().arrived(orderId, driverId);
+    Get.back();
+    if (res != null) {
+      showBottomView();
+    } else {
+      customSnackbar(DialogType.error, "Алдаа гарлаа", 3);
+    }
   }
 
   void received() async {
     hideBottomView();
     driverStatus.value = DriverStatus.delivered;
     var orderId = newOrderInfo["id"];
-    // await RestApi().arrived(orderId, driverId);
-    showBottomView();
+    CustomDialogs().showLoadingDialog();
+    dynamic res = await RestApi().received(orderId, driverId);
+    Get.back();
+    if (res != null) {
+      showBottomView();
+    } else {
+      customSnackbar(DialogType.error, "Алдаа гарлаа", 3);
+    }
   }
 
   void delivered() async {
     hideBottomView();
     driverStatus.value = DriverStatus.finished;
     var orderId = newOrderInfo["id"];
+    // CustomDialogs().showDriverAuthDialog();
     // await RestApi().arrived(orderId, driverId);
-
     showBottomView();
   }
 

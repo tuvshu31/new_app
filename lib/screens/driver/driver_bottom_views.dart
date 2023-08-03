@@ -208,10 +208,11 @@ Widget arrivedView() {
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
+            leading: CircleAvatar(
               backgroundImage: NetworkImage(
-                  scale: 2,
-                  "https://et24-images.s3.ap-northeast-1.amazonaws.com/users/26/small/1.png"),
+                scale: 2,
+                "${URL.AWS}/users/${_driverCtx.newOrderInfo["storeId1"]}/small/1.png",
+              ),
             ),
             title: CustomText(
               text: _driverCtx.newOrderInfo["storeName"] ?? "",

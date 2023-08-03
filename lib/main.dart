@@ -56,11 +56,11 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  handleNotifications(message.data, true);
+  handleNotifications(message.data);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  handleNotifications(message.data, false);
+  handleNotifications(message.data);
 }
 
 final GlobalKey<NavigatorState> navigatorKey =
@@ -131,8 +131,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     AwesomeNotifications().setListeners(
-      onNotificationCreatedMethod: Noti.onNotificationCreatedMethod,
-      onActionReceivedMethod: Noti.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          LocalNofitication.onNotificationCreatedMethod,
+      onActionReceivedMethod: LocalNofitication.onActionReceivedMethod,
     );
   }
 
