@@ -5,6 +5,7 @@ import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -12,19 +13,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class UserProfileOrdersDetailScreen extends StatefulWidget {
-  const UserProfileOrdersDetailScreen({
+class UserOrdersDetailScreen extends StatefulWidget {
+  const UserOrdersDetailScreen({
     super.key,
   });
 
   @override
-  State<UserProfileOrdersDetailScreen> createState() =>
-      _UserProfileOrdersDetailScreenState();
+  State<UserOrdersDetailScreen> createState() => _UserOrdersDetailScreenState();
 }
 
-class _UserProfileOrdersDetailScreenState
-    extends State<UserProfileOrdersDetailScreen> {
+class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   final _userCtx = Get.put(UserController());
+  bool showUserAndDriverCode = true;
+  @override
+  void initState() {
+    super.initState();
+    if (_userCtx.selectedOrder["orderStatus"] == "delivered" ||
+        _userCtx.selectedOrder["orderStatus"] == "canceled") {
+      showUserAndDriverCode = false;
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +44,19 @@ class _UserProfileOrdersDetailScreenState
           child: CustomHeader(
             centerTitle: true,
             customLeading: Container(),
-            customActions: IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: const Icon(
-                Icons.close_rounded,
-                color: Colors.black,
+            customActions: CustomInkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: Get.back,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: MyColors.fadedGrey,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.black,
+                ),
               ),
             ),
             title: "Захиалга",
@@ -270,8 +285,6 @@ class _UserProfileOrdersDetailScreenState
                             subtitle: CustomText(
                                 text: convertToCurrencyFormat(
                               int.parse(product["price"]),
-                              toInt: true,
-                              locatedAtTheEnd: true,
                             )),
                             trailing: CustomText(
                                 text: "${product["quantity"]} ширхэг"),
@@ -290,8 +303,6 @@ class _UserProfileOrdersDetailScreenState
                       text: convertToCurrencyFormat(
                         double.parse(
                             _userCtx.selectedOrder["storeTotalAmount"] ?? "0"),
-                        toInt: true,
-                        locatedAtTheEnd: true,
                       ),
                       color: MyColors.gray,
                     )
@@ -309,8 +320,6 @@ class _UserProfileOrdersDetailScreenState
                       text: convertToCurrencyFormat(
                         int.parse(
                             _userCtx.selectedOrder["deliveryPrice"] ?? "0"),
-                        toInt: true,
-                        locatedAtTheEnd: true,
                       ),
                       color: MyColors.gray,
                     )
@@ -337,8 +346,6 @@ class _UserProfileOrdersDetailScreenState
                     CustomText(
                       text: convertToCurrencyFormat(
                         int.parse(_userCtx.selectedOrder["totalAmount"] ?? "0"),
-                        toInt: true,
-                        locatedAtTheEnd: true,
                       ),
                       color: MyColors.black,
                     )
@@ -387,6 +394,30 @@ class _UserProfileOrdersDetailScreenState
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          showUserAndDriverCode
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const CustomText(
+                      text: "Захиалгаа авах код:",
+                      color: MyColors.gray,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12)),
+                      child: CustomText(
+                        text: _userCtx.selectedOrder["userAndDriverCode"]
+                            .toString(),
+                        color: MyColors.white,
+                      ),
+                    ),
+                  ],
+                )
+              : Container(),
         ],
       ),
     );

@@ -133,7 +133,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText(
-                                    text: saved[index]["storeName"],
+                                    text: saved[index]["name"],
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   CustomText(
@@ -145,14 +145,12 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const CustomText(
-                                        text: "Нийт үнэ: ",
+                                        text: "Үнэ: ",
                                         fontSize: 12,
                                       ),
                                       CustomText(
                                           text: convertToCurrencyFormat(
                                         double.parse(saved[index]["price"]),
-                                        toInt: true,
-                                        locatedAtTheEnd: true,
                                       ))
                                     ],
                                   ),

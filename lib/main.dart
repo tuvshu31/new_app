@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
@@ -21,16 +19,13 @@ import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
-import 'package:Erdenet24/screens/user/user_orders_active_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_screen.dart';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
-import 'package:Erdenet24/screens/user/user_search_screen.dart';
-import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -174,16 +169,13 @@ class _MyAppState extends State<MyApp> {
         userProfileAddressEditScreenRoute: (context) =>
             const UserProfileAddressEditScreen(),
         userProfileHelpScreenRoute: (context) => const UserProfileHelpScreen(),
-        userProfileOrdersScreenRoute: (context) =>
-            const UserProfileOrdersScreen(),
+        userProfileOrdersScreenRoute: (context) => const UserOrdersScreen(),
         userProfilePhoneEditScreenRoute: (context) =>
             const UserProfilePhoneEditScreen(),
         userProfileScreenRoute: (context) => const UserProfileScreen(),
         userQrScanScreenRoute: (context) => const UserQRScanScreen(),
         userSavedScreenRoute: (context) => const UserSavedScreen(),
         userSearchBarScreenRoute: (context) => const UserSearchBarScreenRoute(),
-        userSearchScreenRoute: (context) => const UserSearchScreen(),
-        userStoreListScreenRoute: (context) => const UserStoreListScreen(),
         storeMainScreenRoute: (context) => const StoreMainScreen(),
         storeOrdersScreenRoute: (context) => const StoreOrdersScreen(),
         storeProductsCreateProductScreenRoute: (context) =>

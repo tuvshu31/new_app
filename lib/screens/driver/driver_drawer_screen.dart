@@ -31,22 +31,17 @@ Widget driverDrawer() {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(driverSettingsScreenRoute);
-                    },
-                    child: Container(
-                      width: 75,
-                      height: 75,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MyColors.white,
-                      ),
-                      child: const Icon(
-                        FontAwesomeIcons.user,
-                        size: 40,
-                        color: MyColors.grey,
-                      ),
+                  Container(
+                    width: 75,
+                    height: 75,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: MyColors.white,
+                    ),
+                    child: const Icon(
+                      FontAwesomeIcons.user,
+                      size: 40,
+                      color: MyColors.grey,
                     ),
                   ),
                   CustomText(
@@ -57,7 +52,10 @@ Widget driverDrawer() {
                   )
                 ],
               )),
-          _listTile(IconlyLight.user, "Тохиргоо", () {
+          _listTile(IconlyLight.user, "Хэрэглэгч", () {
+            Get.toNamed(driverSettingsScreenRoute);
+          }),
+          _listTile(IconlyLight.setting, "Тохиргоо", () {
             AppSettings.openAppSettings();
           }),
           _listTile(IconlyLight.location, "Хүргэлтүүд", () {

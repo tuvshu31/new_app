@@ -135,8 +135,6 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
                   CustomText(
                     text: convertToCurrencyFormat(
                       double.parse(data["storeTotalAmount"]),
-                      locatedAtTheEnd: true,
-                      toInt: true,
                     ),
                     fontSize: 16,
                   ),
@@ -240,8 +238,6 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
           trailing: CustomText(
             text: convertToCurrencyFormat(
               double.parse(data["storeTotalAmount"]),
-              locatedAtTheEnd: true,
-              toInt: true,
             ),
             fontSize: 16,
           ),

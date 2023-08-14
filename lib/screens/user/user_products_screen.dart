@@ -195,35 +195,33 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   }
 
   PreferredSize? tabBar() {
-    return !scrollShowHide
-        ? PreferredSize(
-            preferredSize: const Size(double.infinity, kToolbarHeight),
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16, right: 12, left: 12),
-              height: 36,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
+    return PreferredSize(
+      preferredSize: const Size(double.infinity, kToolbarHeight),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16, right: 12, left: 12),
+        height: 36,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: tabItems.isEmpty
+            ? _tabShimmer()
+            : TabBar(
+                onTap: (index) {
+                  changeTab(index);
+                },
+                isScrollable: true,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  color: MyColors.fadedGrey,
+                ),
+                labelColor: MyColors.primary,
+                unselectedLabelColor: Colors.black,
+                tabs: tabItems.map<Widget>((e) {
+                  return Tab(text: e["name"]);
+                }).toList(),
               ),
-              child: tabItems.isEmpty
-                  ? _tabShimmer()
-                  : TabBar(
-                      onTap: (index) {
-                        changeTab(index);
-                      },
-                      isScrollable: true,
-                      indicator: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: MyColors.fadedGrey,
-                      ),
-                      labelColor: MyColors.primary,
-                      unselectedLabelColor: Colors.black,
-                      tabs: tabItems.map<Widget>((e) {
-                        return Tab(text: e["name"]);
-                      }).toList(),
-                    ),
-            ),
-          )
-        : null;
+      ),
+    );
   }
 
   Widget _productsGridView(bool hasMoreProducts, dynamic products) {
@@ -281,50 +279,69 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   Widget _product(data) {
     return Container(
       color: MyColors.white,
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => Get.toNamed(
-                  userProductDetailScreenRoute,
-                  arguments: {
-                    "data": data,
-                  },
-                ),
-                child: Hero(
-                  transitionOnUserGestures: true,
-                  tag: data,
-                  child: CustomImage(
+          GestureDetector(
+            onTap: () => Get.toNamed(
+              userProductDetailScreenRoute,
+              arguments: {
+                "data": data,
+              },
+            ),
+            child: Hero(
+              transitionOnUserGestures: true,
+              tag: data,
+              child: Stack(
+                children: [
+                  CustomImage(
                       width: (Get.width - 36) / 2,
                       height: (Get.width - 36) / 2,
                       url: "${URL.AWS}/products/${data["id"]}/large/1.png"),
-                ),
+                  _storeLogo(int.parse(data["store"])),
+                  _storeClosedFlag(
+                      closedStoreList.contains(int.parse(data["store"]))),
+                  // _productSaleFlag(true),
+                ],
               ),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  text: data['name'],
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CustomText(
-                      text: data['name'],
-                      overflow: TextOverflow.ellipsis,
+                    Text(
+                      convertToCurrencyFormat(
+                        double.parse(data['price']),
+                      ),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    CustomText(
-                      text: convertToCurrencyFormat(double.parse(data['price']),
-                          toInt: true, locatedAtTheEnd: true),
-                      fontWeight: FontWeight.bold,
-                    ),
+                    // Text(
+                    //   convertToCurrencyFormat(
+                    //     double.parse(data['price']),
+                    //   ),
+                    //   style: TextStyle(
+                    //     decoration: TextDecoration.lineThrough,
+                    //   ),
+                    // ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          _storeClosedFlag(closedStoreList.contains(int.parse(data["store"]))),
-          _storeLogo(int.parse(data["store"]))
         ],
       ),
     );
@@ -366,7 +383,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withOpacity(0.4),
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(12),
                   bottomLeft: Radius.circular(12),
@@ -374,6 +391,29 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
               ),
               child: const Text(
                 "Хаалттай",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          )
+        : Container();
+  }
+
+  Widget _productSaleFlag(bool sale) {
+    return sale
+        ? Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.7),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "-5%",
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),

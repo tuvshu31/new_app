@@ -109,8 +109,6 @@ class _DriverPaymentsScreenState extends State<DriverPaymentsScreen> {
                           child: CustomText(
                             text: convertToCurrencyFormat(
                               data["count"] * 3000,
-                              toInt: true,
-                              locatedAtTheEnd: true,
                             ),
                           ),
                         ),

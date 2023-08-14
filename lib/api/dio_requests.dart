@@ -42,6 +42,12 @@ class RestApi {
     return DioClient().sendRequest('products/products', Method.get, [], query);
   }
 
+  //Хэрэглэгчийн сагсанд байгаа бүх бараануудыг шалгах
+  Future checkUserCartProducts(dynamic body) async {
+    return DioClient()
+        .sendRequest('products/checkUserCartProducts', Method.get, body, {});
+  }
+
   //Хэрэглэгч бараануудыг хайж авах
   Future searchProducts(dynamic body) async {
     return DioClient()
@@ -192,6 +198,26 @@ class RestApi {
   Future driverPayments(dynamic body) async {
     return DioClient()
         .sendRequest('users/drivers/driverPayments', Method.get, body, {});
+  }
+
+  //Жолоочийн бонусыг авах
+  Future getDriverBonus(int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/driverBonus?driverId=$driverId', Method.post, [], {});
+  }
+
+  //Жолоочийн бонусыг авах
+  Future driverDeliveries(int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/driverDeliveries?driverId=$driverId',
+        Method.post, [], {});
+  }
+
+  //Жолоочийн бонусыг авах
+  Future driverDeliveriesDetails(int driverId, String date) async {
+    return DioClient().sendRequest(
+        'users/drivers/driverDeliveriesDetails?driverId=$driverId&date=$date',
+        Method.post, [], {});
   }
 
   //Захиалгын мэдээлэл өөрчлөх

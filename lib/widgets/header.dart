@@ -23,6 +23,7 @@ class CustomHeader extends StatefulWidget {
   final dynamic bottomSheet;
   final bool isMainPage;
   final bool customBottom;
+  final double actionWidth;
   final dynamic customTitle;
   final IconData actionIcon;
   final dynamic bottomNavigation;
@@ -34,6 +35,7 @@ class CustomHeader extends StatefulWidget {
 
   const CustomHeader({
     this.withCartAmount = false,
+    this.actionWidth = 56,
     this.appBarElevation = 0,
     this.leadingWidth = 56,
     this.withTabBar = false,
@@ -99,13 +101,14 @@ class _CustomHeaderState extends State<CustomHeader>
 
   Widget _actions(dynamic customActions, IconData icon) {
     return SizedBox(
-      width: 56,
+      width: widget.actionWidth,
       child: Center(
           child: customActions ??
               Stack(
                 children: [
                   IconButton(
                     onPressed: () {
+                      Get.back();
                       Get.back();
                       _navCtx.onItemTapped(2);
                     },

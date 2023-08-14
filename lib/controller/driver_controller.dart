@@ -24,6 +24,8 @@ class DriverController extends GetxController {
   Rx<DriverStatus> driverStatus = DriverStatus.withoutOrder.obs;
   late AnimationController animationController;
   int driverId = RestApiHelper.getUserId();
+  RxMap driverBonusInfo = {}.obs;
+  RxBool fetchingBonusInfo = false.obs;
 
   void playSound(type) async {
     player.play(AssetSource("sounds/$type.wav"));
@@ -90,6 +92,17 @@ class DriverController extends GetxController {
     dynamic user =
         await RestApi().updateDriver(RestApiHelper.getUserId(), body);
     dynamic data = Map<String, dynamic>.from(user);
+  }
+
+  Future<void> getDriverBonusInfo() async {
+    fetchingBonusInfo.value = true;
+    dynamic response = await RestApi().getDriverBonus(driverId);
+    if (response != null) {
+      dynamic res = Map<String, dynamic>.from(response);
+      driverBonusInfo.value = res;
+      log(res.toString());
+    }
+    fetchingBonusInfo.value = false;
   }
 
   void incoming() async {
@@ -186,7 +199,7 @@ class DriverController extends GetxController {
       log(res.toString());
       log(payload.toString());
     } else {
-      if ((newOrderInfo.isEmpty)) {
+      if (newOrderInfo.isEmpty && isOnline.value) {
         animationController.reverse();
         newOrderInfo.value = payload;
         driverStatus.value = DriverStatus.incoming;

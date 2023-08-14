@@ -3,11 +3,11 @@ import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_screen.dart';
-import 'package:Erdenet24/screens/user/user_store_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:get/get.dart';
@@ -25,7 +25,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final _cartCtrl = Get.put(CartController());
   final _userCtx = Get.put(UserController());
   final _loginCtx = Get.put(LoginController());
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -35,11 +35,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _body = [
-      UserSearchScreen(leadingOnTap: _scaffoldKey),
-      const UserStoreListScreen(),
-      const UserCartScreen(),
+    final List<Widget> widgets = [
+      const UserSearchScreen(),
       const UserSavedScreen(),
+      const UserCartScreen(),
+      const UserOrdersScreen(),
       const UserProfileScreen()
     ];
 
@@ -52,11 +52,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               FocusManager.instance.primaryFocus?.unfocus(),
             },
             child: Scaffold(
-              key: _scaffoldKey,
+              key: _navCtrl.scaffoldKey,
               drawer: const UserNavigationDrawerScreen(),
               resizeToAvoidBottomInset: false,
               backgroundColor: MyColors.black,
-              body: _body[_navCtrl.currentIndex.value],
+              body: widgets[_navCtrl.currentIndex.value],
               bottomNavigationBar: _bottomNavigationBar(),
             ),
           ),
@@ -77,16 +77,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             label: 'Хайх',
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.bag),
-            label: 'Дэлгүүр',
+            icon: Icon(IconlyLight.star),
+            label: 'Хадгалсан',
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.buy),
             label: 'Сагс',
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.star),
-            label: 'Хадгалсан',
+            icon: Icon(IconlyLight.bag_2),
+            label: 'Захиалга',
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.profile),

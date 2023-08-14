@@ -14,7 +14,7 @@ import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/user/user_profile_orders_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
@@ -83,9 +83,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
                       Get.to(() => const UserProfileAddressEditScreen());
                     }),
-                    _listTile(IconlyLight.chart, "Захиалгууд", () {
-                      Get.to(() => const UserProfileOrdersScreen());
-                    }),
+       
                     _listTile(IconlyLight.info_circle, "Тусламж", () {
                       Get.to(() => const UserProfileHelpScreen());
                     }),

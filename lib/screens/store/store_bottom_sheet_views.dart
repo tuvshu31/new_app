@@ -172,8 +172,6 @@ Widget showOrdersSetTimeViewBody(context, data, onPressed) {
                               subtitle: CustomText(
                                   text: "Үнэ: ${convertToCurrencyFormat(
                                 int.parse(product["price"]),
-                                toInt: true,
-                                locatedAtTheEnd: true,
                               )}"),
                               trailing: CustomText(
                                 text: "${product["quantity"]} ширхэг",
@@ -203,8 +201,6 @@ Widget showOrdersSetTimeViewBody(context, data, onPressed) {
                       trailing: CustomText(
                         text: convertToCurrencyFormat(
                           double.parse(data["storeTotalAmount"]),
-                          locatedAtTheEnd: true,
-                          toInt: true,
                         ),
                         fontWeight: FontWeight.bold,
                       ),
@@ -425,8 +421,6 @@ Widget storeOrdersToDeliveryBody(context, data, onPressed) {
                             subtitle: CustomText(
                                 text: convertToCurrencyFormat(
                               int.parse(product["price"]),
-                              toInt: true,
-                              locatedAtTheEnd: true,
                             )),
                             trailing: CustomText(
                                 text: "${product["quantity"]} ширхэг"),
@@ -588,8 +582,6 @@ Widget _item(String title, String text, bool isCurrency) {
             isCurrency
                 ? convertToCurrencyFormat(
                     double.parse(text),
-                    locatedAtTheEnd: true,
-                    toInt: true,
                   )
                 : text,
             overflow: TextOverflow.ellipsis,

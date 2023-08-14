@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/slide_button.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -23,83 +24,146 @@ import 'package:slide_to_act/slide_to_act.dart';
 
 final _driverCtx = Get.put(DriverController());
 
-Widget withoutOrderView() {
-  return Padding(
-    padding: const EdgeInsets.all(24.0),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const CustomText(
-          text: "Сүүлийн хүргэлт:",
-          fontSize: 14,
-          color: MyColors.gray,
+class WithoutOrderView extends StatefulWidget {
+  const WithoutOrderView({super.key});
+
+  @override
+  State<WithoutOrderView> createState() => _WithoutOrderViewState();
+}
+
+class _WithoutOrderViewState extends State<WithoutOrderView> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      _driverCtx.getDriverBonusInfo();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.card_giftcard_rounded,
+                  size: 16,
+                  color: MyColors.gray,
+                ),
+                SizedBox(width: 12),
+                CustomText(
+                  text: "Энэ 7 хоногийн урамшуулал:",
+                  fontSize: 14,
+                  color: MyColors.gray,
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Container(
+              height: 70,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: MyColors.black,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: MyColors.primary,
+                          ),
+                          child: Icon(
+                            IconlyLight.discount,
+                            color: MyColors.white,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "30 хүргэлт:",
+                              style: TextStyle(
+                                color: MyColors.gray,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            _driverCtx.fetchingBonusInfo.value
+                                ? CustomShimmer(
+                                    width: Get.width * .2, height: 14)
+                                : CustomText(
+                                    color: MyColors.white,
+                                    text: convertToCurrencyFormat(
+                                      _driverCtx
+                                              .driverBonusInfo["bonusAmount"] ??
+                                          0,
+                                    ),
+                                  ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: MyColors.primary,
+                          ),
+                          child: Icon(
+                            IconlyLight.graph,
+                            color: MyColors.white,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Хүргэлт/Дутуу",
+                              style: TextStyle(
+                                color: MyColors.gray,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            _driverCtx.fetchingBonusInfo.value
+                                ? CustomShimmer(
+                                    width: Get.width * .2, height: 14)
+                                : CustomText(
+                                    color: MyColors.white,
+                                    text:
+                                        "${_driverCtx.driverBonusInfo["bonusCount"] ?? "0"}/ ${_driverCtx.driverBonusInfo["leftCount"] ?? "0"}",
+                                  ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
-        const SizedBox(height: 24),
-        Container(
-          height: 70,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: MyColors.black,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MyColors.primary,
-                      ),
-                      child: Icon(
-                        IconlyLight.wallet,
-                        color: MyColors.white,
-                      ),
-                    ),
-                    CustomText(
-                      color: MyColors.white,
-                      text: convertToCurrencyFormat(
-                        int.parse("3000"),
-                        locatedAtTheEnd: true,
-                        toInt: true,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MyColors.primary,
-                      ),
-                      child: Icon(
-                        IconlyLight.time_circle,
-                        color: MyColors.white,
-                      ),
-                    ),
-                    CustomText(
-                      fontSize: 10,
-                      color: MyColors.white,
-                      text: formatedTime(timeInSecond: int.parse("23")),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 Widget incomingView() {
@@ -168,8 +232,6 @@ Widget incomingView() {
         Text(
           convertToCurrencyFormat(
             int.parse(_driverCtx.newOrderInfo["deliveryPrice"] ?? "3000"),
-            locatedAtTheEnd: true,
-            toInt: true,
           ),
           style: const TextStyle(
             fontSize: 28,
@@ -356,8 +418,6 @@ Widget finishedView() {
           fontSize: 28,
           text: convertToCurrencyFormat(
             double.parse("3000"),
-            toInt: true,
-            locatedAtTheEnd: true,
           ),
         ),
         const SizedBox(height: 8),

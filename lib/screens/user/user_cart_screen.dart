@@ -54,55 +54,24 @@ class _UserCartScreenState extends State<UserCartScreen> {
 
   //Сагсанд тэг үлдэгдэлтэй, эсвэл үлдэгдэл хүрэлцэхгүй бараанууд байгаа эсэхийг шалгаж байна
   Future<void> checkProductsAvailabilityAndNavigate() async {
-    CustomDialogs().showLoadingDialog();
-    List productIdList = [];
+    // CustomDialogs().showLoadingDialog();
+    CustomDialogs().showNotAvailableProductsDialog([13], () {});
+    List<Map<String, dynamic>> body = [];
     for (var element in _cartCtrl.cartList) {
-      productIdList.add(element["id"]);
+      var obj = {"id": element["id"], "quantity": element["quantity"]};
+      body.add(obj);
     }
-    var query = {"id": productIdList};
-    dynamic products = await RestApi().getProducts(query);
+    dynamic products = await RestApi().checkUserCartProducts(body);
     dynamic response = Map<String, dynamic>.from(products);
     if (response["success"]) {
-      List data = response["data"];
-      availableZeroProducts = data.where((element) {
-        if (element["available"] != null) {
-          return int.parse(element["available"]) <= 0;
-        } else {
-          return false;
-        }
-      }).toList();
-      if (availableZeroProducts.isEmpty) {
-        Get.back();
-        Get.to(() => const UserCartAddressInfoScreen());
-      } else {
-        Get.back();
-        void removeFromCart() {
-          availableZeroProducts.forEach(((element) {
-            var product =
-                _cartCtrl.cartList.firstWhere((a) => a["id"] == element["id"]);
-            _cartCtrl.removeProduct(product, context);
-          }));
-          Get.back();
-          customSnackbar(DialogType.success, "Сагснаас хасагдлаа", 3);
-        }
-
-        CustomDialogs().showNotAvailableProductsDialog(
-          availableZeroProducts,
-          removeFromCart,
-        );
+      if (response["notVisibleProducts"].isNotEmpty) {
+        log("Hello");
       }
-      // notSufficientProducts = data.where((element) {
-      //   var product =
-      //       _cartCtrl.cartList.firstWhere((i) => i["id"] == element["id"]);
-      //   if (element["available"] != null) {
-      //     return int.parse(element["available"]) < product["quantity"];
-      //   } else {
-      //     return false;
-      //   }
-      // }).toList();
+      // if (response["finishedProducts"]) {}
+      // if (response["notSuffProducts"]) {}
     }
-
-    setState(() {});
+    log(response.toString());
+    // Get.back();
   }
 
   bool _canIncreaseCount(int count, int available) {
@@ -189,8 +158,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                                           CustomText(
                                               text: convertToCurrencyFormat(
                                             _cartCtrl.productSubtotal[index],
-                                            toInt: true,
-                                            locatedAtTheEnd: true,
                                           ))
                                         ],
                                       ),
@@ -366,8 +333,9 @@ class _UserCartScreenState extends State<UserCartScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomText(
-                    text: convertToCurrencyFormat(_cartCtrl.total,
-                        toInt: true, locatedAtTheEnd: true),
+                    text: convertToCurrencyFormat(
+                      _cartCtrl.total,
+                    ),
                   ),
                   const CustomText(
                     text: "Дэлгэрэнгүй",
@@ -419,8 +387,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                 CustomText(
                   text: convertToCurrencyFormat(
                     _cartCtrl.subTotal,
-                    toInt: true,
-                    locatedAtTheEnd: true,
                   ),
                   color: MyColors.gray,
                 )
@@ -437,8 +403,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                 CustomText(
                   text: convertToCurrencyFormat(
                     _cartCtrl.deliveryPrice.value,
-                    toInt: true,
-                    locatedAtTheEnd: true,
                   ),
                   color: MyColors.gray,
                 )
@@ -465,8 +429,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
                 CustomText(
                   text: convertToCurrencyFormat(
                     _cartCtrl.total,
-                    toInt: true,
-                    locatedAtTheEnd: true,
                   ),
                   color: MyColors.black,
                 )

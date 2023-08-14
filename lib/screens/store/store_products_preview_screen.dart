@@ -79,9 +79,8 @@ class _StoreProductsPreviewScreenState
                   const SizedBox(height: 8),
                   CustomText(
                     text: convertToCurrencyFormat(
-                        double.parse("${_incoming["price"]}"),
-                        toInt: true,
-                        locatedAtTheEnd: true),
+                      double.parse("${_incoming["price"]}"),
+                    ),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),

@@ -43,24 +43,19 @@ String formattedTime(DateTime time) {
 
 String convertToCurrencyFormat(
   num? number, {
-  bool toInt = false,
   String symbol = "₮",
   bool isBalanceHide = false,
-  bool locatedAtTheEnd = false,
 }) {
   String mSymbol = symbol;
 
   if (isBalanceHide) {
-    return locatedAtTheEnd ? '***.** $mSymbol' : '$mSymbol ***.**';
+    return '***.** $mSymbol';
   }
 
   if (number != null) {
     try {
-      var format = toInt ? NumberFormat("#,###") : NumberFormat("#,##0.00");
-
-      return locatedAtTheEnd
-          ? format.format(number) + ' $mSymbol'
-          : '$mSymbol ' + format.format(number);
+      var format = NumberFormat("#,###");
+      return '${format.format(number)} $mSymbol';
     } catch (e) {
       return '$mSymbol 0';
     }

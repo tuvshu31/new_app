@@ -3,6 +3,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -67,6 +68,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       }
     });
     imgCount();
+    log(_data.toString());
   }
 
   void _isProductSaved() async {
@@ -218,6 +220,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                                   onTap: () {
                                     Get.back();
                                     Get.back();
+                                    Get.back();
                                     _navCtrl.onItemTapped(2);
                                   },
                                   child: Material(
@@ -334,14 +337,41 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                     const SizedBox(height: 8),
                     CustomText(
                       text: convertToCurrencyFormat(
-                          double.parse("${_data["price"]}"),
-                          toInt: true,
-                          locatedAtTheEnd: true),
+                        double.parse("${_data["price"]}"),
+                      ),
                       fontSize: 14,
                     ),
-                    const SizedBox(height: 8),
-                    const SizedBox(height: 8),
-                    otherInfoWidget()
+                    _data["otherInfo"].isNotEmpty
+                        ? ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(height: 12);
+                            },
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _data["otherInfo"].length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var data = Map<String, dynamic>.from(
+                                  _data["otherInfo"][index]);
+                              var key = removeBracket(data.keys.toString());
+                              var value = removeBracket(data.values.toString());
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: "$key:",
+                                  ),
+                                  const SizedBox(height: 2),
+                                  CustomText(
+                                    text: value,
+                                    color: MyColors.gray,
+                                    textAlign: TextAlign.justify,
+                                  ),
+                                ],
+                              );
+                            },
+                          )
+                        : Container(),
                   ],
                 ),
               )
@@ -414,27 +444,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
           child: child,
         ),
       ),
-    );
-  }
-
-  Widget otherInfoWidget() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            ports.isNotEmpty ? Text("Ports") : Container(),
-            orts.isNotEmpty ? Text("Orts") : Container(),
-          ],
-        ),
-        descriptions.isNotEmpty
-            ? CustomText(
-                textAlign: TextAlign.justify,
-                color: MyColors.gray,
-                fontSize: 12,
-                text: descriptions,
-              )
-            : Container()
-      ],
     );
   }
 }

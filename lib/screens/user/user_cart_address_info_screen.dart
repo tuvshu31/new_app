@@ -413,8 +413,6 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                         CustomText(
                           text: convertToCurrencyFormat(
                             _cartCtx.subTotal,
-                            toInt: true,
-                            locatedAtTheEnd: true,
                           ),
                           color: MyColors.gray,
                         )
@@ -431,8 +429,6 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                         CustomText(
                           text: convertToCurrencyFormat(
                             _cartCtx.deliveryCost,
-                            toInt: true,
-                            locatedAtTheEnd: true,
                           ),
                           color: MyColors.gray,
                         )
@@ -459,8 +455,6 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                         CustomText(
                           text: convertToCurrencyFormat(
                             _cartCtx.total,
-                            toInt: true,
-                            locatedAtTheEnd: true,
                           ),
                           color: MyColors.black,
                         )

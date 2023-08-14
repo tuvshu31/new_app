@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:custom_timer/custom_timer.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
@@ -79,7 +80,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
 
   Widget _bottomViewsHandler(DriverStatus status) {
     if (status == DriverStatus.withoutOrder) {
-      return withoutOrderView();
+      return const WithoutOrderView();
     } else if (status == DriverStatus.incoming) {
       return incomingView();
     } else if (status == DriverStatus.arrived) {
@@ -91,7 +92,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
     } else if (status == DriverStatus.finished) {
       return finishedView();
     } else {
-      return withoutOrderView();
+      return const WithoutOrderView();
     }
   }
 
@@ -126,12 +127,29 @@ class _DriverMainScreenState extends State<DriverMainScreen>
         centerTitle: true,
         titleSpacing: 0,
         title: _driverCtx.isOnline.value
-            ? const Text(
-                "Online",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Online",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                  ),
+                  CustomTimer(
+                    controller: timerController,
+                    builder: (state, time) {
+                      return Text(
+                        "${time.hours}:${time.minutes}:${time.seconds}",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: MyColors.gray,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               )
             : const Text(
                 "Offline",
@@ -187,57 +205,68 @@ class _DriverMainScreenState extends State<DriverMainScreen>
                 child: Row(
                   children: [
                     Expanded(
-                      child: ListTile(
-                        dense: true,
-                        horizontalTitleGap: 0,
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
-                            Icon(
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Icon(
                               IconlyLight.wallet,
+                              color: MyColors.gray,
                             ),
-                          ],
-                        ),
-                        title: const CustomText(
-                          text: "Өнөөдрийн орлого:",
-                          fontSize: 12,
-                        ),
-                        subtitle: CustomText(
-                            text: convertToCurrencyFormat(
-                          3000,
-                          locatedAtTheEnd: true,
-                          toInt: true,
-                        )),
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Нийт орлого:",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: MyColors.gray,
+                                ),
+                              ),
+                              _driverCtx.fetchingBonusInfo.value
+                                  ? CustomShimmer(
+                                      width: Get.width * .2,
+                                      height: 14,
+                                    )
+                                  : Text(
+                                      "${convertToCurrencyFormat(_driverCtx.driverBonusInfo["totalDeliveryPrice"] ?? 0)} + ${convertToCurrencyFormat(_driverCtx.driverBonusInfo["driverBonus"] ?? 0)}")
+                            ],
+                          )
+                        ],
                       ),
                     ),
                     Expanded(
-                      child: ListTile(
-                        dense: true,
-                        horizontalTitleGap: 0,
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: Icon(
+                            IconlyLight.location,
+                            color: MyColors.gray,
+                          ),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              IconlyLight.time_circle,
+                          children: [
+                            const Text(
+                              "Хүргэлтийн тоо:",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: MyColors.gray,
+                              ),
                             ),
+                            _driverCtx.fetchingBonusInfo.value
+                                ? CustomShimmer(
+                                    width: Get.width * .2, height: 14)
+                                : Text(
+                                    "${_driverCtx.driverBonusInfo["deliveryCount"] ?? 0}")
                           ],
-                        ),
-                        title: const CustomText(
-                          text: "Идэвхтэй хугацаа:",
-                          fontSize: 12,
-                        ),
-                        subtitle: CustomTimer(
-                          controller: timerController,
-                          builder: (state, time) {
-                            return Text(
-                              "${time.hours}:${time.minutes}:${time.seconds}",
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                        )
+                      ],
+                    )),
                   ],
                 ),
               )

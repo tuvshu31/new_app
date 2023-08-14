@@ -191,8 +191,6 @@ class _StoreProductsEditProductsScreenState
                                 fontSize: 12,
                                 text: "Үнэ: ${convertToCurrencyFormat(
                                   double.parse(data["price"]),
-                                  toInt: true,
-                                  locatedAtTheEnd: true,
                                 )}"),
                             CustomText(
                                 fontSize: 12,

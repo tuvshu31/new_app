@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/user_profile_orders_detail_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_orders_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_countdown_timer/countdown_controller.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -32,19 +29,6 @@ class UserController extends GetxController {
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
-
-  void getOrders() async {
-    fetchingOrderList.value = true;
-    var body = {"userId": RestApiHelper.getUserId()};
-    dynamic response = await RestApi().getOrders(body);
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      userOrderList.value = d["data"];
-      userOrderList.value = userOrderList.reversed.toList();
-      filterOrders(0);
-    }
-    fetchingOrderList.value = false;
-  }
 
   void filterOrders(int value) {
     if (value == 0) {
@@ -124,7 +108,7 @@ class UserController extends GetxController {
   void onMapCreated(GoogleMapController controller) async {
     mapController.value.complete(controller);
     Future.delayed(const Duration(seconds: 1), () async {
-      GoogleMapController controller = await mapController.value.future;
+      // GoogleMapController controller = await mapController.value.future;
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -188,7 +172,7 @@ class UserController extends GetxController {
       context: Get.context!,
       isScrollControlled: true,
       builder: (context) {
-        return const UserProfileOrdersDetailScreen();
+        return const UserOrdersDetailScreen();
       },
     );
   }

@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -81,8 +77,6 @@ class _DriverDeliverListScreenState extends State<DriverDeliverListScreen> {
                 CustomText(
                   text: convertToCurrencyFormat(
                     double.parse(data["deliveryPrice"] ?? "3000"),
-                    toInt: true,
-                    locatedAtTheEnd: true,
                   ),
                 ),
                 CustomText(
