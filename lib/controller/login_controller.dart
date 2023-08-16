@@ -61,6 +61,15 @@ class LoginController extends GetxController {
     }
   }
 
+  void saveUserToken() {
+    _messaging.getToken().then((token) async {
+      if (token != null) {
+        var body = {"mapToken": token};
+        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+      }
+    });
+  }
+
   void listenToTokenChanges(String role) {
     _messaging.onTokenRefresh.listen((newToken) async {
       var body = {"mapToken": newToken};

@@ -110,6 +110,8 @@ dependencies:
   dotted_line: ^3.2.2
   flutter_animate: ^4.2.0
   go_router: ^10.0.0
+  flutter_switch: ^0.3.2
+  lite_rolling_switch: ^1.0.0
 
   # flutter_local_notifications: ^14.0.0
   # firebase_messaging: ^14.3.0

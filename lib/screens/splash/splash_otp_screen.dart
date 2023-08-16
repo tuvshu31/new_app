@@ -115,6 +115,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
           };
           dynamic response = await RestApi().registerUser(body);
           dynamic data = Map<String, dynamic>.from(response);
+          log(data.toString());
           putUserIntoBox(data["data"]["id"], "user");
           Get.offAll(const UserHomeScreen());
         }

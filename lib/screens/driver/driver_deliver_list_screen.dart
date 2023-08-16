@@ -1,8 +1,16 @@
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/screens/driver/views/driver_delivery_detail_view.dart';
+import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,73 +25,169 @@ class DriverDeliverListScreen extends StatefulWidget {
 
 class _DriverDeliverListScreenState extends State<DriverDeliverListScreen> {
   final _driverCtx = Get.put(DriverController());
+  List deliveryList = [];
+  bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+    getDriverDeliveries();
+  }
+
+  Future<void> getDriverDeliveries() async {
+    loading = true;
+    dynamic res = await RestApi().driverDeliveries(RestApiHelper.getUserId());
+    if (res != null) {
+      dynamic response = Map<String, dynamic>.from(res);
+      deliveryList = response["deliveries"].reversed.toList();
+      log(deliveryList.toString());
+    }
+    loading = false;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => CustomHeader(
-        title: "Хүргэлтүүд",
-        customActions: Container(),
-        body: _driverCtx.orderList.isEmpty
-            ? CustomLoadingIndicator(
-                text: "Хүргэлт байхгүй байна",
-              )
-            : ListView.separated(
-                separatorBuilder: (context, index) {
-                  return Container(
-                    height: 7,
-                    color: MyColors.fadedGrey,
+    return CustomHeader(
+      title: "Хүргэлтүүд",
+      customActions: Container(),
+      body: !loading && deliveryList.isEmpty
+          ? const CustomLoadingIndicator(text: "Хүргэлт байхгүй байна")
+          : ListView.separated(
+              separatorBuilder: (context, index) {
+                return Container(height: 12);
+              },
+              padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: loading ? 8 : deliveryList.length,
+              itemBuilder: (context, index) {
+                if (loading) {
+                  return listItemShimmer();
+                } else {
+                  var item = deliveryList[index];
+                  return CustomInkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        backgroundColor: MyColors.white,
+                        context: Get.context!,
+                        isScrollControlled: true,
+                        builder: (context) {
+                          return DriverDeliveryDetailView(
+                            date: item["date"],
+                          );
+                        },
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              width: 1,
+                              color: MyColors.background,
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          height: Get.height * .1,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: Get.width * .5,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+                                            item["date"] ?? "No Data",
+                                            style: const TextStyle(
+                                              color: MyColors.gray,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Text(
+                                              "${item["deliveryCount"] ?? 0} хүргэлт"),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  convertToCurrencyFormat(
+                                      item["totalAmount"] ?? 0),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 18,
+                                color: MyColors.black,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   );
-                },
-                physics: const BouncingScrollPhysics(),
-                // padding: const EdgeInsets.symmetric(horizontal: 12),
-                shrinkWrap: true,
-                itemCount: _driverCtx.orderList.length,
-                itemBuilder: (context, index) {
-                  var data = _driverCtx.orderList[index];
-                  return _item(data);
-                },
-              ),
-      ),
+                }
+              },
+            ),
     );
   }
 
-  Widget _item(data) {
+  Widget listItemShimmer() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-      color: MyColors.white,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          width: 1,
+          color: MyColors.background,
+        ),
+      ),
+      padding: const EdgeInsets.all(12),
+      height: Get.height * .1,
+      width: Get.width * .5,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(
+            width: Get.width * .5,
+            child: Row(
               children: [
-                CustomText(
-                  text: data["storeName"] ?? "empty",
+                CustomShimmer(
+                  width: Get.width * .1,
+                  height: Get.width * .1,
+                  borderRadius: 50,
                 ),
-                CustomText(
-                  text: data["orderTime"] ?? "empty",
-                  fontSize: 12,
-                  color: MyColors.gray,
-                ),
+                const SizedBox(width: 12),
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
+                )
               ],
             ),
           ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CustomText(
-                  text: convertToCurrencyFormat(
-                    double.parse(data["deliveryPrice"] ?? "3000"),
-                  ),
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
                 ),
-                CustomText(
-                  text: formatedTime(
-                      timeInSecond: int.parse(data["deliveryDuration"] ?? "0")),
-                  color: MyColors.gray,
-                  fontSize: 12,
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
                 ),
               ],
             ),

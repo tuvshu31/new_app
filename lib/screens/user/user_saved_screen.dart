@@ -188,15 +188,15 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
                                                     Get.back();
                                                     _cartCtrl.emptyTheTrash();
                                                     _cartCtrl.addProduct(
-                                                        saved[index], context);
+                                                        saved[index]);
                                                     customSnackbar(
                                                         DialogType.success,
                                                         "Сагсанд нэмэгдлээ",
                                                         2);
                                                   });
                                                 } else {
-                                                  _cartCtrl.addProduct(
-                                                      saved[index], context);
+                                                  _cartCtrl
+                                                      .addProduct(saved[index]);
                                                   customSnackbar(
                                                       DialogType.success,
                                                       "Сагсанд нэмэгдлээ",

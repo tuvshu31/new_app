@@ -1,146 +1,188 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
 
 class DriverSettingsScreen extends StatefulWidget {
-  const DriverSettingsScreen({super.key});
+  const DriverSettingsScreen({
+    super.key,
+  });
 
   @override
   State<DriverSettingsScreen> createState() => _DriverSettingsScreenState();
 }
 
 class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
-  final _driverCtx = Get.put(DriverController());
+  bool loading = false;
+  List driverInfo = [];
+  @override
+  void initState() {
+    super.initState();
+    getDriverInfo();
+  }
+
+  Future<void> getDriverInfo() async {
+    loading = true;
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
+    if (res != null) {
+      dynamic response = Map<String, dynamic>.from(res);
+      driverInfo = [response["data"]];
+      log(response["data"].toString());
+    }
+    loading = false;
+    setState(() {});
+  }
+
+  String generateDriverName(driverInfo) {
+    var first = driverInfo["firstName"] ?? "";
+    var last = driverInfo["lastName"] ?? "";
+    var name = "${first[0]}. $last";
+    return name;
+  }
 
   @override
   Widget build(BuildContext context) {
-    var info = _driverCtx.driverInfo[0];
     return CustomHeader(
-      title: "Жолоочийн мэдээлэл",
-      customActions: Container(),
-      body: Column(
+        title: "Миний бүртгэл",
+        customActions: Container(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: 75,
+                height: 75,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: MyColors.white,
+                  border: Border.all(width: 1, color: MyColors.background),
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.user,
+                  size: 40,
+                  color: MyColors.grey,
+                ),
+              ),
+              const SizedBox(height: 12),
+              loading
+                  ? CustomShimmer(width: Get.width * .2, height: 14)
+                  : Text(generateDriverName(driverInfo[0])),
+              const SizedBox(height: 12),
+              loading && driverInfo.isEmpty
+                  ? Column(
+                      children: [
+                        listItemShimmer(),
+                        listItemShimmer(),
+                        listItemShimmer(),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        listItem("Гар утасны дугаар",
+                            driverInfo[0]["phone"] ?? "No info"),
+                        listItem("Харилцах банк", "Хаан банк"),
+                        listItem("Дансны дугаар",
+                            driverInfo[0]["bankAccount"] ?? "No data"),
+                      ],
+                    ),
+            ],
+          ),
+        ));
+  }
+
+  Widget listItem(String title, String info) {
+    return CustomInkWell(
+      onTap: () {},
+      child: Stack(
         children: [
-          _listTile(
-            "Утас",
-            info["phone"],
-            IconlyLight.call,
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                width: 1,
+                color: MyColors.background,
+              ),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(color: MyColors.gray, fontSize: 12),
+                ),
+                const SizedBox(height: 4),
+                Text(info),
+              ],
+            ),
           ),
-          _listTile(
-            "Данс",
-            info["bankAccount"],
-            IconlyLight.wallet,
-          ),
-          _listTile(
-            "Хувийн дугаар",
-            info["driverCode"],
-            IconlyLight.tick_square,
-          )
         ],
       ),
     );
   }
 
-  Widget _listTile(String title, String value, IconData icon) {
-    return CustomInkWell(
-      borderRadius: BorderRadius.zero,
-      onTap: () {},
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-        leading: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: MyColors.black,
-              size: 22,
-            ),
-          ],
+  Widget listItemShimmer() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          width: 1,
+          color: MyColors.background,
         ),
-        title: CustomText(text: title, fontSize: 14),
-        subtitle: CustomText(text: value, fontSize: 12),
       ),
-    );
-  }
-}
-
-class DriverSettingsEditView extends StatefulWidget {
-  final String title;
-  final String value;
-  const DriverSettingsEditView({
-    this.title = "",
-    this.value = "",
-    super.key,
-  });
-
-  @override
-  State<DriverSettingsEditView> createState() => _DriverSettingsEditViewState();
-}
-
-class _DriverSettingsEditViewState extends State<DriverSettingsEditView> {
-  bool isEdited = false;
-  final _driverCtx = Get.put(DriverController());
-  TextEditingController controller = TextEditingController();
-  void updateDriverInfo() {
-    var body = {_fieldTitle(widget.title): controller.text};
-    _driverCtx.updateDriverInfo(body);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    controller.text = widget.value;
-  }
-
-  _fieldTitle(String text) {
-    switch (text) {
-      case "Утас":
-        return 'phone';
-      case "Имэйл хаяг":
-        return 'email';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomHeader(
-      title: "Мэдээлэл засах",
-      customActions: Container(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(top: Get.height * .1, left: 24, right: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(text: widget.title),
-              const SizedBox(height: 12),
-              CustomTextField(
-                autoFocus: true,
-                controller: controller,
-                onChanged: ((p0) {
-                  setState(() {
-                    isEdited = p0 != widget.value && p0.length == 8;
-                  });
-                }),
-              ),
-              const SizedBox(height: 24),
-              CustomButton(
-                isActive: isEdited,
-                onPressed: updateDriverInfo,
-                text: "Хадгалах",
-              )
-            ],
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      height: Get.height * .1,
+      width: double.infinity,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: Get.width * .5,
+            child: Row(
+              children: [
+                CustomShimmer(
+                  width: Get.width * .1,
+                  height: Get.width * .1,
+                  borderRadius: 50,
+                ),
+                const SizedBox(width: 12),
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
+                )
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
+                ),
+                CustomShimmer(
+                  width: Get.width * .3,
+                  height: 14,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

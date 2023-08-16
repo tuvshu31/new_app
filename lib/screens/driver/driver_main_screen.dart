@@ -1,22 +1,21 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/screens/driver/views/driver_arrived_view.dart';
+import 'package:Erdenet24/screens/driver/views/driver_delivered_view.dart';
+import 'package:Erdenet24/screens/driver/views/driver_finished_view.dart';
+import 'package:Erdenet24/screens/driver/views/driver_incoming_order_view.dart';
+import 'package:Erdenet24/screens/driver/views/driver_received_view.dart';
+import 'package:Erdenet24/screens/driver/views/driver_without_order_view.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:custom_timer/custom_timer.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/cupertino.dart';
-import 'package:iconly/iconly.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_bottom_views.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
-import 'package:Erdenet24/screens/driver/driver_screen_map_view.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/screens/driver/driver_map_screen.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});
@@ -38,18 +37,10 @@ class _DriverMainScreenState extends State<DriverMainScreen>
   );
   final _driverCtx = Get.put(DriverController());
 
-  List<String> texts = [
-    "",
-    "Зөвшөөрөх",
-    "Ирлээ",
-    "Хүлээн авсан",
-    "Хүлээлгэн өгсөн",
-    "Дуусгах"
-  ];
   @override
   void initState() {
     super.initState();
-    // _loginCtx.listenToTokenChanges("driver");
+    _driverCtx.showBottomView();
     checkIfDriverOnline();
     _driverCtx.animationController = AnimationController(
       vsync: this,
@@ -80,337 +71,120 @@ class _DriverMainScreenState extends State<DriverMainScreen>
 
   Widget _bottomViewsHandler(DriverStatus status) {
     if (status == DriverStatus.withoutOrder) {
-      return const WithoutOrderView();
+      return const DriverWithoutOrderView();
     } else if (status == DriverStatus.incoming) {
-      return incomingView();
+      return const DriverIncomingOrderView();
     } else if (status == DriverStatus.arrived) {
-      return arrivedView();
+      return const DriverArrivedView();
     } else if (status == DriverStatus.received) {
-      return receivedView();
+      return const DriverReceivedView();
     } else if (status == DriverStatus.delivered) {
-      return deliveredView();
+      return const DriverDeliveredView();
     } else if (status == DriverStatus.finished) {
-      return finishedView();
+      return const DriverFinishedView();
     } else {
-      return const WithoutOrderView();
+      return const DriverWithoutOrderView();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-          child: WillPopScope(
-            onWillPop: () async => false,
-            child: Scaffold(
-              resizeToAvoidBottomInset: true,
-              backgroundColor: MyColors.white,
-              drawer: driverDrawer(),
-              appBar: _appBar(),
-              body: _body(),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          backgroundColor: Colors.transparent,
+          drawer: const DriverDrawerScreen(),
+          body: Builder(
+            builder: (context) => Stack(
+              children: [
+                const DriverMapScreen(),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).viewPadding.top + 12,
+                      horizontal: 12,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                          ),
+                          child: const Icon(
+                            Icons.menu_rounded,
+                            color: MyColors.primary,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 4),
+                          ),
+                          child: Obx(
+                            () => Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      convertToCurrencyFormat(
+                                          _driverCtx.driverBonusInfo[
+                                                  "totalDeliveryPrice"] ??
+                                              0),
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${_driverCtx.driverBonusInfo["deliveryCount"] ?? 0} хүргэлт",
+                                      style: const TextStyle(
+                                          color: MyColors.gray, fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Obx(
+                  () => SlideTransition(
+                    position: offset,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _bottomViewsHandler(_driverCtx.driverStatus.value),
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
         ),
       ),
     );
   }
-
-  PreferredSize _appBar() {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(54.0),
-      child: AppBar(
-        iconTheme: const IconThemeData(color: MyColors.primary),
-        backgroundColor: MyColors.white,
-        elevation: 0,
-        centerTitle: true,
-        titleSpacing: 0,
-        title: _driverCtx.isOnline.value
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Online",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                  ),
-                  CustomTimer(
-                    controller: timerController,
-                    builder: (state, time) {
-                      return Text(
-                        "${time.hours}:${time.minutes}:${time.seconds}",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: MyColors.gray,
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              )
-            : const Text(
-                "Offline",
-                style: TextStyle(
-                  color: MyColors.gray,
-                  fontSize: 16,
-                ),
-              ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: CupertinoSwitch(
-                value: _driverCtx.isOnline.value,
-                thumbColor: _driverCtx.isOnline.value
-                    ? MyColors.primary
-                    : MyColors.gray,
-                trackColor: MyColors.background,
-                activeColor: MyColors.black,
-                onChanged: (value) async {
-                  CustomDialogs().showLoadingDialog();
-                  var body = {"isOpen": value};
-                  dynamic response = await RestApi()
-                      .updateDriver(RestApiHelper.getUserId(), body);
-                  Get.back();
-                  if (response != null) {
-                    _driverCtx.isOnline.value = value;
-                    if (value) {
-                      _driverCtx.playSound("engine_start");
-                      timerController.start();
-                      _driverCtx.animationController.forward();
-                    } else {
-                      timerController.finish();
-                      _driverCtx.animationController.reverse();
-                    }
-                  }
-                  // setState(() {});
-                }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _body() {
-    return Stack(
-      children: [
-        const DriverScreenMapView(),
-        _driverCtx.isOnline.value
-            ? Container(
-                height: Get.height * .075,
-                width: double.infinity,
-                color: MyColors.white,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Icon(
-                              IconlyLight.wallet,
-                              color: MyColors.gray,
-                            ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Нийт орлого:",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: MyColors.gray,
-                                ),
-                              ),
-                              _driverCtx.fetchingBonusInfo.value
-                                  ? CustomShimmer(
-                                      width: Get.width * .2,
-                                      height: 14,
-                                    )
-                                  : Text(
-                                      "${convertToCurrencyFormat(_driverCtx.driverBonusInfo["totalDeliveryPrice"] ?? 0)} + ${convertToCurrencyFormat(_driverCtx.driverBonusInfo["driverBonus"] ?? 0)}")
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                        child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Icon(
-                            IconlyLight.location,
-                            color: MyColors.gray,
-                          ),
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Хүргэлтийн тоо:",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: MyColors.gray,
-                              ),
-                            ),
-                            _driverCtx.fetchingBonusInfo.value
-                                ? CustomShimmer(
-                                    width: Get.width * .2, height: 14)
-                                : Text(
-                                    "${_driverCtx.driverBonusInfo["deliveryCount"] ?? 0}")
-                          ],
-                        )
-                      ],
-                    )),
-                  ],
-                ),
-              )
-            : Container(),
-        SlideTransition(
-          position: offset,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Card(
-              margin: const EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: _driverCtx.isOnline.value
-                  ? _bottomViewsHandler(_driverCtx.driverStatus.value)
-                  : Container(),
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  // Widget bottomSheets() {
-  //   return Obx(
-  //     () => _driverCtx.isOnline.value
-  //         ? Align(
-  //             alignment: Alignment.bottomCenter,
-  //             child: Container(
-  //               margin: const EdgeInsets.all(24),
-  //               padding: const EdgeInsets.all(24),
-  //               decoration: BoxDecoration(
-  //                 color: MyColors.white,
-  //                 borderRadius: BorderRadius.circular(24),
-  //               ),
-  //               child: Column(mainAxisSize: MainAxisSize.min, children: [
-  //                 _driverCtx.step.value == 0 && _driverCtx.lastDelivery.isEmpty
-  //                     ? Container()
-  //                     : _driverCtx.step.value == 0 &&
-  //                             _driverCtx.lastDelivery.isNotEmpty
-  //                         ? step0()
-  //                         : steps[_driverCtx.step.value],
-  //                 _driverCtx.step.value != 0
-  //                     ? Builder(
-  //                         builder: (context) {
-  //                           final GlobalKey<SlideActionState> key = GlobalKey();
-  //                           return Padding(
-  //                             padding: const EdgeInsets.all(8.0),
-  //                             child: SlideAction(
-  //                               outerColor: MyColors.black,
-  //                               innerColor: MyColors.primary,
-  //                               elevation: 0,
-  //                               key: key,
-  //                               submittedIcon: const Icon(
-  //                                 FontAwesomeIcons.check,
-  //                                 color: MyColors.white,
-  //                               ),
-  //                               onSubmit: () {
-  //                                 Future.delayed(
-  //                                     const Duration(milliseconds: 300), () {
-  //                                   key.currentState!.reset();
-  //                                   if (_driverCtx.step.value == 1) {
-  //                                     stopSound();
-  //                                     // AwesomeNotifications().dismiss(1);
-  //                                     _driverCtx.updateOrder({
-  //                                       "orderStatus": "driverAccepted",
-  //                                       "deliveryDriverId":
-  //                                           RestApiHelper.getUserId().toString()
-  //                                     });
-  //                                     RestApiHelper.saveOrderId(int.parse(
-  //                                         _driverCtx.deliveryInfo["id"]));
-  //                                     _driverCtx.stopwatch.value.start();
-  //                                     _driverCtx.step.value += 1;
-  //                                   } else if (_driverCtx.step.value == 2) {
-  //                                     RestApiHelper.saveOrderInfo(
-  //                                         _driverCtx.deliveryInfo);
-  //                                     _driverCtx.step.value += 1;
-  //                                     log(_driverCtx.step.value.toString());
-  //                                   } else if (_driverCtx.step.value == 3) {
-  //                                     _driverCtx.updateOrder({
-  //                                       "orderStatus": "delivering",
-  //                                     });
-  //                                     _driverCtx.step.value += 1;
-  //                                     log(_driverCtx.step.value.toString());
-  //                                   } else if (_driverCtx.step.value == 4) {
-  //                                     driverApproveCodeCtrl.clear();
-  //                                     driverDeliveryCodeApproveDialog(
-  //                                       context,
-  //                                       driverApproveCodeCtrl,
-  //                                       () {
-  //                                         if (driverApproveCodeCtrl.text ==
-  //                                             _driverCtx.deliveryInfo[
-  //                                                 "userAndDriverCode"]) {
-  //                                           Get.back();
-  //                                           var deliveryDuration = _driverCtx
-  //                                               .stopwatch
-  //                                               .value
-  //                                               .elapsed
-  //                                               .inSeconds;
-  //                                           _driverCtx.updateOrder({
-  //                                             "orderStatus": "delivered",
-  //                                             "deliveryDuration":
-  //                                                 deliveryDuration,
-  //                                             "deliveryPrice": "3000",
-  //                                             "deliveryPaidOff": false,
-  //                                           });
-  //                                           _driverCtx.fakeDeliveryTimer.value =
-  //                                               deliveryDuration.toString();
-  //                                           _driverCtx.stopwatch.value.reset();
-  //                                           _driverCtx.deliveryInfo.clear();
-  //                                           _driverCtx.storeLocation.refresh();
-  //                                           _driverCtx.step.value += 1;
-  //                                         } else {
-  //                                           customSnackbar(DialogType.error,
-  //                                               "Захиалгын код буруу байна", 3);
-  //                                         }
-  //                                       },
-  //                                     );
-  //                                   } else {
-  //                                     _driverCtx.finishDelivery();
-  //                                   }
-  //                                 });
-  //                               },
-  //                               alignment: Alignment.centerRight,
-  //                               sliderButtonIcon: const Icon(
-  //                                 Icons.double_arrow_rounded,
-  //                                 color: MyColors.white,
-  //                               ),
-  //                               child: Text(
-  //                                 texts[_driverCtx.step.value].toUpperCase(),
-  //                                 style: const TextStyle(
-  //                                   color: Colors.white,
-  //                                   fontSize: 14,
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                           );
-  //                         },
-  //                       )
-  //                     : Container(),
-  //               ]),
-  //             ),
-  //           )
-  //         : Container(),
-  //   );
-  // }
 }

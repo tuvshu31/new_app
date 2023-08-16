@@ -220,6 +220,13 @@ class RestApi {
         Method.post, [], {});
   }
 
+  //Жолоочийн төлбөрийн мэдээллийг авах
+  Future driverPaymentsByWeeks(int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/driverPaymentsByWeeks?driverId=$driverId',
+        Method.post, [], {});
+  }
+
   //Захиалгын мэдээлэл өөрчлөх
   Future updateOrder(int id, dynamic body) async {
     return DioClient()
@@ -288,5 +295,12 @@ class RestApi {
     var body = {"role": role, "token": token};
     return DioClient()
         .sendRequest('firebase/subscribeToTopic', Method.put, body, {});
+  }
+
+  //Тухайн барааг багц мөн эсэхийг шалгах
+  Future checkIncludedProducts(int productId) async {
+    return DioClient().sendRequest(
+        'products/checkIncludedProducts?productId=$productId',
+        Method.post, [], {});
   }
 }

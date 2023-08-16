@@ -42,7 +42,7 @@ Future<void> handleNotifications(message) async {
       id: data["id"] ?? 1,
       channelKey: 'basic_channel',
       title: data["storeName"] ?? "Erdenet24",
-      body: data["text"],
+      body: data["text"] ?? "",
       notificationLayout: data["bigPicture"] != ""
           ? NotificationLayout.BigPicture
           : NotificationLayout.Default,

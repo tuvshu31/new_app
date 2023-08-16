@@ -384,9 +384,9 @@ void delvieryCostWarningModal(dynamic context, dynamic onTap) {
 // }
 
 void driverDeliveryCodeApproveDialog(
-    dynamic context, TextEditingController controller, dynamic onTap) {
+    TextEditingController controller, dynamic onTap) {
   QuickAlert.show(
-    context: context,
+    context: Get.context!,
     type: QuickAlertType.custom,
     barrierDismissible: true,
     customAsset: 'assets/images/png/app/webp.webp',

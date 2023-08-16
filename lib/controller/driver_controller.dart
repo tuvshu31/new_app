@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/enums.dart';
@@ -25,7 +27,8 @@ class DriverController extends GetxController {
   late AnimationController animationController;
   int driverId = RestApiHelper.getUserId();
   RxMap driverBonusInfo = {}.obs;
-  RxBool fetchingBonusInfo = false.obs;
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  TextEditingController textEditingController = TextEditingController();
 
   void playSound(type) async {
     player.play(AssetSource("sounds/$type.wav"));
@@ -61,9 +64,9 @@ class DriverController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
+      locationSettings: LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 2,
+        distanceFilter: isOnline.value ? 5 : 2,
       ),
     ).listen((Position? info) async {
       Position position = await Geolocator.getCurrentPosition(
@@ -79,30 +82,58 @@ class DriverController extends GetxController {
           ),
         ),
       );
-      // var body = {
-      //   "latitude": info.latitude.toString(),
-      //   "longitude": info.longitude.toString(),
-      //   "heading": info.heading.toString()
-      // };
-      // updateDriverInfo(body);
+      if (isOnline.value) {
+        var body = {
+          "latitude": info!.latitude.toString(),
+          "longitude": info.longitude.toString(),
+          "heading": info.heading.toString()
+        };
+        dynamic res =
+            await RestApi().updateDriver(RestApiHelper.getUserId(), body);
+        log(res.toString());
+      }
     });
   }
 
   void updateDriverInfo(dynamic body) async {
+    CustomDialogs().showLoadingDialog();
     dynamic user =
         await RestApi().updateDriver(RestApiHelper.getUserId(), body);
-    dynamic data = Map<String, dynamic>.from(user);
+    if (user != null) {}
+    Get.back();
+  }
+
+  void saveUserToken() {
+    _messaging.getToken().then((token) async {
+      if (token != null) {
+        var body = {"mapToken": token};
+        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+      }
+    });
+  }
+
+  void turnOnOff(dynamic body) async {
+    CustomDialogs().showLoadingDialog();
+    saveUserToken();
+    dynamic user =
+        await RestApi().updateDriver(RestApiHelper.getUserId(), body);
+    if (user != null) {
+      dynamic res = Map<String, dynamic>.from(user);
+      log(res.toString());
+      isOnline.value = res["data"]["isOpen"];
+    }
+    Get.back();
   }
 
   Future<void> getDriverBonusInfo() async {
-    fetchingBonusInfo.value = true;
+    CustomDialogs().showLoadingDialog();
     dynamic response = await RestApi().getDriverBonus(driverId);
     if (response != null) {
       dynamic res = Map<String, dynamic>.from(response);
       driverBonusInfo.value = res;
       log(res.toString());
     }
-    fetchingBonusInfo.value = false;
+    Get.back();
   }
 
   void incoming() async {
@@ -129,6 +160,7 @@ class DriverController extends GetxController {
   void cancelOrder() async {
     stopSound();
     hideBottomView();
+    AwesomeNotifications().cancel(1);
     driverStatus.value = DriverStatus.withoutOrder;
     newOrderInfo.clear();
     showBottomView();
@@ -162,13 +194,24 @@ class DriverController extends GetxController {
     }
   }
 
-  void delivered() async {
-    hideBottomView();
-    driverStatus.value = DriverStatus.finished;
-    var orderId = newOrderInfo["id"];
-    // CustomDialogs().showDriverAuthDialog();
-    // await RestApi().arrived(orderId, driverId);
-    showBottomView();
+  void delivered() {
+    driverDeliveryCodeApproveDialog(
+      textEditingController,
+      () async {
+        if (textEditingController.text ==
+            newOrderInfo["userAndDriverCode"].toString()) {
+          Get.back();
+          hideBottomView();
+          driverStatus.value = DriverStatus.finished;
+          var orderId = newOrderInfo["id"];
+          textEditingController.clear();
+          await RestApi().arrived(orderId, driverId);
+          showBottomView();
+        } else {
+          customSnackbar(DialogType.error, "Захиалгын код буруу байна", 3);
+        }
+      },
+    );
   }
 
   void finished() async {

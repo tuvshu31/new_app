@@ -17,7 +17,7 @@ class CartController extends GetxController {
   RxInt cartItemCount = 0.obs;
   RxInt deliveryPrice = 3000.obs;
 
-  void addProduct(product, context) {
+  void addProduct(product) {
     cartItemCount++;
     var i = cartList.indexWhere((e) => e["id"] == product["id"]);
     if (i > -1) {

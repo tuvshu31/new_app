@@ -43,6 +43,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   String ports = "";
   String orts = "";
   String descriptions = "";
+  List includedProducts = [];
   final _cartCtrl = Get.put(CartController());
   final _navCtrl = Get.put(NavigationController());
 
@@ -391,7 +392,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                     borderRadius: 50,
                   )
                 : CustomButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_isStoreOpen) {
                         if (_cartCtrl.cartList.any(
                             (element) => element["store"] != _data["store"])) {
@@ -401,17 +402,33 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                             listClick(widgetKey);
                             Future.delayed(const Duration(milliseconds: 1600),
                                 () {
-                              _cartCtrl.addProduct(_data, context);
+                              _cartCtrl.addProduct(_data);
                               setState(() {});
                             });
                           });
                         } else {
-                          listClick(widgetKey);
-                          Future.delayed(const Duration(milliseconds: 1600),
-                              () {
-                            _cartCtrl.addProduct(_data, context);
-                            setState(() {});
-                          });
+                          CustomDialogs().showLoadingDialog();
+                          dynamic response = await RestApi()
+                              .checkIncludedProducts(_data["id"]);
+                          if (response != null) {
+                            dynamic d = Map<String, dynamic>.from(response);
+                            if (d["includedProducts"].isNotEmpty) {
+                              includedProducts = d["includedProducts"];
+                              listClick(widgetKey);
+                              for (var element in includedProducts) {
+                                _cartCtrl.addProduct(element);
+                              }
+                              setState(() {});
+                            } else {
+                              listClick(widgetKey);
+                              Future.delayed(const Duration(milliseconds: 1600),
+                                  () {
+                                _cartCtrl.addProduct(_data);
+                                setState(() {});
+                              });
+                            }
+                          }
+                          Get.back();
                         }
                       } else {
                         customSnackbar(

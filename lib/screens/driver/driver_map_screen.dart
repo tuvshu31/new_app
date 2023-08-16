@@ -4,14 +4,14 @@ import "package:flutter/material.dart";
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class DriverScreenMapView extends StatefulWidget {
-  const DriverScreenMapView({super.key});
+class DriverMapScreen extends StatefulWidget {
+  const DriverMapScreen({super.key});
 
   @override
-  State<DriverScreenMapView> createState() => _DriverScreenMapViewState();
+  State<DriverMapScreen> createState() => _DriverMapScreenState();
 }
 
-class _DriverScreenMapViewState extends State<DriverScreenMapView> {
+class _DriverMapScreenState extends State<DriverMapScreen> {
   final _driverCtx = Get.put(DriverController());
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
 
@@ -50,7 +50,7 @@ class _DriverScreenMapViewState extends State<DriverScreenMapView> {
                 markerId: const MarkerId('1'),
                 icon: markerIcon,
                 position: _driverCtx.driverPosition.value,
-                rotation: _driverCtx.driverRotation.value,
+                // rotation: _driverCtx.driverRotation.value,
               ),
             },
             initialCameraPosition: CameraPosition(
