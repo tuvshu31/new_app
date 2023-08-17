@@ -48,6 +48,7 @@ void storeOrdersToDelivery(context, data) {
       const Duration(milliseconds: 300),
       () async {
         slideActionKey.currentState!.reset();
+        Get.back();
         CustomDialogs().showLoadingDialog();
         dynamic req = await RestApi().checkDriverAccepted(data["id"]);
         Get.back();
