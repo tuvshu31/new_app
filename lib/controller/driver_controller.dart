@@ -25,7 +25,6 @@ class DriverController extends GetxController {
   RxDouble driverRotation = 0.0.obs;
   Rx<DriverStatus> driverStatus = DriverStatus.withoutOrder.obs;
   late AnimationController animationController;
-  int driverId = RestApiHelper.getUserId();
   RxMap driverBonusInfo = {}.obs;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   TextEditingController textEditingController = TextEditingController();
@@ -66,7 +65,7 @@ class DriverController extends GetxController {
     Geolocator.getPositionStream(
       locationSettings: LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: isOnline.value ? 5 : 2,
+        distanceFilter: isOnline.value ? 50 : 2,
       ),
     ).listen((Position? info) async {
       Position position = await Geolocator.getCurrentPosition(
@@ -119,7 +118,6 @@ class DriverController extends GetxController {
         await RestApi().updateDriver(RestApiHelper.getUserId(), body);
     if (user != null) {
       dynamic res = Map<String, dynamic>.from(user);
-      log(res.toString());
       isOnline.value = res["data"]["isOpen"];
     }
     Get.back();
@@ -127,6 +125,7 @@ class DriverController extends GetxController {
 
   Future<void> getDriverBonusInfo() async {
     CustomDialogs().showLoadingDialog();
+    int driverId = RestApiHelper.getUserId();
     dynamic response = await RestApi().getDriverBonus(driverId);
     if (response != null) {
       dynamic res = Map<String, dynamic>.from(response);
@@ -148,6 +147,7 @@ class DriverController extends GetxController {
     driverStatus.value = DriverStatus.arrived;
     var orderId = newOrderInfo["id"];
     CustomDialogs().showLoadingDialog();
+    int driverId = RestApiHelper.getUserId();
     dynamic res = await RestApi().acceptOrder(orderId, driverId);
     Get.back();
     if (res != null) {
@@ -171,6 +171,7 @@ class DriverController extends GetxController {
     driverStatus.value = DriverStatus.received;
     var orderId = newOrderInfo["id"];
     CustomDialogs().showLoadingDialog();
+    int driverId = RestApiHelper.getUserId();
     dynamic res = await RestApi().arrived(orderId, driverId);
     Get.back();
     if (res != null) {
@@ -185,6 +186,7 @@ class DriverController extends GetxController {
     driverStatus.value = DriverStatus.delivered;
     var orderId = newOrderInfo["id"];
     CustomDialogs().showLoadingDialog();
+    int driverId = RestApiHelper.getUserId();
     dynamic res = await RestApi().received(orderId, driverId);
     Get.back();
     if (res != null) {
@@ -205,7 +207,8 @@ class DriverController extends GetxController {
           driverStatus.value = DriverStatus.finished;
           var orderId = newOrderInfo["id"];
           textEditingController.clear();
-          await RestApi().arrived(orderId, driverId);
+          int driverId = RestApiHelper.getUserId();
+          await RestApi().finished(orderId, driverId);
           showBottomView();
         } else {
           customSnackbar(DialogType.error, "Захиалгын код буруу байна", 3);
@@ -217,21 +220,8 @@ class DriverController extends GetxController {
   void finished() async {
     hideBottomView();
     driverStatus.value = DriverStatus.withoutOrder;
-    var orderId = newOrderInfo["id"];
-    // await RestApi().arrived(orderId, driverId);
     newOrderInfo.clear();
     showBottomView();
-  }
-
-  void finishDelivery() {
-    RestApiHelper.saveOrderId(0);
-    RestApiHelper.saveOrderInfo({});
-    orderList.clear();
-    driverPayments.clear();
-    fetchDriverOrders();
-    fetchDriverPayments();
-    // removeMarker("store");
-    newOrderInfo.clear();
   }
 
   void driverActionHandler(payload) async {

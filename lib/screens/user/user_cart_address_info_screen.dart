@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
@@ -48,6 +49,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
   FocusNode focusNode4 = FocusNode();
   List locationList = [];
   Map selectedLocation = {};
+  final _loginCtx = Get.put(LoginController());
 
   @override
   void initState() {
@@ -134,8 +136,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       //create invoice
       var qpayBody = {
         "sender_invoice_no": id.toString(),
-        "amount": _cartCtx.total,
-        // "amount": 50,
+        // "amount": _cartCtx.total,
+        "amount": 50,
       };
       dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
       Get.back();
@@ -148,6 +150,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
               "data": jsonDecode(qpayData["data"]),
             },
           );
+          _loginCtx.saveUserToken();
         }
       } else {
         customSnackbar(DialogType.error,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/main.dart';
@@ -105,6 +106,8 @@ class StoreController extends GetxController {
 
   void storeActionHandler(payload) {
     var action = payload["action"];
+    log(payload.toString());
+    log(action.toString());
     if (action == "sent") {
       saveIcomingOrder(navigatorKey.currentContext, payload);
       showIncomingOrderDialog(navigatorKey.currentContext);

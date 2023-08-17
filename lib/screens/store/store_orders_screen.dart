@@ -194,7 +194,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
           trailing: CircularCountDownTimer(
             width: 40,
             height: 40,
-            duration: int.parse(data["prepDuration"]) * 60,
+            duration: int.parse(data["prepDuration"] ?? "0") * 60,
             timeFormatterFunction: (defaultFormatterFunction, duration) {
               if (duration.inSeconds == 0) {
                 return "0";

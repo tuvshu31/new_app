@@ -55,5 +55,4 @@ Future<void> handleNotifications(message) async {
       bigPicture: data["bigPicture"] ?? "",
     ),
   );
-  AwesomeNotifications().cancel(1);
 }

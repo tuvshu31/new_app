@@ -161,6 +161,12 @@ class RestApi {
     return DioClient().sendRequest('orders', Method.get, [], query);
   }
 
+  //Тухайн хэрэглэгчийн захиалгыг авах
+  Future checkDriverAccepted(int id) async {
+    return DioClient()
+        .sendRequest('users/checkDriverAccepted?id=$id', Method.post, [], {});
+  }
+
   //Шинэ захиалгын мэдээллийг жолооч руу илгээх
   Future assignDriver(int id) async {
     return DioClient()
@@ -185,6 +191,13 @@ class RestApi {
   Future arrived(int id, int driverId) async {
     return DioClient().sendRequest(
         'users/drivers/arrived?id=$id&driverId=$driverId', Method.post, [], {});
+  }
+
+  //Жолооч захиалгыг цуцлах
+  Future finished(int id, int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/finished?id=$id&driverId=$driverId',
+        Method.post, [], {});
   }
 
   //Жолооч захиалгыг цуцлах
@@ -230,7 +243,7 @@ class RestApi {
   //Захиалгын мэдээлэл өөрчлөх
   Future updateOrder(int id, dynamic body) async {
     return DioClient()
-        .sendRequest('orders/updateOrder/$id', Method.put, body, {});
+        .sendRequest('orders/updateOrder2/$id', Method.put, body, {});
   }
 
   //Тухайн дэлгүүрийн захиалгыг авах
@@ -282,7 +295,7 @@ class RestApi {
   //Qpay-төлбөрөө төлөх
   Future qpayPayment(dynamic body) async {
     return DioClient()
-        .sendRequest('payment/createInvoice1', Method.post, body, {});
+        .sendRequest('payment/createInvoice2', Method.post, body, {});
   }
 
   //Байршлуудын мэдээлэл авах

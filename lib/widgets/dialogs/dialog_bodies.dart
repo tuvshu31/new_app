@@ -1,3 +1,4 @@
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:curved_progress_bar/curved_progress_bar.dart';
@@ -174,7 +175,10 @@ Widget showNotAvailableProductsDialogBody(
         textAlign: TextAlign.center,
       ),
       SizedBox(height: Get.height * .02),
-      ListView.builder(
+      ListView.separated(
+        separatorBuilder: (context, index) {
+          return Container(height: 7);
+        },
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -190,6 +194,12 @@ Widget showNotAvailableProductsDialogBody(
             title: Text(
               item["name"],
               style: const TextStyle(fontSize: 12),
+            ),
+            subtitle: Text(
+              convertToCurrencyFormat(int.parse(item["price"] ?? 0)),
+              style: const TextStyle(
+                fontSize: 12,
+              ),
             ),
           );
         },

@@ -396,15 +396,31 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                       if (_isStoreOpen) {
                         if (_cartCtrl.cartList.any(
                             (element) => element["store"] != _data["store"])) {
-                          CustomDialogs().showSameStoreProductsDialog(() {
+                          CustomDialogs().showSameStoreProductsDialog(() async {
                             _cartCtrl.emptyTheTrash();
                             Get.back();
-                            listClick(widgetKey);
-                            Future.delayed(const Duration(milliseconds: 1600),
-                                () {
-                              _cartCtrl.addProduct(_data);
-                              setState(() {});
-                            });
+                            CustomDialogs().showLoadingDialog();
+                            dynamic response = await RestApi()
+                                .checkIncludedProducts(_data["id"]);
+                            if (response != null) {
+                              dynamic d = Map<String, dynamic>.from(response);
+                              if (d["includedProducts"].isNotEmpty) {
+                                includedProducts = d["includedProducts"];
+                                listClick(widgetKey);
+                                for (var element in includedProducts) {
+                                  _cartCtrl.addProduct(element);
+                                }
+                                setState(() {});
+                              } else {
+                                listClick(widgetKey);
+                                Future.delayed(
+                                    const Duration(milliseconds: 1600), () {
+                                  _cartCtrl.addProduct(_data);
+                                  setState(() {});
+                                });
+                              }
+                            }
+                            Get.back();
                           });
                         } else {
                           CustomDialogs().showLoadingDialog();

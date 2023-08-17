@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
@@ -54,24 +55,45 @@ class _UserCartScreenState extends State<UserCartScreen> {
 
   //Сагсанд тэг үлдэгдэлтэй, эсвэл үлдэгдэл хүрэлцэхгүй бараанууд байгаа эсэхийг шалгаж байна
   Future<void> checkProductsAvailabilityAndNavigate() async {
-    // CustomDialogs().showLoadingDialog();
-    CustomDialogs().showNotAvailableProductsDialog([13], () {});
     List<Map<String, dynamic>> body = [];
     for (var element in _cartCtrl.cartList) {
       var obj = {"id": element["id"], "quantity": element["quantity"]};
       body.add(obj);
     }
+    CustomDialogs().showLoadingDialog();
     dynamic products = await RestApi().checkUserCartProducts(body);
-    dynamic response = Map<String, dynamic>.from(products);
-    if (response["success"]) {
-      if (response["notVisibleProducts"].isNotEmpty) {
-        log("Hello");
+    Get.back();
+
+    if (products != null) {
+      dynamic response = Map<String, dynamic>.from(products);
+      log(response.toString());
+      if (response["success"]) {
+        if (response["notVisibleProducts"].isNotEmpty) {
+          CustomDialogs().showNotAvailableProductsDialog(
+              response["notVisibleProducts"], () {
+            Get.back();
+            response["notVisibleProducts"]
+                .forEach((el) => {_cartCtrl.removeProduct(el, context)});
+          });
+        } else if (response["finishedProducts"].isNotEmpty) {
+          CustomDialogs()
+              .showNotAvailableProductsDialog(response["finishedProducts"], () {
+            Get.back();
+            response["finishedProducts"]
+                .forEach((el) => {_cartCtrl.removeProduct(el, context)});
+          });
+        } else if (response["notSuffProducts"].isNotEmpty) {
+          CustomDialogs()
+              .showNotAvailableProductsDialog(response["notSuffProducts"], () {
+            Get.back();
+            response["notSuffProducts"]
+                .forEach((el) => {_cartCtrl.removeProduct(el, context)});
+          });
+        } else {
+          Get.toNamed(userCartAddressInfoScreenRoute);
+        }
       }
-      // if (response["finishedProducts"]) {}
-      // if (response["notSuffProducts"]) {}
     }
-    log(response.toString());
-    // Get.back();
   }
 
   bool _canIncreaseCount(int count, int available) {

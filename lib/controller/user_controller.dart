@@ -1,15 +1,14 @@
 import 'dart:async';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
-import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 final _cartCtx = Get.put(CartController());
@@ -21,7 +20,6 @@ class UserController extends GetxController {
   Rx<PageController> activeOrderPageController = PageController().obs;
   RxList userOrderList = [].obs;
   RxList filteredOrderList = [].obs;
-  RxBool fetchingOrderList = false.obs;
   RxInt prepDuration = 1.obs;
   RxDouble markerRotation = 0.0.obs;
   RxMap selectedOrder = {}.obs;
@@ -29,6 +27,31 @@ class UserController extends GetxController {
   Rx<LatLng> driverPosition = LatLng(49.02821126030273, 104.04634376483777).obs;
   Rx<Completer<GoogleMapController>> mapController =
       Completer<GoogleMapController>().obs;
+  RxBool fetchingOrderList = false.obs;
+
+  void getOrders(selectedTab) async {
+    fetchingOrderList.value = true;
+    Map<String, dynamic> query = {
+      "userId": RestApiHelper.getUserId(),
+    };
+    if (selectedTab == 0) {
+      query["orderStatus[0]"] = "sent";
+      query["orderStatus[1]"] = "received";
+      query["orderStatus[2]"] = "preparing";
+      query["orderStatus[3]"] = "delivering";
+    } else if (selectedTab == 1) {
+      query["orderStatus"] = "delivered";
+    } else if (selectedTab == 2) {
+      query["orderStatus"] = "canceled";
+    } else {}
+
+    dynamic response = await RestApi().getOrders(query);
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"]) {
+      filteredOrderList.value = d["data"].reversed.toList();
+    }
+    fetchingOrderList.value = false;
+  }
 
   void filterOrders(int value) {
     if (value == 0) {
@@ -148,8 +171,8 @@ class UserController extends GetxController {
     if (action == "sent") {
       _cartCtx.cartList.clear();
       _cartCtx.cartItemCount.value = 0;
-      _navCtx.onItemTapped(4);
-      Get.offNamed(userProfileOrdersScreenRoute);
+      Get.back();
+      _navCtx.onItemTapped(3);
       changeOrderStatus(payload);
       selectedOrder.value = payload;
       showOrderDetails();

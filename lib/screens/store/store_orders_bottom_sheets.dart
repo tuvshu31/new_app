@@ -48,17 +48,21 @@ void storeOrdersToDelivery(context, data) {
       const Duration(milliseconds: 300),
       () async {
         slideActionKey.currentState!.reset();
-        if (!_storeCtx.driverAccepted.value) {
-          dynamic response = await RestApi().assignDriver(data["id"]);
-          dynamic d = Map<String, dynamic>.from(response);
-          if (d["success"]) {
-            Get.back();
-            notifyToDrivers(context, data);
+        CustomDialogs().showLoadingDialog();
+        dynamic req = await RestApi().checkDriverAccepted(data["id"]);
+        Get.back();
+        if (req != null) {
+          dynamic reqResponse = Map<String, dynamic>.from(req);
+          if (reqResponse["driverAccepted"]) {
+            customSnackbar(DialogType.error,
+                "Хүргэлтийн жолооч ирж байгаа тул түр хүлээнэ үү", 4);
+          } else {
+            dynamic response = await RestApi().assignDriver(data["id"]);
+            dynamic d = Map<String, dynamic>.from(response);
+            if (d["success"]) {
+              notifyToDrivers(context, data);
+            }
           }
-        } else {
-          Get.back();
-          customSnackbar(DialogType.error,
-              "Хүргэлтийн жолооч ирж байгаа тул түр хүлээнэ үү", 4);
         }
       },
     );
