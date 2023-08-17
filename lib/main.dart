@@ -69,7 +69,20 @@ void main() async {
 
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
-  FirebaseMessaging.instance.requestPermission();
+  if (Platform.isIOS) {
+    FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+  } else if (Platform.isAndroid) {
+    FirebaseMessaging.instance.requestPermission();
+  }
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 

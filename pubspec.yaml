@@ -95,7 +95,7 @@ dependencies:
   webview_flutter: ^4.0.7
   badges: ^3.0.3
   firebase_core: ^2.8.0
-  firebase_messaging: ^14.6.6
+  firebase_messaging: ^14.4.1
   awesome_notifications: ^0.7.4+1
   panara_dialogs: ^0.1.4
   sweetsheet: ^0.4.0
