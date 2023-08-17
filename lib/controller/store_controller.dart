@@ -19,7 +19,6 @@ class StoreController extends GetxController {
   RxInt prepDuration = 0.obs;
   Timer? countdownTimer;
   RxList prepDurationList = [].obs;
-  RxBool driverAccepted = false.obs;
 
   final player = AudioPlayer();
 
@@ -114,7 +113,6 @@ class StoreController extends GetxController {
     } else if (action == "received") {
     } else if (action == "driverAccepted") {
       Get.back();
-      driverAccepted.value = true;
     } else if (action == "preparing") {
     } else if (action == "delivering") {
       for (dynamic i in storeOrderList) {
@@ -124,7 +122,6 @@ class StoreController extends GetxController {
       }
       filterOrders(0);
     } else if (action == "delivered") {
-      driverAccepted.value = false;
       for (dynamic i in storeOrderList) {
         if (i["id"] == payload["id"]) {
           i["orderStatus"] = "delivered";
@@ -132,7 +129,6 @@ class StoreController extends GetxController {
       }
       filterOrders(0);
     } else if (action == "canceled") {
-      driverAccepted.value = false;
     } else {}
   }
 }
