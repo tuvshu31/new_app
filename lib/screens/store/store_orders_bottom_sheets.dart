@@ -61,7 +61,7 @@ void storeOrdersToDelivery(context, data) {
             dynamic response = await RestApi().assignDriver(data["id"]);
             dynamic d = Map<String, dynamic>.from(response);
             if (d["success"]) {
-              notifyToDrivers(context, data);
+              notifyToDrivers(data);
             }
           }
         }
@@ -70,9 +70,9 @@ void storeOrdersToDelivery(context, data) {
   }));
 }
 
-void notifyToDrivers(context, data) {
+void notifyToDrivers(data) {
   showDialog(
-    context: context,
+    context: Get.context!,
     builder: (context) {
       return notifyToDriversBody();
     },
