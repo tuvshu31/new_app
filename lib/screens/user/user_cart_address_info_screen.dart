@@ -7,6 +7,7 @@ import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -136,8 +137,8 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       //create invoice
       var qpayBody = {
         "sender_invoice_no": id.toString(),
-        "amount": _cartCtx.total,
-        // "amount": 50,
+        // "amount": _cartCtx.total,
+        "amount": 50,
       };
       dynamic qpayResponse = await RestApi().qpayPayment(qpayBody);
       Get.back();
@@ -177,17 +178,35 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             child: CustomButton(
               isActive: isPhoneOk && isAddressOk && isLocationOk,
               onPressed: () {
-                if (!showPriceDetails) {
-                  FocusScope.of(context).unfocus();
-                  CustomDialogs().showLoadingDialog();
-                  Future.delayed(const Duration(seconds: 1), () {
-                    Get.back();
-                    showPriceDetails = true;
-                    setState(() {});
-                  });
-                } else {
-                  createOrderAndInvoice();
-                }
+                AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                    wakeUpScreen: true,
+                    // payload: Map<String, String>.from(message),
+                    id: 1,
+                    channelKey: 'basic_channel',
+                    title: "Erdenet24",
+                    body: "Hello",
+                    notificationLayout: NotificationLayout.Default,
+                    displayOnBackground: true,
+                    displayOnForeground: true,
+                    locked: false,
+                    category: NotificationCategory.Message,
+                    color: MyColors.primary,
+                    // largeIcon: data["largeIcon"] ?? "",
+                    // bigPicture: data["bigPicture"] ?? "",
+                  ),
+                );
+                // if (!showPriceDetails) {
+                //   FocusScope.of(context).unfocus();
+                //   CustomDialogs().showLoadingDialog();
+                //   Future.delayed(const Duration(seconds: 1), () {
+                //     Get.back();
+                //     showPriceDetails = true;
+                //     setState(() {});
+                //   });
+                // } else {
+                //   createOrderAndInvoice();
+                // }
               },
               text: showPriceDetails ? "Төлбөр төлөх" : "Үргэлжлүүлэх",
               textColor: MyColors.white,
