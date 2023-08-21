@@ -35,43 +35,26 @@ class LocalNofitication {
 }
 
 Future<void> handleNotifications(message) async {
-  showDialog(
-    context: Get.context!,
-    builder: (context) {
-      return Material(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Hello"),
-            CustomButton(
-              text: "CLose",
-              onPressed: Get.back,
-            )
-          ],
-        ),
-      );
-    },
+  var info = message["data"];
+  var data = jsonDecode(info);
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      // wakeUpScreen: true,
+      payload: Map<String, String>.from(message),
+      id: data["id"] ?? 1,
+      channelKey: 'basic_channel',
+      title: data["storeName"] ?? "Erdenet24",
+      body: data["text"] ?? "",
+      // notificationLayout: data["bigPicture"] != ""
+      //     ? NotificationLayout.BigPicture
+      //     : NotificationLayout.Default,
+      displayOnBackground: true,
+      displayOnForeground: true,
+      locked: false,
+      // category: NotificationCategory.Message,
+      color: MyColors.primary,
+      // largeIcon: data["largeIcon"] ?? "",
+      // bigPicture: data["bigPicture"] ?? "",
+    ),
   );
-  // var info = message["data"];
-  // var data = jsonDecode(info);
-  // AwesomeNotifications().createNotification(
-  //   content: NotificationContent(
-  //     wakeUpScreen: true,
-  //     payload: Map<String, String>.from(message),
-  //     id: data["id"] ?? 1,
-  //     channelKey: 'basic_channel',
-  //     title: data["storeName"] ?? "Erdenet24",
-  //     body: data["text"] ?? "",
-  //     notificationLayout: data["bigPicture"] != ""
-  //         ? NotificationLayout.BigPicture
-  //         : NotificationLayout.Default,
-  //     displayOnBackground: true,
-  //     displayOnForeground: true,
-  //     locked: false,
-  //     category: NotificationCategory.Message,
-  //     color: MyColors.primary,
-  //     largeIcon: data["largeIcon"] ?? "",
-  //     bigPicture: data["bigPicture"] ?? "",
-  //   ),
-  // );
 }
