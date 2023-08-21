@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:Erdenet24/widgets/button.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -43,18 +41,16 @@ Future<void> handleNotifications(message) async {
       payload: Map<String, String>.from(message),
       id: data["id"] ?? 1,
       channelKey: 'basic_channel',
-      title: data["storeName"] ?? "Erdenet24",
-      body: data["text"] ?? "",
-      // notificationLayout: data["bigPicture"] != ""
-      //     ? NotificationLayout.BigPicture
-      //     : NotificationLayout.Default,
+      title: data["title"],
+      body: data["body"],
+      notificationLayout: data["isDefault"]
+          ? NotificationLayout.Default
+          : NotificationLayout.BigPicture,
       displayOnBackground: true,
       displayOnForeground: true,
-      locked: false,
-      // category: NotificationCategory.Message,
       color: MyColors.primary,
-      // largeIcon: data["largeIcon"] ?? "",
-      // bigPicture: data["bigPicture"] ?? "",
+      largeIcon: data["largeIcon"],
+      bigPicture: data["bigPicture"],
     ),
   );
 }
