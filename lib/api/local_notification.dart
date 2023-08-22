@@ -42,7 +42,7 @@ Future<void> handleNotifications(message) async {
       id: data["id"] ?? 1,
       channelKey: 'basic_channel',
       title: data["title"],
-      body: data["body"],
+      body: data["text"],
       notificationLayout: data["isDefault"]
           ? NotificationLayout.Default
           : NotificationLayout.BigPicture,
