@@ -207,6 +207,13 @@ class RestApi {
         Method.post, [], {});
   }
 
+  //Жолооч захиалгыг цуцлах
+  Future checkDriverOrder(int driverId) async {
+    return DioClient().sendRequest(
+        'users/drivers/checkDriverOrder?driverId=$driverId',
+        Method.post, [], {});
+  }
+
   //Логин хийсэн жолоочийн төлбөрийн мэдээллийг авах
   Future driverPayments(dynamic body) async {
     return DioClient()

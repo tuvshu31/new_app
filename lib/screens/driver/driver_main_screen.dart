@@ -42,6 +42,8 @@ class _DriverMainScreenState extends State<DriverMainScreen>
     super.initState();
     _driverCtx.showBottomView();
     checkIfDriverOnline();
+    checkDriverOrder();
+
     _driverCtx.animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -60,6 +62,24 @@ class _DriverMainScreenState extends State<DriverMainScreen>
         timerController.start();
         _driverCtx.animationController.forward();
       }
+    }
+  }
+
+  Future<void> checkDriverOrder() async {
+    dynamic response =
+        await RestApi().checkDriverOrder(RestApiHelper.getUserId());
+    dynamic d = Map<String, dynamic>.from(response);
+    if (d["success"] && d["withOrder"]) {
+      _driverCtx.hideBottomView();
+      _driverCtx.newOrderInfo.value = d["order"];
+      _driverCtx.driverStatus.value = d["orderStep"] == 1
+          ? DriverStatus.arrived
+          : d["orderStep"] == 2
+              ? DriverStatus.received
+              : d["orderStep"] == 3
+                  ? DriverStatus.delivered
+                  : DriverStatus.finished;
+      _driverCtx.showBottomView();
     }
   }
 

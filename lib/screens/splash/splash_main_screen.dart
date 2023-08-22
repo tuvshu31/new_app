@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
@@ -12,6 +13,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
+import 'package:new_version/new_version.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SplashMainScreen extends StatefulWidget {
@@ -38,8 +40,16 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
     AppCheckerResult appCheckerResult = await _checker.checkUpdate();
     if (appCheckerResult.canUpdate) {
       CustomDialogs().showNewVersionDialog(() async {
-        final Uri url = Uri.parse(appCheckerResult.appURL!);
-        await launchUrl(url);
+        final appId = Platform.isAndroid ? 'mn.et24' : '6444353401';
+        final url = Uri.parse(
+          Platform.isAndroid
+              ? "market://details?id=$appId"
+              : "https://apps.apple.com/app/id$appId",
+        );
+        launchUrl(
+          url,
+          mode: LaunchMode.externalApplication,
+        );
       });
     } else if (RestApiHelper.getUserId() != 0) {
       _loginCtx.listenToTokenChanges(RestApiHelper.getUserRole());
