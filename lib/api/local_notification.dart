@@ -37,7 +37,7 @@ Future<void> handleNotifications(message) async {
   var data = jsonDecode(info);
   AwesomeNotifications().createNotification(
     content: NotificationContent(
-      // wakeUpScreen: true,
+      wakeUpScreen: true,
       payload: Map<String, String>.from(message),
       id: data["id"] ?? 1,
       channelKey: 'basic_channel',
