@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/driver/views/driver_arrived_view.dart';
@@ -66,20 +67,22 @@ class _DriverMainScreenState extends State<DriverMainScreen>
   }
 
   Future<void> checkDriverOrder() async {
-    dynamic response =
-        await RestApi().checkDriverOrder(RestApiHelper.getUserId());
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"] && d["withOrder"]) {
-      _driverCtx.hideBottomView();
-      _driverCtx.newOrderInfo.value = d["order"];
-      _driverCtx.driverStatus.value = d["orderStep"] == 1
-          ? DriverStatus.arrived
-          : d["orderStep"] == 2
-              ? DriverStatus.received
-              : d["orderStep"] == 3
-                  ? DriverStatus.delivered
-                  : DriverStatus.finished;
-      _driverCtx.showBottomView();
+    if (_driverCtx.isOnline.value) {
+      dynamic response =
+          await RestApi().checkDriverOrder(RestApiHelper.getUserId());
+      dynamic d = Map<String, dynamic>.from(response);
+      if (d["success"] && d["withOrder"]) {
+        _driverCtx.hideBottomView();
+        _driverCtx.driverStatus.value = d["orderStep"] == 1
+            ? DriverStatus.arrived
+            : d["orderStep"] == 2
+                ? DriverStatus.received
+                : d["orderStep"] == 3
+                    ? DriverStatus.delivered
+                    : DriverStatus.finished;
+        _driverCtx.newOrderInfo.value = d["order"];
+        _driverCtx.showBottomView();
+      }
     }
   }
 
