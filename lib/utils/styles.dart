@@ -42,8 +42,7 @@ class MyFonts {
 }
 
 class URL {
-  static const String AWS =
-      "https://et24-images.s3.ap-northeast-1.amazonaws.com";
+  static const String AWS = "https://d1wmfhrj5f6vga.cloudfront.net";
   static const String data =
       'https://us-central1-erdenet-12083.cloudfunctions.net/app/api/read';
   static const String userInfo =

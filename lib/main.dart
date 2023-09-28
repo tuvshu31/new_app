@@ -20,6 +20,7 @@ import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
+import 'package:Erdenet24/screens/user/user_products_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
@@ -185,10 +186,11 @@ class _MyAppState extends State<MyApp> {
         userProfileOrdersScreenRoute: (context) => const UserOrdersScreen(),
         userProfilePhoneEditScreenRoute: (context) =>
             const UserProfilePhoneEditScreen(),
-        userProfileScreenRoute: (context) => const UserProfileScreen(),
         userQrScanScreenRoute: (context) => const UserQRScanScreen(),
         userSavedScreenRoute: (context) => const UserSavedScreen(),
         userSearchBarScreenRoute: (context) => const UserSearchBarScreenRoute(),
+        userProductsSearchScreenRoute: (context) =>
+            const UserProductsSearchScreen(),
         storeMainScreenRoute: (context) => const StoreMainScreen(),
         storeOrdersScreenRoute: (context) => const StoreOrdersScreen(),
         storeProductsCreateProductScreenRoute: (context) =>

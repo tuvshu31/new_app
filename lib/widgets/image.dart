@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class CustomImage extends StatelessWidget {
   final double width;
@@ -26,22 +25,25 @@ class CustomImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
       ),
       clipBehavior: Clip.hardEdge,
-      child: CachedNetworkImage(
-        imageUrl: url,
-        errorWidget: (context, url, error) {
-          return SizedBox(
+      child: Image.network(
+        url,
+        fit: BoxFit.fill,
+        loadingBuilder: (BuildContext context, Widget child,
+            ImageChunkEvent? loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+              child: CustomShimmer(
             width: width,
             height: height,
-            child: const Image(
-              image: AssetImage("assets/images/png/no_image.png"),
-            ),
-          );
-        },
-        progressIndicatorBuilder: (context, url, progress) {
-          return CustomShimmer(
-            width: width,
-            height: height,
-          );
+          )
+
+              // CircularProgressIndicator(
+              //   value: loadingProgress.expectedTotalBytes != null
+              //       ? loadingProgress.cumulativeBytesLoaded /
+              //           loadingProgress.expectedTotalBytes!
+              //       : null,
+              // ),
+              );
         },
       ),
     );

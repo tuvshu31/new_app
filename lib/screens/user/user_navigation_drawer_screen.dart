@@ -1,13 +1,17 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/rendering.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,8 +20,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:iconly/iconly.dart';
 
 class UserNavigationDrawerScreen extends StatefulWidget {
   const UserNavigationDrawerScreen({
@@ -31,204 +34,116 @@ class UserNavigationDrawerScreen extends StatefulWidget {
 
 class _UserNavigationDrawerScreenState
     extends State<UserNavigationDrawerScreen> {
-  int _selectedIndex = 0;
-  List _categories = [];
-  List _subCategories = [];
-  bool fetchingSubCategories = false;
-  final PageController _pageController = PageController();
+  dynamic _user = [];
+  final _loginCtx = Get.put(LoginController());
 
   @override
   void initState() {
     super.initState();
-    readJson();
+    getUserInfo();
   }
 
-  Future<void> readJson() async {
-    String catStr = await rootBundle.loadString('assets/json/categories.json');
-    dynamic categories = await json.decode(catStr);
-    _categories = categories;
-    setState(() {});
-    fetchSubCategories();
-  }
-
-  Future<void> fetchSubCategories() async {
-    fetchingSubCategories = true;
-    dynamic subCatStr = await RestApi()
-        .getCategories({"parentId": _categories[_selectedIndex]['typeId']});
-    if (subCatStr['success'] == true) {
-      _subCategories.clear();
-      _subCategories = subCatStr['data'];
-    }
-    fetchingSubCategories = false;
-    setState(() {});
+  void getUserInfo() async {
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
+    dynamic data = Map<String, dynamic>.from(res);
+    setState(() {
+      _user = data["data"];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        width: double.infinity,
-        child: CustomHeader(
-          title: 'Ангилал',
-          customActions: Container(),
-          customLeading: _leading(),
-          body: Row(
-            children: [
-              _categoryList(),
-              _categoryItems(),
-            ],
-          ),
-        ));
-  }
-
-  Widget _categoryList() {
-    return Container(
-      color: MyColors.fadedGrey,
-      width: Get.width * .25,
-      child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          itemCount: _categories.length,
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-              onTap: () async {
-                _selectedIndex = index;
-                _pageController.jumpToPage(index);
-                setState(() {});
-                fetchSubCategories();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                color: _selectedIndex == index
-                    ? MyColors.white
-                    : Colors.transparent,
+      width: double.infinity,
+      child: CustomHeader(
+        title: 'Ангилал',
+        customActions: Container(),
+        customLeading: _leading(),
+        body: _user.isNotEmpty
+            ? SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image(
-                      image: AssetImage(
-                          "assets/images/png/categories/${_categories[index]['typeId']}.png"),
-                      width: 40,
-                      height: 40,
+                    ListTile(
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: Get.width * .075),
+                      dense: true,
+                      minLeadingWidth: Get.width * .07,
+                      leading: const Icon(
+                        IconlyLight.call,
+                        color: MyColors.black,
+                        size: 20,
+                      ),
+                      title: CustomText(
+                        text: _user["phone"],
+                        fontSize: 14,
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {
+                          Get.to(() => const UserProfilePhoneEditScreen());
+                        },
+                        icon: const Icon(
+                          IconlyLight.edit_square,
+                          size: 16,
+                          color: MyColors.black,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    CustomText(
-                      text: "${_categories[index]['name']}",
-                      fontSize: 12,
-                      textAlign: TextAlign.center,
-                    ),
+                    _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
+                      Get.to(() => const UserProfileAddressEditScreen());
+                    }),
+                    _listTile(IconlyLight.info_circle, "Тусламж", () {
+                      Get.to(() => const UserProfileHelpScreen());
+                    }),
+                    _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
+                      CustomDialogs().showAccountDeleteDialog(() async {
+                        CustomDialogs().showLoadingDialog();
+                        dynamic response = await RestApi()
+                            .deleteUser(RestApiHelper.getUserId());
+                        dynamic d = Map<String, dynamic>.from(response);
+                        Get.back();
+                        if (d["success"]) {
+                          _loginCtx.logout();
+                        } else {
+                          customSnackbar(
+                            DialogType.error,
+                            "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
+                            3,
+                          );
+                        }
+                      });
+                    }),
+                    _listTile(IconlyLight.login, "Системээс гарах", () {
+                      CustomDialogs().showLogoutDialog(() {
+                        _loginCtx.logout();
+                      });
+                    })
                   ],
                 ),
-              ),
-            );
-          }),
-    );
-  }
-
-  Widget _categoryItems() {
-    return Expanded(
-      child: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _pageController,
-        children: [
-          !fetchingSubCategories && _subCategories.isEmpty
-              ? const Center(
-                  child: CustomLoadingIndicator(
-                    text: 'Ангилал хоосон байна',
-                  ),
-                )
-              : Column(
-                  children: [
-                    SizedBox(
-                        width: double.infinity,
-                        height: Get.height * .05,
-                        child: Center(
-                            child: fetchingSubCategories
-                                ? CustomShimmer(
-                                    width: Get.width * .2,
-                                    height: 14,
-                                  )
-                                : CustomText(
-                                    text: _selectedIndex == 0
-                                        ? "Хүнс"
-                                        : _categories[_selectedIndex]['name'],
-                                    fontWeight: FontWeight.bold,
-                                  ))),
-                    Expanded(
-                      child: GridView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: fetchingSubCategories
-                              ? 10
-                              : _subCategories.length,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.2,
-                          ),
-                          itemBuilder: (context, index) {
-                            if (fetchingSubCategories) {
-                              return _subCategoryShimmer();
-                            } else {
-                              return _subCategoryItem(_subCategories[index]);
-                            }
-                          }),
-                    )
-                  ],
-                ),
-        ],
+              )
+            : MyShimmers().userPage(),
       ),
     );
   }
 
-  Widget _subCategoryShimmer() {
-    return Column(
-      children: [
-        CustomShimmer(
-          width: Get.width * .15,
-          height: Get.width * .15,
-          borderRadius: 50,
+  Widget _listTile(IconData icon, String title, dynamic onTap) {
+    return CustomInkWell(
+      borderRadius: BorderRadius.zero,
+      onTap: onTap,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
+        dense: true,
+        minLeadingWidth: Get.width * .07,
+        leading: Icon(
+          icon,
+          color: MyColors.black,
+          size: 20,
         ),
-        const SizedBox(height: 8),
-        CustomShimmer(
-          width: Get.width * .2,
-          height: 12,
-        )
-      ],
-    );
-  }
-
-  Widget _subCategoryItem(item) {
-    return Column(
-      children: [
-        CustomInkWell(
-            onTap: () {
-              Get.to(
-                UserProductsScreen(
-                  navType: NavType.none,
-                  title: item["name"],
-                  typeId: item["parentId"],
-                  categoryId: item["id"],
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(50),
-            child: CustomImage(
-              width: Get.width * .15,
-              height: Get.width * .15,
-              url: "${URL.AWS}/categories/${item['image']}",
-              radius: 50,
-            )),
-        const SizedBox(height: 4),
-        SizedBox(
-          width: Get.width * .3,
-          child: CustomText(
-            text: "${item['name']}",
-            textAlign: TextAlign.center,
-            fontSize: 12,
-          ),
+        title: CustomText(
+          text: title,
+          fontSize: 14,
         ),
-      ],
+      ),
     );
   }
 }

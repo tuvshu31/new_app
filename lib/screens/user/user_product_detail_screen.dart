@@ -1,11 +1,8 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -149,9 +146,12 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                             },
                           ),
                           items: list
-                              .map((item) => CachedImage(
+                              .map(
+                                (item) => CachedImage(
                                   image:
-                                      "${URL.AWS}/products/${_data["id"]}/large/$item.png"))
+                                      "${URL.AWS}/products/${_data["id"]}/large/$item.png",
+                                ),
+                              )
                               .toList()),
                     ),
                   ),
@@ -288,49 +288,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomInkWell(
-                      borderRadius: BorderRadius.zero,
-                      onTap: () {
-                        Get.off(
-                          UserProductsScreen(
-                            navType: NavType.store,
-                            storeId: int.parse(_data["store"]),
-                            title: _data["storeName"],
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(top: 24, bottom: 8),
-                        child: Row(
-                          children: [
-                            CustomImage(
-                              width: 24,
-                              height: 24,
-                              url:
-                                  "${URL.AWS}/users/${_data["store"]}/small/1.png",
-                            ),
-                            const SizedBox(width: 8),
-                            CustomText(
-                              text: "${_data["storeName"]}",
-                              fontSize: 15,
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: const [
-                                  Icon(
-                                    IconlyLight.arrow_right_2,
-                                    size: 20,
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     CustomText(
                       text: "${_data["name"]}",
                       isUpperCase: true,
@@ -342,11 +300,14 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                       ),
                       fontSize: 14,
                     ),
+                    const SizedBox(height: 8),
+                    const Divider(),
                     _data["otherInfo"].isNotEmpty
                         ? ListView.separated(
                             separatorBuilder: (context, index) {
                               return const SizedBox(height: 12);
                             },
+                            padding: const EdgeInsets.only(top: 8),
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: _data["otherInfo"].length,
@@ -373,6 +334,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                             },
                           )
                         : Container(),
+                    SizedBox(height: Get.height * .1),
                   ],
                 ),
               )

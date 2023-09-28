@@ -40,7 +40,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       const UserSavedScreen(),
       const UserCartScreen(),
       const UserOrdersScreen(),
-      const UserProfileScreen()
     ];
 
     return Obx(
@@ -86,11 +85,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.bag_2),
-            label: 'Захиалга',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(IconlyLight.profile),
-            label: 'Профайл',
+            label: 'Захиалгууд',
           ),
         ],
         currentIndex: _navCtrl.currentIndex.value,

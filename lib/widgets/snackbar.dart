@@ -27,10 +27,10 @@ _getDialogTitle(DialogType dialogType) {
 
 void customSnackbar(DialogType dialogType, String text, int duration) {
   Flushbar(
-      title: _getDialogTitle(dialogType),
+      // title: _getDialogTitle(dialogType),
       message: text,
       duration: Duration(seconds: duration),
-      flushbarPosition: FlushbarPosition.TOP,
+      flushbarPosition: FlushbarPosition.BOTTOM,
       backgroundColor: _getDialogColors(dialogType),
       forwardAnimationCurve: Curves.bounceIn,
       shouldIconPulse: false,

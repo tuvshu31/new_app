@@ -1,12 +1,11 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/loading.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -47,16 +46,12 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   int totalProducts = 0;
   int page = 1;
   bool hasMoreProducts = true;
-  bool loading = false;
+  bool fetchingProducts = false;
   bool scrollShowHide = false;
-  bool catLoading = false;
   List products = [];
   List tabItems = [];
-  Map<String, dynamic> pagination = {};
   List closedStoreList = [];
   ScrollController scrollController = ScrollController();
-  final _navCtrl = Get.put(NavigationController());
-  final _cartCtrl = Get.put(CartController());
 
   @override
   void initState() {
@@ -98,34 +93,50 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   }
 
   void callProducts() async {
-    loading = true;
+    fetchingProducts = true;
+    String searchName = "";
+    int searchId = 0;
+    int storeId = widget.storeId;
+    if (widget.isFromSeachBar) {
+      var searchType = widget.searchObject["type"];
+      if (searchType == "word") {
+        searchName = widget.searchObject["name"];
+      }
+      if (searchType == "product") {
+        searchId = widget.searchObject["id"];
+      }
+      if (searchType == "store") {
+        storeId = widget.searchObject["id"];
+      }
+    }
     var query = {
       "page": page,
       "typeId": widget.typeId,
       "categoryId": widget.categoryId,
-      "store": widget.storeId,
+      "store": storeId,
       "visibility": widget.visibility,
-      "limit": 12
+      "searchName": searchName.isNotEmpty ? searchName : 0,
+      "searchId": searchId,
+      "limit": 9
     };
 
     query.removeWhere((key, value) => value == 0);
-    dynamic res = await RestApi().getProducts(query);
-    dynamic response = Map<String, dynamic>.from(res);
-    products = products + response["data"];
-    closedStoreList = response["closed"];
-    pagination = response["pagination"];
-    if (pagination["pageCount"] > page) {
-      hasMoreProducts = true;
-    } else {
+    dynamic response = await RestApi().getProducts(query);
+    dynamic productResponse = Map<String, dynamic>.from(response);
+
+    products = products + productResponse["data"];
+    closedStoreList = productResponse["closed"];
+    if (productResponse["data"].length <
+        productResponse["pagination"]["limit"]) {
       hasMoreProducts = false;
     }
-    loading = false;
+    totalProducts = productResponse["pagination"]["total"];
+    fetchingProducts = false;
     setState(() {});
   }
 
   void callCategories() async {
     if (widget.navType != NavType.none) {
-      catLoading = true;
       dynamic response;
       if (widget.navType == NavType.category) {
         response = await RestApi().getCategories({"parentId": widget.typeId});
@@ -134,167 +145,153 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
       }
       dynamic data = Map<String, dynamic>.from(response)['data'];
       var items = [
-        {"id": 0, "name": "Бүх"}
+        {"id": null, "name": "Бүх"}
       ];
       tabItems = [...items, ...data];
-      catLoading = false;
       setState(() {});
     }
   }
 
+  Future<void> searchProducts(searchObect) async {
+    fetchingProducts = true;
+    var type = searchObect["type"];
+    var body = {"type": type};
+    if (type == "word") {
+      body["keyWord"] = searchObect["name"];
+    } else if (type == "product") {
+      body["productId"] = searchObect["id"];
+    } else if (type == "store") {
+      body["storeId"] = searchObect["id"];
+    }
+    log(body.toString());
+    dynamic response = await RestApi().getSearchResults(body);
+    dynamic productResponse = Map<String, dynamic>.from(response);
+    products = products + productResponse["products"];
+    hasMoreProducts = false;
+    fetchingProducts = false;
+    setState(() {});
+  }
+
   void changeTab(int index) {
     page = 1;
-    widget.categoryId = tabItems[index]["id"];
+    hasMoreProducts = true;
+    widget.categoryId = index == 0 ? 0 : tabItems[index]["id"];
     products.clear();
     setState(() {});
     callProducts();
-    _scrollToTop();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: catLoading ? 4 : tabItems.length,
+      length: tabItems.length,
       child: CustomHeader(
-        actionWidth: Get.width * .3,
-        customActions: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              color: Colors.black,
-              icon: const Icon(
-                IconlyLight.search,
-                size: 20,
-              ),
-              onPressed: () {
-                Get.toNamed(userProductsSearchScreenRoute,
-                    arguments: {"storeId": widget.storeId});
-              },
-            ),
-            // IconButton(
-            //   color: Colors.black,
-            //   icon: const Icon(
-            //     IconlyLight.buy,
-            //     size: 20,
-            //   ),
-            //   onPressed: () {
-            //     Get.toNamed(userProductsSearchScreenRoute,
-            //         arguments: {"storeId": widget.storeId});
-            //   },
-            // ),
-            CustomInkWell(
-              borderRadius: BorderRadius.circular(50),
-              onTap: () {
-                Get.back();
-                Get.back();
-                _navCtrl.onItemTapped(2);
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Stack(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(
-                        IconlyLight.buy,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 2,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: MyColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Obx(() => Text(
-                              _cartCtrl.cartItemCount.value.toString(),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
-                              ),
-                            )),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        customActions: Container(),
         title: widget.title,
+        // subtitle: subtitle(fetchingProducts, totalProducts, "бараа"),
         tabBar: TabBar(
-          onTap: changeTab,
+          onTap: (index) {
+            changeTab(index);
+          },
           isScrollable: true,
-          indicatorColor: catLoading ? Colors.transparent : MyColors.primary,
+          // indicator: BoxDecoration(
+          //   borderRadius: BorderRadius.circular(25),
+          //   color: MyColors.fadedGrey,
+          // ),
+          indicatorColor: MyColors.primary,
           labelColor: MyColors.primary,
           unselectedLabelColor: Colors.black,
-          tabs: tabItems.isEmpty
-              ? _tabShimmer()
-              : tabItems.map<Widget>((e) {
+          tabs: tabItems.map<Widget>((e) {
+            return Tab(text: e["name"]);
+          }).toList(),
+        ),
+        body: _productsGridView(hasMoreProducts, products),
+      ),
+    );
+  }
+
+  PreferredSize? tabBar() {
+    return PreferredSize(
+      preferredSize: const Size(double.infinity, kToolbarHeight),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16, right: 12, left: 12),
+        height: 36,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: tabItems.isEmpty
+            ? _tabShimmer()
+            : TabBar(
+                onTap: (index) {
+                  changeTab(index);
+                },
+                isScrollable: true,
+                // indicator: BoxDecoration(
+                //   borderRadius: BorderRadius.circular(25),
+                //   color: MyColors.fadedGrey,
+                // ),
+                indicatorColor: MyColors.primary,
+                labelColor: MyColors.primary,
+                unselectedLabelColor: Colors.black,
+                tabs: tabItems.map<Widget>((e) {
                   return Tab(text: e["name"]);
                 }).toList(),
-        ),
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                var height =
-                    notification.metrics.maxScrollExtent / products.length;
-                var position = ((notification.metrics.maxScrollExtent -
-                            notification.metrics.extentAfter) /
-                        height)
-                    .round();
-                _scrolledProducts = position;
-                setState(() {});
-                return true;
-              },
-              child: !loading && products.isEmpty
-                  ? Container(
-                      color: MyColors.white,
-                      child: const CustomLoadingIndicator(
-                          text: "Бараа байхгүй байна"),
-                    )
-                  : GridView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 24),
-                      physics: const BouncingScrollPhysics(),
-                      controller: scrollController,
-                      itemCount: products.isEmpty && hasMoreProducts
-                          ? 18
-                          : hasMoreProducts
-                              ? products.length + 3
-                              : products.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.6,
-                      ),
-                      itemBuilder: (context, index) {
-                        if (index < products.length) {
-                          var data = products[index];
-                          return _product(data);
-                        } else if (hasMoreProducts) {
-                          return _shimmer();
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-            ),
-            _backToTop(scrollShowHide, totalProducts)
-          ],
-        ),
+              ),
       ),
+    );
+  }
+
+  Widget _productsGridView(bool hasMoreProducts, dynamic products) {
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            var height = notification.metrics.maxScrollExtent / products.length;
+            var position = ((notification.metrics.maxScrollExtent -
+                        notification.metrics.extentAfter) /
+                    height)
+                .round();
+            _scrolledProducts = position;
+            setState(() {});
+
+            return true;
+          },
+          child: !hasMoreProducts && products.isEmpty
+              ? Container(
+                  color: MyColors.white,
+                  child:
+                      const CustomLoadingIndicator(text: "Бараа байхгүй байна"))
+              : GridView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  physics: const BouncingScrollPhysics(),
+                  controller: scrollController,
+                  itemCount: hasMoreProducts && products.isEmpty
+                      ? products.length + 6
+                      : hasMoreProducts
+                          ? products.length + 3
+                          : products.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.6,
+                  ),
+                  itemBuilder: (context, index) {
+                    if (index < products.length) {
+                      var data = products[index];
+                      return _product(data);
+                    } else if (hasMoreProducts) {
+                      return _shimmer();
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+        ),
+        _backToTop(scrollShowHide, totalProducts)
+      ],
     );
   }
 
@@ -315,10 +312,10 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
             tag: data,
             child: Stack(
               children: [
-                CustomImage(
+                Image.network(
+                  "${URL.AWS}/products/${data["id"]}/large/1.png",
                   width: (Get.width - 36) / 3,
                   height: (Get.width - 36) / 3,
-                  url: data["image"],
                 ),
                 data["withSale"]
                     ? _productSaleFlag(data["salePercent"])
@@ -359,13 +356,32 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     );
   }
 
-  List<Widget> _tabShimmer() {
-    return [
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36)
-    ];
+  Widget _tabShimmer() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        CustomShimmer(
+          width: Get.width * .15,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 46,
+          borderRadius: 50,
+        ),
+      ],
+    );
   }
 
   Widget _productSaleFlag(String salePercent) {
@@ -448,8 +464,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                               ),
                               const SizedBox(width: 8),
                               CustomText(
-                                text:
-                                    "$_scrolledProducts / ${pagination["total"]}",
+                                text: "$_scrolledProducts / $totalProducts",
                                 color: MyColors.black,
                               ),
                               const SizedBox(width: 12),

@@ -61,30 +61,16 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
           title: "Захиалга",
           subtitle: subtitle(_userCtx.fetchingOrderList.value,
               _userCtx.filteredOrderList.length, "захиалга"),
-          tabBar: PreferredSize(
-            preferredSize: const Size(double.infinity, kToolbarHeight),
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16, right: 12, left: 12),
-              height: 36,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: TabBar(
-                  onTap: changeTab,
-                  isScrollable: true,
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    color: MyColors.fadedGrey,
-                  ),
-                  labelColor: MyColors.primary,
-                  unselectedLabelColor: Colors.black,
-                  tabs: const [
-                    Tab(text: "Шинэ"),
-                    Tab(text: "Хүргэсэн"),
-                    Tab(text: "Цуцалсан"),
-                  ]),
-            ),
-          ),
+          tabBar: TabBar(
+              onTap: changeTab,
+              indicatorColor: MyColors.primary,
+              labelColor: MyColors.primary,
+              unselectedLabelColor: Colors.black,
+              tabs: const [
+                Tab(text: "Шинэ"),
+                Tab(text: "Хүргэсэн"),
+                Tab(text: "Цуцалсан")
+              ]),
           body: !_userCtx.fetchingOrderList.value &&
                   _userCtx.filteredOrderList.isEmpty
               ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")

@@ -25,6 +25,7 @@ const String userSavedScreenRoute = '/userSavedScreenRoute';
 const String userSearchBarScreenRoute = '/userSearchBarScreenRoute';
 const String userSearchScreenRoute = '/userSearchScreenRoute';
 const String userStoreListScreenRoute = '/userStoreListScreenRoute';
+const String userProductsSearchScreenRoute = '/userProductsSearchScreenRoute';
 //Store screen routes
 const String storeMainScreenRoute = '/storeMainScreenRoute';
 const String storeOrdersScreenRoute = '/storeOrdersScreenRoute';

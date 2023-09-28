@@ -65,7 +65,6 @@ dependencies:
   qr_code_scanner:
   flutter_launcher_icons:
   quickalert:
-  json_serializable:
   lottie:
   flutter_styled_toast:
   expandable:
@@ -112,6 +111,7 @@ dependencies:
   go_router: ^10.0.0
   flutter_switch: ^0.3.2
   lite_rolling_switch: ^1.0.0
+  json_annotation: ^4.8.0
 
   # flutter_local_notifications: ^14.0.0
   # firebase_messaging: ^14.3.0
@@ -126,7 +126,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  build_runner: ^2.3.2
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -146,7 +147,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/png/categories/
     - assets/images/png/app/
     - assets/images/png/bank/
     - assets/images/png/
@@ -166,10 +166,10 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Nunito
+    - family: Nunito1
       fonts:
         - asset: assets/fonts/Nunito-Regular.ttf
-    - family: Exo
+    - family: Nunito
       fonts:
         - asset: assets/fonts/Montserrat-Medium.ttf
   #

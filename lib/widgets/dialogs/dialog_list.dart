@@ -78,7 +78,6 @@ void customDialog(DialogType dialogType, Widget body, {onWillPop = true}) {
                     Text(
                       _getDialogTitle(dialogType),
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
                         color: MyColors.gray,
                         fontSize: 16,
                       ),

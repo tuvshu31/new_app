@@ -4,35 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MyShimmers {
-  Widget homeScreen() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomShimmer(
-            width: Get.width * .2,
-            height: Get.width * .2,
-            borderRadius: 50,
-          ),
-          const SizedBox(height: 4),
-          CustomShimmer(
-            width: Get.width * .2,
-            height: 12,
-          ),
-          const SizedBox(height: 4),
-          CustomShimmer(
-            width: Get.width * .2,
-            height: 12,
-          )
-        ],
-      ),
-    );
-  }
-
   Widget listView() {
     return Container(
       margin: EdgeInsets.all(Get.width * .03),
