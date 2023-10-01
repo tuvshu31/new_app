@@ -335,4 +335,9 @@ class RestApi {
         'products/checkIncludedProducts?productId=$productId',
         Method.post, [], {});
   }
+
+  //Хэрэглэгч бүх дэлгүүрийн мэдээллүүдийг дуудах
+  Future getStoreList(dynamic query) async {
+    return DioClient().sendRequest('users/getStoreList', Method.get, [], query);
+  }
 }

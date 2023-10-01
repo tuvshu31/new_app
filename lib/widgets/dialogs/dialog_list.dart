@@ -143,6 +143,66 @@ class CustomDialogs {
     );
   }
 
+  void showAlcoholWarningDialog(dynamic onPressed, {onWillPop = true}) {
+    showGeneralDialog(
+      context: Get.context!,
+      barrierLabel: "",
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, a1, a2) {
+        return Container();
+      },
+      transitionBuilder: (ctx, a1, a2, child) {
+        var curve = Curves.bounceInOut.transform(a1.value);
+        return WillPopScope(
+          onWillPop: () async => onWillPop,
+          child: Transform.scale(
+            scale: curve,
+            child: Center(
+              child: Container(
+                width: Get.width,
+                margin: EdgeInsets.all(Get.width * .09),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.only(
+                  right: Get.width * .09,
+                  left: Get.width * .09,
+                  top: Get.height * .04,
+                  bottom: Get.height * .03,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        IconlyBold.info_circle,
+                        size: Get.width * .15,
+                        color: Colors.amber,
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      const Text(
+                        "Та +21 нас хүрсэн үү?",
+                        style: TextStyle(
+                          color: MyColors.gray,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      showAlcoholWarningDialogBody(onPressed),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void showNotAvailableProductsDialog(
       List availableZeroProducts, dynamic onPressed) {
     customDialog(

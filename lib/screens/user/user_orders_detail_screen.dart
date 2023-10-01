@@ -121,6 +121,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                   width: 40,
                   height: 40,
                   duration: _userCtx.prepDuration.value * 60,
+                  initialDuration: 40,
                   timeFormatterFunction: (defaultFormatterFunction, duration) {
                     if (duration.inSeconds == 0) {
                       return "0";

@@ -75,8 +75,10 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
 
   void putUserIntoBox(int id, String type) async {
     RestApiHelper.saveUserId(id);
+    log("user: $id");
     RestApiHelper.saveUserRole(type);
-    _loginCtx.requestNotificationPermission(type);
+    log("role: $type");
+    _loginCtx.saveUserToken();
   }
 
   void submit() async {
@@ -127,6 +129,12 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
       Get.back();
       customSnackbar(DialogType.error, "Error", 2);
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    countdownTimer!.cancel();
   }
 
   @override

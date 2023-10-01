@@ -26,6 +26,7 @@ void showOrdersSetTimeView(context, data) {
           var body = {
             "orderStatus": "preparing",
             "prepDuration": _storeCtx.prepDuration.value.toString(),
+            "orderTime": DateTime.now()
           };
           _storeCtx.updateOrder(data["id"], body);
           Get.back();

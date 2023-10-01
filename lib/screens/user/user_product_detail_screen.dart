@@ -350,17 +350,101 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
             child: _checkingIfStoreClosed
                 ? const CustomShimmer(
                     width: double.infinity,
-                    height: 40,
-                    borderRadius: 50,
+                    height: 44,
+                    borderRadius: 8,
                   )
                 : CustomButton(
                     onPressed: () async {
                       if (_isStoreOpen) {
-                        if (_cartCtrl.cartList.any(
-                            (element) => element["store"] != _data["store"])) {
-                          CustomDialogs().showSameStoreProductsDialog(() async {
-                            _cartCtrl.emptyTheTrash();
+                        if (_data["isAlcohol"]) {
+                          CustomDialogs().showAlcoholWarningDialog(() async {
                             Get.back();
+                            if (_cartCtrl.cartList.any((element) =>
+                                element["store"] != _data["store"])) {
+                              CustomDialogs()
+                                  .showSameStoreProductsDialog(() async {
+                                _cartCtrl.emptyTheTrash();
+                                Get.back();
+                                CustomDialogs().showLoadingDialog();
+                                dynamic response = await RestApi()
+                                    .checkIncludedProducts(_data["id"]);
+                                if (response != null) {
+                                  dynamic d =
+                                      Map<String, dynamic>.from(response);
+                                  if (d["includedProducts"].isNotEmpty) {
+                                    includedProducts = d["includedProducts"];
+                                    listClick(widgetKey);
+                                    for (var element in includedProducts) {
+                                      _cartCtrl.addProduct(element);
+                                    }
+                                    setState(() {});
+                                  } else {
+                                    listClick(widgetKey);
+                                    Future.delayed(
+                                        const Duration(milliseconds: 1600), () {
+                                      _cartCtrl.addProduct(_data);
+                                      setState(() {});
+                                    });
+                                  }
+                                }
+                                Get.back();
+                              });
+                            } else {
+                              CustomDialogs().showLoadingDialog();
+                              dynamic response = await RestApi()
+                                  .checkIncludedProducts(_data["id"]);
+                              if (response != null) {
+                                dynamic d = Map<String, dynamic>.from(response);
+                                if (d["includedProducts"].isNotEmpty) {
+                                  includedProducts = d["includedProducts"];
+                                  listClick(widgetKey);
+                                  for (var element in includedProducts) {
+                                    _cartCtrl.addProduct(element);
+                                  }
+                                  setState(() {});
+                                } else {
+                                  listClick(widgetKey);
+                                  Future.delayed(
+                                      const Duration(milliseconds: 1600), () {
+                                    _cartCtrl.addProduct(_data);
+                                    setState(() {});
+                                  });
+                                }
+                              }
+                              Get.back();
+                            }
+                          });
+                        } else {
+                          if (_cartCtrl.cartList.any((element) =>
+                              element["store"] != _data["store"])) {
+                            CustomDialogs()
+                                .showSameStoreProductsDialog(() async {
+                              _cartCtrl.emptyTheTrash();
+                              Get.back();
+                              CustomDialogs().showLoadingDialog();
+                              dynamic response = await RestApi()
+                                  .checkIncludedProducts(_data["id"]);
+                              if (response != null) {
+                                dynamic d = Map<String, dynamic>.from(response);
+                                if (d["includedProducts"].isNotEmpty) {
+                                  includedProducts = d["includedProducts"];
+                                  listClick(widgetKey);
+                                  for (var element in includedProducts) {
+                                    _cartCtrl.addProduct(element);
+                                  }
+                                  setState(() {});
+                                } else {
+                                  listClick(widgetKey);
+                                  Future.delayed(
+                                      const Duration(milliseconds: 1600), () {
+                                    _cartCtrl.addProduct(_data);
+                                    setState(() {});
+                                  });
+                                }
+                              }
+                              Get.back();
+                            });
+                          } else {
                             CustomDialogs().showLoadingDialog();
                             dynamic response = await RestApi()
                                 .checkIncludedProducts(_data["id"]);
@@ -383,30 +467,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                               }
                             }
                             Get.back();
-                          });
-                        } else {
-                          CustomDialogs().showLoadingDialog();
-                          dynamic response = await RestApi()
-                              .checkIncludedProducts(_data["id"]);
-                          if (response != null) {
-                            dynamic d = Map<String, dynamic>.from(response);
-                            if (d["includedProducts"].isNotEmpty) {
-                              includedProducts = d["includedProducts"];
-                              listClick(widgetKey);
-                              for (var element in includedProducts) {
-                                _cartCtrl.addProduct(element);
-                              }
-                              setState(() {});
-                            } else {
-                              listClick(widgetKey);
-                              Future.delayed(const Duration(milliseconds: 1600),
-                                  () {
-                                _cartCtrl.addProduct(_data);
-                                setState(() {});
-                              });
-                            }
                           }
-                          Get.back();
                         }
                       } else {
                         customSnackbar(

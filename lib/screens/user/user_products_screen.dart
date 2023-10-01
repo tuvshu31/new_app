@@ -301,7 +301,6 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   Widget _product(data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         GestureDetector(
           onTap: () => Get.toNamed(
@@ -318,10 +317,10 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                 CustomImage(
                   width: (Get.width - 36) / 3,
                   height: (Get.width - 36) / 3,
-                  url: data["image"],
+                  url: data["smallImg"],
                 ),
                 data["withSale"]
-                    ? _productSaleFlag(data["salePercent"])
+                    ? _productSaleFlag(data["salePercent"].toString())
                     : Container(),
               ],
             ),

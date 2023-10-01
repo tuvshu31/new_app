@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
@@ -30,7 +32,7 @@ class UserStoreListView extends StatefulWidget {
 
 class _UserStoreListViewState extends State<UserStoreListView> {
   bool loading = false;
-  dynamic storeList = [];
+  List storeList = [];
   @override
   void initState() {
     super.initState();
@@ -39,13 +41,11 @@ class _UserStoreListViewState extends State<UserStoreListView> {
 
   void getStores() async {
     loading = true;
-    var query = {"role": "store", "category": _navCtx.typeId.value};
-    query.removeWhere((key, value) => value == 0);
-    dynamic response = await RestApi().getUsers(query);
+    var query = {"categoryId": _navCtx.typeId.value};
+    dynamic response = await RestApi().getStoreList(query);
     dynamic d = Map<String, dynamic>.from(response);
     loading = false;
     if (d["success"]) {
-      // storeList = d["data"].where((x) => x["name"] != "Тест").toList();
       storeList = d["data"];
     }
     setState(() {});
@@ -91,7 +91,7 @@ class _UserStoreListViewState extends State<UserStoreListView> {
                       onTap: () {
                         Get.to(UserProductsScreen(
                           title: data["name"],
-                          typeId: data["category"],
+                          typeId: _navCtx.typeId.value,
                           storeId: data["id"],
                           navType: NavType.store,
                         ));
@@ -108,7 +108,7 @@ class _UserStoreListViewState extends State<UserStoreListView> {
                                 url:
                                     "${URL.AWS}/users/${data["id"]}/small/1.png",
                               ),
-                              !data["isOpen"]
+                              data["isOpen"] == 0
                                   ? Container(
                                       width: Get.width * .25,
                                       height: Get.width * .25,
@@ -140,11 +140,15 @@ class _UserStoreListViewState extends State<UserStoreListView> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
-                                  CustomText(
-                                    text: data["description"] ?? data["name"],
-                                    overflow: TextOverflow.ellipsis,
-                                    fontSize: 12,
-                                    color: MyColors.gray,
+                                  Text(
+                                    data["description"] != ""
+                                        ? data["name"]
+                                        : data["description"],
+                                    style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 12,
+                                      color: MyColors.gray,
+                                    ),
                                   ),
                                   const SizedBox(height: 8),
                                   RatingBar.builder(
@@ -155,21 +159,21 @@ class _UserStoreListViewState extends State<UserStoreListView> {
                                     unratedColor: MyColors.background,
                                     allowHalfRating: true,
                                     itemCount: 5,
-                                    itemBuilder: (context, _) => Icon(
+                                    itemBuilder: (context, _) => const Icon(
                                       IconlyBold.star,
                                       color: Colors.amber,
                                     ),
-                                    onRatingUpdate: (rating) {
-                                      print(rating);
-                                    },
+                                    onRatingUpdate: (rating) {},
                                   ),
+                                  const SizedBox(height: 8),
+                                  _saleFlag(data)
                                 ],
                               ),
                             ),
                           ),
                           SizedBox(
                             width: Get.width * .1,
-                            child: Center(
+                            child: const Center(
                               child: Icon(
                                 IconlyLight.arrow_right_2,
                                 size: 20,
@@ -183,5 +187,32 @@ class _UserStoreListViewState extends State<UserStoreListView> {
                 }
               }),
     );
+  }
+
+  Widget _saleFlag(dynamic data) {
+    return !data["withSale"]
+        ? Container()
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(.8),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.discount_outlined,
+                  size: 14,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  data["saleText"] ?? "",
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+          );
   }
 }

@@ -147,6 +147,40 @@ Widget showSameStoreProductsDialogBody(dynamic onPressed) {
   );
 }
 
+Widget showAlcoholWarningDialogBody(dynamic onPressed) {
+  return Column(
+    children: [
+      const Text(
+        "Хүргэлт хийх үед бичиг баримтаа баталгаажуулахыг анхаарна уу",
+        textAlign: TextAlign.center,
+      ),
+      SizedBox(height: Get.height * .04),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomButton(
+            isFullWidth: false,
+            onPressed: Get.back,
+            bgColor: Colors.white,
+            text: "Үгүй",
+            elevation: 0,
+            textColor: Colors.black,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: CustomButton(
+              elevation: 0,
+              bgColor: Colors.amber,
+              text: "Тийм",
+              onPressed: onPressed,
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
 Widget showNewVersionDialogBody(dynamic onPressed) {
   return Column(
     children: [

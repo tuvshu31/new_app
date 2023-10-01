@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -16,13 +18,15 @@ class LocalNofitication {
       ReceivedNotification receivedNotification) async {
     var payload = jsonDecode(receivedNotification.payload!["data"]!);
     var role = payload["role"];
-    if (role == "user") {
-      _userCtx.userActionHandler(payload);
-    } else if (role == "store") {
-      _storeCtx.storeActionHandler(payload);
-    } else if (role == "driver") {
-      _driverCtx.driverActionHandler(payload);
-    } else {}
+    if (role == RestApiHelper.getUserRole()) {
+      if (role == "user") {
+        _userCtx.userActionHandler(payload);
+      } else if (role == "store") {
+        _storeCtx.storeActionHandler(payload);
+      } else if (role == "driver") {
+        _driverCtx.driverActionHandler(payload);
+      } else {}
+    }
   }
 
   @pragma("vm:entry-point")
@@ -35,22 +39,26 @@ class LocalNofitication {
 Future<void> handleNotifications(message) async {
   var info = message["data"];
   var data = jsonDecode(info);
-  AwesomeNotifications().createNotification(
-    content: NotificationContent(
-      wakeUpScreen: true,
-      payload: Map<String, String>.from(message),
-      id: data["id"] ?? 1,
-      channelKey: 'basic_channel',
-      title: data["title"],
-      body: data["body"],
-      notificationLayout: data["isDefault"]
-          ? NotificationLayout.Default
-          : NotificationLayout.BigPicture,
-      displayOnBackground: true,
-      displayOnForeground: true,
-      color: MyColors.primary,
-      largeIcon: data["largeIcon"],
-      bigPicture: data["bigPicture"],
-    ),
-  );
+  String notifRole = data["role"];
+  String userRole = RestApiHelper.getUserRole();
+  if (notifRole == userRole) {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        wakeUpScreen: true,
+        payload: Map<String, String>.from(message),
+        id: data["id"] ?? 1,
+        channelKey: 'basic_channel',
+        title: data["title"],
+        body: data["body"],
+        notificationLayout: data["isDefault"]
+            ? NotificationLayout.Default
+            : NotificationLayout.BigPicture,
+        displayOnBackground: true,
+        displayOnForeground: true,
+        color: MyColors.primary,
+        largeIcon: data["largeIcon"],
+        bigPicture: data["bigPicture"],
+      ),
+    );
+  }
 }

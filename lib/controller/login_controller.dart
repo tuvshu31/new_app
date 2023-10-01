@@ -42,30 +42,13 @@ class LoginController extends GetxController {
     }
   }
 
-  void requestNotificationPermission(String role) async {
-    bool isSubscribed = RestApiHelper.isSubscribedToFirebase();
-    if (!isSubscribed) {
-      _messaging.getToken().then((token) async {
-        if (token != null) {
-          var body = {"mapToken": token};
-          await RestApi().updateUser(RestApiHelper.getUserId(), body);
-          dynamic response = await RestApi().subscribeToFirebase(role, token);
-          if (response != null) {
-            dynamic d = Map<String, dynamic>.from(response);
-            if (d["success"]) {
-              RestApiHelper.subscribeToFirebase();
-            }
-          }
-        }
-      });
-    }
-  }
-
   void saveUserToken() {
     _messaging.getToken().then((token) async {
       if (token != null) {
         var body = {"mapToken": token};
-        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+        dynamic res =
+            await RestApi().updateUser(RestApiHelper.getUserId(), body);
+        log("saveUserToken: $res");
       }
     });
   }
