@@ -256,7 +256,7 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                 CustomImage(
                   width: (Get.width - 36) / 3,
                   height: (Get.width - 36) / 3,
-                  url: data["image"],
+                  url: data["smallImg"],
                 ),
                 data["withSale"]
                     ? _productSaleFlag(data["salePercent"])

@@ -18,14 +18,13 @@ class LocalNofitication {
       ReceivedNotification receivedNotification) async {
     var payload = jsonDecode(receivedNotification.payload!["data"]!);
     var role = payload["role"];
-    if (role == RestApiHelper.getUserRole()) {
-      if (role == "user") {
-        _userCtx.userActionHandler(payload);
-      } else if (role == "store") {
-        _storeCtx.storeActionHandler(payload);
-      } else if (role == "driver") {
-        _driverCtx.driverActionHandler(payload);
-      } else {}
+    var userRole = RestApiHelper.getUserRole();
+    if (userRole == "store") {
+      _storeCtx.storeActionHandler(payload);
+    } else if (userRole == "driver") {
+      _driverCtx.driverActionHandler(payload);
+    } else if (userRole == "user") {
+      _userCtx.userActionHandler(payload);
     }
   }
 
@@ -39,26 +38,23 @@ class LocalNofitication {
 Future<void> handleNotifications(message) async {
   var info = message["data"];
   var data = jsonDecode(info);
-  String notifRole = data["role"];
-  String userRole = RestApiHelper.getUserRole();
-  if (notifRole == userRole) {
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        wakeUpScreen: true,
-        payload: Map<String, String>.from(message),
-        id: data["id"] ?? 1,
-        channelKey: 'basic_channel',
-        title: data["title"],
-        body: data["body"],
-        notificationLayout: data["isDefault"]
-            ? NotificationLayout.Default
-            : NotificationLayout.BigPicture,
-        displayOnBackground: true,
-        displayOnForeground: true,
-        color: MyColors.primary,
-        largeIcon: data["largeIcon"],
-        bigPicture: data["bigPicture"],
-      ),
-    );
-  }
+
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      wakeUpScreen: true,
+      payload: Map<String, String>.from(message),
+      id: data["id"] ?? 1,
+      channelKey: 'basic_channel',
+      title: data["title"],
+      body: data["body"],
+      notificationLayout: data["isDefault"]
+          ? NotificationLayout.Default
+          : NotificationLayout.BigPicture,
+      displayOnBackground: true,
+      displayOnForeground: true,
+      color: MyColors.primary,
+      largeIcon: data["largeIcon"],
+      bigPicture: data["bigPicture"],
+    ),
+  );
 }

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
@@ -25,12 +26,24 @@ class UserOrdersDetailScreen extends StatefulWidget {
 class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   final _userCtx = Get.put(UserController());
   bool showUserAndDriverCode = true;
+  int initialDuration = 0;
   @override
   void initState() {
     super.initState();
     if (_userCtx.selectedOrder["orderStatus"] == "delivered" ||
         _userCtx.selectedOrder["orderStatus"] == "canceled") {
       showUserAndDriverCode = false;
+      setState(() {});
+    }
+    checkPrepDuration();
+  }
+
+  Future<void> checkPrepDuration() async {
+    dynamic res =
+        await RestApi().checkPrepDuration(_userCtx.selectedOrder["id"]);
+    dynamic response = Map<String, dynamic>.from(res);
+    if (response["success"]) {
+      initialDuration = response["initialDuration"];
       setState(() {});
     }
   }
@@ -120,8 +133,10 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                   isReverse: true,
                   width: 40,
                   height: 40,
-                  duration: _userCtx.prepDuration.value * 60,
-                  initialDuration: 40,
+                  duration: initialDuration == 0
+                      ? 0
+                      : _userCtx.prepDuration.value * 60,
+                  initialDuration: initialDuration,
                   timeFormatterFunction: (defaultFormatterFunction, duration) {
                     if (duration.inSeconds == 0) {
                       return "0";

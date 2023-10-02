@@ -340,4 +340,10 @@ class RestApi {
   Future getStoreList(dynamic query) async {
     return DioClient().sendRequest('users/getStoreList', Method.get, [], query);
   }
+
+  //Хэрэглэгчийн бэлдэх хугацааг шалгах
+  Future checkPrepDuration(int orderId) async {
+    return DioClient().sendRequest(
+        'orders/checkPrepDuration?orderId=$orderId', Method.post, [], {});
+  }
 }

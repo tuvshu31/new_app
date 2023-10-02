@@ -292,7 +292,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                     CustomImage(
                       width: (Get.width - 36) / 4,
                       height: (Get.width - 36) / 4,
-                      url: data["image"],
+                      url: data["smallImg"],
                     ),
                     data["withSale"]
                         ? _productSaleFlag(data["salePercent"])

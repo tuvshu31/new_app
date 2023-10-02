@@ -45,6 +45,9 @@ class CustomImage extends StatelessWidget {
               // ),
               );
         },
+        errorBuilder: (context, error, stackTrace) {
+          return Container();
+        },
       ),
     );
   }
