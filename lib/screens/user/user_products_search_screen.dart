@@ -25,7 +25,6 @@ class UserProductsSearchScreen extends StatefulWidget {
 }
 
 class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
-  bool isSearching = false;
   bool fetchinSuggestions = false;
   List searchHistory = [];
   int totalProducts = 0;
@@ -49,10 +48,10 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
 
   void callProducts(String text) async {
     loading = true;
+    products.clear();
     var query = {"searchName": text, "store": _incoming["storeId"]};
     dynamic res = await RestApi().getProducts(query);
     dynamic response = Map<String, dynamic>.from(res);
-    products.clear();
     products = response["data"];
     pagination = response["pagination"];
     if (pagination["pageCount"] > page) {
@@ -110,18 +109,23 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                   children: [
                     Container(
                       padding: const EdgeInsets.only(left: 12),
-                      child: const Center(
-                        child: Icon(
-                          IconlyLight.search,
-                          color: MyColors.primary,
-                          size: 20,
-                        ),
+                      child: Center(
+                        child: loading && searchController.text.isNotEmpty
+                            ? const CupertinoActivityIndicator()
+                            : const Icon(
+                                IconlyLight.search,
+                                color: MyColors.primary,
+                                size: 20,
+                              ),
                       ),
                     ),
                     Expanded(
                       child: TextField(
                           textInputAction: TextInputAction.search,
-                          onChanged: callProducts,
+                          onChanged: (value) {
+                            setState(() {});
+                            callProducts(value);
+                          },
                           autofocus: true,
                           controller: searchController,
                           decoration: const InputDecoration(
@@ -160,11 +164,10 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                           cursorWidth: 1,
                           onSubmitted: (value) {}),
                     ),
-                    isSearching
+                    searchController.text.isNotEmpty
                         ? IconButton(
                             onPressed: () {
                               searchController.clear();
-                              isSearching = false;
                               setState(() {});
                             },
                             icon: const Icon(
@@ -178,58 +181,61 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                 ),
               ),
             ),
-            body: Stack(
-              children: [
-                NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    var height =
-                        notification.metrics.maxScrollExtent / products.length;
-                    var position = ((notification.metrics.maxScrollExtent -
-                                notification.metrics.extentAfter) /
-                            height)
-                        .round();
-                    _scrolledProducts = position;
-                    setState(() {});
-                    return true;
-                  },
-                  child: !loading && products.isEmpty
-                      ? Container(
-                          color: MyColors.white,
-                          child: const CustomLoadingIndicator(
-                              text: "Бараа байхгүй байна"),
-                        )
-                      : GridView.builder(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 24),
-                          physics: const BouncingScrollPhysics(),
-                          controller: scrollController,
-                          itemCount: products.isEmpty && hasMoreProducts
-                              ? 18
-                              : hasMoreProducts
-                                  ? products.length + 3
-                                  : products.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.6,
-                          ),
-                          itemBuilder: (context, index) {
-                            if (index < products.length) {
-                              var data = products[index];
-                              return _product(data);
-                            } else if (hasMoreProducts) {
-                              return _shimmer();
-                            } else {
-                              return Container();
-                            }
-                          },
-                        ),
-                ),
-                _backToTop(scrollShowHide, totalProducts)
-              ],
-            ),
+            body: searchController.text.isEmpty
+                ? const CustomLoadingIndicator(text: "Хайх үгээ оруулна уу")
+                : Stack(
+                    children: [
+                      NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          var height = notification.metrics.maxScrollExtent /
+                              products.length;
+                          var position =
+                              ((notification.metrics.maxScrollExtent -
+                                          notification.metrics.extentAfter) /
+                                      height)
+                                  .round();
+                          _scrolledProducts = position;
+                          setState(() {});
+                          return true;
+                        },
+                        child: !loading && products.isEmpty
+                            ? Container(
+                                color: MyColors.white,
+                                child: const CustomLoadingIndicator(
+                                    text: "Бараа байхгүй байна"),
+                              )
+                            : GridView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 24),
+                                physics: const BouncingScrollPhysics(),
+                                controller: scrollController,
+                                itemCount: products.isEmpty && hasMoreProducts
+                                    ? 18
+                                    : hasMoreProducts
+                                        ? products.length + 3
+                                        : products.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 0.6,
+                                ),
+                                itemBuilder: (context, index) {
+                                  if (index < products.length) {
+                                    var data = products[index];
+                                    return _product(data);
+                                  } else if (hasMoreProducts) {
+                                    return _shimmer();
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              ),
+                      ),
+                      _backToTop(scrollShowHide, totalProducts)
+                    ],
+                  ),
           ),
         ),
       ),

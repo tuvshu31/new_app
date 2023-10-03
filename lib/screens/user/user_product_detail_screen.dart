@@ -147,10 +147,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                           ),
                           items: list
                               .map(
-                                (item) => CachedImage(
-                                  image:
-                                      "${URL.AWS}/products/${_data["id"]}/large/$item.png",
-                                ),
+                                (item) => CachedImage(image: _data["largeImg"]),
                               )
                               .toList()),
                     ),

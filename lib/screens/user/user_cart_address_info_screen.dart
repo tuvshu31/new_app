@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -36,10 +37,12 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
   bool isAddressOk = false;
   bool isLocationOk = false;
   bool isApartment = false;
-  dynamic _user = [];
+  Map _userInfo = {};
   bool showPriceDetails = false;
+  bool loading = false;
   String phoneErrorText = "";
   String locationErrorText = "";
+  String address1 = "";
   TextEditingController phone = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController kod = TextEditingController();
@@ -75,29 +78,28 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
   }
 
   void getUserInfo() async {
-    dynamic locations = await RestApi().getLocations();
-    if (locations != null) {
-      dynamic locationsResponse = Map<String, dynamic>.from(locations);
-      locationList = locationsResponse["locations"];
-      setState(() {});
+    loading = true;
+    dynamic res1 = await RestApi().getAllLocations();
+    dynamic response = Map<String, dynamic>.from(res1);
+    if (response["success"]) {
+      locationList = response["data"];
     }
-
-    var query = {"id": RestApiHelper.getUserId()};
-    dynamic res = await RestApi().getUsers(query);
-    dynamic data = Map<String, dynamic>.from(res);
-    _user = data["data"][0];
-    if (_user["userPhone"] != null && _user["userPhone"] != 0) {
-      phone.text = _user["userPhone"].toString();
+    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
+    dynamic info = Map<String, dynamic>.from(res);
+    if (info["success"]) {
+      _userInfo = info["data"];
+      address1 = _userInfo["userAddress1"] ?? "";
+      selectedLocation =
+          locationList.firstWhere((element) => element["name"] == address1);
+      isLocationOk = address1.isNotEmpty;
+      address.text = _userInfo["userAddress"] ?? "";
+      isAddressOk = address.text.isNotEmpty;
+      phone.text =
+          _userInfo["userPhone"] == 0 ? "" : _userInfo["userPhone"].toString();
+      isPhoneOk = phone.text.isNotEmpty;
+      kod.text = _userInfo["userEntranceCode"] ?? "";
     }
-    if (_user["userAddress"] != null && _user["userAddress"].isNotEmpty) {
-      address.text = _user["userAddress"];
-    }
-    if (_user["userEntranceCode"] != null &&
-        _user["userEntranceCode"].isNotEmpty) {
-      kod.text = _user["userEntranceCode"];
-    }
-    isPhoneOk = phone.text.isNotEmpty;
-    isAddressOk = address.text.isNotEmpty;
+    loading = false;
     setState(() {});
   }
 
@@ -120,7 +122,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
       "userAndDriverCode": random4digit(),
       "userId": RestApiHelper.getUserId(),
       "storeId1": storeId,
-      "address": "${selectedLocation["locationName"]} - ${address.text}",
+      "address": "${selectedLocation["name"]} - ${address.text}",
       "orderStatus": "notPaid",
       "totalAmount": _cartCtx.total,
       "storeTotalAmount": _cartCtx.subTotal.toString(),
@@ -195,7 +197,7 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             ),
           ),
         ),
-        body: _user.isNotEmpty
+        body: !loading
             ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -206,48 +208,47 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                       color: MyColors.gray,
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      height: 42,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(
-                          color: MyColors.grey,
-                          width: 1,
+                    CustomInkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () {
+                        showModalBottomSheet(
+                          backgroundColor: MyColors.white,
+                          context: Get.context!,
+                          isScrollControlled: true,
+                          builder: (context) {
+                            return _addressPickerBody();
+                          },
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        height: 42,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: MyColors.grey,
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: DropdownButton(
-                            value: selectedLocation["locationName"],
-                            focusNode: focusNode4,
-                            icon: const Icon(IconlyLight.arrow_down_2),
-                            isDense: true,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(12),
-                            hint: const CustomText(
-                              text: "Байршил сонгох",
-                              color: MyColors.gray,
-                              fontSize: 14,
+                        child: Center(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              address1 != ""
+                                  ? address1
+                                  : selectedLocation["name"] ??
+                                      "Байршил сонгох",
+                              style: TextStyle(
+                                color: selectedLocation.isNotEmpty ||
+                                        address1 != ""
+                                    ? MyColors.black
+                                    : MyColors.grey,
+                              ),
                             ),
-                            underline: Container(),
-                            items: locationList.map((e) {
-                              String value = e["locationName"];
-                              return DropdownMenuItem(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              selectedLocation = locationList.firstWhere(
-                                  (element) => element["locationName"] == val);
-                              address.clear();
-                              isAddressOk = false;
-                              isApartment = selectedLocation["isApartment"];
-                              _cartCtx.deliveryPrice.value =
-                                  selectedLocation["deliveryPrice"];
-                              isLocationOk = true;
-                              setState(() {});
-                            }),
+                            const Icon(IconlyLight.arrow_down_2)
+                          ],
+                        )),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -302,34 +303,32 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                       },
                     ),
                     _errorText(phoneErrorText),
-                    isApartment
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(height: 12),
-                              Row(
-                                children: const [
-                                  CustomText(
-                                    text: "Орцны код",
-                                    color: MyColors.gray,
-                                  ),
-                                  CustomText(
-                                    text: " /Заавал биш/",
-                                    fontSize: 12,
-                                    color: MyColors.gray,
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              CustomTextField(
-                                focusNode: focusNode3,
-                                hintText: "#1234",
-                                controller: kod,
-                                textInputAction: TextInputAction.done,
-                              ),
-                            ],
-                          )
-                        : Container(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 12),
+                        Row(
+                          children: const [
+                            CustomText(
+                              text: "Орцны код",
+                              color: MyColors.gray,
+                            ),
+                            CustomText(
+                              text: " /Заавал биш/",
+                              fontSize: 12,
+                              color: MyColors.gray,
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          focusNode: focusNode3,
+                          hintText: "#1234",
+                          controller: kod,
+                          textInputAction: TextInputAction.done,
+                        ),
+                      ],
+                    ),
                     _priceDetails()
                   ],
                 ),
@@ -353,6 +352,18 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
                     const SizedBox(height: 12),
                     CustomShimmer(
                       width: Get.width * .3,
+                      height: 16,
+                      borderRadius: 12,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomShimmer(
+                      width: Get.width,
+                      height: 42,
+                      borderRadius: 25,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomShimmer(
+                      width: Get.width * .4,
                       height: 16,
                       borderRadius: 12,
                     ),
@@ -470,5 +481,88 @@ class _UserCartAddressInfoScreenState extends State<UserCartAddressInfoScreen> {
             ),
           )
         : Container();
+  }
+
+  Widget _addressPickerBody() {
+    return MediaQuery(
+      data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
+      child: SafeArea(
+          child: Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Байршил сонгох",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  CustomInkWell(
+                    onTap: Get.back,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: MyColors.fadedGrey,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => Container(
+                  height: 0.4,
+                  width: double.infinity,
+                  color: MyColors.grey,
+                ),
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: locationList.length,
+                itemBuilder: (context, index) {
+                  var item = locationList[index];
+                  return CustomInkWell(
+                    onTap: () {
+                      selectedLocation = item;
+                      address1 = item["name"];
+                      address.clear();
+                      isAddressOk = false;
+                      isApartment = selectedLocation["apartment"] == 1;
+                      _cartCtx.deliveryPrice.value = selectedLocation["price"];
+                      isLocationOk = true;
+                      setState(() {});
+                      Get.back();
+                    },
+                    borderRadius: BorderRadius.circular(0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20, vertical: Get.width * .04),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomText(text: item["name"]),
+                          const Icon(
+                            IconlyLight.arrow_right_2,
+                            size: 18,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        ),
+      )),
+    );
   }
 }

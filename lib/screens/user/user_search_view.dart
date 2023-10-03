@@ -1,3 +1,4 @@
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -100,19 +101,21 @@ class _UserSearchViewState extends State<UserSearchView> {
                                   borderRadius: BorderRadius.circular(50),
                                   child: Container(
                                     width: Get.width * .22,
+                                    height: Get.width * .22,
                                     decoration: BoxDecoration(
                                       color: MyColors.fadedGrey,
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(Get.width * .04),
+                                    child: Center(
                                       child: !item["empty"]
                                           ? Image.network(
                                               item["image"],
-                                              width: double.infinity,
+                                              width: Get.width * .16,
+                                              height: Get.width * .16,
                                             )
                                           : Image(
-                                              width: double.infinity,
+                                              width: Get.width * .16,
+                                              height: Get.width * .16,
                                               color: const Color.fromRGBO(
                                                   255, 255, 255, 0.1),
                                               colorBlendMode:

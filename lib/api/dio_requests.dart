@@ -322,6 +322,12 @@ class RestApi {
     return DioClient().sendRequest('locations', Method.get, [], {});
   }
 
+  //Байршлуудын мэдээлэл авах
+  Future getAllLocations() async {
+    return DioClient()
+        .sendRequest('locations/getAllLocations', Method.get, [], {});
+  }
+
 //Token-г subscribe хийх
   Future subscribeToFirebase(String role, String token) async {
     var body = {"role": role, "token": token};

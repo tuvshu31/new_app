@@ -1,3 +1,4 @@
+import 'package:Erdenet24/widgets/button.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -444,34 +445,42 @@ void delvieryCostWarningModal(dynamic context, dynamic onTap) {
 
 void driverDeliveryCodeApproveDialog(
     TextEditingController controller, dynamic onTap) {
-  QuickAlert.show(
+  showDialog(
     context: Get.context!,
-    type: QuickAlertType.custom,
-    barrierDismissible: true,
-    customAsset: 'assets/images/png/app/webp.webp',
-    showCancelBtn: false,
-    cancelBtnText: "Болих",
-    onConfirmBtnTap: onTap,
-    confirmBtnText: "Баталгаажуулах",
-    confirmBtnColor: MyColors.green,
-    cancelBtnTextStyle: TextStyle(
-      fontSize: 14,
-      color: MyColors.gray,
-      fontWeight: FontWeight.bold,
-    ),
-    confirmBtnTextStyle: TextStyle(
-      color: MyColors.white,
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-    ),
-    widget: CustomTextField(
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.number,
-      maxLength: 4,
-      autoFocus: true,
-      controller: controller,
-      hintText: "4 оронтой код оруулна уу",
-    ),
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return WillPopScope(
+        onWillPop: () async =>
+            false, // False will prevent and true will allow to dismiss
+        child: AlertDialog(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          ),
+          title: const Text(
+            'Захиалгын код',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
+          actionsPadding: const EdgeInsets.only(bottom: 14),
+          actionsAlignment: MainAxisAlignment.center,
+          content: CustomTextField(
+            textInputAction: TextInputAction.done,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            autoFocus: true,
+            controller: controller,
+            hintText: "4 оронтой код оруулна уу",
+          ),
+          actions: <Widget>[
+            CustomButton(
+              isFullWidth: false,
+              text: "Баталгаажуулах",
+              onPressed: onTap,
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 

@@ -26,7 +26,9 @@ class UserOrdersDetailScreen extends StatefulWidget {
 class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   final _userCtx = Get.put(UserController());
   bool showUserAndDriverCode = true;
+  int prepDuration = 60;
   int initialDuration = 0;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +46,9 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
     dynamic response = Map<String, dynamic>.from(res);
     if (response["success"]) {
       initialDuration = response["initialDuration"];
+      prepDuration = response["prepDuration"];
+      log(_userCtx.prepDuration.value.toString());
+      log(response.toString());
       setState(() {});
     }
   }
@@ -128,14 +133,13 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
               ),
             ],
           ),
-          statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 2
+          statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 2 &&
+                  initialDuration != 0
               ? CircularCountDownTimer(
                   isReverse: true,
                   width: 40,
                   height: 40,
-                  duration: initialDuration == 0
-                      ? 0
-                      : _userCtx.prepDuration.value * 60,
+                  duration: prepDuration,
                   initialDuration: initialDuration,
                   timeFormatterFunction: (defaultFormatterFunction, duration) {
                     if (duration.inSeconds == 0) {
