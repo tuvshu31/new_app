@@ -1,19 +1,20 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/widgets/text.dart';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:Erdenet24/widgets/header.dart';
 import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class UserSavedScreen extends StatefulWidget {
   const UserSavedScreen({Key? key}) : super(key: key);
@@ -23,300 +24,241 @@ class UserSavedScreen extends StatefulWidget {
 }
 
 class _UserSavedScreenState extends State<UserSavedScreen> {
-  bool loading = false;
   int page = 1;
-  dynamic saved = [];
+  bool loading = false;
+  List saved = [];
   bool hasMore = true;
-  dynamic closedStoreList = [];
-  final _cartCtrl = Get.put(CartController());
-
-  void getUserProducts() async {
-    loading = true;
-    dynamic response =
-        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
-    dynamic d = Map<String, dynamic>.from(response);
-    saved = saved + d['data'];
-    closedStoreList = d["closedStoreList"];
-    if (d["data"].length < d["pagination"]["limit"]) {
-      hasMore = false;
-    }
-    loading = false;
-    setState(() {});
-  }
-
-  void deleteProduct(dynamic data, context) async {
-    CustomDialogs().showLoadingDialog();
-    dynamic res = await RestApi().deleteUserProduct(
-        {"userId": RestApiHelper.getUserId(), "productId": data['id']});
-    Get.back();
-    if (res != null) {
-      dynamic delete = Map<String, dynamic>.from(res);
-      if (delete["success"]) {
-        setState(() {
-          saved.remove(data);
-          _cartCtrl.savedList.remove(data["id"]);
-        });
-      } else {
-        customSnackbar(DialogType.error, "Барааг устгахад алдаа гарлаа", 2);
-      }
-    }
-  }
+  Map pagination = {};
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    getUserProducts();
+    getUserSavedProducts();
+    scrollHandler();
+  }
+
+  void getUserSavedProducts() async {
+    loading = true;
+    var query = {"page": page};
+    dynamic getUserSavedProducts = await UserApi().getUserSavedProducts(query);
+    loading = false;
+    if (getUserSavedProducts != null) {
+      dynamic response = Map<String, dynamic>.from(getUserSavedProducts);
+      if (response["success"]) {
+        saved = saved + response["data"];
+      }
+      pagination = response["pagination"];
+      if (pagination["pageCount"] > page) {
+        hasMore = true;
+      } else {
+        hasMore = false;
+      }
+    }
+    if (mounted) {
+      setState(() {
+        // Your state change code goes here
+      });
+    }
+  }
+
+  void scrollHandler() {
+    scrollController.addListener(
+      () {
+        if (scrollController.position.maxScrollExtent ==
+                scrollController.offset &&
+            hasMore) {
+          page++;
+          setState(() {});
+          log(page.toString());
+          getUserSavedProducts();
+        }
+      },
+    );
+  }
+
+  Future<void> removeItem(Map item) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic deleteUserSavedProduct =
+        await UserApi().deleteUserSavedProduct(item["id"]);
+    Get.back();
+    if (deleteUserSavedProduct != null) {
+      dynamic response = Map<String, dynamic>.from(deleteUserSavedProduct);
+      if (response["success"]) {
+        saved.remove(item);
+        setState(() {});
+        customSnackbar(ActionType.success, "Амжилттай усталаа", 2);
+      } else {
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+      }
+    }
+  }
+
+  void addToCart(int productId, int storeId) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic addToCart = await UserApi().addToCart(productId, storeId);
+    Get.back();
+    if (addToCart != null) {
+      dynamic response = Map<String, dynamic>.from(addToCart);
+      if (response["success"]) {
+        Map product = saved.firstWhere((element) => element["id"] == productId);
+        int index = saved.indexOf(product);
+        saved[index]["inCart"] = true;
+        setState(() {});
+        customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
+      } else {
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
         isMainPage: true,
-        title: "Таны хадгалсан",
+        title: saved.isNotEmpty
+            ? "Таны хадгалсан (${saved.length})"
+            : "Таны хадгалсан",
         customActions: Container(),
-        subtitle: subtitle(loading, saved.length, "бараа"),
-        body: !loading && saved.isEmpty
-            ? const CustomLoadingIndicator(
-                text: "Хадгалсан бараа байхгүй байна")
-            : ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: saved.length == 0 ? 8 : saved.length,
-                itemBuilder: (context, index) {
-                  if (saved.length == 0) {
-                    return MyShimmers().listView();
-                  } else {
-                    bool storeClosed = closedStoreList
-                        .any((el) => el == int.parse(saved[index]["store"]));
-                    bool notVisible = !saved[index]["visibility"];
-                    return Container(
-                      margin: EdgeInsets.all(Get.width * .03),
-                      height: Get.height * .13,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              storeClosed || notVisible
-                                  ? null
-                                  : Get.toNamed(
-                                      '/ProductsRoute',
-                                      arguments: {
-                                        "data": saved[index],
-                                      },
-                                    );
-                            },
-                            child: Hero(
-                              tag: saved[index],
-                              transitionOnUserGestures: true,
-                              child: Container(
-                                width: Get.width * .25,
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: _imageHandler(storeClosed, notVisible,
-                                    saved[index]["id"]),
-                                // child: CachedImage(
-                                //     image:
-                                //         "${URL.AWS}/products/${saved[index]["id"]}/small/1.png"),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: Get.width * .045),
-                          Expanded(
-                            child: SizedBox(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomText(
-                                    text: saved[index]["name"],
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  CustomText(
-                                    text: saved[index]["storeName"],
-                                    fontSize: 12,
-                                    color: MyColors.gray,
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const CustomText(
-                                        text: "Үнэ: ",
-                                        fontSize: 12,
-                                      ),
-                                      CustomText(
-                                          text: convertToCurrencyFormat(
-                                        double.parse(saved[index]["price"]),
-                                      ))
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        height: 1,
-                                        width: double.infinity,
-                                        color: MyColors.background,
-                                      ),
-                                      Row(
-                                        children: [
-                                          TextButton.icon(
-                                            style: TextButton.styleFrom(
-                                                splashFactory:
-                                                    NoSplash.splashFactory,
-                                                foregroundColor: MyColors.black,
-                                                padding: EdgeInsets.zero,
-                                                tapTargetSize:
-                                                    MaterialTapTargetSize
-                                                        .shrinkWrap,
-                                                alignment:
-                                                    Alignment.centerLeft),
-                                            onPressed: () {
-                                              if (storeClosed || notVisible) {
-                                              } else {
-                                                if (_cartCtrl.cartList.any(
-                                                    (element) =>
-                                                        element["store"] !=
-                                                        saved[index]
-                                                            ["store"])) {
-                                                  CustomDialogs()
-                                                      .showSameStoreProductsDialog(
-                                                          () {
-                                                    Get.back();
-                                                    _cartCtrl.emptyTheTrash();
-                                                    _cartCtrl.addProduct(
-                                                        saved[index]);
-                                                    customSnackbar(
-                                                        DialogType.success,
-                                                        "Сагсанд нэмэгдлээ",
-                                                        2);
-                                                  });
-                                                } else {
-                                                  _cartCtrl
-                                                      .addProduct(saved[index]);
-                                                  customSnackbar(
-                                                      DialogType.success,
-                                                      "Сагсанд нэмэгдлээ",
-                                                      2);
-                                                }
-                                              }
-                                            },
-                                            icon: Icon(
-                                              IconlyLight.buy,
-                                              size: 16,
-                                              color: storeClosed || notVisible
-                                                  ? MyColors.gray
-                                                  : MyColors.black,
-                                            ),
-                                            label: CustomText(
-                                              text: "Сагслах",
-                                              fontSize: 12,
-                                              color: storeClosed || notVisible
-                                                  ? MyColors.gray
-                                                  : MyColors.black,
-                                            ),
-                                          ),
-                                          SizedBox(width: Get.width * .03),
-                                          Container(
-                                            width: 1,
-                                            height: 16,
-                                            color: MyColors.black,
-                                          ),
-                                          SizedBox(width: Get.width * .03),
-                                          TextButton.icon(
-                                            style: TextButton.styleFrom(
-                                                splashFactory:
-                                                    NoSplash.splashFactory,
-                                                foregroundColor: MyColors.black,
-                                                padding: EdgeInsets.zero,
-                                                tapTargetSize:
-                                                    MaterialTapTargetSize
-                                                        .shrinkWrap,
-                                                alignment:
-                                                    Alignment.centerLeft),
-                                            onPressed: () {
-                                              deleteProduct(
-                                                  saved[index], context);
-                                            },
-                                            icon: const Icon(
-                                              IconlyLight.delete,
-                                              size: 16,
-                                            ),
-                                            label: const CustomText(
-                                              text: "Устгах",
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: Get.width * .045),
-                        ],
-                      ),
-                    );
-                  }
-                }));
+        body: loading && saved.isEmpty
+            ? listShimmerWidget()
+            : !loading && saved.isEmpty
+                ? customEmptyWidget("Хадгалсан бараа байхгүй байна")
+                : ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        width: double.infinity,
+                        height: Get.height * .008,
+                        decoration: BoxDecoration(color: MyColors.fadedGrey),
+                      );
+                    },
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: hasMore ? saved.length + 1 : saved.length,
+                    controller: scrollController,
+                    itemBuilder: (context, index) {
+                      if (index < saved.length) {
+                        var item = saved[index];
+                        return listItemWidget(item, () {
+                          addToCart(item["id"], item["store"]);
+                        }, () {
+                          removeItem(item);
+                        });
+                      } else if (hasMore) {
+                        return Center(
+                            child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: itemShimmer(),
+                        ));
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ));
   }
 
-  Widget _imageHandler(bool storeClosed, bool notVisible, int id) {
-    if (storeClosed) {
-      return Stack(
-        children: [
-          Image.network(errorBuilder: (context, error, stackTrace) {
-            return const Image(
-                image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/$id/small/1.png"),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: MyColors.black.withOpacity(0.5)),
-              child: Center(
-                  child: CustomText(
-                text: "Хаалттай",
-                textAlign: TextAlign.center,
-                color: MyColors.white,
-                fontSize: 14,
-              )),
+  Widget listItemWidget(
+      Map item, VoidCallback onClicked1, VoidCallback onClicked2) {
+    return SizedBox(
+      height: Get.height * .11,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(width: Get.width * .04),
+          Stack(
+            children: [
+              customImage(Get.width * .2, item["image"], isCircle: true)
+            ],
+          ),
+          SizedBox(width: Get.width * .04),
+          SizedBox(
+            width: Get.width * .6,
+            height: Get.height * .11,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CustomText(
+                  text: item["name"],
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: Get.height * .01),
+                CustomText(
+                  text: item["storeName"],
+                  fontSize: 13,
+                  color: MyColors.gray,
+                ),
+                Row(
+                  children: [
+                    Text(convertToCurrencyFormat(item["price"])),
+                    SizedBox(width: Get.width * .04),
+                    Container(
+                      width: 1,
+                      height: 16,
+                      color: MyColors.grey,
+                    ),
+                    SizedBox(width: Get.width * .04),
+                    customTextButton(
+                      onClicked1,
+                      IconlyLight.buy,
+                      "Сагслах",
+                      isActive: !item["inCart"],
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ElevatedButton(
+              style: const ButtonStyle(
+                  elevation: MaterialStatePropertyAll<double>(0),
+                  backgroundColor:
+                      MaterialStatePropertyAll<Color>(Colors.white)),
+              onPressed: onClicked2,
+              child: const Center(
+                child: Icon(
+                  IconlyLight.delete,
+                  size: 20,
+                  color: Colors.black,
+                ),
+              ),
             ),
           ),
         ],
-      );
-    } else if (notVisible) {
-      return Stack(
-        children: [
-          Image.network(errorBuilder: (context, error, stackTrace) {
-            return const Image(
-                image: AssetImage("assets/images/png/no_image.png"));
-          }, "${URL.AWS}/products/$id/small/1.png"),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: MyColors.black.withOpacity(0.5)),
-              child: Center(
-                  child: CustomText(
-                text: "Дууссан",
-                textAlign: TextAlign.center,
-                color: MyColors.white,
-                fontSize: 14,
-              )),
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Image.network(errorBuilder: (context, error, stackTrace) {
-        return const Image(image: AssetImage("assets/images/png/no_image.png"));
-      }, "${URL.AWS}/products/$id/small/1.png");
-    }
+      ),
+    );
   }
+}
+
+Widget customTextButton(VoidCallback onPressed, IconData icon, String text,
+    {bool isActive = true}) {
+  return ElevatedButton(
+    style: ButtonStyle(
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      elevation: const MaterialStatePropertyAll<double>(0),
+      backgroundColor: const MaterialStatePropertyAll<Color>(Colors.white),
+      overlayColor: MaterialStatePropertyAll<Color>(
+        Colors.black.withOpacity(0.1),
+      ),
+      padding: const MaterialStatePropertyAll(EdgeInsets.all(0)),
+    ),
+    onPressed: isActive ? onPressed : null,
+    child: Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: isActive ? MyColors.black : MyColors.background,
+        ),
+        const SizedBox(width: 8),
+        CustomText(
+          text: text,
+          fontSize: 12,
+          color: isActive ? MyColors.black : MyColors.background,
+        ),
+      ],
+    ),
+  );
 }

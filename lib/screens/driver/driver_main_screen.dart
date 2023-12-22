@@ -1,6 +1,7 @@
-import 'dart:async';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/driver.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/screens/driver/views/driver_arrived_view.dart';
 import 'package:Erdenet24/screens/driver/views/driver_delivered_view.dart';
 import 'package:Erdenet24/screens/driver/views/driver_finished_view.dart';
@@ -8,14 +9,19 @@ import 'package:Erdenet24/screens/driver/views/driver_incoming_order_view.dart';
 import 'package:Erdenet24/screens/driver/views/driver_received_view.dart';
 import 'package:Erdenet24/screens/driver/views/driver_without_order_view.dart';
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:custom_timer/custom_timer.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import "package:flutter/material.dart";
-import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
-import 'package:Erdenet24/screens/driver/driver_map_screen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconly/iconly.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});
@@ -24,69 +30,137 @@ class DriverMainScreen extends StatefulWidget {
   State<DriverMainScreen> createState() => _DriverMainScreenState();
 }
 
-class _DriverMainScreenState extends State<DriverMainScreen>
-    with TickerProviderStateMixin {
-  late Animation<Offset> offset;
-
-  late CustomTimerController timerController = CustomTimerController(
-    vsync: this,
-    begin: const Duration(hours: 2),
-    end: const Duration(),
-    initialState: CustomTimerState.reset,
-    interval: CustomTimerInterval.milliseconds,
-  );
+class _DriverMainScreenState extends State<DriverMainScreen> {
+  bool loading = false;
   final _driverCtx = Get.put(DriverController());
+  final _loginCtx = Get.put(LoginController());
+
+  static const CameraPosition _initialCameraPosition = CameraPosition(
+    target: LatLng(49.02778937705711, 104.04735316811922),
+    zoom: 17.4746,
+  );
 
   @override
   void initState() {
     super.initState();
-    _driverCtx.showBottomView();
-    checkIfDriverOnline();
-    checkDriverOrder();
-
-    _driverCtx.animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    offset = Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero)
-        .animate(_driverCtx.animationController);
+    getDriverInfo();
   }
 
-  Future<void> checkIfDriverOnline() async {
-    dynamic response = await RestApi().getDriver(RestApiHelper.getUserId());
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"]) {
-      _driverCtx.isOnline.value = d["data"][0]["isOpen"];
-      if (_driverCtx.isOnline.value) {
-        _driverCtx.playSound("engine_start");
-        timerController.start();
-        _driverCtx.animationController.forward();
+  void getDriverInfo() async {
+    loading = true;
+    dynamic getDriverInfo = await DriverApi().getDriverInfo();
+    loading = false;
+    if (getDriverInfo != null) {
+      dynamic response = Map<String, dynamic>.from(getDriverInfo);
+      if (response["success"]) {
+        log(response.toString());
+        _driverCtx.driverInfo.value = response["data"];
       }
     }
+    setState(() {});
   }
 
-  Future<void> checkDriverOrder() async {
-    dynamic response =
-        await RestApi().checkDriverOrder(RestApiHelper.getUserId());
-    dynamic d = Map<String, dynamic>.from(response);
-    if (d["success"] && d["withOrder"]) {
-      _driverCtx.hideBottomView();
-      _driverCtx.newOrderInfo.value = d["order"];
-      _driverCtx.driverStatus.value = d["orderStep"] == 1
-          ? DriverStatus.arrived
-          : d["orderStep"] == 2
-              ? DriverStatus.received
-              : d["orderStep"] == 3
-                  ? DriverStatus.delivered
-                  : DriverStatus.finished;
-      _driverCtx.showBottomView();
-    }
+  void onMapCreated(GoogleMapController controller) {
+    int distanceFilter = 1;
+    Geolocator.getPositionStream(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: distanceFilter,
+        timeLimit: const Duration(seconds: 1),
+      ),
+    ).listen((Position? info) async {
+      if (_driverCtx.driverInfo["isOpen"] == true) {
+        distanceFilter = 50;
+      }
+      _driverCtx.driverLoc.value = {
+        "latitute": info!.latitude,
+        "longitute": info.longitude,
+        "heading": info.heading,
+      };
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              _driverCtx.driverLoc["latitute"],
+              _driverCtx.driverLoc["longitute"],
+            ),
+            zoom: 17.0,
+          ),
+        ),
+      );
+      if (_driverCtx.driverInfo["isOpen"] == true) {
+        dynamic res = await DriverApi().updateDriverLoc(_driverCtx.driverLoc);
+        log(res.toString());
+      }
+    });
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _driverCtx.animationController.dispose();
+  Widget build(BuildContext context) {
+    return loading
+        ? _driverShimmerScreen()
+        : Obx(
+            () => WillPopScope(
+              onWillPop: () async => false,
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.white,
+                  elevation: 1,
+                  iconTheme: const IconThemeData(color: Colors.black),
+                  centerTitle: true,
+                  title: _driverCtx.driverInfo["isOpen"]
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(
+                              Icons.circle,
+                              color: Colors.green,
+                              size: 12,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              "Online",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Text(
+                          "Offline",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                  actions: const [
+                    Icon(IconlyLight.scan),
+                    SizedBox(width: 16),
+                  ],
+                ),
+                drawer: _drawer(),
+                body: Stack(
+                  children: [
+                    GoogleMap(
+                      mapType: MapType.normal,
+                      zoomControlsEnabled: false,
+                      zoomGesturesEnabled: false,
+                      buildingsEnabled: true,
+                      myLocationButtonEnabled: true,
+                      rotateGesturesEnabled: true,
+                      compassEnabled: false,
+                      initialCameraPosition: _initialCameraPosition,
+                      onMapCreated: onMapCreated,
+                    ),
+                    // DriverWithoutOrderView()
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _bottomViewsHandler(_driverCtx.driverStatus.value),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
   }
 
   Widget _bottomViewsHandler(DriverStatus status) {
@@ -107,102 +181,83 @@ class _DriverMainScreenState extends State<DriverMainScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-      child: WillPopScope(
-        onWillPop: () async => false,
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: Colors.transparent,
-          drawer: const DriverDrawerScreen(),
-          body: Builder(
-            builder: (context) => Stack(
-              children: [
-                const DriverMapScreen(),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).viewPadding.top + 12,
-                      horizontal: 12,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.all(12),
-                          ),
-                          child: const Icon(
-                            Icons.menu_rounded,
-                            color: MyColors.primary,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {});
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 4),
-                          ),
-                          child: Obx(
-                            () => Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      convertToCurrencyFormat(
-                                          _driverCtx.driverBonusInfo[
-                                                  "totalDeliveryPrice"] ??
-                                              0),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      "${_driverCtx.driverBonusInfo["deliveryCount"] ?? 0} хүргэлт",
-                                      style: const TextStyle(
-                                          color: MyColors.gray, fontSize: 12),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+  Widget _driverShimmerScreen() {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: customLoadingWidget(),
+      ),
+    );
+  }
+
+  Widget _drawer() {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: ListView(
+        children: [
+          DrawerHeader(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                width: 75,
+                height: 75,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: MyColors.white,
+                  border: Border.all(width: 1, color: MyColors.background),
                 ),
-                Obx(
-                  () => SlideTransition(
-                    position: offset,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: _bottomViewsHandler(_driverCtx.driverStatus.value),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
+                child: const Icon(
+                  Icons.account_balance,
+                  size: 40,
+                  color: MyColors.grey,
+                ),
+              ),
+              loading
+                  ? CustomShimmer(width: Get.width * .2, height: 14)
+                  : Text("Name")
+            ],
+          )),
+          _drawerListTile(IconlyLight.user, "Миний бүртгэл", () {
+            Get.toNamed(driverSettingsScreenRoute);
+          }),
+          _drawerListTile(IconlyLight.setting, "Тохиргоо", () {
+            AppSettings.openAppSettings();
+          }),
+          _drawerListTile(IconlyLight.location, "Хүргэлтүүд", () {
+            Get.toNamed(driverDeliverListScreenRoute);
+          }),
+          _drawerListTile(IconlyLight.wallet, "Төлбөр", () {
+            Get.toNamed(driverPaymentsScreenRoute);
+          }),
+          _drawerListTile(IconlyLight.logout, "Аппаас гарах", () {
+            CustomDialogs().showLogoutDialog(() {
+              _loginCtx.logout();
+            });
+          }),
+          const SizedBox(height: 18),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerListTile(IconData icon, String title, dynamic onTap) {
+    return CustomInkWell(
+      borderRadius: BorderRadius.zero,
+      onTap: onTap,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
+        dense: true,
+        minLeadingWidth: Get.width * .07,
+        leading: Icon(
+          icon,
+          color: MyColors.black,
+          size: 20,
+        ),
+        title: CustomText(
+          text: title,
+          fontSize: 14,
         ),
       ),
     );

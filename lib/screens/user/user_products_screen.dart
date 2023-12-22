@@ -1,480 +1,749 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
+import 'dart:async';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/textfield.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
-import 'package:flutter/material.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:shimmer/shimmer.dart';
 
 class UserProductsScreen extends StatefulWidget {
-  final int typeId;
-  final int storeId;
-  final String title;
-  int categoryId;
-  final int visibility;
-  final bool isFromSeachBar;
-  final dynamic searchObject;
-  final NavType navType;
-
-  UserProductsScreen({
-    Key? key,
-    this.typeId = 0,
-    this.storeId = 0,
-    this.isFromSeachBar = false,
-    this.searchObject,
-    required this.navType,
-    this.categoryId = 0,
-    this.visibility = 1,
-    required this.title,
-  }) : super(key: key);
+  const UserProductsScreen({super.key});
 
   @override
-  _UserProductsScreenState createState() => _UserProductsScreenState();
+  State<UserProductsScreen> createState() => _UserProductsScreenState();
 }
 
 class _UserProductsScreenState extends State<UserProductsScreen> {
-  int _scrolledProducts = 0;
-  int totalProducts = 0;
-  int page = 1;
-  bool hasMoreProducts = true;
-  bool loading = false;
-  bool scrollShowHide = false;
-  bool catLoading = false;
+  final _arguments = Get.arguments;
   List products = [];
-  List tabItems = [];
-  Map<String, dynamic> pagination = {};
-  List closedStoreList = [];
+  bool loading = false;
+  int page = 1;
+  bool hasMore = false;
+  int totalCount = 0;
+  Map pagination = {};
+  List<int> selectedIndex = [];
+  bool showUptoTopButton = false;
+  bool searching = false;
+  String categoryTitle = "Ангилал";
+  String sortTitle = "Эрэмбэлэх";
+  bool showSearchBar = false;
+  Map sort = {};
+  bool catLoading = false;
+  List categories = [];
+  List<Map<dynamic, dynamic>> sortValues = [
+    {"name": "Үнэ өсөхөөр", "icon": IconlyLight.arrow_up, "sort": "price"},
+    {"name": "Үнэ буурахаар", "icon": IconlyLight.arrow_down, "sort": "-price"},
+    {"name": "Хямдралтай нь эхэндээ", "icon": Icons.tag, "sort": "salePercent"},
+  ];
   ScrollController scrollController = ScrollController();
-  final _navCtrl = Get.put(NavigationController());
-  final _cartCtrl = Get.put(CartController());
-
+  TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    callCategories();
-    callProducts();
-    handleScroller();
+    scrollHandler();
+    getUserProducts();
+    getUserStoreCategories();
   }
 
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
+  void getUserProducts() async {
+    loading = true;
+    setState(() {});
+    dynamic typeId = 0;
+    if (selectedIndex.length == 1) {
+      if (selectedIndex.contains(0)) {
+        typeId = 0;
+      } else {
+        typeId = selectedIndex[0];
+      }
+    } else {
+      typeId = selectedIndex;
+    }
+    var query = {
+      "store": _arguments["id"],
+      "limit": 15,
+      "page": page,
+      "typeId": typeId,
+      "sort": sort.isEmpty ? 0 : sort["sort"]
+    };
+    query.removeWhere((key, value) => value == 0);
+    dynamic getUserProducts = await UserApi().getUserProducts(query);
+    loading = false;
+    setState(() {});
+    if (getUserProducts != null) {
+      dynamic response = Map<String, dynamic>.from(getUserProducts);
+      if (response["success"]) {
+        products = products + response["data"];
+        pagination = response["pagination"];
+        setState(() {});
+        if (pagination["pageCount"] > page) {
+          hasMore = true;
+          setState(() {});
+        } else {
+          hasMore = false;
+          setState(() {});
+        }
+      }
+    }
   }
 
-  void handleScroller() {
+  void handleCategoryTitle() {
+    int wordLength = 10;
+    List filteredList = categories
+        .where((e) => selectedIndex.contains(categories.indexOf(e)))
+        .toList();
+    bool isAllSelected = filteredList.any((element) => element["sub"] == 0);
+    if (isAllSelected) {
+      categoryTitle = "Ангилал";
+    } else {
+      String name = filteredList[0]["name"];
+      int plusNumber = filteredList.length - 1;
+      if (filteredList.length == 1) {
+        if (name.length > wordLength) {
+          categoryTitle = "${name.substring(0, wordLength)}...";
+        } else {
+          categoryTitle = name;
+        }
+      } else if (name.length < wordLength) {
+        categoryTitle = "$name... ${plusNumber != 0 ? "+$plusNumber" : ""}";
+      } else {
+        categoryTitle =
+            "${name.substring(0, wordLength)}... ${plusNumber != 0 ? "+$plusNumber" : ""}";
+      }
+    }
+    setState(() {});
+  }
+
+  void handleSortTitle(String selectedSortName) {
+    int wordLength = 10;
+    if (selectedSortName.length < wordLength) {
+      sortTitle = selectedSortName;
+    } else {
+      sortTitle = "${selectedSortName.substring(0, wordLength)}...";
+    }
+    setState(() {});
+  }
+
+  void getUserStoreCategories() async {
+    catLoading = true;
+    dynamic getUserStoreCategories =
+        await UserApi().getUserStoreCategories(_arguments["id"]);
+    catLoading = false;
+    if (getUserStoreCategories != null) {
+      dynamic response = Map<String, dynamic>.from(getUserStoreCategories);
+      if (response["success"]) {
+        categories = response["data"];
+      }
+    }
+    setState(() {});
+  }
+
+  void scrollHandler() {
     scrollController.addListener(() {
       if (scrollController.offset >= 300) {
-        scrollShowHide = true;
+        showUptoTopButton = true;
       } else {
-        scrollShowHide = false;
+        showUptoTopButton = false;
       }
+      setState(() {});
     });
     scrollController.addListener(
       () {
         if (scrollController.position.maxScrollExtent ==
-            scrollController.offset) {
+                scrollController.offset &&
+            hasMore) {
           page++;
-          callProducts();
+          setState(() {});
+          if (showSearchBar) {
+            searchUserProducts();
+          } else {
+            getUserProducts();
+          }
         }
       },
     );
-    setState(() {});
   }
 
-  void _scrollToTop() {
+  void searchUserProducts() async {
+    loading = true;
+    setState(() {});
+    showUptoTopButton = false;
+    var query = {"limit": 12, "page": page, "keyWord": searchController.text};
+    query.removeWhere((key, value) => value == 0);
+    dynamic searchUserProducts =
+        await UserApi().searchUserProducts(_arguments["id"], query);
+    loading = false;
+    setState(() {});
+    if (searchUserProducts != null) {
+      dynamic response = Map<String, dynamic>.from(searchUserProducts);
+      setState(() {
+        if (response["success"]) {
+          products = products + response["data"];
+          log(products.toString());
+        }
+        pagination = response["pagination"];
+        if (pagination["pageCount"] > page) {
+          hasMore = true;
+        } else {
+          hasMore = false;
+        }
+      });
+    }
+  }
+
+  void scrollToTop() {
     scrollController.animateTo(0,
         duration: const Duration(seconds: 1), curve: Curves.elasticInOut);
   }
 
-  void callProducts() async {
-    loading = true;
-    var query = {
-      "page": page,
-      "typeId": widget.typeId,
-      "categoryId": widget.categoryId,
-      "store": widget.storeId,
-      "visibility": widget.visibility,
-      "limit": 12
-    };
-
-    query.removeWhere((key, value) => value == 0);
-    dynamic res = await RestApi().getProducts(query);
-    dynamic response = Map<String, dynamic>.from(res);
-    products = products + response["data"];
-    closedStoreList = response["closed"];
-    pagination = response["pagination"];
-    if (pagination["pageCount"] > page) {
-      hasMoreProducts = true;
-    } else {
-      hasMoreProducts = false;
-    }
-    loading = false;
-    setState(() {});
+  void showCategoryBottomSheet() {
+    Get.bottomSheet(
+      StatefulBuilder(builder: (context, setState) {
+        return FractionallySizedBox(
+          heightFactor: 0.7,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Ангилал сонгох",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    IconButton(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.close_rounded),
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  separatorBuilder: (context, index) {
+                    return Container(
+                      height: 7,
+                      color: MyColors.fadedGrey,
+                    );
+                  },
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    var item = categories[index];
+                    var sub = item["sub"];
+                    return CustomInkWell(
+                      borderRadius: BorderRadius.zero,
+                      onTap: () {
+                        if (index != 0 && selectedIndex.contains(0)) {
+                          selectedIndex.remove(0);
+                        }
+                        if (index == 0 && !selectedIndex.contains(0)) {
+                          selectedIndex.clear();
+                        }
+                        if (selectedIndex.contains(sub)) {
+                          selectedIndex.remove(sub);
+                        } else {
+                          selectedIndex.add(sub);
+                        }
+                        List filteredList = categories
+                            .where((e) =>
+                                selectedIndex.contains(categories.indexOf(e)))
+                            .toList();
+                        totalCount = 0;
+                        for (var element in filteredList) {
+                          String count = element["count"].toString();
+                          totalCount += int.parse(count);
+                        }
+                        setState(() {});
+                      },
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: selectedIndex.contains(sub),
+                            onChanged: (val) {},
+                            activeColor: MyColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          Text(item["name"]),
+                          Expanded(
+                            child: Text(
+                              item["count"].toString(),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                          const SizedBox(width: 16)
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: Get.height * .04),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomButton(
+                    isActive: selectedIndex.isNotEmpty,
+                    onPressed: () {
+                      page = 1;
+                      products.clear();
+                      setState(() {});
+                      Get.back();
+                      getUserProducts();
+                      handleCategoryTitle();
+                    },
+                    text: "Хайх ($totalCount)",
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16)
+            ],
+          ),
+        );
+      }),
+      backgroundColor: MyColors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+      ),
+    );
   }
 
-  void callCategories() async {
-    if (widget.navType != NavType.none) {
-      catLoading = true;
-      dynamic response;
-      if (widget.navType == NavType.category) {
-        response = await RestApi().getCategories({"parentId": widget.typeId});
-      } else if (widget.navType == NavType.store) {
-        response = await RestApi().getStoreCategories(widget.storeId);
-      }
-      dynamic data = Map<String, dynamic>.from(response)['data'];
-      var items = [
-        {"id": 0, "name": "Бүх"}
-      ];
-      tabItems = [...items, ...data];
-      catLoading = false;
+  void showSortBottomSheet() {
+    Get.bottomSheet(
+      StatefulBuilder(builder: (context, setState) {
+        return FractionallySizedBox(
+          heightFactor: .35,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Эрэмбэлэх",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    IconButton(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.close_rounded),
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  separatorBuilder: (context, index) {
+                    return Container(
+                      height: 7,
+                      color: MyColors.fadedGrey,
+                    );
+                  },
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: sortValues.length,
+                  itemBuilder: (context, index) {
+                    var item = sortValues[index];
+                    return CustomInkWell(
+                      borderRadius: BorderRadius.zero,
+                      onTap: () {
+                        if (sort != item) {
+                          sort = item;
+                          page = 1;
+                          products.clear();
+                          setState(() {});
+                          Get.back();
+                          handleSortTitle(item["name"]);
+                          getUserProducts();
+                        } else {
+                          sort = {};
+                          page = 1;
+                          products.clear();
+                          setState(() {});
+                          Get.back();
+                          handleSortTitle("Эрэмбэлэх");
+                          getUserProducts();
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: sortValues.indexOf(sort) == index,
+                            onChanged: (val) {},
+                            activeColor: MyColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          Text(item["name"]),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [Icon(item["icon"])],
+                            ),
+                          ),
+                          const SizedBox(width: 16)
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: Get.height * .04),
+            ],
+          ),
+        );
+      }),
+      backgroundColor: MyColors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  Timer? _debounceTimer;
+  void _onTypingFinished(String text) {
+    searching = true;
+    setState(() {});
+    if (_debounceTimer != null) {
+      _debounceTimer!.cancel();
+    }
+    _debounceTimer = Timer(const Duration(seconds: 1), () {
+      log('Typing finished: $text');
+      page = 1;
+      products.clear();
+      searching = false;
       setState(() {});
-    }
-  }
-
-  void changeTab(int index) {
-    page = 1;
-    widget.categoryId = tabItems[index]["id"];
-    products.clear();
-    setState(() {});
-    callProducts();
-    _scrollToTop();
+      if (text.isNotEmpty) {
+        searchUserProducts();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 0,
-      length: catLoading ? 4 : tabItems.length,
-      child: CustomHeader(
-        actionWidth: Get.width * .3,
-        customActions: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              color: Colors.black,
-              icon: const Icon(
-                IconlyLight.search,
-                size: 20,
-              ),
-              onPressed: () {
-                Get.toNamed(userProductsSearchScreenRoute,
-                    arguments: {"storeId": widget.storeId});
-              },
-            ),
-            // IconButton(
-            //   color: Colors.black,
-            //   icon: const Icon(
-            //     IconlyLight.buy,
-            //     size: 20,
-            //   ),
-            //   onPressed: () {
-            //     Get.toNamed(userProductsSearchScreenRoute,
-            //         arguments: {"storeId": widget.storeId});
-            //   },
-            // ),
-            CustomInkWell(
-              borderRadius: BorderRadius.circular(50),
-              onTap: () {
-                Get.back();
-                Get.back();
-                _navCtrl.onItemTapped(2);
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Stack(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(
-                        IconlyLight.buy,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 2,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: MyColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Obx(() => Text(
-                              _cartCtrl.cartItemCount.value.toString(),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
-                              ),
-                            )),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        title: widget.title,
-        tabBar: TabBar(
-          onTap: changeTab,
-          isScrollable: true,
-          indicatorColor: catLoading ? Colors.transparent : MyColors.primary,
-          labelColor: MyColors.primary,
-          unselectedLabelColor: Colors.black,
-          tabs: tabItems.isEmpty
-              ? _tabShimmer()
-              : tabItems.map<Widget>((e) {
-                  return Tab(text: e["name"]);
-                }).toList(),
-        ),
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                var height =
-                    notification.metrics.maxScrollExtent / products.length;
-                var position = ((notification.metrics.maxScrollExtent -
-                            notification.metrics.extentAfter) /
-                        height)
-                    .round();
-                _scrolledProducts = position;
-                setState(() {});
-                return true;
-              },
-              child: !loading && products.isEmpty
-                  ? Container(
-                      color: MyColors.white,
-                      child: const CustomLoadingIndicator(
-                          text: "Бараа байхгүй байна"),
-                    )
-                  : GridView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 24),
-                      physics: const BouncingScrollPhysics(),
-                      controller: scrollController,
-                      itemCount: products.isEmpty && hasMoreProducts
-                          ? 18
-                          : hasMoreProducts
-                              ? products.length + 3
-                              : products.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.6,
-                      ),
-                      itemBuilder: (context, index) {
-                        if (index < products.length) {
-                          var data = products[index];
-                          return _product(data);
-                        } else if (hasMoreProducts) {
-                          return _shimmer();
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-            ),
-            _backToTop(scrollShowHide, totalProducts)
-          ],
+    return CustomHeader(
+      actionWidth: showSearchBar ? Get.width * .04 : 56,
+      customLeading: _customLeading(),
+      customTitle: _customTitle(),
+      customActions: _customActions(),
+      tabBar: _tabBar(),
+      body: _body(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AnimatedOpacity(
+        duration: const Duration(milliseconds: 1000),
+        opacity: showUptoTopButton ? 1.0 : 0.0,
+        child: FloatingActionButton.extended(
+          onPressed: scrollToTop,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          label: const Text("Дээш буцах", style: TextStyle(fontSize: 12)),
+          icon: const Icon(
+            IconlyLight.arrow_up,
+            size: 16,
+          ),
         ),
       ),
     );
   }
 
-  Widget _product(data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => Get.toNamed(
-            userProductDetailScreenRoute,
-            arguments: {
-              "data": data,
+  Widget _customActions() {
+    return showSearchBar
+        ? Container()
+        : IconButton(
+            onPressed: () {
+              products.clear();
+              showSearchBar = true;
+              setState(() {});
             },
-          ),
-          child: Hero(
-            transitionOnUserGestures: true,
-            tag: data,
-            child: Stack(
-              children: [
-                CustomImage(
-                  width: (Get.width - 36) / 3,
-                  height: (Get.width - 36) / 3,
-                  url: data["smallImg"],
-                ),
-                data["withSale"]
-                    ? _productSaleFlag(data["salePercent"].toString())
-                    : Container(),
-              ],
+            icon: const Icon(
+              IconlyLight.search,
+              color: Colors.black,
+              size: 20,
             ),
-          ),
-        ),
-        Text(
-          convertToCurrencyFormat(
-            double.parse(data['price']),
-          ),
-          style: TextStyle(
-            color: data["withSale"] ? Colors.green : Colors.black,
-          ),
-        ),
-        data["withSale"]
-            ? Text(
-                convertToCurrencyFormat(
-                  double.parse(data['beforeSalePrice']),
-                ),
-                style: const TextStyle(
-                  fontSize: 12,
-                  decoration: TextDecoration.lineThrough,
-                  color: Colors.grey,
-                ),
-              )
-            : Container(),
-        Text(
-          data["name"] ?? "",
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 12,
-          ),
-        ),
-      ],
+          );
+  }
+
+  PreferredSize _tabBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(showSearchBar ? 0 : Get.height * .07),
+      child: showSearchBar
+          ? Container()
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: Get.width * .04),
+                  _button(categoryTitle, () {
+                    showCategoryBottomSheet();
+                  }, IconlyLight.category),
+                  SizedBox(width: Get.width * .02),
+                  _button(sortTitle, () {
+                    showSortBottomSheet();
+                  }, IconlyLight.filter_2),
+                  SizedBox(width: Get.width * .04),
+                ],
+              ),
+            ),
     );
   }
 
-  List<Widget> _tabShimmer() {
-    return [
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36),
-      CustomShimmer(width: Get.width * .2, height: 36)
-    ];
+  Widget _customTitle() {
+    return showSearchBar
+        ? _search()
+        : Text(
+            _arguments["title"],
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+            ),
+          );
   }
 
-  Widget _productSaleFlag(String salePercent) {
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.green.withOpacity(.8),
-          borderRadius: BorderRadius.circular(12),
+  Widget _search() {
+    return Container(
+      height: 42,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(width: 1, color: MyColors.background),
+      ),
+      child: TextField(
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        controller: searchController,
+        decoration: InputDecoration(
+          hintText: "Бүтээгдэхүүн хайх...",
+          suffixIcon: searching
+              ? const CupertinoActivityIndicator()
+              : const Icon(
+                  IconlyLight.search,
+                  color: MyColors.primary,
+                  size: 20,
+                ),
+          counterText: '',
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          hintStyle: const TextStyle(
+            fontSize: MyFontSizes.normal,
+            color: MyColors.grey,
+          ),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent,
+              width: MyDimentions.borderWidth,
+            ),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent,
+              width: MyDimentions.borderWidth,
+            ),
+          ),
+          disabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent,
+              width: MyDimentions.borderWidth,
+            ),
+          ),
         ),
-        child: Text(
-          "-$salePercent%",
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+        style: const TextStyle(
+          fontSize: MyFontSizes.large,
+          color: MyColors.black,
         ),
+        cursorColor: MyColors.primary,
+        cursorWidth: 1,
+        onChanged: (val) {
+          _onTypingFinished(val);
+        },
       ),
     );
   }
 
-  Widget _shimmer() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Shimmer.fromColors(
-          baseColor: MyColors.fadedGrey,
-          highlightColor: MyColors.grey.withOpacity(0.3),
-          child: Container(
-            width: (Get.width - 36) / 3,
-            height: (Get.width - 36) / 3,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        CustomShimmer(
-          width: Get.width * .2,
-          height: 16,
-          borderRadius: 12,
-        ),
-        CustomShimmer(
-          width: Get.width * .2,
-          height: 16,
-          borderRadius: 12,
-        ),
-      ],
-    );
-  }
-
-  Widget _backToTop(bool show, int totalProducts) {
-    return show
-        ? Positioned(
-            bottom: Get.height * .01,
-            right: Get.width * .33,
-            child: Container(
-              margin: const EdgeInsets.only(top: 20),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: _scrollToTop,
-                      child: Card(
-                        color: MyColors.gray.withOpacity(0.1),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
+  Widget _body() {
+    return loading && products.isEmpty
+        ? productsLoadingWidget()
+        : !loading && products.isEmpty
+            ? customEmptyWidget("Бараа байхгүй байна")
+            : GridView.builder(
+                controller: scrollController,
+                physics: const BouncingScrollPhysics(),
+                itemCount: hasMore ? products.length + 3 : products.length,
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  if (index < products.length) {
+                    var item = products[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CustomInkWell(
+                          onTap: () => Get.toNamed(
+                            userProductDetailScreenRoute,
+                            arguments: {
+                              "id": item["id"],
+                              "store": item["store"],
+                              "storeName": _arguments["title"],
+                            },
+                          ),
+                          child: Hero(
+                            transitionOnUserGestures: true,
+                            tag: item["id"],
+                            child: Stack(
+                              children: [
+                                customImage(Get.width * .3, item["image"]),
+                                // Positioned(
+                                //   right: 10,
+                                //   top: 5,
+                                //   child: Container(
+                                //     padding: const EdgeInsets.all(4),
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.green,
+                                //       borderRadius: BorderRadius.circular(8),
+                                //     ),
+                                //     child: const Text(
+                                //       "-5%",
+                                //       style: TextStyle(
+                                //           color: Colors.white, fontSize: 12),
+                                //     ),
+                                //   ),
+                                // )
+                              ],
+                            ),
+                          ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: Get.width * .3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(width: 12),
-                              const Icon(
-                                IconlyLight.arrow_up,
-                                size: 20,
-                                color: MyColors.primary,
+                              Text(
+                                convertToCurrencyFormat(item['price']),
                               ),
-                              const SizedBox(width: 8),
-                              CustomText(
-                                text:
-                                    "$_scrolledProducts / ${pagination["total"]}",
-                                color: MyColors.black,
+                              const SizedBox(height: 4),
+                              Text(
+                                item["name"] ?? "",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
                               ),
-                              const SizedBox(width: 12),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        : Container();
+                      ],
+                    );
+                  } else if (hasMore) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CustomShimmer(
+                            width: Get.width * .3, height: Get.width * .3),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: Get.width * .3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomShimmer(width: Get.width * .2, height: 16),
+                              const SizedBox(height: 4),
+                              CustomShimmer(width: Get.width * .2, height: 16)
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              );
   }
-}
 
-Widget subtitle(bool loading, int total, String type) {
-  return !loading
-      ? CustomText(
-          text: "$total $type",
-          fontSize: MyFontSizes.small,
-          color: MyColors.gray,
-        )
-      : CustomShimmer(
-          width: Get.width * .15,
-          height: 16,
-        );
+  Widget _customLeading() {
+    return CustomInkWell(
+      onTap: showSearchBar
+          ? () {
+              showSearchBar = false;
+              categoryTitle = "Ангилал";
+              sortTitle = "Эрэмбэлэх";
+              selectedIndex = [];
+              sort = {};
+              page = 1;
+              searchController.clear();
+              products.clear();
+              setState(() {});
+              getUserProducts();
+            }
+          : Get.back,
+      child: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: Icon(
+          showSearchBar ? Icons.close_rounded : IconlyLight.arrow_left,
+          color: MyColors.black,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  Widget _button(String text, VoidCallback onPressed, IconData icon) {
+    return Expanded(
+      child: CustomInkWell(
+        onTap: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              width: 1,
+              color: MyColors.background,
+            ),
+          ),
+          height: 42,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(text),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -1,17 +1,22 @@
-import 'package:Erdenet24/utils/routes.dart';
+import 'dart:io';
+
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/api/socket_instance.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
-
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 
 class StoreMainScreen extends StatefulWidget {
   const StoreMainScreen({Key? key}) : super(key: key);
@@ -21,98 +26,136 @@ class StoreMainScreen extends StatefulWidget {
 }
 
 class _StoreMainScreenState extends State<StoreMainScreen> {
-  final _storeCtx = Get.put(StoreController());
   final _loginCtx = Get.put(LoginController());
+  Map data = {};
+  bool loading = false;
+  bool isOpen = false;
+  int storeId = RestApiHelper.getUserId();
 
   @override
   void initState() {
     super.initState();
-    _storeCtx.fetchStoreInfo();
-    _loginCtx.listenToTokenChanges("store");
+    getStoreInfo();
+  }
+
+  void getStoreInfo() async {
+    loading = true;
+    setState(() {});
+    dynamic getStoreInfo = await StoreApi().getStoreInfo();
+    loading = false;
+    setState(() {});
+    if (getStoreInfo != null) {
+      dynamic response = Map<String, dynamic>.from(getStoreInfo);
+      if (response["success"]) {
+        data = response["data"];
+        isOpen = data["isOpen"];
+        setState(() {});
+      } else {}
+    }
+  }
+
+  void openAndCloseStore(int open) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic openAndCloseStore = await StoreApi().openAndCloseStore(open);
+    Get.back();
+    if (openAndCloseStore != null) {
+      dynamic response = Map<String, dynamic>.from(openAndCloseStore);
+      if (response["success"]) {
+        isOpen = open == 1;
+        setState(() {});
+        if (isOpen) {
+          SocketClient().connect();
+          SocketClient().saveDeviceInfo();
+        } else {
+          SocketClient().disconnect();
+        }
+        customSnackbar(ActionType.success,
+            "Дэлгүүр ${isOpen ? "нээгдлээ" : "хаагдлаа"}", 2);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(
-        () => !_storeCtx.fetching.value
-            ? Column(
+        backgroundColor: Colors.white,
+        body: loading
+            ? customLoadingWidget()
+            : Column(
                 children: [
                   SizedBox(height: Get.height * .075),
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                        "${URL.AWS}/users/${RestApiHelper.getUserId()}/small/1.png"),
+                      "${URL.AWS}/users/${data["id"]}/small/1.png",
+                    ),
                     radius: Get.width * .1,
                   ),
                   const SizedBox(height: 8),
                   CustomText(
-                    text: _storeCtx.storeInfo["name"] ?? "",
+                    text: data["name"] ?? "",
                     fontSize: 16,
                   ),
                   const SizedBox(height: 4),
                   CustomText(
-                    text: _storeCtx.storeInfo["phone"] ?? "",
+                    text: data["phone"] ?? "",
                     fontSize: 12,
                     color: MyColors.gray,
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: Get.height * .02),
-                          _switchListTile(),
-                          _listTile(IconlyLight.edit, "Бараа нэмэх, засварлах",
-                              () {
-                            Get.toNamed(storeProductsEditMainScreenRoute);
-                          }),
-                          _listTile(IconlyLight.chart, "Захиалгууд", () {
-                            Get.toNamed(storeOrdersScreenRoute);
-                          }),
-                          _listTile(IconlyLight.setting, "Тохиргоо", () {
-                            Get.toNamed(storeSettingsScreenRoute);
-                          }),
-                          _listTile(IconlyLight.info_circle, "Тусламж", () {}),
-                          _listTile(IconlyLight.login, "Аппаас гарах", () {
-                            CustomDialogs().showLogoutDialog(() {
-                              _loginCtx.logout();
-                            });
-                          })
-                        ],
-                      ),
+                  SizedBox(height: Get.height * .02),
+                  ListTile(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: Get.width * .075),
+                    dense: true,
+                    minLeadingWidth: Get.width * .07,
+                    leading: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isOpen ? IconlyLight.hide : IconlyLight.show,
+                          color: MyColors.black,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                    title: CustomText(
+                      text: isOpen ? "Дэлгүүрээ хаах" : "Дэлгүүрээ нээх",
+                      fontSize: 14,
+                    ),
+                    trailing: CupertinoSwitch(
+                      value: isOpen,
+                      thumbColor: isOpen ? MyColors.primary : MyColors.gray,
+                      trackColor: MyColors.background,
+                      activeColor: MyColors.black,
+                      onChanged: (value) {
+                        showCustomDialog(ActionType.warning,
+                            "Та дэлгүүрээ ${isOpen ? "хаахдаа" : "нээхдээ"} итгэлтэй байна уу?",
+                            () {
+                          Get.back();
+                          openAndCloseStore(isOpen ? 0 : 1);
+                        });
+                      },
                     ),
                   ),
+                  _listTile(IconlyLight.plus, "Бараа нэмэх", () {
+                    Get.toNamed(storeProductsAddScreenRoute);
+                  }),
+                  _listTile(IconlyLight.edit, "Бараа засварлах", () {
+                    Get.toNamed(storeProductsEditScreenRoute);
+                  }),
+                  _listTile(IconlyLight.graph, "Захиалгууд", () {
+                    Get.toNamed(storeOrdersScreenRoute);
+                  }),
+                  _listTile(IconlyLight.setting, "Тохиргоо", () {
+                    Get.toNamed(storeSettingsScreenRoute);
+                  }),
+                  _listTile(IconlyLight.info_circle, "Тусламж", () {}),
+                  _listTile(IconlyLight.login, "Аппаас гарах", () {
+                    CustomDialogs().showLogoutDialog(() {
+                      _loginCtx.logout();
+                    });
+                  }),
                 ],
-              )
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Image(
-                        image:
-                            const AssetImage("assets/images/png/android.png"),
-                        width: Get.width * .22,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      "ERDENET24",
-                      softWrap: true,
-                      style: TextStyle(
-                        fontFamily: "Exo",
-                        fontSize: 22,
-                        color: MyColors.black,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-      ),
-    );
+              ));
   }
 
   Widget _listTile(IconData icon, String title, dynamic onTap) {
@@ -132,56 +175,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
           text: title,
           fontSize: 14,
         ),
-      ),
-    );
-  }
-
-  Widget _switchListTile() {
-    bool isOpen = _storeCtx.storeInfo["isOpen"];
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
-      dense: true,
-      minLeadingWidth: Get.width * .07,
-      leading: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isOpen ? IconlyLight.hide : IconlyLight.show,
-            color: MyColors.black,
-            size: 20,
-          ),
-        ],
-      ),
-      title: CustomText(
-        text: isOpen ? "Дэлгүүрээ хаах" : "Дэлгүүрээ нээх",
-        fontSize: 14,
-      ),
-      trailing: CupertinoSwitch(
-        value: isOpen,
-        thumbColor: isOpen ? MyColors.primary : MyColors.gray,
-        trackColor: MyColors.background,
-        activeColor: MyColors.black,
-        onChanged: (value) {
-          closeStoreModal(
-            context,
-            "Дэлгүүрээ ${isOpen ? "хаах уу?" : "нээх үү?"}",
-            isOpen
-                ? "Дэлгүүрээ хааснаар дэлгүүрийн мэдээлэл болон бараанууд аппликейшн дээр харагдахгүй болохыг анхаарна уу"
-                : "Дэлгүүрээ нээснээр дэлгүүрийн бараанууд хэрэглэгчидэд харагдаж, цагийн хуваарын дагуу захиалга хийх боломжтой болохыг анхаарна уу",
-            isOpen ? "Хаах" : "Нээх",
-            () {
-              Get.back();
-              if (value == true) {}
-              _storeCtx.storeInfo["isOpen"] = value;
-              var body = {"isOpen": value};
-              _storeCtx.updateStoreInfo(
-                  body,
-                  context,
-                  isOpen ? "Дэлгүүр хаагдлаа" : "Дэлгүүр нээгдлээ",
-                  "Алдаа гарлаа");
-            },
-          );
-        },
       ),
     );
   }

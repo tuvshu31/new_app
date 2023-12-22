@@ -1,16 +1,20 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
-import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
+
+const localUrl = "http://192.168.1.191:8000/e24/";
+const prodUrl = 'https://www.e24api1215.com/e24/';
 
 class DioClient {
   Dio dio = Dio(
     BaseOptions(
-      // baseUrl: "http://192.168.8.5:8000/",
-      baseUrl: 'https://www.e24api1215.com/',
+      // baseUrl: localUrl,
+      baseUrl: prodUrl,
       connectTimeout: const Duration(minutes: 2),
       receiveTimeout: const Duration(minutes: 1),
     ),
@@ -31,7 +35,7 @@ class DioClient {
 
   Future<dynamic> sendRequest(
     String path,
-    Method _method,
+    Method method,
     dynamic body,
     Map<String, dynamic>? queryParam,
   ) async {
@@ -46,7 +50,7 @@ class DioClient {
         path,
         data: body,
         options: Options(
-          method: _getMethodName(_method),
+          method: _getMethodName(method),
           // headers: {"content-Type": 'application/x-www-form-urlencoded'},
         ),
         queryParameters: queryParam,
@@ -64,13 +68,37 @@ class DioClient {
   Future<dynamic> sendFile(
     String path,
     Method method,
-    File imageFile,
+    List images,
   ) async {
     try {
-      var formData = FormData.fromMap({
-        'file':
-            await MultipartFile.fromFile(imageFile.path, filename: 'image.png')
-      });
+      List<MultipartFile> small = [];
+      List<MultipartFile> large = [];
+      for (var i = 0; i < images.length; i++) {
+        String imagePath = images[i];
+        ImageProperties properties =
+            await FlutterNativeImage.getImageProperties(imagePath);
+        File compressedLargeImage = await FlutterNativeImage.compressImage(
+            imagePath,
+            quality: 90,
+            targetWidth: 600,
+            targetHeight:
+                (properties.height! * 600 / properties.width!.toInt()).round());
+        MultipartFile largeImage =
+            await MultipartFile.fromFile(compressedLargeImage.path);
+        large.add(largeImage);
+        File compressedSmallImage = await FlutterNativeImage.compressImage(
+            imagePath,
+            quality: 90,
+            targetWidth: 300,
+            targetHeight:
+                (properties.height! * 300 / properties.width!.toInt()).round());
+        MultipartFile smallImage =
+            await MultipartFile.fromFile(compressedSmallImage.path);
+        small.add(smallImage);
+      }
+      FormData formData = FormData.fromMap(
+        {'small': small, 'large': large},
+      );
       Response<String> response = await dio.request(
         path,
         data: formData,
@@ -81,11 +109,11 @@ class DioClient {
       if (responseJson['success'] == true) {
         return responseJson;
       } else {
-        print(responseJson);
+        log(responseJson);
       }
     } catch (e) {
       if (e is DioError) {
-        print(e);
+        log(e.toString());
       }
     }
   }

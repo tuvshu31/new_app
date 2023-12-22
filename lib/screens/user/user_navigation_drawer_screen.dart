@@ -1,26 +1,22 @@
-import 'dart:convert';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/widgets/image.dart';
-import 'package:Erdenet24/widgets/loading.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:iconly/iconly.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
+import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
 
 class UserNavigationDrawerScreen extends StatefulWidget {
   const UserNavigationDrawerScreen({
@@ -34,21 +30,28 @@ class UserNavigationDrawerScreen extends StatefulWidget {
 
 class _UserNavigationDrawerScreenState
     extends State<UserNavigationDrawerScreen> {
-  dynamic _user = [];
+  bool loading = false;
+  String userPhone = "";
   final _loginCtx = Get.put(LoginController());
 
   @override
   void initState() {
     super.initState();
-    getUserInfo();
+    getUserPhone();
   }
 
-  void getUserInfo() async {
-    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic data = Map<String, dynamic>.from(res);
-    setState(() {
-      _user = data["data"];
-    });
+  void getUserPhone() async {
+    loading = true;
+    setState(() {});
+    dynamic getUserPhone = await UserApi().getUserPhone();
+    loading = false;
+    setState(() {});
+    if (getUserPhone != null) {
+      dynamic response = Map<String, dynamic>.from(getUserPhone);
+      if (response["success"]) {
+        userPhone = response["data"]["phone"];
+      }
+    }
   }
 
   @override
@@ -56,73 +59,79 @@ class _UserNavigationDrawerScreenState
     return Drawer(
       width: double.infinity,
       child: CustomHeader(
-        title: 'Ангилал',
-        customActions: Container(),
-        customLeading: _leading(),
-        body: _user.isNotEmpty
-            ? SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: Get.width * .075),
-                      dense: true,
-                      minLeadingWidth: Get.width * .07,
-                      leading: const Icon(
-                        IconlyLight.call,
-                        color: MyColors.black,
-                        size: 20,
-                      ),
-                      title: CustomText(
-                        text: _user["phone"],
-                        fontSize: 14,
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          Get.to(() => const UserProfilePhoneEditScreen());
-                        },
-                        icon: const Icon(
-                          IconlyLight.edit_square,
-                          size: 16,
-                          color: MyColors.black,
+          title: 'Профайл',
+          customActions: Container(),
+          customLeading: _leading(),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: Get.width * .075),
+                  dense: true,
+                  minLeadingWidth: Get.width * .07,
+                  leading: const Icon(
+                    IconlyLight.call,
+                    color: MyColors.black,
+                    size: 20,
+                  ),
+                  title: loading
+                      ? Row(
+                          children: [
+                            CustomShimmer(
+                              width: Get.width * .3,
+                              height: 16,
+                            ),
+                          ],
+                        )
+                      : CustomText(
+                          text: userPhone,
+                          fontSize: 14,
                         ),
-                      ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Get.to(() => const UserProfilePhoneEditScreen());
+                    },
+                    icon: const Icon(
+                      IconlyLight.edit_square,
+                      size: 16,
+                      color: MyColors.black,
                     ),
-                    _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
-                      Get.to(() => const UserProfileAddressEditScreen());
-                    }),
-                    _listTile(IconlyLight.info_circle, "Тусламж", () {
-                      Get.to(() => const UserProfileHelpScreen());
-                    }),
-                    _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
-                      CustomDialogs().showAccountDeleteDialog(() async {
-                        CustomDialogs().showLoadingDialog();
-                        dynamic response = await RestApi()
-                            .deleteUser(RestApiHelper.getUserId());
-                        dynamic d = Map<String, dynamic>.from(response);
-                        Get.back();
-                        if (d["success"]) {
-                          _loginCtx.logout();
-                        } else {
-                          customSnackbar(
-                            DialogType.error,
-                            "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
-                            3,
-                          );
-                        }
-                      });
-                    }),
-                    _listTile(IconlyLight.login, "Системээс гарах", () {
-                      CustomDialogs().showLogoutDialog(() {
-                        _loginCtx.logout();
-                      });
-                    })
-                  ],
+                  ),
                 ),
-              )
-            : MyShimmers().userPage(),
-      ),
+                _listTile(IconlyLight.location, "Хүргэлтийн хаяг", () {
+                  Get.to(() => const UserProfileAddressEditScreen());
+                }),
+                _listTile(IconlyLight.info_circle, "Тусламж", () {
+                  Get.to(() => const UserProfileHelpScreen());
+                }),
+                _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
+                  CustomDialogs().showAccountDeleteDialog(() async {
+                    CustomDialogs().showLoadingDialog();
+                    dynamic response =
+                        await RestApi().deleteUser(RestApiHelper.getUserId());
+                    dynamic d = Map<String, dynamic>.from(response);
+                    Get.back();
+                    if (d["success"]) {
+                      _loginCtx.logout();
+                    } else {
+                      customSnackbar(
+                        ActionType.error,
+                        "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
+                        3,
+                      );
+                    }
+                  });
+                }),
+                _listTile(IconlyLight.login, "Системээс гарах", () {
+                  CustomDialogs().showLogoutDialog(() {
+                    _loginCtx.logout();
+                  });
+                })
+              ],
+            ),
+          )),
     );
   }
 

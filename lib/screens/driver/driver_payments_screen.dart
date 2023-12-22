@@ -8,7 +8,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +91,7 @@ class _DriverPaymentsScreenState extends State<DriverPaymentsScreen> {
             ),
           ),
           !loading && paymentList.isEmpty
-              ? const CustomLoadingIndicator(text: "Хүргэлт байхгүй байна")
+              ? customEmptyWidget("Хүргэлт байхгүй байна")
               : Expanded(
                   child: ListView.separated(
                     separatorBuilder: (context, index) {

@@ -53,7 +53,7 @@ class _CustomSearchFieldState extends State<CustomSearchField> {
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.only(left: 12),
+            padding: const EdgeInsets.only(left: 12),
             child: Center(
               child: Icon(
                 widget.leadingIcon,
@@ -182,7 +182,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         borderRadius: BorderRadius.circular(50),
         border: Border.all(
           width: 1,
-          color: widget.errorText.isEmpty ? MyColors.grey : MyColors.primary,
+          color:
+              widget.errorText.isEmpty ? MyColors.background : MyColors.primary,
         ),
       ),
       child: TextField(
@@ -233,56 +234,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
           setState(() {});
         },
       ),
-    );
-  }
-}
-
-class CustomPinCodeTextField extends StatefulWidget {
-  final dynamic onChanged;
-  final dynamic onCompleted;
-  const CustomPinCodeTextField({this.onCompleted, this.onChanged, super.key});
-
-  @override
-  State<CustomPinCodeTextField> createState() => _CustomPinCodeTextFieldState();
-}
-
-class _CustomPinCodeTextFieldState extends State<CustomPinCodeTextField> {
-  @override
-  Widget build(BuildContext context) {
-    return PinCodeTextField(
-      autoFocus: true,
-      appContext: context,
-      cursorColor: MyColors.primary,
-      cursorWidth: 1,
-      length: 6,
-      obscureText: false,
-      animationType: AnimationType.fade,
-      keyboardType: TextInputType.number,
-      textStyle: const TextStyle(fontSize: 16),
-      pinTheme: PinTheme(
-          shape: PinCodeFieldShape.box,
-          borderRadius: BorderRadius.circular(12),
-          fieldHeight: 48,
-          fieldWidth: 40,
-          activeFillColor: Colors.white,
-          inactiveFillColor: MyColors.white,
-          selectedFillColor: MyColors.white,
-          borderWidth: 1,
-          activeColor: MyColors.grey,
-          inactiveColor: MyColors.grey,
-          selectedColor: MyColors.primary),
-      animationDuration: const Duration(milliseconds: 300),
-      enableActiveFill: true,
-      // errorAnimationController: errorController,
-      // controller: textEditingController,
-      onCompleted: widget.onCompleted,
-      onChanged: widget.onChanged,
-      beforeTextPaste: (text) {
-        print("Allowing to paste $text");
-        //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-        //but you can show anything you want here, like your pop up saying wrong paste format or etc
-        return true;
-      },
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 class NavigationController extends GetxController {
   RxInt currentIndex = 0.obs;
-  Rx<PageController> searchViewController = PageController().obs;
   var scaffoldKey = GlobalKey<ScaffoldState>();
   RxString title = "".obs;
   RxInt typeId = 0.obs;

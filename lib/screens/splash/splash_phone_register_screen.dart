@@ -1,19 +1,16 @@
-import 'dart:developer';
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class SplashPhoneRegisterScreen extends StatefulWidget {
   const SplashPhoneRegisterScreen({super.key});
@@ -26,34 +23,27 @@ class SplashPhoneRegisterScreen extends StatefulWidget {
 class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
   bool _phoneNumberOk = false;
   bool _privacyApproved = false;
-
-  final _loginCtrl = Get.put(LoginController());
+  TextEditingController controller = TextEditingController();
   @override
-  void initState() {
-    super.initState();
-
-    _loginCtrl.phoneController.clear();
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   void sendOTP() async {
     CustomDialogs().showLoadingDialog();
-    if (_loginCtrl.phoneController.text == "99681828") {
-      _loginCtrl.verifyCode.value = 111111;
-      Get.back();
-      Get.toNamed(splashOtpScreenRoute);
-    } else {
-      _loginCtrl.verifyCode.value = random6digit();
-      dynamic authCode = await RestApi().sendAuthCode(
-        _loginCtrl.phoneController.text,
-        _loginCtrl.verifyCode.value.toString(),
+    dynamic generateCode = await UserApi().sendAuthCode(controller.text);
+    dynamic codeResponse = Map<String, dynamic>.from(generateCode);
+    Get.back();
+    if (codeResponse["success"]) {
+      int code = codeResponse["code"];
+      Get.toNamed(
+        splashOtpScreenRoute,
+        arguments: {"code": code.toString(), "phone": controller.text},
       );
-      Get.back();
-      if (authCode[0]["Result"] == "SUCCESS") {
-        Get.toNamed(splashOtpScreenRoute);
-      } else {
-        customSnackbar(DialogType.error,
-            "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
-      }
+    } else {
+      customSnackbar(
+          ActionType.error, "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу", 3);
     }
   }
 
@@ -87,11 +77,10 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
               hintText: "Утасны дугаар",
               keyboardType: TextInputType.number,
               maxLength: 8,
-              controller: _loginCtrl.phoneController,
+              controller: controller,
               onChanged: ((val) {
-                setState(() {
-                  _phoneNumberOk = val.length == 8 ? true : false;
-                });
+                _phoneNumberOk = val.length == 8 ? true : false;
+                setState(() {});
               }),
             ),
             Row(

@@ -14,8 +14,6 @@ import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 
 class LoginController extends GetxController {
   final _cartCtx = Get.put(CartController());
-  RxInt verifyCode = 0.obs;
-  TextEditingController phoneController = TextEditingController();
   final _navCtx = Get.put(NavigationController());
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 

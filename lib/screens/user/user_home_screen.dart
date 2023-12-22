@@ -1,10 +1,9 @@
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/controller/user_controller_OLD.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_screen.dart';
@@ -22,15 +21,12 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   final _navCtrl = Get.put(NavigationController());
-  final _cartCtrl = Get.put(CartController());
-  final _userCtx = Get.put(UserController());
   final _loginCtx = Get.put(LoginController());
 
   @override
   void initState() {
     super.initState();
     _loginCtx.listenToTokenChanges("user");
-    _cartCtrl.getUserProducts();
   }
 
   @override
@@ -43,21 +39,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     ];
 
     return Obx(
-      () => Container(
-        color: MyColors.white,
-        child: SafeArea(
-          child: GestureDetector(
-            onTap: () => {
-              FocusManager.instance.primaryFocus?.unfocus(),
-            },
-            child: Scaffold(
-              key: _navCtrl.scaffoldKey,
-              drawer: const UserNavigationDrawerScreen(),
-              resizeToAvoidBottomInset: false,
-              backgroundColor: MyColors.black,
-              body: widgets[_navCtrl.currentIndex.value],
-              bottomNavigationBar: _bottomNavigationBar(),
-            ),
+      () => SafeArea(
+        top: false,
+        bottom: false,
+        maintainBottomViewPadding: false,
+        child: GestureDetector(
+          onTap: () => {
+            FocusManager.instance.primaryFocus?.unfocus(),
+          },
+          child: Scaffold(
+            key: _navCtrl.scaffoldKey,
+            drawer: const UserNavigationDrawerScreen(),
+            resizeToAvoidBottomInset: false,
+            body: widgets[_navCtrl.currentIndex.value],
+            bottomNavigationBar: _bottomNavigationBar(),
           ),
         ),
       ),
@@ -70,7 +65,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         canvasColor: MyColors.white,
       ),
       child: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.search),
             label: 'Хайх',
@@ -81,7 +76,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.buy),
-            label: 'Сагс',
+            label: "Сагс",
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.bag_2),

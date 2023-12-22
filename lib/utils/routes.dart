@@ -6,12 +6,12 @@ const String splashPhoneRegisterScreenRoute = '/splashPhoneRegisterScreenRoute';
 const String splashProminentDisclosureScreenRoute =
     '/splashProminentDisclosureScreenRoute';
 //User screen routes
-const String userCartAddressInfoScreenRoute = '/userCartAddressInfoScreen';
+const String userCartAddressScreenRoute = '/userCartAddressScreenRoute';
 const String userCartScreenRoute = '/userCartScreen';
 const String userHomeScreenRoute = '/userHomeScreen';
 const String userNavigationDrawerScreenRoute =
     '/userNavigationDrawerScreenRoute';
-const String userOrderPaymentScreenRoute = '/userOrderPaymentScreenRoute';
+const String userPaymentScreenRoute = '/UserPaymentScreenRoute';
 const String userProductDetailScreenRoute = '/userProductDetailScreenRoute';
 const String userProfileAddressEditScreenRoute =
     '/userProfileAddressEditScreenRoute';
@@ -26,18 +26,17 @@ const String userSearchBarScreenRoute = '/userSearchBarScreenRoute';
 const String userSearchScreenRoute = '/userSearchScreenRoute';
 const String userStoreListScreenRoute = '/userStoreListScreenRoute';
 const String userProductsSearchScreenRoute = '/userProductsSearchScreenRoute';
+const String userProductsScreenRoute = '/userProductsScreenRoute';
 //Store screen routes
 const String storeMainScreenRoute = '/storeMainScreenRoute';
 const String storeOrdersScreenRoute = '/storeOrdersScreenRoute';
-const String storeProductsCreateProductScreenRoute =
-    '/storeProductsCreateProductScreenRoute';
-const String storeProductsEditMainScreenRoute =
-    '/storeProductsEditMainScreenRoute';
-const String storeProductsEditProductRoute = '/storeProductsEditProductRoute';
+const String storeProductsAddScreenRoute = '/storeProductsAddScreenRoute';
+const String storeProductsEditScreenRoute = '/storeProductsEditScreenRoute';
 const String storeProductsPreviewScreenRoute =
     '/storeProductsPreviewScreenRoute';
 const String storeSettingsScreenRoute = '/storeSettingsScreenRoute';
 const String storeIncomingCallScreenRoute = "/storeIncomingCallScreenRoute";
+const String storeEditProductScreenRoute = "/storeEditProductScreenRoute";
 //Driver screen routes
 const String driverMainScreenRoute = '/driverMainScreenRoute';
 const String driverDrawerScreenRoute = '/driverDrawerScreenRoute';

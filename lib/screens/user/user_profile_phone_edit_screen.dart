@@ -51,10 +51,10 @@ class _UserProfilePhoneEditScreenState
     dynamic response = Map<String, dynamic>.from(authCode);
     Get.back();
     if (response["success"]) {
-      customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 3);
+      customSnackbar(ActionType.success, "Амжилттай хадгалагдлаа", 3);
       Get.back();
     } else {
-      customSnackbar(DialogType.error,
+      customSnackbar(ActionType.error,
           "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
       Get.back();
     }

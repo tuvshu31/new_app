@@ -1,6 +1,4 @@
 import 'dart:developer';
-
-import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -10,7 +8,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashProminentDisclosure extends StatefulWidget {

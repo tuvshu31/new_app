@@ -2,7 +2,7 @@ enum Method { get, post, put, delete }
 
 enum NavType { none, category, store }
 
-enum DialogType { success, warning, error }
+enum ActionType { success, warning, error }
 
 enum DriverStatus {
   withoutOrder,
@@ -11,4 +11,12 @@ enum DriverStatus {
   received,
   delivered,
   finished,
+}
+
+enum OrderStatus {
+  newOrder,
+  preparing,
+  waitingForDriver,
+  delivering,
+  delivered,
 }

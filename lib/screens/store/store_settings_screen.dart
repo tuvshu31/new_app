@@ -1,19 +1,12 @@
-import 'dart:io';
-
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/help_controller.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/image_picker.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 
 class StoreSettingsScreen extends StatefulWidget {
@@ -24,65 +17,34 @@ class StoreSettingsScreen extends StatefulWidget {
 }
 
 class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
-  dynamic _user = [];
+  Map data = {};
   bool loading = false;
-  String imageListBefore = "";
-  final _helpCtrl = Get.put(HelpController());
-  TextEditingController storeName = TextEditingController();
-  TextEditingController phoneNumber = TextEditingController();
-  TextEditingController description = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
+  @override
   void initState() {
     super.initState();
-    DefaultCacheManager().emptyCache();
-    _helpCtrl.chosenImage.clear();
     getStoreInfo();
   }
 
   void getStoreInfo() async {
     loading = true;
-    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic data = Map<String, dynamic>.from(res);
-    setState(() {
-      _user = data["data"];
-      storeName.text = _user["name"] ?? "";
-      phoneNumber.text = _user["phone"] ?? "";
-      description.text = _user["description"] ?? "";
-    });
-    var file = await DefaultCacheManager()
-        .getSingleFile("${URL.AWS}/users/${_user["id"]}/small/1.png");
-    _helpCtrl.chosenImage.add(file.path);
-    loading = false;
-    imageListBefore = _helpCtrl.chosenImage.toString();
     setState(() {});
-  }
-
-  void submit() async {
-    // CustomDialogs().showLoadingDialog();
-    // if (imageListBefore != _helpCtrl.chosenImage.toString()) {
-    //   if (imageListBefore != [].toString()) {
-    //     await RestApi().deleteImage("users", _user["id"]);
-    //   }
-    //   await RestApi()
-    //       .uploadImage("users", _user["id"], File(_helpCtrl.chosenImage[0]));
-    // }
-
-    // var body = {
-    //   "id": _user["id"],
-    //   "name": storeName.text,
-    //   "phone": phoneNumber.text,
-    //   "description": description.text,
-    // };
-    // dynamic product = await RestApi().updateUser(_user["id"], body);
-    // dynamic data = Map<String, dynamic>.from(product);
-    // if (data["success"]) {
-    //   Get.back();
-    //   successSnackBar("Амжилттай засагдлаа", 2, context);
-    // } else {
-    //   Get.back();
-    //   errorSnackBar("Алдаа гарлаа", 2, context);
-    // }
-    Get.back();
+    dynamic getStoreInfo = await StoreApi().getStoreInfo();
+    loading = false;
+    setState(() {});
+    if (getStoreInfo != null) {
+      dynamic response = Map<String, dynamic>.from(getStoreInfo);
+      if (response["success"]) {
+        data = response["data"];
+        nameController.text = data["name"] ?? "";
+        phoneController.text = data["phone"] ?? "";
+        descriptionController.text = data["description"] ?? "";
+        setState(() {});
+      } else {}
+    }
   }
 
   @override
@@ -90,60 +52,56 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
     return CustomHeader(
       title: "Тохиргоо",
       customActions: Container(),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: Get.height * .04),
-              loading
-                  ? MyShimmers().imagePickerShimmer(1)
-                  : const CustomImagePicker(imageLimit: 1),
-              _title("Дэлгүүрийн нэр"),
-              CustomTextField(
-                controller: storeName,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
+      body: loading
+          ? customLoadingWidget()
+          : Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: Get.height * .02),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      "${URL.AWS}/users/${data["id"]}/small/1.png",
+                    ),
+                    radius: Get.width * .1,
+                  ),
+                  _infoWidget("Дэлгүүрийн нэр", nameController),
+                  _infoWidget("Утасны дугаар", phoneController),
+                  _infoWidget("Танилцуулга", descriptionController),
+                  const SizedBox(height: 24),
+                  CustomButton(
+                    isActive: false,
+                    text: "Хадгалах",
+                    onPressed: () {},
+                  ),
+                ],
               ),
-              _title("Утасны дугаар"),
-              CustomTextField(
-                controller: phoneNumber,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-              ),
-              _title("Танилцуулга"),
-              CustomTextField(
-                controller: description,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.done,
-              ),
-              SizedBox(height: Get.height * .05),
-              CustomButton(
-                isActive: true,
-                text: "Хадгалах",
-                onPressed: submit,
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
-  Widget _title(String text) {
+  Widget _infoWidget(
+    String title,
+    TextEditingController controller,
+  ) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Container(
           margin: const EdgeInsets.only(left: 4),
           child: CustomText(
-            text: text,
+            text: title,
             fontSize: 12,
             color: MyColors.gray,
           ),
         ),
         const SizedBox(height: 8),
+        CustomTextField(
+          controller: controller,
+        ),
+        const SizedBox(height: 12),
       ],
     );
   }

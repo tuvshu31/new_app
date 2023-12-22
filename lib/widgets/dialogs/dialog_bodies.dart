@@ -1,28 +1,9 @@
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/image.dart';
-import 'package:curved_progress_bar/curved_progress_bar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/button.dart';
-
-Widget showLoadingDialogBody() {
-  return Center(
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(Get.width * .09),
-      child: const CurvedCircularProgressIndicator(
-        strokeWidth: 5,
-        animationDuration: Duration(seconds: 1),
-        backgroundColor: MyColors.background,
-        color: MyColors.primary,
-      ),
-    ),
-  );
-}
 
 Widget showLogoutDialogBody(dynamic onPressed) {
   return Column(
@@ -108,40 +89,6 @@ Widget showNetworkErrorDialogBody(dynamic onPressed) {
         onPressed: () {
           Get.back();
         },
-      ),
-    ],
-  );
-}
-
-Widget showSameStoreProductsDialogBody(dynamic onPressed) {
-  return Column(
-    children: [
-      const Text(
-        "Сагсанд өөр 2 харилцагчийн бүтээгдэхүүн оруулах боломжгүй",
-        textAlign: TextAlign.center,
-      ),
-      SizedBox(height: Get.height * .04),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CustomButton(
-            isFullWidth: false,
-            onPressed: Get.back,
-            bgColor: Colors.white,
-            text: "Хаах",
-            elevation: 0,
-            textColor: Colors.black,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: CustomButton(
-              elevation: 0,
-              bgColor: Colors.amber,
-              text: "Сагс хоослох",
-              onPressed: onPressed,
-            ),
-          ),
-        ],
       ),
     ],
   );

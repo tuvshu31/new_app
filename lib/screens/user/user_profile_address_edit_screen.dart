@@ -92,10 +92,10 @@ class _UserProfileAddressEditScreenState
     Get.back();
     Get.back();
     if (response["success"]) {
-      customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 3);
+      customSnackbar(ActionType.success, "Амжилттай хадгалагдлаа", 3);
     } else {
       customSnackbar(
-          DialogType.error, "Алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
+          ActionType.error, "Алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
     }
   }
 
@@ -149,13 +149,10 @@ class _UserProfileAddressEditScreenState
                   CustomInkWell(
                     borderRadius: BorderRadius.circular(50),
                     onTap: () {
-                      showModalBottomSheet(
+                      Get.bottomSheet(
+                        _addressPickerBody(),
                         backgroundColor: MyColors.white,
-                        context: Get.context!,
                         isScrollControlled: true,
-                        builder: (context) {
-                          return _addressPickerBody();
-                        },
                       );
                     },
                     child: Container(

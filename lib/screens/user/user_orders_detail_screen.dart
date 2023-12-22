@@ -1,11 +1,9 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -15,7 +13,11 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserOrdersDetailScreen extends StatefulWidget {
+  final int id;
+  final String orderId;
   const UserOrdersDetailScreen({
+    required this.id,
+    required this.orderId,
     super.key,
   });
 
@@ -24,150 +26,118 @@ class UserOrdersDetailScreen extends StatefulWidget {
 }
 
 class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
-  final _userCtx = Get.put(UserController());
   bool showUserAndDriverCode = true;
   int prepDuration = 60;
   int initialDuration = 0;
+  int step = 1;
+  bool loading = false;
+  Map order = {};
 
   @override
   void initState() {
     super.initState();
-    if (_userCtx.selectedOrder["orderStatus"] == "delivered" ||
-        _userCtx.selectedOrder["orderStatus"] == "canceled") {
-      showUserAndDriverCode = false;
-      setState(() {});
-    }
-    checkPrepDuration();
+    getUserOrderDetails();
   }
 
-  Future<void> checkPrepDuration() async {
-    dynamic res =
-        await RestApi().checkPrepDuration(_userCtx.selectedOrder["id"]);
-    dynamic response = Map<String, dynamic>.from(res);
-    if (response["success"]) {
-      initialDuration = response["initialDuration"];
-      prepDuration = response["prepDuration"];
-      log(_userCtx.prepDuration.value.toString());
-      log(response.toString());
-      setState(() {});
+  void getUserOrderDetails() async {
+    loading = true;
+    dynamic getUserOrderDetails =
+        await UserApi().getUserOrderDetails(widget.id);
+    loading = false;
+    if (getUserOrderDetails != null) {
+      dynamic response = Map<String, dynamic>.from(getUserOrderDetails);
+      if (response["success"]) {
+        order = response["data"];
+        step = order["orderStep"];
+      }
     }
+    setState(() {});
   }
+
+  List statusList = [
+    {
+      "text": "Баталгаажсан",
+      "wrappedText": "Баталгаажсан",
+      "icon": Icons.check,
+    },
+    {
+      "text": "Бэлдэж байна",
+      "wrappedText": "Бэлдэж \n байна",
+      "icon": Icons.check,
+    },
+    {
+      "text": "Хүргэж байна",
+      "wrappedText": "Хүргэж \n байна",
+      "icon": Icons.check,
+    },
+    {
+      "text": "Хүргэсэн",
+      "wrappedText": "Хүргэсэн",
+      "icon": Icons.check,
+    }
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => MediaQuery(
-        data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
-        child: SafeArea(
-          child: CustomHeader(
-            centerTitle: true,
-            customLeading: Container(),
-            customActions: CustomInkWell(
-              borderRadius: BorderRadius.circular(50),
-              onTap: Get.back,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: MyColors.fadedGrey,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8),
-                child: const Icon(
-                  Icons.close_rounded,
-                  color: Colors.black,
-                ),
+    return MediaQuery(
+      data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
+      child: SafeArea(
+        child: CustomHeader(
+          centerTitle: true,
+          customLeading: Container(),
+          customActions: CustomInkWell(
+            borderRadius: BorderRadius.circular(50),
+            onTap: Get.back,
+            child: Container(
+              decoration: BoxDecoration(
+                color: MyColors.fadedGrey,
+                shape: BoxShape.circle,
               ),
-            ),
-            title: "Захиалга",
-            subtitle: Text(
-              "#${_userCtx.selectedOrder["orderId"] ?? "00000"}",
-              style: const TextStyle(
-                color: MyColors.gray,
-                fontSize: 12,
-              ),
-            ),
-            body: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 12),
-                  _stepper(),
-                  const SizedBox(height: 12),
-                  _divider(),
-                  const SizedBox(height: 12),
-                  _statusInfo(),
-                  const SizedBox(height: 12),
-                  _divider(),
-                  const SizedBox(height: 12),
-                  _addressInfo(),
-                  const SizedBox(height: 12),
-                  _divider(),
-                  _productsInfoAndMap(),
-                ],
+              padding: const EdgeInsets.all(8),
+              child: const Icon(
+                Icons.close_rounded,
+                color: Colors.black,
               ),
             ),
           ),
+          title: "Захиалга",
+          subtitle: Text(
+            widget.orderId,
+            style: const TextStyle(
+              color: MyColors.gray,
+              fontSize: 12,
+            ),
+          ),
+          // body: listShimmerWidget(),
+          body: loading
+              ? listShimmerWidget()
+              : SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 12),
+                      _stepper(),
+                      const SizedBox(height: 12),
+                      _divider(),
+                      const SizedBox(height: 12),
+                      _statusInfo(),
+                      const SizedBox(height: 12),
+                      _divider(),
+                      const SizedBox(height: 12),
+                      _addressInfo(),
+                      const SizedBox(height: 12),
+                      _divider(),
+                      _productsInfoAndMap(),
+                    ],
+                  ),
+                ),
         ),
       ),
     );
   }
 
-  Widget _statusInfo() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(
-                statusInfo(_userCtx.selectedOrder["orderStatus"])["icon"],
-                color: MyColors.primary,
-              ),
-              const SizedBox(width: 12),
-              CustomText(
-                text: statusInfo(
-                    _userCtx.selectedOrder["orderStatus"])["longText"],
-                fontSize: 12,
-                color: MyColors.primary,
-              ),
-            ],
-          ),
-          statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 2 &&
-                  initialDuration != 0
-              ? CircularCountDownTimer(
-                  isReverse: true,
-                  width: 40,
-                  height: 40,
-                  duration: prepDuration,
-                  initialDuration: initialDuration,
-                  timeFormatterFunction: (defaultFormatterFunction, duration) {
-                    if (duration.inSeconds == 0) {
-                      return "0";
-                    } else {
-                      return Function.apply(
-                          defaultFormatterFunction, [duration]);
-                    }
-                  },
-                  fillColor: MyColors.primary,
-                  ringColor: MyColors.black,
-                  strokeCap: StrokeCap.round,
-                  textStyle: const TextStyle(
-                    fontSize: 8.0,
-                  ),
-                )
-              : CustomText(
-                  text: _userCtx.selectedOrder["updatedAt"] ?? "",
-                  color: MyColors.gray,
-                  fontSize: 10,
-                )
-        ],
-      ),
-    );
-  }
-
   Widget _stepper() {
-    int step = statusInfo(_userCtx.selectedOrder["orderStatus"])["step"];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -188,26 +158,11 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Хүлээн \n авсан",
-                style: TextStyle(fontSize: 10),
-              ),
-              Text(
-                "Бэлдэж \n байна",
-                style: TextStyle(fontSize: 10),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "Хүргэж \n байна",
-                style: TextStyle(fontSize: 10),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "Хүргэсэн",
-                style: TextStyle(fontSize: 10),
-                textAlign: TextAlign.center,
-              ),
+            children: [
+              _text(0),
+              _text(1),
+              _text(2),
+              _text(3),
             ],
           )
         ],
@@ -238,6 +193,13 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
     );
   }
 
+  Widget _text(int index) {
+    return Text(
+      statusList[index]["wrappedText"],
+      style: const TextStyle(fontSize: 10),
+    );
+  }
+
   Widget _divider() {
     return Container(
       height: 7,
@@ -245,27 +207,132 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
     );
   }
 
+  Widget _statusInfo() {
+    Map element = statusList[step - 1];
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                element["icon"],
+                color: MyColors.primary,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                element["text"],
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              )
+            ],
+          ),
+          step == 2
+              ? CircularCountDownTimer(
+                  width: Get.height * .07,
+                  height: Get.height * .07,
+                  duration: order["prepDuration"],
+                  initialDuration: order["initialDuration"],
+                  fillColor: MyColors.background,
+                  isReverse: true,
+                  ringColor: Colors.red,
+                )
+              : CustomText(
+                  text: order["updatedAt"],
+                  color: MyColors.gray,
+                  fontSize: 10,
+                )
+        ],
+      ),
+    );
+  }
+
+  Widget _addressInfo() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Хүргэлтийн хаяг"),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const CustomText(
+                text: "Хаяг:",
+                color: MyColors.gray,
+              ),
+              CustomText(
+                text: order["address"] ?? "N/a",
+                color: MyColors.gray,
+                fontSize: 12,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const CustomText(
+                text: "Утас:",
+                color: MyColors.gray,
+              ),
+              CustomText(
+                text: order["phone"] ?? "N/a",
+                color: MyColors.gray,
+                fontSize: 12,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          showUserAndDriverCode
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const CustomText(
+                      text: "Захиалгаа авах код:",
+                      color: MyColors.gray,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12)),
+                      child: CustomText(
+                        text: "${order["code"]}",
+                        color: MyColors.white,
+                      ),
+                    ),
+                  ],
+                )
+              : Container(),
+        ],
+      ),
+    );
+  }
+
   Widget _productsInfoAndMap() {
-    return statusInfo(_userCtx.selectedOrder["orderStatus"])["step"] == 3
+    return step == 3
         ? SizedBox(
             height: Get.height * .6,
-            child: GoogleMap(
+            child: const GoogleMap(
               scrollGesturesEnabled: false,
               zoomControlsEnabled: false,
               zoomGesturesEnabled: false,
               mapType: MapType.normal,
               buildingsEnabled: true,
               myLocationButtonEnabled: true,
-              onCameraMove: _userCtx.onCameraMove,
+              // onCameraMove: _userCtx.onCameraMove,
               rotateGesturesEnabled: true,
               trafficEnabled: false,
               compassEnabled: false,
-              markers: Set<Marker>.of(_userCtx.markers.values),
+              // markers: Set<Marker>.of(_userCtx.markers.values),
               initialCameraPosition: CameraPosition(
-                target: _userCtx.driverPosition.value,
+                target: LatLng(37.42796133580664, -122.085749655962),
                 zoom: 14.4746,
               ),
-              onMapCreated: _userCtx.onMapCreated,
+              // onMapCreated: _userCtx.onMapCreated,
             ),
           )
         : Padding(
@@ -278,10 +345,11 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: _userCtx.selectedOrder["products"].length,
+                  itemCount: order["products"].length ?? 0,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemBuilder: (context, index) {
-                    var product = _userCtx.selectedOrder["products"][index];
+                    // var product = _userCtx.selectedOrder["products"][index];
+                    var item = order["products"][index];
                     return Container(
                         height: Get.height * .09,
                         color: MyColors.white,
@@ -289,25 +357,24 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                           child: ListTile(
                             dense: true,
                             contentPadding: EdgeInsets.zero,
-                            minLeadingWidth: Get.width * .15,
-                            leading: Container(
-                              clipBehavior: Clip.hardEdge,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: CachedImage(
-                                  image:
-                                      "${URL.AWS}/products/${product["id"]}/small/1.png"),
+                            // minLeadingWidth: Get.width * .15,
+                            leading: SizedBox(
+                              width: Get.width * .15,
+                              child: customImage(
+                                Get.width * .15,
+                                item["image"],
+                              ),
                             ),
                             title: CustomText(
-                              text: product["name"],
+                              text: item["name"],
                               fontSize: 14,
                             ),
                             subtitle: CustomText(
                                 text: convertToCurrencyFormat(
-                              int.parse(product["price"]),
+                              item["price"],
                             )),
-                            trailing: CustomText(
-                                text: "${product["quantity"]} ширхэг"),
+                            trailing:
+                                CustomText(text: "${item["quantity"]} ширхэг"),
                           ),
                         ));
                   },
@@ -320,10 +387,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                       color: MyColors.gray,
                     ),
                     CustomText(
-                      text: convertToCurrencyFormat(
-                        double.parse(
-                            _userCtx.selectedOrder["storeTotalAmount"] ?? "0"),
-                      ),
+                      text: convertToCurrencyFormat(order["productsTotal"]),
                       color: MyColors.gray,
                     )
                   ],
@@ -337,10 +401,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                       color: MyColors.gray,
                     ),
                     CustomText(
-                      text: convertToCurrencyFormat(
-                        int.parse(
-                            _userCtx.selectedOrder["deliveryPrice"] ?? "0"),
-                      ),
+                      text: convertToCurrencyFormat(order["deliveryPrice"]),
                       color: MyColors.gray,
                     )
                   ],
@@ -364,9 +425,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                   children: [
                     const CustomText(text: "Нийт үнэ:"),
                     CustomText(
-                      text: convertToCurrencyFormat(
-                        int.parse(_userCtx.selectedOrder["totalAmount"] ?? "0"),
-                      ),
+                      text: convertToCurrencyFormat(order["totalAmount"]),
                       color: MyColors.black,
                     )
                   ],
@@ -375,71 +434,5 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
               ],
             ),
           );
-  }
-
-  Widget _addressInfo() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 12, right: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Хүргэлтийн хаяг"),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CustomText(
-                text: "Хаяг:",
-                color: MyColors.gray,
-              ),
-              CustomText(
-                text: _userCtx.selectedOrder["address"] ?? "",
-                color: MyColors.gray,
-                fontSize: 12,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CustomText(
-                text: "Утас:",
-                color: MyColors.gray,
-              ),
-              CustomText(
-                text: _userCtx.selectedOrder["phone"] ?? "",
-                color: MyColors.gray,
-                fontSize: 12,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          showUserAndDriverCode
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const CustomText(
-                      text: "Захиалгаа авах код:",
-                      color: MyColors.gray,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: CustomText(
-                        text: _userCtx.selectedOrder["userAndDriverCode"]
-                            .toString(),
-                        color: MyColors.white,
-                      ),
-                    ),
-                  ],
-                )
-              : Container(),
-        ],
-      ),
-    );
   }
 }

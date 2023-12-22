@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -31,4 +32,35 @@ class CustomShimmer extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget userHomeScreenMainViewShimmer() {
+  return Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 18,
+      vertical: 0,
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            width: Get.width * .2,
+            decoration: BoxDecoration(
+              color: MyColors.fadedGrey,
+              shape: BoxShape.circle,
+            ),
+            child: CustomShimmer(
+              width: Get.width * .2,
+              height: Get.width * .2,
+              borderRadius: 50,
+            )),
+        const SizedBox(height: 8),
+        CustomShimmer(
+          width: Get.width * .2,
+          height: 16,
+          borderRadius: 12,
+        )
+      ],
+    ),
+  );
 }

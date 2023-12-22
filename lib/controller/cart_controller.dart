@@ -26,15 +26,16 @@ class CartController extends GetxController {
       cartList.add({...product, "quantity": 1});
     }
     cartList.refresh();
+    customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
   }
 
-  void getUserProducts() async {
-    dynamic response =
-        await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
-    dynamic d = Map<String, dynamic>.from(response);
-    savedList.value = d["savedProductsIdList"];
-    closedStoreList.value = d["closedStoreList"];
-  }
+  // void getUserProducts() async {
+  //   dynamic response =
+  //       await RestApi().getUserProducts(RestApiHelper.getUserId(), {"page": 1});
+  //   dynamic d = Map<String, dynamic>.from(response);
+  //   savedList.value = d["savedProductsIdList"];
+  //   closedStoreList.value = d["closedStoreList"];
+  // }
 
   void saveProduct(product, context) async {
     CustomDialogs().showLoadingDialog();
@@ -49,7 +50,7 @@ class CartController extends GetxController {
       if (res["success"]) {
         savedList.remove(product["id"]);
       } else {
-        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
     } else {
       dynamic response = await RestApi().saveUserProduct(body);
@@ -57,9 +58,9 @@ class CartController extends GetxController {
       Get.back();
       if (res["success"]) {
         savedList.add(product["id"]);
-        customSnackbar(DialogType.success, "Амжилттай хадгалагдлаа", 2);
+        customSnackbar(ActionType.success, "Амжилттай хадгалагдлаа", 2);
       } else {
-        customSnackbar(DialogType.error, "Алдаа гарлаа", 2);
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
     }
   }
@@ -114,7 +115,7 @@ class CartController extends GetxController {
   //     .toList();
   get subTotal => cartList.isNotEmpty
       ? cartList
-          .map((e) => double.parse(e['price']) * e["quantity"])
+          .map((e) => e['price'] * e["quantity"])
           .toList()
           .reduce((value, element) => value + element)
       : 0;

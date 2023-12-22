@@ -1,246 +1,337 @@
 import 'dart:developer';
 
-import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/api/dio_requests/store.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
+import 'package:Erdenet24/screens/store/store_orders_detail_screen.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
+import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/loading.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
+import 'package:iconly/iconly.dart';
+import 'package:lottie/lottie.dart';
 
 class StoreOrdersScreen extends StatefulWidget {
-  const StoreOrdersScreen({super.key});
+  const StoreOrdersScreen({Key? key}) : super(key: key);
 
   @override
   State<StoreOrdersScreen> createState() => _StoreOrdersScreenState();
 }
 
 class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
+  bool updating = false;
   final _storeCtx = Get.put(StoreController());
-  PageController pageController = PageController();
+  ScrollController scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    _storeCtx.filterOrders(0);
+    _storeCtx.orders.clear();
+    _storeCtx.tab.value = 0;
+    _storeCtx.page.value = 1;
+    _storeCtx.getStoreOrders();
+    scrollHandler();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    pageController.dispose();
+  void scrollHandler() {
+    scrollController.addListener(
+      () {
+        if (scrollController.position.maxScrollExtent ==
+                scrollController.offset &&
+            _storeCtx.hasMore.value) {
+          _storeCtx.page.value++;
+          setState(() {});
+          _storeCtx.getStoreOrders();
+        }
+      },
+    );
+  }
+
+  void onTap(int val) {
+    _storeCtx.orders.clear();
+    _storeCtx.tab.value = val;
+    _storeCtx.page.value = 1;
+    _storeCtx.getStoreOrders();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomHeader(
-      withTabBar: true,
-      title: "Захиалгууд",
-      customActions: Container(),
-      body: Align(
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            DefaultTabController(
-              length: 3,
-              initialIndex: 0,
-              child: TabBar(
-                onTap: ((value) {
-                  _storeCtx.filterOrders(value);
-                  pageController.animateToPage(
-                    value,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.bounceInOut,
-                  );
-                }),
-                labelColor: MyColors.primary,
-                unselectedLabelColor: MyColors.black,
-                indicatorColor: MyColors.primary,
-                tabs: const [
-                  Tab(text: "Шинэ"),
-                  Tab(text: "Хүргэлтэнд"),
-                  Tab(text: "Хүргэсэн"),
-                ],
-              ),
+    return Obx(
+      () => DefaultTabController(
+        initialIndex: _storeCtx.tab.value,
+        length: 2,
+        child: CustomHeader(
+          title: "Захиалгууд",
+          customActions: Container(),
+          tabBar: TabBar(
+              onTap: (val) => onTap(val),
+              indicatorColor: MyColors.primary,
+              labelColor: MyColors.primary,
+              unselectedLabelColor: Colors.black,
+              tabs: const [
+                Tab(text: "Шинэ"),
+                Tab(text: "Хүргэсэн"),
+              ]),
+          body: _storeCtx.loading.value && _storeCtx.orders.isEmpty
+              ? listShimmerWidget()
+              : !_storeCtx.loading.value && _storeCtx.orders.isEmpty
+                  ? customEmptyWidget("Захиалга байхгүй байна")
+                  : ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          width: double.infinity,
+                          height: Get.height * .008,
+                          decoration: BoxDecoration(color: MyColors.fadedGrey),
+                        );
+                      },
+                      padding: const EdgeInsets.only(top: 12),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _storeCtx.hasMore.value
+                          ? _storeCtx.orders.length + 1
+                          : _storeCtx.orders.length,
+                      controller: scrollController,
+                      itemBuilder: (context, index) {
+                        if (index < _storeCtx.orders.length) {
+                          var item = _storeCtx.orders[index];
+                          String orderStatus =
+                              _storeCtx.orders[index]["orderStatus"];
+                          return CustomInkWell(
+                            borderRadius: BorderRadius.zero,
+                            onTap: () {
+                              Get.bottomSheet(
+                                StoreOrdersDetailScreen(
+                                  id: item["id"],
+                                  orderId: item["orderId"],
+                                ),
+                                backgroundColor: MyColors.white,
+                                isScrollControlled: true,
+                              );
+                            },
+                            child: Container(
+                              height: Get.height * .07,
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  SizedBox(width: Get.width * .04),
+                                  SizedBox(
+                                    width: Get.width * .4,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomText(
+                                          text: "ID: ${item["orderId"]}",
+                                          fontSize: 13,
+                                          color: MyColors.gray,
+                                        ),
+                                        Text(convertToCurrencyFormat(
+                                            item["totalAmount"])),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: orderStatus == "sent"
+                                        ? _newOrderActionWidget()
+                                        : orderStatus == "preparing"
+                                            ? _preparingActionWidget(item)
+                                            : orderStatus == "waitingForDriver"
+                                                ? _waitingForDriverActionWidget(
+                                                    item)
+                                                : orderStatus == "delivering"
+                                                    ? _deliveringActionWidget(
+                                                        item)
+                                                    : orderStatus == "delivered"
+                                                        ? _deliveredActionWidget(
+                                                            item)
+                                                        : Container(),
+                                  ),
+                                  SizedBox(width: Get.width * .04),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else if (_storeCtx.hasMore.value) {
+                          return listItemShimmer();
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+        ),
+      ),
+    );
+  }
+
+  Widget _newOrderActionWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: const Text(
+            "Шинэ",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _preparingActionWidget(item) {
+    int duration = item["prepDuration"];
+    int initialDuration = item["initialDuration"];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        CircularCountDownTimer(
+          width: Get.height * .07,
+          height: Get.height * .07,
+          duration: duration,
+          initialDuration: initialDuration,
+          fillColor: MyColors.background,
+          isReverse: true,
+          ringColor: Colors.red,
+        ),
+      ],
+    );
+  }
+
+  Widget _waitingForDriverActionWidget(Map item) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        CustomText(
+          text: item["date"],
+          fontSize: 13,
+          color: MyColors.gray,
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset(
+              'assets/json/radiant.json',
+              height: 24,
+              width: 24,
+            ),
+            const SizedBox(width: 8),
+            const CustomText(
+              text: "Жолооч хүлээж байна...",
+              fontSize: 12,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _deliveringActionWidget(Map item) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        CustomText(
+          text: item["date"],
+          fontSize: 13,
+          color: MyColors.gray,
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              "assets/images/png/car.png",
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const CustomText(
+              text: "Хүргэж байгаа",
+              fontSize: 12,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _deliveredActionWidget(Map item) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        CustomText(
+          text: item["date"],
+          fontSize: 13,
+          color: MyColors.gray,
+        ),
+        Text(
+          "Хүргэсэн",
+          style: TextStyle(color: Colors.green),
+        )
+      ],
+    );
+  }
+
+  Widget listItemShimmer() {
+    return SizedBox(
+      height: Get.width * .2 + 16,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(width: Get.width * .04),
+            Stack(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: Get.width * 0.15,
+                    maxHeight: Get.width * 0.15,
+                  ),
+                  child: CustomShimmer(
+                    width: Get.width * .15,
+                    height: Get.width * .15,
+                    borderRadius: 50,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(width: Get.width * .04),
             Expanded(
-              child: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: pageController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _storeOdersListView(),
-                  _storeOdersListView(),
-                  _storeOdersListView(),
+                  CustomShimmer(width: Get.width * .7, height: 16),
+                  CustomShimmer(width: Get.width * .7, height: 16),
+                  CustomShimmer(width: Get.width * .7, height: 16),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _storeOdersListView() {
-    return Obx(
-      () => _storeCtx.filteredOrderList.isEmpty
-          ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
-          : ListView.separated(
-              padding: const EdgeInsets.all(12),
-              separatorBuilder: (context, index) {
-                return const SizedBox(height: 7);
-              },
-              physics: const BouncingScrollPhysics(),
-              itemCount: _storeCtx.filteredOrderList.length,
-              itemBuilder: (context, index) {
-                var data = _storeCtx.filteredOrderList[index];
-                return data["orderStatus"] == "received"
-                    ? _newOrder(data)
-                    : data["orderStatus"] == "preparing"
-                        ? _preparing(data)
-                        : _noTrailing(data);
-              },
-            ),
-    );
-  }
-
-  Widget _newOrder(data) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: (() {
-        showOrdersSetTimeView(context, data);
-      }),
-      child: Stack(
-        children: [
-          Card(
-            elevation: 1,
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: ListTile(
-              title: CustomText(
-                text: "Захиалга: #${data["orderId"]}",
-                fontSize: 12,
-              ),
-              subtitle: CustomText(
-                text: data["orderTime"],
-                fontSize: 12,
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomText(
-                    text: convertToCurrencyFormat(
-                      double.parse(data["storeTotalAmount"]),
-                    ),
-                    fontSize: 16,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: MyColors.primary.withOpacity(0.9),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(8),
-                  bottomLeft: Radius.circular(6),
-                ),
-              ),
-              child: const Center(
-                child: Text(
-                  "Шинэ захиалга",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _preparing(data) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: (() {
-        storeOrdersToDelivery(context, data);
-      }),
-      child: Card(
-        elevation: 1,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ListTile(
-          title: CustomText(
-            text: "Захиалга: #${data["orderId"]}",
-            fontSize: 12,
-          ),
-          subtitle: CustomText(
-            text: data["orderTime"],
-            fontSize: 12,
-          ),
-          trailing: CircularCountDownTimer(
-            width: 40,
-            height: 40,
-            duration: int.parse(data["prepDuration"] ?? "0") * 60,
-            timeFormatterFunction: (defaultFormatterFunction, duration) {
-              if (duration.inSeconds == 0) {
-                return "0";
-              } else {
-                return Function.apply(defaultFormatterFunction, [duration]);
-              }
-            },
-            fillColor: MyColors.primary,
-            ringColor: MyColors.black,
-            strokeCap: StrokeCap.round,
-            textStyle: const TextStyle(
-              fontSize: 10.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _noTrailing(data) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: (() {
-        storeOrdersToDelivery(context, data);
-      }),
-      child: Card(
-        elevation: 1,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ListTile(
-          title: CustomText(
-            text: "Захиалга: #${data["orderId"]}",
-            fontSize: 12,
-          ),
-          subtitle: CustomText(
-            text: data["orderTime"],
-            fontSize: 12,
-          ),
-          trailing: CustomText(
-            text: convertToCurrencyFormat(
-              double.parse(data["storeTotalAmount"]),
-            ),
-            fontSize: 16,
-          ),
         ),
       ),
     );

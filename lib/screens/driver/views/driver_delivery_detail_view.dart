@@ -6,7 +6,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
@@ -69,7 +69,7 @@ class _DriverDeliveryDetailViewState extends State<DriverDeliveryDetailView> {
             ),
           ),
           body: !loading && deliveryList.isEmpty
-              ? const CustomLoadingIndicator(text: "Хүргэлт байхгүй байна")
+              ? customEmptyWidget("Хүргэлт байхгүй байна")
               : ListView.separated(
                   separatorBuilder: (context, index) {
                     return Container(height: 12);

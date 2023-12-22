@@ -1,235 +1,216 @@
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/text.dart';
-// import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'button.dart';
+import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/button.dart';
 
-class CustomDialogs {
-  Future<dynamic> showDialog(BuildContext context, Widget content) async {
-    showGeneralDialog(
-      context: context,
-      barrierLabel: "",
-      barrierDismissible: true,
-      pageBuilder: (ctx, a1, a2) {
-        return Container();
-      },
-      transitionBuilder: (ctx, a1, a2, child) {
-        var curve = Curves.bounceInOut.transform(a1.value);
-        return Transform.scale(
+Color _getDialogColors(ActionType actionType) {
+  switch (actionType) {
+    case ActionType.error:
+      return Colors.red;
+    case ActionType.warning:
+      return Colors.amber;
+    case ActionType.success:
+      return Colors.green;
+    default:
+      return Colors.red;
+  }
+}
+
+String _getDialogTitle(ActionType actionType) {
+  switch (actionType) {
+    case ActionType.error:
+      return "Уучлаарай";
+    case ActionType.warning:
+      return "Анхааруулга";
+    case ActionType.success:
+      return "Амжилттай";
+    default:
+      return "Уучлаарай";
+  }
+}
+
+void showCustomDialog(
+    ActionType actionType, String text, VoidCallback onPressed,
+    {onWillPop = true}) {
+  showGeneralDialog(
+    context: Get.context!,
+    barrierLabel: "",
+    barrierDismissible: false,
+    transitionDuration: const Duration(milliseconds: 400),
+    pageBuilder: (ctx, a1, a2) {
+      return Container();
+    },
+    transitionBuilder: (ctx, a1, a2, child) {
+      var curve = Curves.bounceInOut.transform(a1.value);
+      return WillPopScope(
+        onWillPop: () async => onWillPop,
+        child: Transform.scale(
           scale: curve,
-          child: content,
-          // _moreDialogBody(ctx),
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 400),
-    );
-  }
-
-  static Future<dynamic> showSuccessDialog(bool isSuccess, String middleText) {
-    // final player = AudioCache();
-    // player
-    //     .play(isSuccess ? "sounds/success_bell.wav" : "sounds/error_bell.wav");
-    return Get.dialog(successdDialogBody(isSuccess, middleText),
-        barrierDismissible: false);
-  }
-
-  // Future showLoadingDialog(dynamic context) {
-  //   return showDialog(context, _loadingdDialogBody());
-  // }
-
-  Future showTestingInfoDialog(dynamic context) {
-    return showDialog(context, _showTestingVersionWarningBody());
-  }
-
-  Future showLogoutDialog(dynamic context, dynamic onTap) {
-    return showDialog(context, _logoutWarningBody(onTap));
-  }
-
-  Future showCustomDialog(dynamic context, dynamic body) {
-    return showDialog(context, _customDialogBody(body));
-  }
-}
-
-Widget successdDialogBody(bool isSuccess, String middleText) {
-  return WillPopScope(
-      onWillPop: () async => false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Material(
-            color: Colors.transparent,
+          child: Center(
             child: Container(
-              margin: const EdgeInsets.all(40),
-              padding: const EdgeInsets.all(20),
+              width: Get.width,
+              margin: EdgeInsets.all(Get.width * .09),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: Get.width * .2,
-                    height: Get.width * .2,
-                    decoration: BoxDecoration(
-                        color: isSuccess ? MyColors.green : MyColors.primary,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: Icon(
-                      isSuccess
-                          ? FontAwesomeIcons.check
-                          : FontAwesomeIcons.times,
-                      color: MyColors.white,
-                      size: 34,
+              padding: EdgeInsets.only(
+                right: Get.width * .09,
+                left: Get.width * .09,
+                top: Get.height * .04,
+                bottom: Get.height * .03,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      IconlyBold.info_circle,
+                      size: Get.width * .15,
+                      color: _getDialogColors(actionType),
                     ),
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  CustomText(
-                    text: isSuccess ? "Амжилттай" : "Уучлаарай",
-                    fontSize: MyFontSizes.large,
-                    color: isSuccess ? MyColors.green : MyColors.primary,
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  CustomText(
-                    text: middleText,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: Get.height * .04),
-                  SizedBox(
-                    width: Get.width * .3,
-                    child: CustomButton(
-                      isActive: true,
-                      cornerRadius: 50,
-                      text: "Хаах",
-                      textFontWeight: FontWeight.normal,
-                      isFullWidth: true,
-                      onPressed: () => Get.back(),
-                      bgColor: isSuccess ? MyColors.green : MyColors.primary,
-                      elevation: 0,
+                    SizedBox(height: Get.height * .02),
+                    Text(
+                      _getDialogTitle(actionType),
+                      style: const TextStyle(
+                        color: MyColors.gray,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: Get.height * .02),
+                    Column(
+                      children: [
+                        Text(
+                          text,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: Get.height * .04),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                                child: CustomButton(
+                              onPressed: Get.back,
+                              bgColor: Colors.white,
+                              text: "Үгүй",
+                              elevation: 0,
+                              textColor: Colors.black,
+                            )),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomButton(
+                                elevation: 0,
+                                bgColor: _getDialogColors(actionType),
+                                text: "Тийм",
+                                onPressed: onPressed,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
-      ));
-}
-
-Widget _showTestingVersionWarningBody() {
-  return AlertDialog(
-    // backgroundColor: Theme.of(context).ba
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(height: Get.height * .02),
-        Image(
-          image: AssetImage("assets/images/png/app/warning.png"),
-          width: Get.width * .25,
         ),
-        SizedBox(height: Get.height * .05),
-        CustomText(
-          textAlign: TextAlign.center,
-          text: "Туршилтын хувилбар тул захиалга хийгдэхгүйг анхаарна уу",
-          fontSize: 14,
-        ),
-        SizedBox(height: Get.height * .05),
-        SizedBox(
-          width: Get.width * .3,
-          child: CustomButton(
-            bgColor: MyColors.warning,
-            text: "Хаах",
-            onPressed: () => Get.back(),
-            isFullWidth: false,
-          ),
-        )
-      ],
-    ),
+      );
+    },
   );
 }
 
-Widget _logoutWarningBody(dynamic onTap) {
-  return AlertDialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    title: Container(
-      color: MyColors.background,
-      height: Get.height * .1,
-    ),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: Get.height * .02),
-        Container(
-          width: double.infinity,
-          color: MyColors.primary,
-        ),
-        // Container(
-        //   padding: const EdgeInsets.all(12),
-        //   decoration:
-        //       BoxDecoration(color: MyColors.fadedGrey, shape: BoxShape.circle),
-        //   child: Image(
-        //     image: const AssetImage("assets/images/png/app/dial.png"),
-        //     width: Get.width * .15,
-        //   ),
-        // ),
-        SizedBox(height: Get.height * .02),
-        const CustomText(
-            textAlign: TextAlign.center, text: "Нэвтрэх эрхээ сонгоно уу"),
-        SizedBox(height: Get.height * .02),
-        RadioListTile(
-          dense: true,
-          activeColor: MyColors.primary,
-          value: true,
-          groupValue: true,
-          onChanged: ((value) {}),
-          title: const CustomText(
-            text: "Хэрэглэгч",
-            fontSize: 14,
-          ),
-        ),
-        RadioListTile(
-          dense: true,
-          activeColor: MyColors.primary,
-          value: false,
-          groupValue: true,
-          onChanged: ((value) {}),
-          title: const CustomText(
-            text: "Байгууллага",
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(height: Get.height * .03),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            CustomButton(
-              bgColor: MyColors.primary,
-              text: "Нэвтрэх",
-              onPressed: onTap,
-              isFullWidth: false,
+void showMyCustomDialog(bool onWillPop, ActionType actionType, String text,
+    VoidCallback onPressed, Widget body,
+    {String okText = "Тийм", String cancelText = "Үгүй"}) {
+  showGeneralDialog(
+    context: Get.context!,
+    barrierLabel: "",
+    barrierDismissible: false,
+    transitionDuration: const Duration(milliseconds: 400),
+    pageBuilder: (ctx, a1, a2) {
+      return Container();
+    },
+    transitionBuilder: (ctx, a1, a2, child) {
+      var curve = Curves.bounceInOut.transform(a1.value);
+      return WillPopScope(
+        onWillPop: () async => onWillPop,
+        child: Transform.scale(
+          scale: curve,
+          child: Center(
+            child: Container(
+              width: Get.width,
+              margin: EdgeInsets.all(Get.width * .09),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.only(
+                right: Get.width * .09,
+                left: Get.width * .09,
+                top: Get.height * .04,
+                bottom: Get.height * .03,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      IconlyBold.info_circle,
+                      size: Get.width * .15,
+                      color: _getDialogColors(actionType),
+                    ),
+                    SizedBox(height: Get.height * .02),
+                    Text(
+                      _getDialogTitle(actionType),
+                      style: const TextStyle(
+                        color: MyColors.gray,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: Get.height * .02),
+                    Column(
+                      children: [
+                        Text(
+                          text,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: Get.height * .04),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                                child: CustomButton(
+                              onPressed: Get.back,
+                              bgColor: Colors.white,
+                              text: cancelText,
+                              elevation: 0,
+                              textColor: Colors.black,
+                            )),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomButton(
+                                elevation: 0,
+                                bgColor: _getDialogColors(actionType),
+                                text: okText,
+                                onPressed: onPressed,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        )
-      ],
-    ),
+          ),
+        ),
+      );
+    },
   );
-}
-
-Widget _customDialogBody(dynamic body) {
-  return AlertDialog(
-      // backgroundColor: Theme.of(context).ba
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      content: body);
 }

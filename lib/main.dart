@@ -1,7 +1,11 @@
+// I love you my super dad heart (Ruby)
 import 'dart:async';
 import 'dart:io';
 import 'package:Erdenet24/api/local_notification.dart';
+import 'package:Erdenet24/api/socket_instance.dart';
+import 'package:Erdenet24/controller/data_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
@@ -9,40 +13,37 @@ import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
+import 'package:Erdenet24/screens/store/store_edit_product_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
+import 'package:Erdenet24/screens/store/store_orders_detail_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
-import 'package:Erdenet24/screens/store/store_products_create_product_screen.dart';
-import 'package:Erdenet24/screens/store/store_products_edit_main_screen.dart';
-import 'package:Erdenet24/screens/store/store_products_edit_product_screen.dart';
-import 'package:Erdenet24/screens/store/store_products_preview_screen.dart';
+import 'package:Erdenet24/screens/store/store_products_add_screen.dart';
+import 'package:Erdenet24/screens/store/store_products_edit_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
-import 'package:Erdenet24/screens/user/user_order_payment_screen.dart';
+import 'package:Erdenet24/screens/user/user_payment_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
+import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
+import 'package:Erdenet24/screens/user/user_products_screen.dart';
 import 'package:Erdenet24/screens/user/user_products_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
-import 'package:Erdenet24/screens/user/user_profile_screen.dart';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dropdown_alert/dropdown_alert.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/controller/product_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_main_screen_OLD.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
-import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_bar_screen.dart';
-import 'package:Erdenet24/screens/user/user_cart_address_info_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_address_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -52,11 +53,11 @@ import 'firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  handleNotifications(message.data);
+  // handleNotifications(message.data);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  handleNotifications(message.data);
+  // handleNotifications(message.data);
 }
 
 final GlobalKey<NavigatorState> navigatorKey =
@@ -64,6 +65,7 @@ final GlobalKey<NavigatorState> navigatorKey =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LocalNotification.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -87,28 +89,13 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
-  AwesomeNotifications().initialize(
-    // set the icon to null if you want to use the default app icon
-    'resource://drawable/res_notification_app_icon',
-    [
-      NotificationChannel(
-        channelGroupKey: 'basic_channel_group',
-        channelKey: 'basic_channel',
-        channelName: 'Basic notifications',
-        channelDescription: 'Notification channel for basic tests',
-        importance: NotificationImportance.High,
-      )
-    ],
-    // Channel groups are only visual and are not required
-    channelGroups: [
-      NotificationChannelGroup(
-          channelGroupKey: 'basic_channel_group',
-          channelGroupName: 'Basic group')
-    ],
-    debug: true,
-  );
   if (Platform.isAndroid) {
     GeolocatorAndroid.registerWith();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+      ),
+    );
   } else if (Platform.isIOS) {
     GeolocatorApple.registerWith();
   }
@@ -129,21 +116,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  //Huudas shiljiheer ondelete hiigdeed bga blhoor eniig duudaj bga. Ustgaj bolohgui
-  final cartCtrl = Get.put(CartController(), permanent: true);
-  final loginCtrl = Get.put(LoginController(), permanent: true);
-  final productCtrl = Get.put(ProductController(), permanent: true);
-
-  // Only after at least the action method is set, the notification events are delivered
-
+  final _dataCtx = Get.put(DataController());
   @override
   void initState() {
     super.initState();
-    AwesomeNotifications().setListeners(
-      onNotificationCreatedMethod:
-          LocalNofitication.onNotificationCreatedMethod,
-      onActionReceivedMethod: LocalNofitication.onActionReceivedMethod,
-    );
+    listenToNotification();
+    _dataCtx.getMainCategories();
+  }
+
+  listenToNotification() {
+    print("Listening to notification");
+    LocalNotification.onClickNotification.stream.listen((event) {
+      // Navigator.push(context,
+      //     MaterialPageRoute(builder: (context) => n));
+    });
   }
 
   @override
@@ -154,12 +140,8 @@ class _MyAppState extends State<MyApp> {
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,
       theme: ThemeData(
-        fontFamily: 'Nunito',
+        fontFamily: 'Rubik',
         visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-
-      builder: (context, child) => Stack(
-        children: [child!, const DropdownAlert()],
       ),
       routes: <String, WidgetBuilder>{
         splashMainScreenRoute: (context) => const SplashMainScreen(),
@@ -174,10 +156,8 @@ class _MyAppState extends State<MyApp> {
         userCartScreenRoute: (context) => const UserCartScreen(),
         userNavigationDrawerScreenRoute: (context) =>
             const UserNavigationDrawerScreen(),
-        userCartAddressInfoScreenRoute: (context) =>
-            const UserCartAddressInfoScreen(),
-        userOrderPaymentScreenRoute: (context) =>
-            const UserOrderPaymentScreen(),
+        userCartAddressScreenRoute: (context) => const UserCartAddressScreen(),
+        userPaymentScreenRoute: (context) => const UserPaymentScreen(),
         userProductDetailScreenRoute: (context) =>
             const UserProductDetailScreen(),
         userProfileAddressEditScreenRoute: (context) =>
@@ -191,17 +171,16 @@ class _MyAppState extends State<MyApp> {
         userSearchBarScreenRoute: (context) => const UserSearchBarScreenRoute(),
         userProductsSearchScreenRoute: (context) =>
             const UserProductsSearchScreen(),
+        userProductsScreenRoute: (context) => UserProductsScreen(),
         storeMainScreenRoute: (context) => const StoreMainScreen(),
         storeOrdersScreenRoute: (context) => const StoreOrdersScreen(),
-        storeProductsCreateProductScreenRoute: (context) =>
-            const StoreProductsCreateProductScreen(),
-        storeProductsEditMainScreenRoute: (context) =>
-            const StoreProductsEditMainScreen(),
-        storeProductsEditProductRoute: (context) =>
-            const StoreProductsEditProductScreen(),
-        storeProductsPreviewScreenRoute: (context) =>
-            const StoreProductsPreviewScreen(),
+        storeProductsAddScreenRoute: (context) =>
+            const StoreProductsAddScreen(),
+        storeProductsEditScreenRoute: (context) =>
+            const StoreProductsEditScreen(),
         storeSettingsScreenRoute: (context) => const StoreSettingsScreen(),
+        storeEditProductScreenRoute: (context) =>
+            const StoreEditProductScreen(),
         driverMainScreenRoute: (context) => const DriverMainScreen(),
         driverDeliverListScreenRoute: (context) =>
             const DriverDeliverListScreen(),

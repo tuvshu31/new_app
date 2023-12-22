@@ -9,7 +9,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ class _DriverDeliverListScreenState extends State<DriverDeliverListScreen> {
       title: "Хүргэлтүүд",
       customActions: Container(),
       body: !loading && deliveryList.isEmpty
-          ? const CustomLoadingIndicator(text: "Хүргэлт байхгүй байна")
+          ? customEmptyWidget("Хүргэлт байхгүй байна")
           : ListView.separated(
               separatorBuilder: (context, index) {
                 return Container(height: 12);
@@ -67,15 +67,12 @@ class _DriverDeliverListScreenState extends State<DriverDeliverListScreen> {
                   var item = deliveryList[index];
                   return CustomInkWell(
                     onTap: () {
-                      showModalBottomSheet(
-                        backgroundColor: MyColors.white,
-                        context: Get.context!,
+                      Get.bottomSheet(
+                        DriverDeliveryDetailView(
+                          date: item["date"],
+                        ),
                         isScrollControlled: true,
-                        builder: (context) {
-                          return DriverDeliveryDetailView(
-                            date: item["date"],
-                          );
-                        },
+                        backgroundColor: MyColors.white,
                       );
                     },
                     child: Stack(

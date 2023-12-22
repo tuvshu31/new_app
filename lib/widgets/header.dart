@@ -32,6 +32,7 @@ class CustomHeader extends StatefulWidget {
   final int leadingWidth;
   final int appBarElevation;
   final dynamic floatingActionButton;
+  final FloatingActionButtonLocation floatingActionButtonLocation;
 
   const CustomHeader({
     this.withCartAmount = false,
@@ -58,6 +59,7 @@ class CustomHeader extends StatefulWidget {
     this.bottomSheet,
     this.customActions,
     this.title = '',
+    this.floatingActionButtonLocation = FloatingActionButtonLocation.endFloat,
     Key? key,
   }) : super(key: key);
 
@@ -92,6 +94,8 @@ class _CustomHeaderState extends State<CustomHeader>
               bottom: widget.tabBar,
             ),
             bottomSheet: widget.bottomSheet,
+            floatingActionButton: widget.floatingActionButton ?? Container(),
+            floatingActionButtonLocation: widget.floatingActionButtonLocation,
             body: widget.body,
           ),
         ),

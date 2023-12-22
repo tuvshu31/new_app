@@ -1,8 +1,25 @@
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+final player = AudioPlayer();
+void playSound(type, {bool loop = false}) async {
+  player.play(AssetSource("sounds/$type.wav"), volume: 100);
+  if (loop) {
+    player.onPlayerComplete.listen((event) {
+      player.play(
+        AssetSource("sounds/$type.wav"),
+      );
+    });
+  }
+}
+
+void stopSound() async {
+  player.stop();
+}
 
 int random4digit() {
   var rnd = Random();

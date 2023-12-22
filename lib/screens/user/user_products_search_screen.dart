@@ -4,7 +4,7 @@ import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/image.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -182,7 +182,7 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
               ),
             ),
             body: searchController.text.isEmpty
-                ? const CustomLoadingIndicator(text: "Хайх үгээ оруулна уу")
+                ? customEmptyWidget("Хайх үгээ оруулна уу")
                 : Stack(
                     children: [
                       NotificationListener<ScrollNotification>(
@@ -201,8 +201,7 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                         child: !loading && products.isEmpty
                             ? Container(
                                 color: MyColors.white,
-                                child: const CustomLoadingIndicator(
-                                    text: "Бараа байхгүй байна"),
+                                child: customEmptyWidget("Бараа байхгүй байна"),
                               )
                             : GridView.builder(
                                 padding: const EdgeInsets.symmetric(

@@ -1,249 +1,224 @@
-import 'package:get/get.dart';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/widgets/image.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:flutter/material.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/widgets/header.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/loading.dart';
+import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/user/user_products_screen.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
+import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 
 class UserOrdersScreen extends StatefulWidget {
-  const UserOrdersScreen({super.key});
+  const UserOrdersScreen({Key? key}) : super(key: key);
 
   @override
   State<UserOrdersScreen> createState() => _UserOrdersScreenState();
 }
 
 class _UserOrdersScreenState extends State<UserOrdersScreen> {
-  int selectedTab = 0;
   final _userCtx = Get.put(UserController());
-  PageController pageController = PageController();
-  // bool loading = false;
-  // List orderList = [];
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _userCtx.getOrders(selectedTab);
+    _userCtx.tab.value = 0;
+    _userCtx.page.value = 1;
+    _userCtx.orders.clear();
+    _userCtx.getUserOrders();
+    scrollHandler();
   }
 
-  void changeTab(int index) {
-    _userCtx.filteredOrderList.clear();
-    selectedTab = index;
-    _userCtx.getOrders(selectedTab);
-    setState(() {});
+  void scrollHandler() {
+    scrollController.addListener(
+      () {
+        if (scrollController.position.maxScrollExtent ==
+                scrollController.offset &&
+            _userCtx.hasMore.value) {
+          _userCtx.page.value++;
+          setState(() {});
+          _userCtx.getUserOrders();
+        }
+      },
+    );
   }
 
-  String orderStatus(int tab) {
-    if (tab == 0) {
-      return "preparing,sent";
-    } else if (tab == 1) {
-      return "delivered";
-    } else {
-      return "canceled";
-    }
+  void onTap(int val) {
+    _userCtx.tab.value = val;
+    _userCtx.page.value = 1;
+    _userCtx.orders.clear();
+    _userCtx.getUserOrders();
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => DefaultTabController(
-        initialIndex: 0,
+        initialIndex: _userCtx.tab.value,
         length: 3,
         child: CustomHeader(
-          isMainPage: true,
-          customActions: Container(),
-          title: "Захиалга",
-          subtitle: subtitle(_userCtx.fetchingOrderList.value,
-              _userCtx.filteredOrderList.length, "захиалга"),
-          tabBar: TabBar(
-              onTap: changeTab,
-              indicatorColor: MyColors.primary,
-              labelColor: MyColors.primary,
-              unselectedLabelColor: Colors.black,
-              tabs: const [
-                Tab(text: "Шинэ"),
-                Tab(text: "Хүргэсэн"),
-                Tab(text: "Цуцалсан")
-              ]),
-          body: !_userCtx.fetchingOrderList.value &&
-                  _userCtx.filteredOrderList.isEmpty
-              ? const CustomLoadingIndicator(text: "Захиалга байхгүй байна")
-              : ListView.separated(
-                  separatorBuilder: (context, index) {
-                    return Container(height: 12);
-                  },
-                  padding: const EdgeInsets.only(top: 12, right: 12, left: 12),
-                  physics: const BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: _userCtx.fetchingOrderList.value
-                      ? 8
-                      : _userCtx.filteredOrderList.length,
-                  itemBuilder: (context, index) {
-                    if (_userCtx.fetchingOrderList.value) {
-                      return _listItemShimmer();
-                    } else {
-                      var item = _userCtx.filteredOrderList[index];
-                      return CustomInkWell(
-                        onTap: () {
-                          _userCtx.selectedOrder.value = item;
-                          _userCtx.showOrderDetails();
+            isMainPage: true,
+            title: "Захиалгууд",
+            customActions: Container(),
+            tabBar: TabBar(
+                onTap: (val) => onTap(val),
+                indicatorColor: MyColors.primary,
+                labelColor: MyColors.primary,
+                unselectedLabelColor: Colors.black,
+                tabs: const [
+                  Tab(text: "Шинэ"),
+                  Tab(text: "Хүргэсэн"),
+                  Tab(text: "Цуцалсан")
+                ]),
+            body: _userCtx.loading.value && _userCtx.orders.isEmpty
+                ? listShimmerWidget()
+                : !_userCtx.loading.value && _userCtx.orders.isEmpty
+                    ? customEmptyWidget("Захиалга байхгүй байна")
+                    : ListView.separated(
+                        separatorBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            width: double.infinity,
+                            height: Get.height * .008,
+                            decoration:
+                                BoxDecoration(color: MyColors.fadedGrey),
+                          );
                         },
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  width: 1,
-                                  color: MyColors.background,
-                                ),
+                        padding: const EdgeInsets.only(top: 12),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _userCtx.hasMore.value
+                            ? _userCtx.orders.length + 1
+                            : _userCtx.orders.length,
+                        controller: scrollController,
+                        itemBuilder: (context, index) {
+                          if (index < _userCtx.orders.length) {
+                            var item = _userCtx.orders[index];
+                            return listItemWidget(item, () {}, () {});
+                          } else if (_userCtx.hasMore.value) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: itemShimmer(),
                               ),
-                              padding: const EdgeInsets.all(12),
-                              height: Get.height * .1,
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: Get.width * .5,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CustomImage(
-                                          width: Get.width * .1,
-                                          height: Get.width * .1,
-                                          url:
-                                              "${URL.AWS}/users/${item["storeId1"]}/small/1.png",
-                                          radius: 50,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            item["storeName"] ?? "",
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          item["orderTime"],
-                                          style: const TextStyle(
-                                            color: MyColors.gray,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                        Text(
-                                          convertToCurrencyFormat(
-                                            int.parse(item["totalAmount"]),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    size: 18,
-                                    color: MyColors.black,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            selectedTab == 0
-                                ? Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(8),
-                                          bottomRight: Radius.circular(8)),
-                                    ),
-                                    child: Text(
-                                      statusInfo(item["orderStatus"])["text"],
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  )
-                                : Container()
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                ),
-        ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      )),
       ),
     );
   }
 
-  Widget _listItemShimmer() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          width: 1,
-          color: MyColors.background,
+  //  var item = _userCtx.filteredOrderList[index];
+  Widget listItemWidget(
+      Map item, VoidCallback onClicked1, VoidCallback onClicked2) {
+    return CustomInkWell(
+      onTap: () {
+        Get.bottomSheet(
+          UserOrdersDetailScreen(
+            id: item["id"],
+            orderId: item["orderId"],
+          ),
+          backgroundColor: MyColors.white,
+          isScrollControlled: true,
+        );
+      },
+      child: Container(
+        height: Get.height * .08,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(width: Get.width * .04),
+            Stack(
+              children: [
+                customImage(Get.width * .15, item["image"], isCircle: true)
+              ],
+            ),
+            SizedBox(width: Get.width * .04),
+            SizedBox(
+              width: Get.width * .4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomText(
+                    text: item["orderId"],
+                    fontSize: 13,
+                    color: MyColors.gray,
+                  ),
+                  CustomText(
+                    text: item["storeName"],
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(convertToCurrencyFormat(item["totalAmount"])),
+                ],
+              ),
+            ),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                CustomText(
+                  text: item["date"],
+                  fontSize: 13,
+                  color: MyColors.gray,
+                ),
+                const Spacer(),
+                CustomText(
+                  textAlign: TextAlign.end,
+                  text: item["orderStatusMNG"],
+                  fontSize: 12,
+                  color: _userCtx.tab.value == 0
+                      ? Colors.amber
+                      : _userCtx.tab.value == 1
+                          ? Colors.green
+                          : Colors.red,
+                ),
+              ],
+            )),
+            SizedBox(width: Get.width * .04),
+          ],
         ),
-      ),
-      padding: const EdgeInsets.all(12),
-      height: Get.height * .1,
-      width: Get.width * .5,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: Get.width * .5,
-            child: Row(
-              children: [
-                CustomShimmer(
-                  width: Get.width * .1,
-                  height: Get.width * .1,
-                  borderRadius: 50,
-                ),
-                const SizedBox(width: 12),
-                CustomShimmer(
-                  width: Get.width * .3,
-                  height: 14,
-                )
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CustomShimmer(
-                  width: Get.width * .3,
-                  height: 14,
-                ),
-                CustomShimmer(
-                  width: Get.width * .3,
-                  height: 14,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
+}
+
+Widget customTextButton(VoidCallback onPressed, IconData icon, String text,
+    {bool isActive = true}) {
+  return ElevatedButton(
+    style: ButtonStyle(
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      elevation: const MaterialStatePropertyAll<double>(0),
+      backgroundColor: const MaterialStatePropertyAll<Color>(Colors.white),
+      overlayColor: MaterialStatePropertyAll<Color>(
+        Colors.black.withOpacity(0.1),
+      ),
+      padding: const MaterialStatePropertyAll(EdgeInsets.all(0)),
+    ),
+    onPressed: isActive ? onPressed : null,
+    child: Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: isActive ? MyColors.black : MyColors.background,
+        ),
+        const SizedBox(width: 8),
+        CustomText(
+          text: text,
+          fontSize: 12,
+          color: isActive ? MyColors.black : MyColors.background,
+        ),
+      ],
+    ),
+  );
 }

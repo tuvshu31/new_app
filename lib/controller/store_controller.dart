@@ -1,134 +1,84 @@
-import 'dart:async';
 import 'dart:developer';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/main.dart';
-import 'package:Erdenet24/screens/store/store_orders_bottom_sheets.dart';
-import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:Erdenet24/api/dio_requests/store.dart';
+import 'package:Erdenet24/api/local_notification.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
 
 class StoreController extends GetxController {
-  RxList storeOrderList = [].obs;
-  RxMap storeInfo = {}.obs;
-  RxList filteredOrderList = [].obs;
-  RxBool fetching = false.obs;
-  RxString orderStatus = "".obs;
-  RxInt prepDuration = 0.obs;
-  Timer? countdownTimer;
-  RxList prepDurationList = [].obs;
+  RxInt page = 1.obs;
+  RxBool loading = false.obs;
+  RxList orders = [].obs;
+  RxBool hasMore = true.obs;
+  RxMap pagination = {}.obs;
+  RxInt tab = 0.obs;
+  RxInt selectedTime = 0.obs;
 
-  final player = AudioPlayer();
-
-  void playSound(type, {bool loop = false}) async {
-    player.play(AssetSource("sounds/$type.wav"), volume: 100);
-    if (loop) {
-      player.onPlayerComplete.listen((event) {
-        player.play(
-          AssetSource("sounds/$type.wav"),
-        );
-      });
-    }
-  }
-
-  void stopSound() async {
-    player.stop();
-  }
-
-  void startTimer(Duration i) {
-    prepDurationList.add(i);
-    countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      const reduceSecondsBy = 1;
-      final seconds = prepDurationList.last.inSeconds - reduceSecondsBy;
-      if (seconds < 0) {
-        countdownTimer!.cancel();
+  void getStoreOrders() async {
+    loading.value = true;
+    var query = {"page": page, "status": tab};
+    dynamic getUserOrders = await StoreApi().getStoreOrders(query);
+    loading.value = false;
+    if (getUserOrders != null) {
+      dynamic response = Map<String, dynamic>.from(getUserOrders);
+      if (response["success"]) {
+        orders = orders + response["data"];
+        log(orders.toString());
+      }
+      pagination.value = response["pagination"];
+      if (pagination["pageCount"] > page.value) {
+        hasMore.value = true;
       } else {
-        prepDurationList.last = Duration(seconds: seconds);
+        hasMore.value = false;
       }
-    });
-  }
-
-  void fetchStoreInfo() async {
-    fetching.value = true;
-    dynamic res1 = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic data1 = Map<String, dynamic>.from(res1);
-    if (data1["success"]) {
-      storeInfo.value = data1["data"];
-    }
-
-    dynamic res2 =
-        await RestApi().getStoreOrders(RestApiHelper.getUserId(), {});
-    dynamic data2 = Map<String, dynamic>.from(res2);
-    if (data2["success"]) {
-      storeOrderList.value = reversedArray(data2["data"]);
-    }
-    fetching.value = false;
-  }
-
-  void updateStoreInfo(body, context, successMsg, errorMsg) async {
-    dynamic user = await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    dynamic data = Map<String, dynamic>.from(user);
-    if (data["success"]) {
-      customSnackbar(DialogType.success, successMsg, 2);
-    } else {
-      customSnackbar(DialogType.error, errorMsg, 2);
     }
   }
 
-  void filterOrders(int value) {
-    filteredOrderList.clear();
-    if (value == 0) {
-      filteredOrderList.value = storeOrderList
-          .where((p0) =>
-              p0["orderStatus"] == "received" ||
-              p0["orderStatus"] == "preparing" ||
-              p0["orderStatus"] == "driverAccepted")
-          .toList();
-    }
-    if (value == 1) {
-      filteredOrderList.value = storeOrderList
-          .where((p0) => p0["orderStatus"] == "delivering")
-          .toList();
-    }
-    if (value == 2) {
-      filteredOrderList.value = storeOrderList
-          .where((p0) => p0["orderStatus"] == "delivered")
-          .toList();
-    }
+  void handleSentAction(Map payload) {
+    LocalNotification.showIncomingSoundNotification(
+      id: payload["id"],
+      title: "Erdenet24",
+      body: "Шинэ захиалга ирлээ",
+    );
+    Get.offNamed(storeMainScreenRoute);
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) {
+        return showIncomingOrderDialogBody(() {
+          stopSound();
+          Get.back();
+          Get.toNamed(storeOrdersScreenRoute);
+        });
+      },
+    );
   }
 
-  void updateOrder(int id, dynamic body) async {
-    await RestApi().updateOrder(id, body);
+  void handleDeliveringAction(Map payload) {
+    LocalNotification.showSimpleNotification(
+      id: payload["id"],
+      title: "Erdenet24",
+      body: "${payload["orderId"]} дугаартай захиалга хүргэлтэнд гарлаа",
+    );
+    int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+    orders[index]["orderStatus"] = "delivering";
   }
 
-  void storeActionHandler(payload) {
-    var action = payload["action"];
+  void handlePreparingAction(Map payload) {}
+
+  void handleSocketActions(Map payload) async {
     log(payload.toString());
-    log(action.toString());
+    String action = payload["action"];
     if (action == "sent") {
-      saveIcomingOrder(navigatorKey.currentContext, payload);
-      showIncomingOrderDialog(navigatorKey.currentContext);
-    } else if (action == "received") {
-    } else if (action == "driverAccepted") {
-      Get.back();
-    } else if (action == "preparing") {
-    } else if (action == "delivering") {
-      for (dynamic i in storeOrderList) {
-        if (i["id"] == payload["id"]) {
-          i["orderStatus"] = "delivering";
-        }
-      }
-      filterOrders(0);
-    } else if (action == "delivered") {
-      for (dynamic i in storeOrderList) {
-        if (i["id"] == payload["id"]) {
-          i["orderStatus"] = "delivered";
-        }
-      }
-      filterOrders(0);
-    } else if (action == "canceled") {
-    } else {}
+      handleSentAction(payload);
+    }
+    if (action == "preparing") {
+      handlePreparingAction(payload);
+    }
+    if (action == "delivering") {
+      handleDeliveringAction(payload);
+    }
   }
 }

@@ -10,7 +10,6 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class DriverSettingsScreen extends StatefulWidget {
@@ -67,7 +66,7 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
                   border: Border.all(width: 1, color: MyColors.background),
                 ),
                 child: const Icon(
-                  FontAwesomeIcons.user,
+                  Icons.account_balance,
                   size: 40,
                   color: MyColors.grey,
                 ),

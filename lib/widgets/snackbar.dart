@@ -3,35 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:another_flushbar/flushbar.dart';
 
-_getDialogColors(DialogType dialogType) {
-  switch (dialogType) {
-    case DialogType.error:
+_getDialogColors(ActionType actionType) {
+  switch (actionType) {
+    case ActionType.error:
       return Colors.red;
-    case DialogType.warning:
+    case ActionType.warning:
       return Colors.amber;
-    case DialogType.success:
+    case ActionType.success:
       return Colors.green;
   }
 }
 
-_getDialogTitle(DialogType dialogType) {
-  switch (dialogType) {
-    case DialogType.error:
-      return "Уучлаарай";
-    case DialogType.warning:
-      return "Анхааруулга";
-    case DialogType.success:
-      return "Амжилттай";
-  }
-}
-
-void customSnackbar(DialogType dialogType, String text, int duration) {
+void customSnackbar(ActionType ActionType, String text, int duration) {
   Flushbar(
-      // title: _getDialogTitle(dialogType),
+      // title: _getDialogTitle(ActionType),
       message: text,
       duration: Duration(seconds: duration),
       flushbarPosition: FlushbarPosition.BOTTOM,
-      backgroundColor: _getDialogColors(dialogType),
+      backgroundColor: _getDialogColors(ActionType),
       forwardAnimationCurve: Curves.bounceIn,
       shouldIconPulse: false,
       icon: const Icon(

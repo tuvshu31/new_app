@@ -1,24 +1,18 @@
 import 'dart:async';
-import 'dart:developer';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
-import 'package:Erdenet24/screens/store/store_main_screen.dart';
-import 'package:Erdenet24/screens/user/user_home_screen.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class SplashOtpScreen extends StatefulWidget {
   const SplashOtpScreen({super.key});
@@ -28,13 +22,12 @@ class SplashOtpScreen extends StatefulWidget {
 }
 
 class _SplashOtpScreenState extends State<SplashOtpScreen> {
-  var pinCode = "";
-  dynamic user = [];
   String loginType = "";
   Timer? countdownTimer;
   Duration myDuration = const Duration(minutes: 1);
-  final _loginCtx = Get.put(LoginController());
-  final _driverCtx = Get.put(DriverController());
+  final arguments = Get.arguments;
+  TextEditingController controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -43,9 +36,8 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
 
   void startTimer() {
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      const reduceSecondsBy = 1;
       setState(() {
-        final seconds = myDuration.inSeconds - reduceSecondsBy;
+        final seconds = myDuration.inSeconds - 1;
         if (seconds < 0) {
           countdownTimer!.cancel();
         } else {
@@ -55,79 +47,50 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
     });
   }
 
-  void resetTimer() async {
-    _loginCtx.verifyCode.value = random6digit();
-
-    dynamic authCode = await RestApi().sendAuthCode(
-        _loginCtx.phoneController.text, _loginCtx.verifyCode.value.toString());
+  void sendOTP() async {
+    CustomDialogs().showLoadingDialog();
+    dynamic generateCode = await UserApi().sendAuthCode(arguments["phone"]);
+    dynamic response = Map<String, dynamic>.from(generateCode);
     Get.back();
-    if (authCode[0]["Result"] == "SUCCESS") {
-      setState(() {
-        countdownTimer!.cancel();
-        myDuration = const Duration(minutes: 1);
-        startTimer();
-      });
+    myDuration = const Duration(minutes: 1);
+    setState(() {});
+    startTimer();
+    if (response["success"]) {
+      int code = response["code"];
+      arguments['code'] = code.toString();
     } else {
-      customSnackbar(DialogType.error,
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
+      countdownTimer!.cancel();
+      customSnackbar(
+          ActionType.error, "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу", 3);
     }
   }
 
-  void putUserIntoBox(int id, String type) async {
-    RestApiHelper.saveUserId(id);
-    log("user: $id");
-    RestApiHelper.saveUserRole(type);
-    log("role: $type");
-    _loginCtx.saveUserToken();
-  }
-
-  void submit() async {
+  Future<void> onCompleted(String value) async {
     CustomDialogs().showLoadingDialog();
-    dynamic response =
-        await RestApi().checkUser(_loginCtx.phoneController.text);
-    if (response != null) {
-      dynamic data = Map<String, dynamic>.from(response);
-
-      if (data["success"] && _loginCtx.verifyCode.value == int.parse(pinCode)) {
-        Get.back();
-        if (data.length > 1) {
-          switch (data["role"]) {
-            case "admin":
-              putUserIntoBox(data["adminId"], "admin");
-              break;
-            case "manager":
-              putUserIntoBox(data["managerId"], "manager");
-              break;
-            case "store":
-              loginTypeBottomSheet(data["userId"], data["storeId"]);
-              break;
-            case "user":
-              putUserIntoBox(data["userId"], "user");
-              _loginCtx.navigateToScreen(userHomeScreenRoute);
-              break;
-            case "driver":
-              putUserIntoBox(data["driverId"], "driver");
-              _loginCtx.navigateToScreen(driverMainScreenRoute);
-              break;
-          }
-        } else {
-          var body = {
-            "phone": _loginCtx.phoneController.text,
-            "role": "user",
-          };
-          dynamic response = await RestApi().registerUser(body);
-          dynamic data = Map<String, dynamic>.from(response);
-          log(data.toString());
-          putUserIntoBox(data["data"]["id"], "user");
-          Get.offAll(const UserHomeScreen());
+    if (arguments["code"] == value) {
+      dynamic checkUserRole = await UserApi().checkUserRole(arguments["phone"]);
+      Get.back();
+      dynamic response = Map<String, dynamic>.from(checkUserRole);
+      if (response["success"]) {
+        var data = response["data"];
+        switch (data["role"]) {
+          case "user":
+            handleUserLogin(data);
+            break;
+          case "store":
+            handleStoreLogin(data);
+            break;
+          case "driver":
+            handleDriverLogin(data);
+            break;
+          default:
+            handleUserLogin(data);
+            break;
         }
-      } else {
-        Get.back();
-        customSnackbar(DialogType.error, "Баталгаажуулах код буруу байна", 2);
       }
     } else {
       Get.back();
-      customSnackbar(DialogType.error, "Error", 2);
+      customSnackbar(ActionType.error, "Баталгаажуулах код буруу байна", 3);
     }
   }
 
@@ -146,7 +109,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
       customActions: Container(),
       title: "Баталгаажуулах",
       body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
             Container(
@@ -161,25 +124,44 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
             SizedBox(height: Get.height * .03),
             CustomText(
               text:
-                  "${_loginCtx.phoneController.text} дугаарлуу илгээсэн нэвтрэх кодыг оруулна уу",
+                  "${arguments["phone"]} дугаарлуу илгээсэн нэвтрэх кодыг оруулна уу",
               color: MyColors.gray,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: Get.height * .03),
-            CustomPinCodeTextField(
-              onCompleted: (value) {
-                submit();
-              },
-              onChanged: (value) {
-                setState(() {
-                  pinCode = value;
-                });
-              },
+            PinCodeTextField(
+              autoFocus: true,
+              appContext: context,
+              cursorColor: MyColors.primary,
+              controller: controller,
+              cursorWidth: 1,
+              length: 6,
+              animationType: AnimationType.fade,
+              keyboardType: TextInputType.number,
+              textStyle: const TextStyle(fontSize: 16),
+              pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(12),
+                  fieldHeight: 48,
+                  fieldWidth: (Get.width - 90) / 6,
+                  activeFillColor: Colors.white,
+                  inactiveFillColor: MyColors.white,
+                  selectedFillColor: MyColors.white,
+                  borderWidth: 1,
+                  activeColor: MyColors.grey,
+                  inactiveColor: MyColors.grey,
+                  selectedColor: MyColors.primary),
+              animationDuration: const Duration(milliseconds: 300),
+              enableActiveFill: true,
+              onCompleted: onCompleted,
+              onChanged: (value) {},
+              enablePinAutofill: false,
+              useExternalAutoFillGroup: true,
             ),
             SizedBox(height: Get.height * .03),
             myDuration.inSeconds.isLowerThan(1)
                 ? TextButton(
-                    onPressed: resetTimer,
+                    onPressed: sendOTP,
                     child: const CustomText(
                       text: "Дахин код авах",
                       fontSize: 14,
@@ -187,93 +169,137 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
                     ),
                   )
                 : CustomText(
-                    text: '$minutes:$seconds',
-                    fontSize: 20,
+                    text:
+                        '$minutes:$seconds секундын дараа дахин код авах боломжтой',
+                    fontSize: 14,
+                    textAlign: TextAlign.center,
                   ),
           ],
         ),
       ),
     );
   }
+}
 
-  void loginTypeBottomSheet(int userId, int storeId) {
-    setState(() {
-      countdownTimer!.cancel();
-      loginType = "";
-    });
-    Get.bottomSheet(isDismissible: false, StatefulBuilder(
+void saveUserInfo(int id, String role) {
+  RestApiHelper.saveUserId(id);
+  RestApiHelper.saveUserRole(role);
+}
+
+void handleUserLogin(data) {
+  var userId = data["userId"];
+  saveUserInfo(userId, "user");
+  Get.offAllNamed(userHomeScreenRoute);
+}
+
+void handleStoreLogin(data) {
+  Get.bottomSheet(
+      backgroundColor: MyColors.white,
+      isDismissible: false,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      )), StatefulBuilder(
+    builder: ((context, setState) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _content(
+              data["storeId"],
+              "store",
+              NetworkImage("${URL.AWS}/users/${data["storeId"]}/small/1.png"),
+              data["storeName"],
+              storeMainScreenRoute,
+            ),
+            const Divider(),
+            _content(
+              data["userId"],
+              "user",
+              const AssetImage("assets/images/png/user.png"),
+              "Хэрэглэгч",
+              userHomeScreenRoute,
+            ),
+          ],
+        ),
+      );
+    }),
+  ));
+}
+
+void handleDriverLogin(data) {
+  Get.bottomSheet(
+    StatefulBuilder(
       builder: ((context, setState) {
-        return Container(
-          height: Get.height * .3,
-          decoration: const BoxDecoration(
-            color: MyColors.white,
-          ),
-          padding: EdgeInsets.symmetric(
-              vertical: Get.width * .06, horizontal: Get.width * .03),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              CustomText(
-                text: "Нэвтрэх эрхээ сонгоно уу",
-                fontSize: 16,
+              _content(
+                data["driverId"],
+                "driver",
+                const AssetImage("assets/images/png/car.png"),
+                "Жолооч",
+                driverMainScreenRoute,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: RadioListTile(
-                        activeColor: MyColors.primary,
-                        dense: true,
-                        value: "user",
-                        groupValue: loginType,
-                        title: CustomText(
-                          text: "Хэрэглэгч",
-                          fontSize: 14,
-                        ),
-                        onChanged: ((value) {
-                          setState(() {
-                            loginType = value!;
-                          });
-                        })),
-                  ),
-                  Expanded(
-                    child: RadioListTile(
-                        dense: true,
-                        activeColor: MyColors.primary,
-                        value: "store",
-                        title: CustomText(
-                          text: "Байгууллага",
-                          fontSize: 14,
-                        ),
-                        groupValue: loginType,
-                        onChanged: ((value) {
-                          setState(() {
-                            loginType = value!;
-                          });
-                        })),
-                  ),
-                ],
+              const Divider(),
+              _content(
+                data["userId"],
+                "user",
+                const AssetImage("assets/images/png/user.png"),
+                "Хэрэглэгч",
+                userHomeScreenRoute,
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: Get.width * .2),
-                child: CustomButton(
-                  isActive: loginType.isNotEmpty,
-                  onPressed: (() {
-                    if (loginType == "user") {
-                      putUserIntoBox(userId, "user");
-                      Get.offAll(() => const UserHomeScreen());
-                    } else if (loginType == "store") {
-                      putUserIntoBox(storeId, "store");
-                      Get.offAll(() => const StoreMainScreen());
-                    }
-                  }),
-                  text: "Нэвтрэх",
-                ),
-              )
             ],
           ),
         );
       }),
-    ));
-  }
+    ),
+    backgroundColor: MyColors.white,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+    ),
+  );
+}
+
+Widget _content(
+  int id,
+  String role,
+  ImageProvider image,
+  String title,
+  String route,
+) {
+  return GestureDetector(
+    onTap: () {
+      saveUserInfo(id, role);
+      Get.offAllNamed(route);
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: SizedBox(
+          width: Get.width * .1,
+          height: Get.width * .1,
+          child: CircleAvatar(
+            backgroundImage: image,
+          ),
+        ),
+        title: Text(title),
+        trailing: const Icon(
+          IconlyLight.arrow_right_2,
+          color: Colors.black,
+          size: 20,
+        ),
+      ),
+    ),
+  );
 }

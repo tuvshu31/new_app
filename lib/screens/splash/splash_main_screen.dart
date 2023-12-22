@@ -1,20 +1,16 @@
-import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
+import 'dart:async';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
-import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_app_version_checker/flutter_app_version_checker.dart';
 
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
-import 'package:new_version/new_version.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class SplashMainScreen extends StatefulWidget {
   const SplashMainScreen({Key? key}) : super(key: key);
@@ -24,56 +20,31 @@ class SplashMainScreen extends StatefulWidget {
 }
 
 class _SplashMainScreenState extends State<SplashMainScreen> {
-  bool stayOnScreen = false;
+  String currentVersion = "";
   final _checker = AppVersionChecker();
-  final _loginCtx = Get.put(LoginController());
+
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration.zero, () {
-      handleInitialRoute();
-    });
+    handleInitialRoute();
   }
 
   Future<void> handleInitialRoute() async {
     AppCheckerResult appCheckerResult = await _checker.checkUpdate();
+    currentVersion = appCheckerResult.currentVersion;
+    setState(() {});
     if (appCheckerResult.canUpdate) {
-      CustomDialogs().showNewVersionDialog(() async {
-        final appId = Platform.isAndroid ? 'mn.et24' : '6444353401';
-        final url = Uri.parse(
-          Platform.isAndroid
-              ? "market://details?id=$appId"
-              : "https://apps.apple.com/app/id$appId",
-        );
-        launchUrl(
-          url,
-          mode: LaunchMode.externalApplication,
-        );
-      });
-    } else if (RestApiHelper.getUserId() != 0) {
-      _loginCtx.listenToTokenChanges(RestApiHelper.getUserRole());
-      //Login hiisen hereglegch bn gsn ug
-      if (RestApiHelper.getUserRole() == "store") {
-        Get.offAllNamed(storeMainScreenRoute);
-      } else if (RestApiHelper.getUserRole() == "driver") {
-        _loginCtx.navigateToScreen(driverMainScreenRoute);
-      } else if (RestApiHelper.getUserRole() == "user") {
-        _loginCtx.navigateToScreen(userHomeScreenRoute);
-      }
+      //Update хийгээгүй хэрэглэгч
+      _showUpdateDialog();
+      return;
+    }
+    if (RestApiHelper.getUserId() != 0) {
+      //Login хийсэн хэрэглэгч
+      String route = _initialRoute(RestApiHelper.getUserRole());
+      Get.offAllNamed(route);
     } else {
-      //Login hiigeegui hereglegch bn gsn ug
-      setState(() {
-        stayOnScreen = true;
-      });
-      Timer(
-        const Duration(seconds: 4),
-        () => Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const SplashPhoneRegisterScreen()),
-        ),
-      );
+      await Future.delayed(const Duration(seconds: 3));
+      Get.offAllNamed(splashPhoneRegisterScreenRoute);
     }
   }
 
@@ -83,58 +54,86 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: MyColors.white,
-      body: stayOnScreen
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(),
-                  Column(
-                    children: [
-                      Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18)),
-                        child: Image(
-                          image:
-                              const AssetImage("assets/images/png/android.png"),
-                          width: width * .22,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        "ERDENET24",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontFamily: "Exo",
-                          fontSize: 22,
-                          color: MyColors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: MyColors.primary,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const CustomText(
-                        text: "Шинэчлэл шалгаж байна...",
-                        fontSize: 12,
-                      ),
-                      SizedBox(height: height * .05)
-                    ],
-                  )
-                ],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(),
+          Column(
+            children: [
+              Container(
+                clipBehavior: Clip.hardEdge,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(18)),
+                child: Image(
+                  image: const AssetImage("assets/images/png/android.png"),
+                  width: width * .22,
+                ),
               ),
-            )
-          : Container(),
+              const SizedBox(height: 24),
+              const Text(
+                "ERDENET24",
+                softWrap: true,
+                style: TextStyle(
+                  fontFamily: "Exo",
+                  fontSize: 22,
+                  color: MyColors.black,
+                ),
+              )
+            ],
+          ),
+          Column(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: MyColors.primary,
+                  strokeWidth: 2,
+                ),
+              ),
+              const SizedBox(height: 24),
+              currentVersion.isNotEmpty
+                  ? CustomText(
+                      text: "Хувилбар: $currentVersion",
+                      fontSize: 10,
+                    )
+                  : CustomShimmer(
+                      width: Get.width * .22,
+                      height: 14,
+                    ),
+              SizedBox(height: height * .05)
+            ],
+          )
+        ],
+      ),
     );
   }
+}
+
+String _initialRoute(String role) {
+  switch (role) {
+    case "store":
+      return storeMainScreenRoute;
+    case "driver":
+      return driverMainScreenRoute;
+    case "user":
+      return userHomeScreenRoute;
+    default:
+      return userHomeScreenRoute;
+  }
+}
+
+void _showUpdateDialog() {
+  CustomDialogs().showNewVersionDialog(() async {
+    final appId = Platform.isAndroid ? 'mn.et24' : '6444353401';
+    final url = Uri.parse(
+      Platform.isAndroid
+          ? "market://details?id=$appId"
+          : "https://apps.apple.com/app/id$appId",
+    );
+    launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+  });
 }

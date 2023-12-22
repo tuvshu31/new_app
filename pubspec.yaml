@@ -36,26 +36,16 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons:
   get:
-  font_awesome_flutter:
   intl:
-  flutter_rating_bar:
-  flutter_svg:
   dio:
   cached_network_image:
   shimmer:
-  simple_animations:
   url_launcher:
-  flutter_spinkit:
-  curved_navigation_bar:
   rename:
   new_version:
-  in_app_update:
-  top_snackbar_flutter:
   iconly:
   carousel_slider:
-  flutter_easyloading:
   pin_code_fields:
-  get_storage:
   hive:
   hive_flutter:
   dotted_border:
@@ -64,54 +54,37 @@ dependencies:
   qr_flutter:
   qr_code_scanner:
   flutter_launcher_icons:
-  quickalert:
   lottie:
-  flutter_styled_toast:
-  expandable:
   image_cropper:
-  transparent_image:
   upgrader:
   new_version_plus:
-  flutter_cache_manager:
   google_maps_flutter:
   geolocator:
   audioplayers:
-  slide_to_act: ^2.0.1
-  custom_timer: ^0.2.3
-  slide_countdown: ^0.4.1
   timer_count_down: ^2.2.2
   flutter_countdown_timer: ^4.1.0
   app_settings: ^4.2.0
-  flutter_material_pickers: ^3.3.0
-  numberpicker: ^2.1.1
   geocoding: ^2.0.5
-  flutter_picker: ^2.1.0
-  percent_indicator: ^4.2.2
-  animated_text_kit: ^4.2.2
   circular_countdown_timer: ^0.2.3
   connectivity_plus: ^3.0.3
   flutter_app_version_checker: ^0.3.2
-  webview_flutter: ^4.0.7
   badges: ^3.0.3
   firebase_core: ^2.15.1
   firebase_messaging: ^14.6.6
-  awesome_notifications:
-  panara_dialogs: ^0.1.4
-  sweetsheet: ^0.4.0
-  blurry: ^1.4.2
   awesome_dialog: ^3.0.2
   add_to_cart_animation: ^2.0.3
   curved_progress_bar: ^1.0.2
-  flutter_intro: ^3.0.2
-  animated_digit: ^3.2.1
   flutter_dropdown_alert: ^1.0.7
   another_flushbar: ^1.12.30
-  dotted_line: ^3.2.2
   flutter_animate: ^4.2.0
-  go_router: ^10.0.0
-  flutter_switch: ^0.3.2
-  lite_rolling_switch: ^1.0.0
-  json_annotation: ^4.8.0
+  flutter_native_image: ^0.0.6
+  flutter_local_notifications: ^16.2.0
+  socket_io_client: ^2.0.3+1
+  dotted_line: ^3.2.2
+  webview_flutter: ^4.2.2
+  slide_countdown: ^0.6.0
+  expandable: ^5.0.1
+  animated_digit: ^3.2.3
 
   # flutter_local_notifications: ^14.0.0
   # firebase_messaging: ^14.3.0
@@ -166,10 +139,7 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Geologica-Light.ttf
-    - family: Exo
+    - family: Rubik
       fonts:
         - asset: assets/fonts/Rubik-Regular.ttf
   #

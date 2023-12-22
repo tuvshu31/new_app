@@ -1,5 +1,4 @@
 import 'package:Erdenet24/api/dio_instance.dart';
-import 'package:Erdenet24/api/dio_message.dart';
 import 'package:Erdenet24/utils/enums.dart';
 
 class RestApi {
@@ -286,18 +285,13 @@ class RestApi {
 
   //Зураг оруулах
   Future uploadImage(String type, int id, dynamic body) async {
-    return DioClient().sendFile("$type/$id/uploadphoto", Method.post, body);
+    // return DioClient().sendFile("$type/$id/uploadphoto", Method.post, body);
   }
 
   //Зураг устгах
   Future deleteImage(String type, int id) async {
     return DioClient()
         .sendRequest("$type/$id/deletephoto", Method.delete, [], {});
-  }
-
-  Future sendAuthCode(String phone, String code) async {
-    return DioMessage()
-        .sendMessage("send", phone, "Erdenet24 nevtrekh kod: $code");
   }
 
   //Жолоочийн мэдээллийг авах
