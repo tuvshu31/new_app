@@ -55,17 +55,4 @@ class SocketClient {
   Future<void> disconnect() async {
     socket.disconnect();
   }
-
-  Future<void> saveDeviceInfo() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      log(androidInfo.model.toString());
-      print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      log(iosInfo.model.toString());
-      print('Running on ${iosInfo.utsname.machine}'); // e.g. "iPod7,1"
-    }
-  }
 }

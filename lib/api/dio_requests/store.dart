@@ -106,4 +106,10 @@ class StoreApi {
     return DioClient()
         .sendRequest('setToDelivery?orderId=$orderId', Method.post, [], {});
   }
+
+  //Шинэ захиалга ирсэн үгүйг шалгах
+  Future checkStoreNewOrders() async {
+    return DioClient().sendRequest(
+        'checkStoreNewOrders?storeId=$storeId', Method.post, [], {});
+  }
 }

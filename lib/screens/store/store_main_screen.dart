@@ -1,7 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
@@ -27,31 +30,38 @@ class StoreMainScreen extends StatefulWidget {
 
 class _StoreMainScreenState extends State<StoreMainScreen> {
   final _loginCtx = Get.put(LoginController());
+  final _storeCtx = Get.put(StoreController());
   Map data = {};
   bool loading = false;
   bool isOpen = false;
   int storeId = RestApiHelper.getUserId();
+  String deviceStatus = "";
 
   @override
   void initState() {
     super.initState();
     getStoreInfo();
+    _loginCtx.checkUserDeviceInfo();
   }
 
   void getStoreInfo() async {
     loading = true;
-    setState(() {});
     dynamic getStoreInfo = await StoreApi().getStoreInfo();
     loading = false;
-    setState(() {});
     if (getStoreInfo != null) {
       dynamic response = Map<String, dynamic>.from(getStoreInfo);
       if (response["success"]) {
         data = response["data"];
         isOpen = data["isOpen"];
-        setState(() {});
-      } else {}
+        if (isOpen) {
+          SocketClient().connect();
+          checkStoreNewOrders();
+        } else {
+          SocketClient().disconnect();
+        }
+      }
     }
+    setState(() {});
   }
 
   void openAndCloseStore(int open) async {
@@ -65,12 +75,24 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         setState(() {});
         if (isOpen) {
           SocketClient().connect();
-          SocketClient().saveDeviceInfo();
+          checkStoreNewOrders();
         } else {
           SocketClient().disconnect();
         }
         customSnackbar(ActionType.success,
             "Дэлгүүр ${isOpen ? "нээгдлээ" : "хаагдлаа"}", 2);
+      }
+    }
+  }
+
+  void checkStoreNewOrders() async {
+    dynamic checkStoreNewOrders = await StoreApi().checkStoreNewOrders();
+    if (checkStoreNewOrders != null) {
+      dynamic response = Map<String, dynamic>.from(checkStoreNewOrders);
+      if (response["success"]) {
+        if (response["data"]) {
+          _storeCtx.handleSentAction({"id": 0});
+        }
       }
     }
   }

@@ -172,4 +172,14 @@ class UserApi {
         'emptyAndAddToCart?id=$userId&productId=$productId&storeId=$storeId&quantity=$quantity',
         Method.post, [], {});
   }
+
+  //Хэрэглэгчийн хандаж буй төхөөрөмжийг шалгах
+  Future checkUserDeviceInfo(
+    String role,
+    String device,
+  ) async {
+    return DioClient().sendRequest(
+        'checkUserDeviceInfo?id=$userId&role=$role&device=$device',
+        Method.post, [], {});
+  }
 }

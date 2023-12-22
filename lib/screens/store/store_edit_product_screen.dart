@@ -75,12 +75,13 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
       dynamic response = Map<String, dynamic>.from(getProductInfo);
       if (response["success"]) {
         productInfo = response["data"];
-        log(productInfo.toString());
         images = productInfo["images"];
         _nameController.text = productInfo["name"];
         _priceController.text = productInfo["price"].toString();
         _countController.text = productInfo["available"].toString();
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     }
   }
@@ -124,8 +125,10 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
       dynamic response = Map<String, dynamic>.from(getStoreCategoryList);
       if (response["success"]) {
         categories = response["data"];
-        setState(() {});
-      } else {}
+        if (mounted) {
+          setState(() {});
+        }
+      }
     }
   }
 

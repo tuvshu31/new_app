@@ -4,6 +4,7 @@ import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 
 Widget imagePickerOptionsWidget(VoidCallback onPress1, VoidCallback onPress2) {
   return SizedBox(
@@ -24,9 +25,8 @@ Widget imagePickerOptionsWidget(VoidCallback onPress1, VoidCallback onPress2) {
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(20),
-                    child: Image(
-                      image: AssetImage("assets/images/png/app/camera.png"),
-                      width: 30,
+                    child: Icon(
+                      IconlyLight.camera,
                     ),
                   )),
             ),
@@ -50,10 +50,7 @@ Widget imagePickerOptionsWidget(VoidCallback onPress1, VoidCallback onPress2) {
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(20),
-                    child: Image(
-                      image: AssetImage("assets/images/png/app/gallery.png"),
-                      width: 30,
-                    ),
+                    child: Icon(IconlyLight.image),
                   )),
             ),
             const SizedBox(height: 12),
