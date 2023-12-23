@@ -11,7 +11,6 @@ import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -58,7 +57,6 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   void getUserProducts() async {
     loading = true;
-    setState(() {});
     dynamic typeId = 0;
     if (selectedIndex.length == 1) {
       if (selectedIndex.contains(0)) {
@@ -79,22 +77,19 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     query.removeWhere((key, value) => value == 0);
     dynamic getUserProducts = await UserApi().getUserProducts(query);
     loading = false;
-    setState(() {});
     if (getUserProducts != null) {
       dynamic response = Map<String, dynamic>.from(getUserProducts);
       if (response["success"]) {
         products = products + response["data"];
         pagination = response["pagination"];
-        setState(() {});
         if (pagination["pageCount"] > page) {
           hasMore = true;
-          setState(() {});
         } else {
           hasMore = false;
-          setState(() {});
         }
       }
     }
+    setState(() {});
   }
 
   void handleCategoryTitle() {
@@ -619,22 +614,26 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                             child: Stack(
                               children: [
                                 customImage(Get.width * .3, item["image"]),
-                                // Positioned(
-                                //   right: 10,
-                                //   top: 5,
-                                //   child: Container(
-                                //     padding: const EdgeInsets.all(4),
-                                //     decoration: BoxDecoration(
-                                //       color: Colors.green,
-                                //       borderRadius: BorderRadius.circular(8),
-                                //     ),
-                                //     child: const Text(
-                                //       "-5%",
-                                //       style: TextStyle(
-                                //           color: Colors.white, fontSize: 12),
-                                //     ),
-                                //   ),
-                                // )
+                                item["salePercent"] > 0
+                                    ? Positioned(
+                                        right: 10,
+                                        top: 5,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            "-${item["salePercent"]}%",
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12),
+                                          ),
+                                        ),
+                                      )
+                                    : Container()
                               ],
                             ),
                           ),
@@ -645,8 +644,26 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                convertToCurrencyFormat(item['price']),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    convertToCurrencyFormat(item['price']),
+                                  ),
+                                  item["salePercent"] > 0
+                                      ? Text(
+                                          convertToCurrencyFormat(
+                                              item['oldPrice']),
+                                          style: const TextStyle(
+                                            color: MyColors.gray,
+                                            fontSize: 10,
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                          ),
+                                        )
+                                      : Container(),
+                                ],
                               ),
                               const SizedBox(height: 4),
                               Text(

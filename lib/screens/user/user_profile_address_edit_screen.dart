@@ -272,61 +272,49 @@ class _UserProfileAddressEditScreenState
                 ],
               ),
             )
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomShimmer(
-                    width: Get.width * .3,
-                    height: 16,
-                    borderRadius: 12,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width,
-                    height: 42,
-                    borderRadius: 25,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width * .3,
-                    height: 16,
-                    borderRadius: 12,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width,
-                    height: 42,
-                    borderRadius: 25,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width * .4,
-                    height: 16,
-                    borderRadius: 12,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width,
-                    height: 42,
-                    borderRadius: 25,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width * .4,
-                    height: 16,
-                    borderRadius: 12,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomShimmer(
-                    width: Get.width,
-                    height: 42,
-                    borderRadius: 25,
-                  ),
-                ],
-              ),
-            ),
+          : _shimmer(),
+    );
+  }
+
+  Widget _shimmer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Байршил"),
+          const SizedBox(height: 12),
+          CustomShimmer(
+            width: Get.width,
+            height: 42,
+            borderRadius: 25,
+          ),
+          const SizedBox(height: 12),
+          Text("Дэлгэрэнгүй хаяг"),
+          const SizedBox(height: 12),
+          CustomShimmer(
+            width: Get.width,
+            height: 42,
+            borderRadius: 25,
+          ),
+          const SizedBox(height: 12),
+          Text("Утас"),
+          const SizedBox(height: 12),
+          CustomShimmer(
+            width: Get.width,
+            height: 42,
+            borderRadius: 25,
+          ),
+          const SizedBox(height: 12),
+          Text("Орцны код"),
+          const SizedBox(height: 12),
+          CustomShimmer(
+            width: Get.width,
+            height: 42,
+            borderRadius: 25,
+          ),
+        ],
+      ),
     );
   }
 

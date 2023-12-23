@@ -13,8 +13,8 @@ const prodUrl = 'https://www.e24api1215.com/e24/';
 class DioClient {
   Dio dio = Dio(
     BaseOptions(
-      // baseUrl: localUrl,
-      baseUrl: prodUrl,
+      baseUrl: localUrl,
+      // baseUrl: prodUrl,
       connectTimeout: const Duration(minutes: 2),
       receiveTimeout: const Duration(minutes: 1),
     ),

@@ -19,7 +19,7 @@ void customSnackbar(ActionType ActionType, String text, int duration) {
       // title: _getDialogTitle(ActionType),
       message: text,
       duration: Duration(seconds: duration),
-      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarPosition: FlushbarPosition.TOP,
       backgroundColor: _getDialogColors(ActionType),
       forwardAnimationCurve: Curves.bounceIn,
       shouldIconPulse: false,

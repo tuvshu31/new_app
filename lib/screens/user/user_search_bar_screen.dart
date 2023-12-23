@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
@@ -180,7 +181,12 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
               itemBuilder: (context, index) {
                 if (index < products.length) {
                   var item = products[index];
-                  return listItemWidget(item, () {}, () {});
+                  return listItemWidget(item, () {
+                    Get.toNamed(userProductsScreenRoute, arguments: {
+                      "title": item["storeName"],
+                      "id": item["store"]
+                    });
+                  });
                 } else if (searching) {
                   return itemShimmer();
                 } else {
@@ -193,29 +199,30 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
 
   //  var item = _userCtx.filteredOrderList[index];
   Widget listItemWidget(
-      Map item, VoidCallback onClicked1, VoidCallback onClicked2) {
+    Map item,
+    VoidCallback onClicked,
+  ) {
     return CustomInkWell(
-      onTap: () {},
-      child: Container(
-        height: Get.height * .07,
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(width: Get.width * .04),
-            Stack(
-              children: [
-                customImage(Get.width * .12, item["image"], isCircle: true)
-              ],
-            ),
-            SizedBox(width: Get.width * .04),
-            CustomText(
-              text: item["storeName"],
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+      borderRadius: BorderRadius.zero,
+      onTap: onClicked,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(width: Get.width * .04),
+          customImage(Get.width * .12, item["image"], isCircle: true),
+          SizedBox(width: Get.width * .04),
+          CustomText(
+            text: item["storeName"],
+            overflow: TextOverflow.ellipsis,
+          ),
+          const Spacer(),
+          const Icon(
+            IconlyLight.arrow_right_2,
+            size: 20,
+          ),
+          SizedBox(width: Get.width * .04),
+        ],
       ),
     );
   }

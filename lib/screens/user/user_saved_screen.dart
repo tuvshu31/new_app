@@ -29,6 +29,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
   List saved = [];
   bool hasMore = true;
   Map pagination = {};
+  int total = 0;
   ScrollController scrollController = ScrollController();
 
   @override
@@ -49,6 +50,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
         saved = saved + response["data"];
       }
       pagination = response["pagination"];
+      total = pagination["total"];
       if (pagination["pageCount"] > page) {
         hasMore = true;
       } else {
@@ -86,8 +88,8 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
       dynamic response = Map<String, dynamic>.from(deleteUserSavedProduct);
       if (response["success"]) {
         saved.remove(item);
+        total -= 1;
         setState(() {});
-        customSnackbar(ActionType.success, "Амжилттай усталаа", 2);
       } else {
         customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
@@ -116,9 +118,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
   Widget build(BuildContext context) {
     return CustomHeader(
         isMainPage: true,
-        title: saved.isNotEmpty
-            ? "Таны хадгалсан (${saved.length})"
-            : "Таны хадгалсан",
+        title: saved.isNotEmpty ? "Таны хадгалсан ($total)" : "Таны хадгалсан",
         customActions: Container(),
         body: loading && saved.isEmpty
             ? listShimmerWidget()

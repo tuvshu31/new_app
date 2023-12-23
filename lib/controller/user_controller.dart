@@ -4,7 +4,6 @@ import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 
@@ -17,6 +16,7 @@ class UserController extends GetxController {
   RxBool hasMore = true.obs;
   RxMap pagination = {}.obs;
   RxBool loading = false.obs;
+  RxMap userInfo = {}.obs;
 
   void getUserOrders() async {
     loading.value = true;
@@ -129,6 +129,17 @@ class UserController extends GetxController {
     }
     if (action == "delivered") {
       handleDeliveredAction(payload);
+    }
+  }
+
+  void getUserInfoDetails() async {
+    dynamic getUserInfoDetails = await UserApi().getUserInfoDetails();
+    if (getUserInfoDetails != null) {
+      dynamic response = Map<String, dynamic>.from(getUserInfoDetails);
+      if (response["success"]) {
+        userInfo.value = response["data"];
+        log(userInfo.toString());
+      }
     }
   }
 }

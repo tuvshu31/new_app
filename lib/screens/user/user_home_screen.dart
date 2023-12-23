@@ -1,6 +1,7 @@
 import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/controller/user_controller_OLD.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
@@ -22,11 +23,14 @@ class UserHomeScreen extends StatefulWidget {
 class _UserHomeScreenState extends State<UserHomeScreen> {
   final _navCtrl = Get.put(NavigationController());
   final _loginCtx = Get.put(LoginController());
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
     super.initState();
     _loginCtx.listenToTokenChanges("user");
+    _userCtx.getUserInfoDetails();
+    _loginCtx.checkUserDeviceInfo();
   }
 
   @override

@@ -94,7 +94,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
         listClick(widgetKey);
         Future.delayed(const Duration(milliseconds: 1600), () {
           cartCount++;
-          customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
         });
       } else {
         handleAddCartError(
@@ -126,7 +125,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
               Future.delayed(const Duration(milliseconds: 1600), () {
                 cartCount = 1;
                 setState(() {});
-                customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
               });
             } else {
               customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
@@ -146,7 +144,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       dynamic response = Map<String, dynamic>.from(addToSaved);
       if (response["success"]) {
         info["isSaved"] = true;
-        customSnackbar(ActionType.success, "Амжилттай хадгаллаа", 2);
       } else {
         customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }

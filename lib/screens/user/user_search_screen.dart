@@ -376,7 +376,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 child: CustomShimmer(
                   width: Get.width * .16,
                   height: Get.width * .16,
-                  isCircle: true,
+                  borderRadius: 50,
                 ),
               ),
               SizedBox(height: Get.height * .04),

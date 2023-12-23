@@ -90,12 +90,6 @@ class UserApi {
         .sendRequest('getUserOrders?id=$userId', Method.post, [], query);
   }
 
-  //Хэрэглэгчийн утасны дугаарыг авах
-  Future getUserPhone() async {
-    return DioClient()
-        .sendRequest('getUserPhone?id=$userId', Method.post, [], {});
-  }
-
   //Сонгосон дэлгүүрийн бараануудыг авах
   Future getUserProducts(dynamic query) async {
     return DioClient().sendRequest('getUserProducts', Method.post, [], query);
@@ -181,5 +175,11 @@ class UserApi {
     return DioClient().sendRequest(
         'checkUserDeviceInfo?id=$userId&role=$role&device=$device',
         Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн хувийн мэдээллийг авах
+  Future getUserInfoDetails() async {
+    return DioClient()
+        .sendRequest('getUserInfoDetails?userId=$userId', Method.post, [], {});
   }
 }
