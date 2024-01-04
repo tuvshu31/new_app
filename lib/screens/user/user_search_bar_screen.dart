@@ -32,19 +32,6 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     super.initState();
   }
 
-  void searchUserAllProducts() async {
-    String keyWord = searchController.text;
-    dynamic searchUserAllProducts =
-        await UserApi().searchUserAllProducts(keyWord);
-    if (searchUserAllProducts != null) {
-      dynamic response = Map<String, dynamic>.from(searchUserAllProducts);
-      if (response["success"]) {
-        products = products + response["data"];
-      }
-    }
-    setState(() {});
-  }
-
   Timer? _debounceTimer;
   void _onTypingFinished(String text) {
     searching = true;
@@ -53,13 +40,23 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
     if (_debounceTimer != null) {
       _debounceTimer!.cancel();
     }
-    _debounceTimer = Timer(const Duration(seconds: 1), () {
-      log('Typing finished: $text');
-      searching = false;
-      setState(() {});
+    _debounceTimer = Timer(const Duration(seconds: 1), () async {
       if (text.isNotEmpty) {
-        searchUserAllProducts();
+        String keyWord = searchController.text;
+        dynamic searchUserAllProducts =
+            await UserApi().searchUserAllProducts(keyWord);
+        searching = false;
+        if (searchUserAllProducts != null) {
+          dynamic response = Map<String, dynamic>.from(searchUserAllProducts);
+          if (response["success"]) {
+            products = response["data"];
+            log(products.toString());
+          }
+        }
+      } else {
+        searching = false;
       }
+      setState(() {});
     });
   }
 
@@ -110,7 +107,7 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                 decoration: const InputDecoration(
                   counterText: '',
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                  hintText: "Бүтээгдэхүүн хайх...",
+                  hintText: "Хайлт жишээ нь: сүү, бууз гм",
                   hintStyle: TextStyle(
                     fontSize: MyFontSizes.normal,
                     color: MyColors.gray,
@@ -182,9 +179,10 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
                 if (index < products.length) {
                   var item = products[index];
                   return listItemWidget(item, () {
-                    Get.toNamed(userProductsScreenRoute, arguments: {
+                    Get.offNamed(userProductsScreenRoute, arguments: {
                       "title": item["storeName"],
-                      "id": item["store"]
+                      "id": item["store"],
+                      "isOpen": item["isOpen"] == true ? 1 : 0
                     });
                   });
                 } else if (searching) {
@@ -212,9 +210,19 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
           SizedBox(width: Get.width * .04),
           customImage(Get.width * .12, item["image"], isCircle: true),
           SizedBox(width: Get.width * .04),
-          CustomText(
-            text: item["storeName"],
-            overflow: TextOverflow.ellipsis,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomText(
+                text: item["storeName"],
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                item["description"] ?? "",
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              )
+            ],
           ),
           const Spacer(),
           const Icon(

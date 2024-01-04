@@ -17,6 +17,7 @@ class UserController extends GetxController {
   RxMap pagination = {}.obs;
   RxBool loading = false.obs;
   RxMap userInfo = {}.obs;
+  List categories = [].obs;
 
   void getUserOrders() async {
     loading.value = true;
@@ -129,6 +130,14 @@ class UserController extends GetxController {
     }
     if (action == "delivered") {
       handleDeliveredAction(payload);
+    }
+  }
+
+  void getMainCategories() async {
+    dynamic getMainCategories = await UserApi().getMainCategories();
+    dynamic response = Map<String, dynamic>.from(getMainCategories);
+    if (response["success"]) {
+      categories = response["data"];
     }
   }
 

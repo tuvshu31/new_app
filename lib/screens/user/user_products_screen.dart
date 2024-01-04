@@ -512,69 +512,110 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   Widget _customTitle() {
     return showSearchBar
         ? _search()
-        : Text(
-            _arguments["title"],
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-            ),
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _arguments["title"],
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+              _arguments["isOpen"] == 0
+                  ? const Text(
+                      "Хаалттай",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
+                        // fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  : Container(),
+            ],
           );
   }
 
   Widget _search() {
     return Container(
-      height: 42,
+      height: 40,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(width: 1, color: MyColors.background),
+        color: MyColors.fadedGrey,
       ),
-      child: TextField(
-        keyboardType: TextInputType.text,
-        autofocus: true,
-        controller: searchController,
-        decoration: InputDecoration(
-          hintText: "Бүтээгдэхүүн хайх...",
-          suffixIcon: searching
-              ? const CupertinoActivityIndicator()
-              : const Icon(
-                  IconlyLight.search,
-                  color: MyColors.primary,
-                  size: 20,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(left: 12),
+            child: Center(
+              child: searching
+                  ? const CupertinoActivityIndicator()
+                  : const Icon(
+                      IconlyLight.search,
+                      color: MyColors.primary,
+                      size: 20,
+                    ),
+            ),
+          ),
+          Expanded(
+            child: TextField(
+              textInputAction: TextInputAction.search,
+              autofocus: true,
+              controller: searchController,
+              decoration: const InputDecoration(
+                counterText: '',
+                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                hintText: "Бүтээгдэхүүн хайх...",
+                hintStyle: TextStyle(
+                  fontSize: MyFontSizes.normal,
+                  color: MyColors.gray,
                 ),
-          counterText: '',
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          hintStyle: const TextStyle(
-            fontSize: MyFontSizes.normal,
-            color: MyColors.grey,
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-              width: MyDimentions.borderWidth,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                    width: MyDimentions.borderWidth,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                    width: MyDimentions.borderWidth,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                    width: MyDimentions.borderWidth,
+                  ),
+                ),
+              ),
+              style: const TextStyle(
+                fontSize: MyFontSizes.large,
+                color: MyColors.black,
+              ),
+              cursorColor: MyColors.primary,
+              cursorWidth: 1.5,
+              onSubmitted: (value) {},
+              onChanged: (val) {
+                _onTypingFinished(val);
+              },
             ),
           ),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-              width: MyDimentions.borderWidth,
-            ),
-          ),
-          disabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-              width: MyDimentions.borderWidth,
-            ),
-          ),
-        ),
-        style: const TextStyle(
-          fontSize: MyFontSizes.large,
-          color: MyColors.black,
-        ),
-        cursorColor: MyColors.primary,
-        cursorWidth: 1,
-        onChanged: (val) {
-          _onTypingFinished(val);
-        },
+          searchController.text.isNotEmpty
+              ? IconButton(
+                  onPressed: () {
+                    searchController.clear();
+                    products.clear();
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: MyColors.gray,
+                    size: 18,
+                  ),
+                )
+              : Container()
+        ],
       ),
     );
   }
@@ -584,125 +625,136 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
         ? productsLoadingWidget()
         : !loading && products.isEmpty
             ? customEmptyWidget("Бараа байхгүй байна")
-            : GridView.builder(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                itemCount: hasMore ? products.length + 3 : products.length,
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 0.7,
-                ),
-                itemBuilder: (context, index) {
-                  if (index < products.length) {
-                    var item = products[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CustomInkWell(
-                          onTap: () => Get.toNamed(
-                            userProductDetailScreenRoute,
-                            arguments: {
-                              "id": item["id"],
-                              "store": item["store"],
-                              "storeName": _arguments["title"],
-                            },
+            : RefreshIndicator(
+                color: MyColors.primary,
+                onRefresh: () async {
+                  products.clear();
+                  page = 1;
+                  await Future.delayed(const Duration(milliseconds: 600));
+                  setState(() {});
+                  getUserProducts();
+                },
+                child: GridView.builder(
+                  controller: scrollController,
+                  itemCount: hasMore ? products.length + 3 : products.length,
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemBuilder: (context, index) {
+                    if (index < products.length) {
+                      var item = products[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CustomInkWell(
+                            onTap: () => Get.toNamed(
+                              userProductDetailScreenRoute,
+                              arguments: {
+                                "id": item["id"],
+                                "store": item["store"],
+                                "storeName": _arguments["title"],
+                                "isOpen": _arguments["isOpen"]
+                              },
+                            ),
+                            child: Hero(
+                              transitionOnUserGestures: true,
+                              tag: item["id"],
+                              child: Stack(
+                                children: [
+                                  customImage(Get.width * .3, item["image"]),
+                                  item["salePercent"] > 0
+                                      ? Positioned(
+                                          right: 10,
+                                          top: 5,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              "-${item["salePercent"]}%",
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
                           ),
-                          child: Hero(
-                            transitionOnUserGestures: true,
-                            tag: item["id"],
-                            child: Stack(
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: Get.width * .3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                customImage(Get.width * .3, item["image"]),
-                                item["salePercent"] > 0
-                                    ? Positioned(
-                                        right: 10,
-                                        top: 5,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            "-${item["salePercent"]}%",
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      convertToCurrencyFormat(item['price']),
+                                    ),
+                                    item["salePercent"] > 0
+                                        ? Text(
+                                            convertToCurrencyFormat(
+                                                item['oldPrice']),
                                             style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12),
-                                          ),
-                                        ),
-                                      )
-                                    : Container()
+                                              color: MyColors.gray,
+                                              fontSize: 10,
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                            ),
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  item["name"] ?? "",
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: Get.width * .3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    convertToCurrencyFormat(item['price']),
-                                  ),
-                                  item["salePercent"] > 0
-                                      ? Text(
-                                          convertToCurrencyFormat(
-                                              item['oldPrice']),
-                                          style: const TextStyle(
-                                            color: MyColors.gray,
-                                            fontSize: 10,
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                          ),
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                item["name"] ?? "",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                        ],
+                      );
+                    } else if (hasMore) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CustomShimmer(
+                              width: Get.width * .3, height: Get.width * .3),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: Get.width * .3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomShimmer(
+                                    width: Get.width * .2, height: 16),
+                                const SizedBox(height: 4),
+                                CustomShimmer(width: Get.width * .2, height: 16)
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  } else if (hasMore) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CustomShimmer(
-                            width: Get.width * .3, height: Get.width * .3),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: Get.width * .3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomShimmer(width: Get.width * .2, height: 16),
-                              const SizedBox(height: 4),
-                              CustomShimmer(width: Get.width * .2, height: 16)
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
+                        ],
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
               );
   }
 

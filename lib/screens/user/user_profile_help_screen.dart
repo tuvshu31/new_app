@@ -1,3 +1,7 @@
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -16,42 +20,50 @@ class UserProfileHelpScreen extends StatefulWidget {
 }
 
 class _UserProfileHelpScreenState extends State<UserProfileHelpScreen> {
-  List faqList = [
-    {
-      "question": "Төлбөрөө хэрхэн төлөх вэ?",
-      "answer":
-          "Хэрэглэгч та захиалгын төлбөрөө бэлэн мөнгөөр төлөх боломжгүй харин бүх төрлийн интернэт банк болон Qpay ашиглан төлбөрөө төлөх боломжтой."
-    },
-    {
-      "question": "Миний захиалга хаана явж байгааг яаж мэдэх вэ?",
-      "answer":
-          "Захиалга хийснээр миний захиалга дэлгэц гарч ирэх бөгөөд таны захиалгын хүргэлтийн мэдээлэл харагдана."
-    },
-    {
-      "question": "Захиалгаа буцаах боломжтой юу?",
-      "answer":
-          "Таны захиалгыг байгууллага хүлээж авсанаас хойш өөрчлөх, цуцлах боломжгүй. Тиймээс захиалгаа баталгаажуулахаас өмнө сайтар нягтална уу."
-    },
-    // {
-    //   "question": "И-баримт өгдөг үү?",
-    //   "answer": "Таны худалдан авсан хоолны баримт нь танд хүргэлттэй хамт очно"
-    // }
-  ];
+  List help = [];
+  bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+    getUserHelpContent();
+  }
+
+  void getUserHelpContent() async {
+    loading = true;
+    dynamic getUserHelpContent = await UserApi().getUserHelpContent();
+    loading = false;
+    if (getUserHelpContent != null) {
+      dynamic response = Map<String, dynamic>.from(getUserHelpContent);
+      if (response["success"]) {
+        help = response["data"];
+      } else {
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+      }
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return CustomHeader(
       title: "Тусламж",
       customActions: Container(),
-      body: ExpandableTheme(
-        data: const ExpandableThemeData(
-          useInkWell: true,
-        ),
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          children: [for (var i in faqList) _item(i)],
-        ),
-      ),
+      body: loading
+          ? listShimmerWidget()
+          : ExpandableTheme(
+              data: const ExpandableThemeData(
+                useInkWell: true,
+              ),
+              child: ListView.separated(
+                itemCount: help.length,
+                itemBuilder: (context, index) {
+                  var item = help[index];
+                  return _item(item);
+                },
+                separatorBuilder: (context, index) {
+                  return Container();
+                },
+              )),
     );
   }
 

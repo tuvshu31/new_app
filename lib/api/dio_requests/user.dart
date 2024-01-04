@@ -39,10 +39,9 @@ class UserApi {
   }
 
   //Хэрэглэгч бараа хадгалах
-  Future addToSaved(int productId, int storeId) async {
+  Future addToSaved(int productId) async {
     return DioClient().sendRequest(
-        'addToSaved?id=$userId&storeId=$storeId&productId=$productId',
-        Method.post, [], {});
+        'addToSaved?id=$userId&productId=$productId', Method.post, [], {});
   }
 
   //Хэрэглэгчийн хадгалсан барааг устгах
@@ -181,5 +180,42 @@ class UserApi {
   Future getUserInfoDetails() async {
     return DioClient()
         .sendRequest('getUserInfoDetails?userId=$userId', Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн утасны дугаар өөрчлөх үед утасны дугаар шалгаад баталгаажуулах код явуулах
+  Future checkPhoneAndSendOTP(String phone) async {
+    return DioClient().sendRequest(
+        'checkPhoneAndSendOTP?userId=$userId&phone=$phone',
+        Method.post, [], {});
+  }
+
+  //QR code унших үед дэлгүүрийн мэдээллийг авах
+  Future getStoreInfo(int storeId) async {
+    return DioClient()
+        .sendRequest('getStoreInfo?id=$storeId', Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн утасны дугаарыг өөрчлөх
+  Future updateUserPhoneNumber(String phone) async {
+    return DioClient().sendRequest(
+        'updateUserPhoneNumber?userId=$userId&phone=$phone',
+        Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн байршлын мэдээллийг өөрчлөх
+  Future updateUserAddress(dynamic body) async {
+    return DioClient()
+        .sendRequest('updateUserAddress?userId=$userId', Method.post, body, {});
+  }
+
+  //Хэрэглэгчийн тусламж хэсгийн мэдээллүүдийг дуудах
+  Future getUserHelpContent() async {
+    return DioClient().sendRequest('getUserHelpContent', Method.post, [], {});
+  }
+
+  //ХАйлт хийх үед дэлгүүрийн дэлгүүрийн мэдээллийг дуудах
+  Future getStoreDetailsInfo(dynamic body) async {
+    return DioClient()
+        .sendRequest('getStoreDetailsInfo', Method.post, body, {});
   }
 }

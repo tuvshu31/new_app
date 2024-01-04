@@ -116,34 +116,6 @@ class MyShimmers {
       },
     );
   }
-
-  Widget userPage() {
-    return ListView.separated(
-        separatorBuilder: (context, index) {
-          return Container(
-            height: 8,
-          );
-        },
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
-            dense: true,
-            minLeadingWidth: Get.width * .07,
-            leading: const CustomShimmer(
-              width: 40,
-              height: 40,
-              borderRadius: 50,
-            ),
-            title: CustomShimmer(
-              width: Get.width * .65,
-              height: 14,
-            ),
-          );
-        });
-  }
 }
 
 Widget listShimmerWidget() {

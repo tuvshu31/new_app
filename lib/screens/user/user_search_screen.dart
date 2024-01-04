@@ -1,4 +1,7 @@
-import 'package:Erdenet24/controller/data_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +18,8 @@ import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 
+import '../../widgets/dialogs/dialog_list.dart';
+
 class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
 
@@ -28,9 +33,10 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   List categories = [];
   List storeList = [];
   String title = "";
+  int category = 0;
   PageController controller = PageController();
   final _navCtx = Get.put(NavigationController());
-  final _dataCtx = Get.put(DataController());
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
@@ -39,7 +45,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   }
 
   void getMainCategories() async {
-    if (_dataCtx.categories.isEmpty) {
+    if (_userCtx.categories.isEmpty) {
       loading = true;
       dynamic getMainCategories = await UserApi().getMainCategories();
       dynamic response = Map<String, dynamic>.from(getMainCategories);
@@ -48,12 +54,12 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       }
       loading = false;
     } else {
-      categories = _dataCtx.categories;
+      categories = _userCtx.categories;
     }
     setState(() {});
   }
 
-  void getStoreList(int category) async {
+  void getStoreList() async {
     storeLoading = true;
     dynamic getMainCategories = await UserApi().getStoreList(category);
     dynamic response = Map<String, dynamic>.from(getMainCategories);
@@ -73,6 +79,99 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
     storeList.clear();
     storeLoading = true;
     setState(() {});
+  }
+
+  void showWarningDialog(String title, VoidCallback onPressed) {
+    showGeneralDialog(
+      context: Get.context!,
+      barrierLabel: "",
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, a1, a2) {
+        return Container();
+      },
+      transitionBuilder: (ctx, a1, a2, child) {
+        var curve = Curves.bounceInOut.transform(a1.value);
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Transform.scale(
+            scale: curve,
+            child: Center(
+              child: Container(
+                width: Get.width,
+                margin: EdgeInsets.all(Get.width * .09),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.only(
+                  right: Get.width * .09,
+                  left: Get.width * .09,
+                  top: Get.height * .04,
+                  bottom: Get.height * .03,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        IconlyBold.info_circle,
+                        size: Get.width * .15,
+                        color: Colors.amber,
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      Text(
+                        "Анхааруулга",
+                        style: const TextStyle(
+                          color: MyColors.gray,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      Column(
+                        children: [
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: Get.height * .04),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                  child: CustomButton(
+                                onPressed: () {
+                                  Get.back();
+                                  animateToPage(0);
+                                },
+                                bgColor: Colors.white,
+                                text: "Үгүй",
+                                elevation: 0,
+                                textColor: Colors.black,
+                              )),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: CustomButton(
+                                  elevation: 0,
+                                  bgColor: Colors.amber,
+                                  text: "Тийм",
+                                  onPressed: onPressed,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -135,11 +234,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
           color: MyColors.black,
         ),
       ),
-      body: loading
-          ? _shimmerWidget()
-          : categories.isEmpty
-              ? customEmptyWidget("Ангилал олдсонгүй")
-              : _bodyWidget(),
+      body: _bodyWidget(),
     );
   }
 
@@ -182,45 +277,81 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   }
 
   Widget _button(int index) {
-    var item = categories[index - 1];
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: CustomInkWell(
-          onTap: () {
-            title = item["name"];
-            setState(() {});
-            animateToPage(1);
-            getStoreList(item["id"]);
-          },
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                customImage(
-                  Get.width * .16,
-                  item["image"],
-                  isCircle: true,
-                ),
-                SizedBox(height: Get.height * .04),
-                Text(
-                  item["name"] ?? "",
-                  style: TextStyle(
-                    color: !item["empty"] ? MyColors.black : MyColors.grey,
+    var item = loading ? null : categories[index - 1];
+    return loading
+        ? Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomShimmer(
+                        width: Get.width * .16,
+                        height: Get.width * .16,
+                        borderRadius: 50,
+                      ),
+                      SizedBox(height: Get.height * .04),
+                      CustomShimmer(width: Get.width * .2, height: 16)
+                    ],
+                  )),
             ),
-          ),
-        ),
-      ),
-    );
+          )
+        : Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: CustomInkWell(
+                onTap: () {
+                  title = item["name"];
+                  setState(() {});
+                  animateToPage(1);
+                  if (item["warning"] != "") {
+                    showWarningDialog(item["warning"], () {
+                      Get.back();
+                      category = item["id"];
+                      setState(() {});
+                      getStoreList();
+                    });
+                  } else {
+                    category = item["id"];
+                    setState(() {});
+                    getStoreList();
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      customImage(
+                        Get.width * .16,
+                        item["image"],
+                        isCircle: true,
+                      ),
+                      SizedBox(height: Get.height * .04),
+                      Text(
+                        item["name"] ?? "",
+                        style: TextStyle(
+                          color:
+                              !item["empty"] ? MyColors.black : MyColors.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
   }
 
   Widget _homeScreenStoreListView() {
@@ -243,155 +374,94 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
           ? listShimmerWidget()
           : !storeLoading && storeList.isEmpty
               ? customEmptyWidget("Дэлгүүр байхгүй байна")
-              : ListView.separated(
-                  separatorBuilder: (context, index) {
-                    return Container();
+              : RefreshIndicator(
+                  color: MyColors.primary,
+                  onRefresh: () async {
+                    storeList.clear();
+                    await Future.delayed(const Duration(milliseconds: 600));
+                    setState(() {});
+                    getStoreList();
                   },
-                  physics: const BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: storeList.isEmpty ? 6 : storeList.length,
-                  itemBuilder: (context, index) {
-                    if (storeList.isEmpty) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      var data = storeList[index];
-                      return CustomInkWell(
-                        onTap: () {
-                          Get.toNamed(userProductsScreenRoute, arguments: {
-                            "title": data["name"],
-                            "id": data["id"]
-                          });
-                        },
-                        borderRadius: BorderRadius.zero,
-                        child: SizedBox(
-                          height: Get.width * .2 + 16,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                customImage(
-                                  Get.width * .2,
-                                  data["image"],
-                                  isCircle: true,
-                                  isFaded: data["isOpen"] == 0,
-                                  fadeText: "Хаалттай",
-                                ),
-                                SizedBox(width: Get.width * .05),
-                                SizedBox(
-                                  width: Get.width * .6,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        data["name"],
-                                        style: const TextStyle(
-                                          color: MyColors.black,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        data["description"],
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return Container();
+                    },
+                    shrinkWrap: true,
+                    itemCount: storeList.isEmpty ? 6 : storeList.length,
+                    itemBuilder: (context, index) {
+                      if (storeList.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        var data = storeList[index];
+                        return CustomInkWell(
+                          onTap: () {
+                            Get.toNamed(userProductsScreenRoute, arguments: {
+                              "title": data["name"],
+                              "id": data["id"],
+                              "isOpen": data["isOpen"]
+                            });
+                          },
+                          borderRadius: BorderRadius.zero,
+                          child: SizedBox(
+                            height: Get.width * .2 + 16,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  customImage(
+                                    Get.width * .2,
+                                    data["image"],
+                                    isCircle: true,
+                                    isFaded: data["isOpen"] == 0,
+                                    fadeText: "Хаалттай",
                                   ),
-                                ),
-                                const Expanded(
-                                  child: Center(
-                                    child: Icon(
-                                      IconlyLight.arrow_right_2,
-                                      size: 20,
+                                  SizedBox(width: Get.width * .05),
+                                  SizedBox(
+                                    width: Get.width * .6,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          data["name"],
+                                          style: const TextStyle(
+                                            color: MyColors.black,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          data["description"],
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
+                                  const Expanded(
+                                    child: Center(
+                                      child: Icon(
+                                        IconlyLight.arrow_right_2,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }
-                  },
+                        );
+                      }
+                    },
+                  ),
                 ),
-    );
-  }
-
-  Widget _shimmerWidget() {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              _shimmer(),
-              _shimmer(),
-              _shimmer(),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Row(
-            children: [
-              _shimmer(),
-              _shimmer(),
-              _shimmer(),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Row(
-            children: [
-              _shimmer(),
-              _shimmer(),
-              _shimmer(),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _shimmer() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: Get.width * .16,
-                height: Get.width * .16,
-                child: CustomShimmer(
-                  width: Get.width * .16,
-                  height: Get.width * .16,
-                  borderRadius: 50,
-                ),
-              ),
-              SizedBox(height: Get.height * .04),
-              SizedBox(
-                width: Get.width * .16,
-                height: 16,
-                child: CustomShimmer(
-                  width: Get.width * .16,
-                  height: 16,
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

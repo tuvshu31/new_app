@@ -39,7 +39,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
     scrollHandler();
   }
 
-  void getUserSavedProducts() async {
+  Future<void> getUserSavedProducts() async {
     loading = true;
     var query = {"page": page};
     dynamic getUserSavedProducts = await UserApi().getUserSavedProducts(query);
@@ -124,36 +124,45 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
             ? listShimmerWidget()
             : !loading && saved.isEmpty
                 ? customEmptyWidget("Хадгалсан бараа байхгүй байна")
-                : ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        width: double.infinity,
-                        height: Get.height * .008,
-                        decoration: BoxDecoration(color: MyColors.fadedGrey),
-                      );
+                : RefreshIndicator(
+                    color: MyColors.primary,
+                    onRefresh: () async {
+                      saved.clear();
+                      page = 1;
+                      await Future.delayed(const Duration(milliseconds: 600));
+                      setState(() {});
+                      getUserSavedProducts();
                     },
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: hasMore ? saved.length + 1 : saved.length,
-                    controller: scrollController,
-                    itemBuilder: (context, index) {
-                      if (index < saved.length) {
-                        var item = saved[index];
-                        return listItemWidget(item, () {
-                          addToCart(item["id"], item["store"]);
-                        }, () {
-                          removeItem(item);
-                        });
-                      } else if (hasMore) {
-                        return Center(
-                            child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: itemShimmer(),
-                        ));
-                      } else {
-                        return Container();
-                      }
-                    },
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          width: double.infinity,
+                          height: Get.height * .008,
+                          decoration: BoxDecoration(color: MyColors.fadedGrey),
+                        );
+                      },
+                      itemCount: hasMore ? saved.length + 1 : saved.length,
+                      controller: scrollController,
+                      itemBuilder: (context, index) {
+                        if (index < saved.length) {
+                          var item = saved[index];
+                          return listItemWidget(item, () {
+                            addToCart(item["id"], item["store"]);
+                          }, () {
+                            removeItem(item);
+                          });
+                        } else if (hasMore) {
+                          return Center(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: itemShimmer(),
+                          ));
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
                   ));
   }
 

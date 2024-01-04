@@ -104,7 +104,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
         amount["subTotal"] -= product["totalPrice"];
         cart.removeWhere((element) => element["id"] == productId);
         setState(() {});
-        customSnackbar(ActionType.success, "Амжилттай устгалаа", 2);
       } else {
         customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
@@ -124,7 +123,6 @@ class _UserCartScreenState extends State<UserCartScreen> {
         if (response["success"]) {
           cart.clear();
           setState(() {});
-          customSnackbar(ActionType.success, "Амжилттай устгалаа", 2);
         } else {
           customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
         }
@@ -134,7 +132,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
 
   void addToSaved(int productId, int storeId) async {
     CustomDialogs().showLoadingDialog();
-    dynamic addToSaved = await UserApi().addToSaved(productId, storeId);
+    dynamic addToSaved = await UserApi().addToSaved(productId);
     Get.back();
     if (addToSaved != null) {
       dynamic response = Map<String, dynamic>.from(addToSaved);

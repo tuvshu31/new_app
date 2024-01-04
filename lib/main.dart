@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
-import 'package:Erdenet24/controller/data_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
@@ -116,12 +116,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _dataCtx = Get.put(DataController());
+  final _userCtx = Get.put(UserController());
   @override
   void initState() {
     super.initState();
     listenToNotification();
-    _dataCtx.getMainCategories();
+    _userCtx.getMainCategories();
   }
 
   listenToNotification() {

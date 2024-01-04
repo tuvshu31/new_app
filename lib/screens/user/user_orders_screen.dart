@@ -79,37 +79,40 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                 ? listShimmerWidget()
                 : !_userCtx.loading.value && _userCtx.orders.isEmpty
                     ? customEmptyWidget("Захиалга байхгүй байна")
-                    : ListView.separated(
-                        separatorBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            width: double.infinity,
-                            height: Get.height * .008,
-                            decoration:
-                                BoxDecoration(color: MyColors.fadedGrey),
-                          );
-                        },
-                        padding: const EdgeInsets.only(top: 12),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: _userCtx.hasMore.value
-                            ? _userCtx.orders.length + 1
-                            : _userCtx.orders.length,
-                        controller: scrollController,
-                        itemBuilder: (context, index) {
-                          if (index < _userCtx.orders.length) {
-                            var item = _userCtx.orders[index];
-                            return listItemWidget(item, () {}, () {});
-                          } else if (_userCtx.hasMore.value) {
-                            return Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: itemShimmer(),
-                              ),
+                    : RefreshIndicator(
+                        onRefresh: () async {},
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              width: double.infinity,
+                              height: Get.height * .008,
+                              decoration:
+                                  BoxDecoration(color: MyColors.fadedGrey),
                             );
-                          } else {
-                            return Container();
-                          }
-                        },
+                          },
+                          padding: const EdgeInsets.only(top: 12),
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: _userCtx.hasMore.value
+                              ? _userCtx.orders.length + 1
+                              : _userCtx.orders.length,
+                          controller: scrollController,
+                          itemBuilder: (context, index) {
+                            if (index < _userCtx.orders.length) {
+                              var item = _userCtx.orders[index];
+                              return listItemWidget(item, () {}, () {});
+                            } else if (_userCtx.hasMore.value) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: itemShimmer(),
+                                ),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
                       )),
       ),
     );

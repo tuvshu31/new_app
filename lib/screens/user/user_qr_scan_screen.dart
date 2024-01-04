@@ -1,5 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/dio_requests/store.dart';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
@@ -71,8 +79,24 @@ class _UserQRScanScreenState extends State<UserQRScanScreen> {
     setState(() {
       this.controller = controller;
     });
-    controller.scannedDataStream.listen((barcode) {
-      print(barcode);
+    controller.scannedDataStream.listen((barcode) async {
+      final data = json.decode(barcode.code!);
+      if (data["type"] == "navigate") {
+        Get.back();
+        CustomDialogs().showLoadingDialog();
+        String route = data["argument1"];
+        int storeId = int.parse(data["argument2"]);
+        dynamic getStoreInfo = await UserApi().getStoreInfo(storeId);
+        Get.back();
+        if (getStoreInfo != null) {
+          dynamic response = Map<String, dynamic>.from(getStoreInfo);
+          String storeName = response["data"]['name'];
+          Get.toNamed("/$route",
+              arguments: {"title": storeName, "id": storeId});
+        } else {
+          customSnackbar(ActionType.error, "QR code буруу байна!", 2);
+        }
+      }
     });
   }
 }

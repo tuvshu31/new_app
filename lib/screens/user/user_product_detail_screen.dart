@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
@@ -47,6 +49,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     super.initState();
     getProductDetails();
     getProductAvailableInfo();
+    log(_arguments.toString());
   }
 
   void listClick(GlobalKey widgetKey) async {
@@ -56,10 +59,10 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
 
   void getProductDetails() async {
     loading = true;
-    dynamic getUserStoreCategories =
+    dynamic getProductDetails =
         await UserApi().getProductDetails(_arguments["id"]);
-    if (getUserStoreCategories != null) {
-      dynamic response = Map<String, dynamic>.from(getUserStoreCategories);
+    if (getProductDetails != null) {
+      dynamic response = Map<String, dynamic>.from(getProductDetails);
       if (response["success"]) {
         data = response["data"];
         images.add(Image.network(data["image"]));
@@ -138,17 +141,17 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     }
   }
 
-  void addToSaved(int productId, int storeId) async {
-    dynamic addToSaved = await UserApi().addToSaved(productId, storeId);
+  void addToSaved(int productId) async {
+    dynamic addToSaved = await UserApi().addToSaved(productId);
     if (addToSaved != null) {
       dynamic response = Map<String, dynamic>.from(addToSaved);
       if (response["success"]) {
-        info["isSaved"] = true;
+        info["isSaved"] = response["isSaved"];
+        setState(() {});
       } else {
         customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
     }
-    setState(() {});
   }
 
   @override
@@ -360,14 +363,23 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                 child: Center(
                   child: CustomButton(
                     onPressed: () {
-                      addToCart(_arguments["id"], _arguments["store"]);
+                      if (_arguments["isOpen"] == 1) {
+                        addToCart(_arguments["id"], _arguments["store"]);
+                      } else {
+                        customSnackbar(
+                          ActionType.warning,
+                          "Уучлаарай, байгууллага хаалттай байна",
+                          3,
+                        );
+                      }
                     },
                     isLoading: addingToCart,
-                    isActive: !loadingInfo,
                     text: "Сагсанд нэмэх",
                     textColor: MyColors.white,
                     elevation: 0,
-                    bgColor: MyColors.primary,
+                    bgColor: !loadingInfo && _arguments["isOpen"] == 1
+                        ? MyColors.primary
+                        : MyColors.background,
                   ),
                 ),
               ),
@@ -434,6 +446,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       borderRadius: BorderRadius.circular(50),
       elevation: 2,
       child: CustomInkWell(
+        borderRadius: BorderRadius.circular(50),
         onTap: () => Get.back(),
         child: Container(
           decoration: BoxDecoration(
@@ -457,7 +470,8 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       borderRadius: BorderRadius.circular(50),
       elevation: 2,
       child: CustomInkWell(
-        onTap: () => addToSaved(_arguments["id"], _arguments["store"]),
+        borderRadius: BorderRadius.circular(50),
+        onTap: () => addToSaved(_arguments["id"]),
         child: Container(
             decoration: BoxDecoration(
               color: MyColors.white,
@@ -465,17 +479,23 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
-              child: info.isNotEmpty && !info["isSaved"]
+              child: info.isEmpty
                   ? const Icon(
                       IconlyLight.star,
                       size: 20,
-                      color: MyColors.black,
+                      color: MyColors.gray,
                     )
-                  : const Icon(
-                      IconlyBold.star,
-                      size: 20,
-                      color: Colors.amber,
-                    ),
+                  : !info["isSaved"]
+                      ? const Icon(
+                          IconlyLight.star,
+                          size: 20,
+                          color: MyColors.black,
+                        )
+                      : const Icon(
+                          IconlyBold.star,
+                          size: 20,
+                          color: Colors.amber,
+                        ),
             )),
       ),
     );

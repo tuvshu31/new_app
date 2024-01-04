@@ -1,7 +1,8 @@
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
+import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/user/user_profile_phone_edit_otp_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -22,41 +23,25 @@ class UserProfilePhoneEditScreen extends StatefulWidget {
 
 class _UserProfilePhoneEditScreenState
     extends State<UserProfilePhoneEditScreen> {
+  bool phoneNumberOk = false;
   TextEditingController phoneController = TextEditingController();
-  bool phoneIsOk = false;
-  dynamic _user = [];
+  final _userCtx = Get.put(UserController());
 
-  @override
-  void initState() {
-    super.initState();
-    getUserInfo();
-  }
-
-  void getUserInfo() async {
-    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
-    dynamic data = Map<String, dynamic>.from(res);
-    setState(() {
-      _user = data["data"];
-    });
-    phoneController.text = _user["phone"].toString();
-  }
-
-  void savePhoneNumber() async {
+  void checkPhoneAndSendOTP() async {
     CustomDialogs().showLoadingDialog();
-    var body = {
-      "phone": phoneController.text,
-    };
-    dynamic authCode =
-        await RestApi().updateUser(RestApiHelper.getUserId(), body);
-    dynamic response = Map<String, dynamic>.from(authCode);
+    String phone = phoneController.text;
+    dynamic checkPhoneAndSendOTP = await UserApi().checkPhoneAndSendOTP(phone);
     Get.back();
-    if (response["success"]) {
-      customSnackbar(ActionType.success, "Амжилттай хадгалагдлаа", 3);
-      Get.back();
-    } else {
-      customSnackbar(ActionType.error,
-          "Серверийн алдаа гарлаа түр хүлээгээд дахин оролдоно уу", 2);
-      Get.back();
+    if (checkPhoneAndSendOTP != null) {
+      dynamic response = Map<String, dynamic>.from(checkPhoneAndSendOTP);
+      if (response["success"]) {
+        Get.to(
+          () => const UserProfilePhoneEditOtpScreen(),
+          arguments: {"phone": phone, "code": response["code"]},
+        );
+      } else {
+        customSnackbar(ActionType.error, response["error"], 3);
+      }
     }
   }
 
@@ -64,47 +49,52 @@ class _UserProfilePhoneEditScreenState
   Widget build(BuildContext context) {
     return CustomHeader(
         customActions: Container(),
-        title: "Утасны дугаар өөрчлөх",
-        body: _user.isNotEmpty
-            ? Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                        color: MyColors.fadedGrey, shape: BoxShape.circle),
-                    child: Image(
-                      image: const AssetImage("assets/images/png/app/dial.png"),
-                      width: Get.width * .1,
-                    ),
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  const CustomText(
-                    text: "Утасны дугаараа оруулна уу",
-                    color: MyColors.gray,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  CustomTextField(
-                    autoFocus: true,
-                    hintText: "Утасны дугаар",
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    maxLength: 8,
-                    controller: phoneController,
-                    onChanged: (p0) {
-                      setState(() {
-                        phoneIsOk = p0.length == 8;
-                      });
-                    },
-                  ),
-                  SizedBox(height: Get.height * .03),
-                  CustomButton(
-                    text: "Өөрчлөх",
-                    isActive: phoneIsOk,
-                    onPressed: savePhoneNumber,
-                  ),
-                ]))
-            : MyShimmers().userPage());
+        title: "Утасны дугаараа солих",
+        body: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                    color: MyColors.fadedGrey, shape: BoxShape.circle),
+                child: Image(
+                  image: const AssetImage("assets/images/png/app/dial.png"),
+                  width: Get.width * .1,
+                ),
+              ),
+              SizedBox(height: Get.height * .03),
+              const CustomText(
+                text: "Шинэ утасны дугаараа оруулна уу",
+                color: MyColors.gray,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: Get.height * .03),
+              CustomTextField(
+                autoFocus: true,
+                hintText: "Утасны дугаар",
+                keyboardType: TextInputType.number,
+                maxLength: 8,
+                controller: phoneController,
+                onChanged: ((val) {
+                  phoneNumberOk = val.length == 8 ? true : false;
+                  setState(() {});
+                }),
+              ),
+              SizedBox(height: Get.height * .03),
+              CustomButton(
+                text: "Баталгаажуулах код авах",
+                isActive: phoneNumberOk,
+                onPressed: () {
+                  if (_userCtx.userInfo["phone"] == phoneController.text) {
+                    customSnackbar(
+                        ActionType.error,
+                        "Уучлаарай шинэ утасны дугаар одоогийн утасны дугаартай адил байна",
+                        3);
+                  } else {
+                    checkPhoneAndSendOTP();
+                  }
+                },
+              ),
+            ])));
   }
 }
