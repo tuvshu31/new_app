@@ -363,12 +363,12 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                 child: Center(
                   child: CustomButton(
                     onPressed: () {
-                      if (_arguments["isOpen"] == 1) {
+                      if (_arguments["isOpen"]) {
                         addToCart(_arguments["id"], _arguments["store"]);
                       } else {
                         customSnackbar(
-                          ActionType.warning,
-                          "Уучлаарай, байгууллага хаалттай байна",
+                          ActionType.error,
+                          "Байгууллага хаалттай байна",
                           3,
                         );
                       }
@@ -377,7 +377,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                     text: "Сагсанд нэмэх",
                     textColor: MyColors.white,
                     elevation: 0,
-                    bgColor: !loadingInfo && _arguments["isOpen"] == 1
+                    bgColor: !loadingInfo && _arguments["isOpen"]
                         ? MyColors.primary
                         : MyColors.background,
                   ),

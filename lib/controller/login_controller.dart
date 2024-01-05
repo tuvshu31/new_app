@@ -32,7 +32,6 @@ class LoginController extends GetxController {
     RestApiHelper.saveUserRole("");
     RestApiHelper.saveOrderId(0);
     _navCtx.onItemTapped(0);
-    _cartCtx.savedList.clear();
     Get.back();
     Get.offAll(() => const SplashPhoneRegisterScreen());
   }

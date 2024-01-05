@@ -201,7 +201,8 @@ class _UserProductsSearchScreenState extends State<UserProductsSearchScreen> {
                         child: !loading && products.isEmpty
                             ? Container(
                                 color: MyColors.white,
-                                child: customEmptyWidget("Бараа байхгүй байна"),
+                                child:
+                                    customEmptyWidget("Хайлт илэрцгүй байна"),
                               )
                             : GridView.builder(
                                 padding: const EdgeInsets.symmetric(

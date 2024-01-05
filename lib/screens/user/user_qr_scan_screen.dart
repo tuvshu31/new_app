@@ -7,6 +7,7 @@ import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import "package:flutter/material.dart";
@@ -53,7 +54,27 @@ class _UserQRScanScreenState extends State<UserQRScanScreen> {
               color: MyColors.white,
               fontSize: 16,
             ),
-          )
+          ),
+          Positioned(
+              top: Get.width * .05,
+              right: Get.width * .05,
+              child: CustomInkWell(
+                borderRadius: BorderRadius.circular(50),
+                onTap: () {
+                  Get.back();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: MyColors.fadedGrey,
+                  ),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                  ),
+                ),
+              ))
         ],
       ),
     ));
@@ -91,8 +112,12 @@ class _UserQRScanScreenState extends State<UserQRScanScreen> {
         if (getStoreInfo != null) {
           dynamic response = Map<String, dynamic>.from(getStoreInfo);
           String storeName = response["data"]['name'];
-          Get.toNamed("/$route",
-              arguments: {"title": storeName, "id": storeId});
+          bool isOpen = response["data"]["isOpen"];
+          Get.toNamed("/$route", arguments: {
+            "title": storeName,
+            "id": storeId,
+            "isOpen": isOpen,
+          });
         } else {
           customSnackbar(ActionType.error, "QR code буруу байна!", 2);
         }

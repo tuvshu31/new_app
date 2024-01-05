@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
@@ -30,6 +31,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
   Map amount = {};
   bool loading = false;
   int loadingId = 0;
+  final _navCtx = Get.put(NavigationController());
 
   @override
   void initState() {
@@ -149,50 +151,58 @@ class _UserCartScreenState extends State<UserCartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomHeader(
-        isMainPage: true,
-        title:
-            cart.isNotEmpty ? "Таны сагсанд (${cart.length})" : "Таны сагсанд",
-        customActions: cart.isNotEmpty
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  customTextButton(
-                    () => emptyTheCart(),
-                    IconlyLight.delete,
-                    "Хоослох",
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  )
-                ],
-              )
-            : Container(),
-        actionWidth: Get.width * .3,
-        bottomSheet: cart.isNotEmpty ? _bottomSheet() : null,
-        body: loading && cart.isEmpty
-            ? listShimmerWidget()
-            : !loading && cart.isEmpty
-                ? customEmptyWidget("Таны сагс хоосон байна")
-                : SizedBox(
-                    height: Get.height * .73,
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          width: double.infinity,
-                          height: Get.height * .008,
-                          decoration: BoxDecoration(color: MyColors.fadedGrey),
-                        );
-                      },
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: cart.length,
-                      itemBuilder: (context, index) {
-                        Map item = cart[index];
-                        return listItemWidget(item);
-                      },
+    return WillPopScope(
+      onWillPop: () async {
+        _navCtx.onItemTapped(0);
+        return false;
+      },
+      child: CustomHeader(
+          isMainPage: true,
+          title: cart.isNotEmpty
+              ? "Таны сагсанд (${cart.length})"
+              : "Таны сагсанд",
+          customActions: cart.isNotEmpty
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    customTextButton(
+                      () => emptyTheCart(),
+                      IconlyLight.delete,
+                      "Хоослох",
                     ),
-                  ));
+                    const SizedBox(
+                      width: 16,
+                    )
+                  ],
+                )
+              : Container(),
+          actionWidth: Get.width * .3,
+          bottomSheet: cart.isNotEmpty ? _bottomSheet() : null,
+          body: loading && cart.isEmpty
+              ? listShimmerWidget()
+              : !loading && cart.isEmpty
+                  ? customEmptyWidget("Таны сагс хоосон байна")
+                  : SizedBox(
+                      height: Get.height * .73,
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            width: double.infinity,
+                            height: Get.height * .008,
+                            decoration:
+                                BoxDecoration(color: MyColors.fadedGrey),
+                          );
+                        },
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: cart.length,
+                        itemBuilder: (context, index) {
+                          Map item = cart[index];
+                          return listItemWidget(item);
+                        },
+                      ),
+                    )),
+    );
   }
 
   Widget listItemWidget(Map item) {

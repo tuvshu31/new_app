@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
@@ -162,36 +163,34 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
       ),
       body: !searching && searchController.text.isEmpty
           ? customEmptyWidget("Хайх үгээ оруулна уу")
-          : ListView.separated(
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              itemCount: searching ? 12 : products.length,
-              separatorBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  width: double.infinity,
-                  height: Get.height * .008,
-                  decoration: BoxDecoration(color: MyColors.fadedGrey),
-                );
-              },
-              padding: const EdgeInsets.only(top: 12),
-              itemBuilder: (context, index) {
-                if (index < products.length) {
-                  var item = products[index];
-                  return listItemWidget(item, () {
-                    Get.offNamed(userProductsScreenRoute, arguments: {
-                      "title": item["storeName"],
-                      "id": item["store"],
-                      "isOpen": item["isOpen"] == true ? 1 : 0
-                    });
-                  });
-                } else if (searching) {
-                  return itemShimmer();
-                } else {
-                  return Container();
-                }
-              },
-            ),
+          : searching && products.isEmpty
+              ? listShimmerWidget()
+              : !searching && products.isNotEmpty
+                  ? ListView.separated(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: products.length,
+                      separatorBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          width: double.infinity,
+                          height: Get.height * .008,
+                          decoration: BoxDecoration(color: MyColors.fadedGrey),
+                        );
+                      },
+                      padding: const EdgeInsets.only(top: 12),
+                      itemBuilder: (context, index) {
+                        var item = products[index];
+                        return listItemWidget(item, () {
+                          Get.offNamed(userProductsScreenRoute, arguments: {
+                            "title": item["storeName"],
+                            "id": item["store"],
+                            "isOpen": item["isOpen"]
+                          });
+                        });
+                      },
+                    )
+                  : customEmptyWidget("Хайлт илэрцгүй байна"),
     );
   }
 
@@ -231,38 +230,6 @@ class _UserSearchBarScreenRouteState extends State<UserSearchBarScreenRoute> {
           ),
           SizedBox(width: Get.width * .04),
         ],
-      ),
-    );
-  }
-
-  Widget itemShimmer() {
-    return SizedBox(
-      height: Get.height * .07,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(width: Get.width * .04),
-            Stack(
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: Get.width * 0.12,
-                    maxHeight: Get.width * 0.12,
-                  ),
-                  child: CustomShimmer(
-                    width: Get.width * .12,
-                    height: Get.width * .12,
-                    borderRadius: 50,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(width: Get.width * .04),
-            CustomShimmer(width: Get.width * .65, height: 16),
-          ],
-        ),
       ),
     );
   }

@@ -122,26 +122,26 @@ class _CustomHeaderState extends State<CustomHeader>
                       color: MyColors.black,
                     ),
                   ),
-                  Obx(
-                    () => Positioned(
-                      top: 6,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red,
-                        ),
-                        child: Text(
-                          _cartCtx.cartItemCount.value.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
+                  // Obx(
+                  //   () => Positioned(
+                  //     top: 6,
+                  //     right: 8,
+                  //     child: Container(
+                  //       padding: const EdgeInsets.all(4),
+                  //       decoration: const BoxDecoration(
+                  //         shape: BoxShape.circle,
+                  //         color: Colors.red,
+                  //       ),
+                  //       child: Text(
+                  //         _cartCtx.cartItemCount.value.toString(),
+                  //         style: const TextStyle(
+                  //           color: Colors.white,
+                  //           fontSize: 10,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // )
                 ],
               )),
     );

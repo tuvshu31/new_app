@@ -1,4 +1,5 @@
 import 'package:Erdenet24/api/local_notification.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/image.dart';
@@ -21,6 +22,7 @@ class UserOrdersScreen extends StatefulWidget {
 }
 
 class _UserOrdersScreenState extends State<UserOrdersScreen> {
+  final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
   ScrollController scrollController = ScrollController();
 
@@ -58,62 +60,75 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => DefaultTabController(
-        initialIndex: _userCtx.tab.value,
-        length: 3,
-        child: CustomHeader(
-            isMainPage: true,
-            title: "Захиалгууд",
-            customActions: Container(),
-            tabBar: TabBar(
-                onTap: (val) => onTap(val),
-                indicatorColor: MyColors.primary,
-                labelColor: MyColors.primary,
-                unselectedLabelColor: Colors.black,
-                tabs: const [
-                  Tab(text: "Шинэ"),
-                  Tab(text: "Хүргэсэн"),
-                  Tab(text: "Цуцалсан")
-                ]),
-            body: _userCtx.loading.value && _userCtx.orders.isEmpty
-                ? listShimmerWidget()
-                : !_userCtx.loading.value && _userCtx.orders.isEmpty
-                    ? customEmptyWidget("Захиалга байхгүй байна")
-                    : RefreshIndicator(
-                        onRefresh: () async {},
-                        child: ListView.separated(
-                          separatorBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              width: double.infinity,
-                              height: Get.height * .008,
-                              decoration:
-                                  BoxDecoration(color: MyColors.fadedGrey),
-                            );
+      () => WillPopScope(
+        onWillPop: () async {
+          _navCtx.onItemTapped(0);
+          return false;
+        },
+        child: DefaultTabController(
+          initialIndex: _userCtx.tab.value,
+          length: 3,
+          child: CustomHeader(
+              isMainPage: true,
+              title: "Захиалгууд",
+              customActions: Container(),
+              tabBar: TabBar(
+                  onTap: (val) => onTap(val),
+                  indicatorColor: MyColors.primary,
+                  labelColor: MyColors.primary,
+                  unselectedLabelColor: Colors.black,
+                  tabs: const [
+                    Tab(text: "Шинэ"),
+                    Tab(text: "Хүргэсэн"),
+                    Tab(text: "Цуцалсан")
+                  ]),
+              body: _userCtx.loading.value && _userCtx.orders.isEmpty
+                  ? listShimmerWidget()
+                  : !_userCtx.loading.value && _userCtx.orders.isEmpty
+                      ? customEmptyWidget("Захиалга байхгүй байна")
+                      : RefreshIndicator(
+                          color: MyColors.primary,
+                          onRefresh: () async {
+                            await Future.delayed(
+                                const Duration(milliseconds: 600));
+                            _userCtx.orders.clear();
+                            _userCtx.page.value = 1;
+                            _userCtx.getUserOrders();
                           },
-                          padding: const EdgeInsets.only(top: 12),
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: _userCtx.hasMore.value
-                              ? _userCtx.orders.length + 1
-                              : _userCtx.orders.length,
-                          controller: scrollController,
-                          itemBuilder: (context, index) {
-                            if (index < _userCtx.orders.length) {
-                              var item = _userCtx.orders[index];
-                              return listItemWidget(item, () {}, () {});
-                            } else if (_userCtx.hasMore.value) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: itemShimmer(),
-                                ),
+                          child: ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                width: double.infinity,
+                                height: Get.height * .008,
+                                decoration:
+                                    BoxDecoration(color: MyColors.fadedGrey),
                               );
-                            } else {
-                              return Container();
-                            }
-                          },
-                        ),
-                      )),
+                            },
+                            padding: const EdgeInsets.only(top: 12),
+                            itemCount: _userCtx.hasMore.value
+                                ? _userCtx.orders.length + 1
+                                : _userCtx.orders.length,
+                            controller: scrollController,
+                            itemBuilder: (context, index) {
+                              if (index < _userCtx.orders.length) {
+                                var item = _userCtx.orders[index];
+                                return listItemWidget(item, () {}, () {});
+                              } else if (_userCtx.hasMore.value) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: itemShimmer(),
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
+                        )),
+        ),
       ),
     );
   }

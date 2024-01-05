@@ -63,7 +63,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
 
   void scrollToTop() {
     scrollController.animateTo(0,
-        duration: const Duration(seconds: 1), curve: Curves.elasticInOut);
+        duration: const Duration(seconds: 1), curve: Curves.linear);
   }
 
   Timer? _debounceTimer;
@@ -882,7 +882,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
         : loading
             ? customLoadingWidget()
             : customEmptyWidget(
-                showSearchBar ? "Хайх үгээ оруулна уу" : "Бараа байхгүй байна",
+                showSearchBar ? "Хайх үгээ оруулна уу" : "Хайлт илэрцгүй байна",
               );
   }
 

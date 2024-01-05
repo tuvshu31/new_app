@@ -1,5 +1,7 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/store.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/widgets/custom_dialogs.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
   bool hasMore = true;
   Map pagination = {};
   int total = 0;
+  final _navCtx = Get.put(NavigationController());
   ScrollController scrollController = ScrollController();
 
   @override
@@ -109,61 +112,105 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
         setState(() {});
         customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
       } else {
-        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+        handleAddCartError(
+          response["errorType"],
+          response["errorText"],
+          productId,
+          storeId,
+        );
       }
+    }
+  }
+
+  void handleAddCartError(
+      String errorType, String errorText, int productId, int storeId) {
+    if (errorType == "same_store") {
+      showMyCustomDialog(
+        true,
+        ActionType.warning,
+        errorText,
+        () async {
+          Get.back();
+          dynamic emptyAndAddToCart =
+              await UserApi().emptyAndAddToCart(productId, storeId);
+          if (emptyAndAddToCart != null) {
+            dynamic response = Map<String, dynamic>.from(emptyAndAddToCart);
+            if (response["success"]) {
+              customSnackbar(ActionType.success, "Сагсанд нэмэгдлээ", 2);
+            } else {
+              customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+            }
+          }
+        },
+        Container(),
+        okText: "Нэмэх",
+        cancelText: "Хаах",
+      );
+    }
+    if (errorType == "not_enought") {
+      log("NOt enough!");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomHeader(
-        isMainPage: true,
-        title: saved.isNotEmpty ? "Таны хадгалсан ($total)" : "Таны хадгалсан",
-        customActions: Container(),
-        body: loading && saved.isEmpty
-            ? listShimmerWidget()
-            : !loading && saved.isEmpty
-                ? customEmptyWidget("Хадгалсан бараа байхгүй байна")
-                : RefreshIndicator(
-                    color: MyColors.primary,
-                    onRefresh: () async {
-                      saved.clear();
-                      page = 1;
-                      await Future.delayed(const Duration(milliseconds: 600));
-                      setState(() {});
-                      getUserSavedProducts();
-                    },
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          width: double.infinity,
-                          height: Get.height * .008,
-                          decoration: BoxDecoration(color: MyColors.fadedGrey),
-                        );
+    return WillPopScope(
+      onWillPop: () async {
+        _navCtx.onItemTapped(0);
+        return false;
+      },
+      child: CustomHeader(
+          isMainPage: true,
+          title:
+              saved.isNotEmpty ? "Таны хадгалсан ($total)" : "Таны хадгалсан",
+          customActions: Container(),
+          body: loading && saved.isEmpty
+              ? listShimmerWidget()
+              : !loading && saved.isEmpty
+                  ? customEmptyWidget("Хадгалсан бараа байхгүй байна")
+                  : RefreshIndicator(
+                      color: MyColors.primary,
+                      onRefresh: () async {
+                        saved.clear();
+                        page = 1;
+                        await Future.delayed(const Duration(milliseconds: 600));
+                        setState(() {});
+                        getUserSavedProducts();
                       },
-                      itemCount: hasMore ? saved.length + 1 : saved.length,
-                      controller: scrollController,
-                      itemBuilder: (context, index) {
-                        if (index < saved.length) {
-                          var item = saved[index];
-                          return listItemWidget(item, () {
-                            addToCart(item["id"], item["store"]);
-                          }, () {
-                            removeItem(item);
-                          });
-                        } else if (hasMore) {
-                          return Center(
-                              child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: itemShimmer(),
-                          ));
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  ));
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            width: double.infinity,
+                            height: Get.height * .008,
+                            decoration:
+                                BoxDecoration(color: MyColors.fadedGrey),
+                          );
+                        },
+                        itemCount: hasMore ? saved.length + 1 : saved.length,
+                        controller: scrollController,
+                        itemBuilder: (context, index) {
+                          if (index < saved.length) {
+                            var item = saved[index];
+                            return listItemWidget(item, () {
+                              addToCart(item["id"], item["store"]);
+                            }, () {
+                              removeItem(item);
+                            });
+                          } else if (hasMore) {
+                            return Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: itemShimmer(),
+                            ));
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    )),
+    );
   }
 
   Widget listItemWidget(

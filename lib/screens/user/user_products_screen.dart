@@ -198,7 +198,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   void scrollToTop() {
     scrollController.animateTo(0,
-        duration: const Duration(seconds: 1), curve: Curves.elasticInOut);
+        duration: const Duration(seconds: 1), curve: Curves.linear);
   }
 
   void showCategoryBottomSheet() {
@@ -522,7 +522,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                   fontSize: 16,
                 ),
               ),
-              _arguments["isOpen"] == 0
+              _arguments["isOpen"] == false
                   ? const Text(
                       "Хаалттай",
                       style: TextStyle(
@@ -624,7 +624,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     return loading && products.isEmpty
         ? productsLoadingWidget()
         : !loading && products.isEmpty
-            ? customEmptyWidget("Бараа байхгүй байна")
+            ? customEmptyWidget("Хайлт илэрцгүй байна")
             : RefreshIndicator(
                 color: MyColors.primary,
                 onRefresh: () async {
@@ -636,6 +636,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                 },
                 child: GridView.builder(
                   controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: hasMore ? products.length + 3 : products.length,
                   shrinkWrap: true,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -34,6 +36,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   List storeList = [];
   String title = "";
   int category = 0;
+  bool isHomePage = false;
   PageController controller = PageController();
   final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
@@ -176,13 +179,27 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      physics: const NeverScrollableScrollPhysics(),
-      controller: controller,
-      children: [
-        _homeScreenMainView(),
-        _homeScreenStoreListView(),
-      ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (isHomePage) {
+          return true;
+        } else {
+          animateToPage(0);
+          return false;
+        }
+      },
+      child: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (value) {
+          isHomePage = value == 0;
+          setState(() {});
+        },
+        controller: controller,
+        children: [
+          _homeScreenMainView(),
+          _homeScreenStoreListView(),
+        ],
+      ),
     );
   }
 
@@ -383,6 +400,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     getStoreList();
                   },
                   child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
                       return Container();
                     },
@@ -415,7 +433,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                     Get.width * .2,
                                     data["image"],
                                     isCircle: true,
-                                    isFaded: data["isOpen"] == 0,
+                                    isFaded: !data["isOpen"],
                                     fadeText: "Хаалттай",
                                   ),
                                   SizedBox(width: Get.width * .05),
