@@ -36,7 +36,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   List storeList = [];
   String title = "";
   int category = 0;
-  bool isHomePage = false;
+  bool isHomePage = true;
   PageController controller = PageController();
   final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
@@ -191,7 +191,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       child: PageView(
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: (value) {
-          isHomePage = value == 0;
+          isHomePage = value == 1;
           setState(() {});
         },
         controller: controller,

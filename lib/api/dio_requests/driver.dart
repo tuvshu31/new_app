@@ -61,4 +61,9 @@ class DriverApi {
     return DioClient()
         .sendRequest('driverFinished?driverId=$driverId', Method.post, [], {});
   }
+
+  Future getAllPreparingOrders() async {
+    return DioClient()
+        .sendRequest('getAllPreparingOrders', Method.post, [], {});
+  }
 }
