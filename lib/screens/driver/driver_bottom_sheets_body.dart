@@ -1,0 +1,177 @@
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+
+class DriverBottomSheetsBody extends StatefulWidget {
+  Map item;
+  DriverBottomSheetsBody({required this.item, super.key});
+
+  @override
+  State<DriverBottomSheetsBody> createState() => _DriverBottomSheetsBodyState();
+}
+
+class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
+  final _driverCtx = Get.put(DriverController());
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(Get.width * .04),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: widget.item["orderStatus"] == "preparing"
+            ? _receivedView()
+            : _deliveredView(),
+      ),
+    );
+  }
+
+  List<Widget> _receivedView() {
+    return [
+      _listTileWidget(
+        customImage(
+          Get.width * .1,
+          "${URL.AWS}/users/${628}/small/1.png",
+          isCircle: true,
+        ),
+        "Erdenet24 market",
+        "Subtitle",
+        "99921312",
+      ),
+      const Divider(),
+      SizedBox(height: Get.width * .03),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Захиалгын дугаар:"),
+          Text("123456789"),
+        ],
+      ),
+      SizedBox(height: Get.width * .03),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Тоо ширхэг:"),
+          Text("5 ширхэг"),
+        ],
+      ),
+      SizedBox(height: Get.width * .08),
+      CustomButton(
+        text: "Хүлээн авлаа",
+        onPressed: () {
+          Get.back();
+          _driverCtx.received(widget.item);
+        },
+      ),
+    ];
+  }
+
+  List<Widget> _deliveredView() {
+    return [
+      _listTileWidget(
+        ClipRRect(
+            borderRadius: BorderRadius.circular(50),
+            clipBehavior: Clip.hardEdge,
+            child: Container(
+              width: Get.width * .1,
+              height: Get.width * .1,
+              color: Colors.amber,
+              child: Center(
+                child: Icon(
+                  IconlyLight.profile,
+                  color: MyColors.white,
+                  size: 20,
+                ),
+              ),
+            )),
+        "User address!",
+        "USerSubtitle!",
+        "99921312",
+      ),
+      const Divider(),
+      SizedBox(height: Get.width * .03),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Захиалгын дугаар:"),
+          Text("123456789"),
+        ],
+      ),
+      SizedBox(height: Get.width * .03),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Тоо ширхэг:"),
+          Text("5 ширхэг"),
+        ],
+      ),
+      SizedBox(height: Get.width * .08),
+      CustomButton(
+        text: "Хүлээлгэн өглөө",
+        onPressed: () {
+          Get.back();
+          _driverCtx.showSecretCodeDialog(widget.item);
+        },
+      ),
+    ];
+  }
+
+  Widget _listTileWidget(
+    Widget leadingWidget,
+    String title,
+    String subtitle,
+    String phone,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: Get.width * .03),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          leadingWidget,
+          SizedBox(width: Get.width * .04),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: MyColors.gray, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          CustomInkWell(
+            onTap: () {
+              Get.back();
+              makePhoneCall("+976-$phone");
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                  color: Colors.green, shape: BoxShape.circle),
+              child: const Icon(
+                Icons.phone_rounded,
+                size: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

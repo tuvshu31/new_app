@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/screens/driver/driver_deliver_list_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
-import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
@@ -40,7 +38,6 @@ import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/screens/driver/driver_main_screen_OLD.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_bar_screen.dart';
 import 'package:Erdenet24/screens/user/user_cart_address_screen.dart';
@@ -182,9 +179,6 @@ class _MyAppState extends State<MyApp> {
         storeEditProductScreenRoute: (context) =>
             const StoreEditProductScreen(),
         driverMainScreenRoute: (context) => const DriverMainScreen(),
-        driverDeliverListScreenRoute: (context) =>
-            const DriverDeliverListScreen(),
-        driverPaymentsScreenRoute: (context) => const DriverPaymentsScreen(),
         driverSettingsScreenRoute: (context) => const DriverSettingsScreen(),
       },
     );

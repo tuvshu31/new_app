@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -96,35 +98,48 @@ String formatedTime({required int timeInSecond}) {
   return "$minute мин $second сек";
 }
 
-List reversedArray(List myList) {
-  for (var i = 0; i < myList.length / 2; i++) {
-    var temp = myList[i];
-    myList[i] = myList[myList.length - 1 - i];
-    myList[myList.length - 1 - i] = temp;
+Color _handleColor(String status) {
+  if (status == "preparing") {
+    return Colors.amber;
+  } else if (status == "delivering") {
+    return Colors.blue;
+  } else if (status == "delivered") {
+    return Colors.green;
+  } else if (status == "canceled") {
+    return Colors.red;
+  } else {
+    return Colors.black;
   }
-  return myList;
 }
 
-List statusList = [
-  {"status": "notPaid", "text": "Төлбөр төлөөгүй", "color": Colors.blue},
-  {"status": "sent", "text": "Төлбөр төлсөн", "color": Colors.orange},
-  {
-    "status": "received",
-    "text": "Захиалгыг хүлээн авсан",
-    "color": Colors.cyanAccent
-  },
-  {
-    "status": "driverAccepted",
-    "text": "Жолооч хүлээн авсан",
-    "color": Colors.blueAccent
-  },
-  {"status": "preparing", "text": "Бэлдэж байна", "color": Colors.amber},
-  {"status": "delivering", "text": "Хүргэж байгаа", "color": Colors.brown},
-  {"status": "delivered", "text": "Хүргэсэн", "color": Colors.green},
-  {"status": "canceled", "text": "Цуцалсан", "color": Colors.red},
-];
+String _handleText(String status) {
+  if (status == "preparing") {
+    return "Бэлдэж байна";
+  } else if (status == "delivering") {
+    return "Хүргэж байна";
+  } else if (status == "delivered") {
+    return "Хүргэсэн";
+  } else if (status == "canceled") {
+    return "Цуцалсан";
+  } else {
+    return "";
+  }
+}
 
-Map status(String text) {
-  Map obj = statusList.firstWhere((element) => element["status"] == text);
-  return obj;
+Widget status(String status) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(
+        Icons.circle_rounded,
+        size: 8,
+        color: _handleColor(status),
+      ),
+      SizedBox(width: Get.width * .02),
+      Text(
+        _handleText(status),
+        style: const TextStyle(fontSize: 12),
+      )
+    ],
+  );
 }

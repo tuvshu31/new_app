@@ -112,6 +112,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
       "kod": kod.text,
       "total": totalPrice,
     };
+    log(body.toString());
     dynamic createNewOrder = await UserApi().createNewOrder(body);
     Get.back();
     if (createNewOrder != null) {

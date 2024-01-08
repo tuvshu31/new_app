@@ -18,6 +18,7 @@ import shared_preferences_foundation
   // if #available(iOS 10.0, *) {
   //       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
   //     }
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

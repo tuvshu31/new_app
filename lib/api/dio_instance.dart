@@ -7,14 +7,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 
-const localUrl = "http://192.168.43.19:8000/e24/";
+const localUrl = "http://192.168.1.191:8000/e24/";
 const prodUrl = 'https://www.e24api1215.com/e24/';
 
 class DioClient {
   Dio dio = Dio(
     BaseOptions(
-      // baseUrl: localUrl,
-      baseUrl: prodUrl,
+      baseUrl: localUrl,
+      // baseUrl: prodUrl,
       connectTimeout: const Duration(minutes: 2),
       receiveTimeout: const Duration(minutes: 1),
     ),

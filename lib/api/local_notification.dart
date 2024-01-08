@@ -104,8 +104,8 @@ class LocalNotification {
     );
   }
 
-  static Future _showIncomingSoundNotificationDetails() async {
-    return const NotificationDetails(
+  static Future _showNotificationWithSoundDetails(String sound) async {
+    return NotificationDetails(
       android: AndroidNotificationDetails(
         'your channel id',
         'your channel name',
@@ -114,9 +114,9 @@ class LocalNotification {
         priority: Priority.high,
         enableVibration: true,
         playSound: true,
-        sound: RawResourceAndroidNotificationSound('incoming'),
+        sound: RawResourceAndroidNotificationSound(sound),
       ),
-      iOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
     );
   }
 
@@ -148,16 +148,17 @@ class LocalNotification {
     );
   }
 
-  static Future showIncomingSoundNotification({
+  static Future showNotificationWithSound({
     required int id,
     required String title,
     required String body,
+    required String sound,
   }) async {
     await _flutterLocalNotificationsPlugin.show(
       id,
       title,
       body,
-      await _showIncomingSoundNotificationDetails(),
+      await _showNotificationWithSoundDetails(sound),
     );
   }
 }

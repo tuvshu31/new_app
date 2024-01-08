@@ -6,21 +6,16 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconly/iconly.dart';
 
 class DriverMainScreen extends StatefulWidget {
@@ -33,16 +28,13 @@ class DriverMainScreen extends StatefulWidget {
 class _DriverMainScreenState extends State<DriverMainScreen>
     with TickerProviderStateMixin {
   bool loading = false;
-  List acceptedOrders = [];
-  List orders = [];
   final _driverCtx = Get.put(DriverController());
   final _loginCtx = Get.put(LoginController());
-  late AnimationController animationController;
 
   @override
   void initState() {
     super.initState();
-    getAllPreparingOrders();
+    _driverCtx.getAllPreparingOrders();
     getDriverInfo();
   }
 
@@ -51,140 +43,10 @@ class _DriverMainScreenState extends State<DriverMainScreen>
     if (getDriverInfo != null) {
       dynamic response = Map<String, dynamic>.from(getDriverInfo);
       if (response["success"]) {
-        log(response.toString());
         _driverCtx.driverInfo.value = response["data"];
+        _driverCtx.isOnline.value = _driverCtx.driverInfo["isOpen"];
       }
     }
-    setState(() {});
-  }
-
-  void getAllPreparingOrders() async {
-    loading = true;
-    dynamic getAllPreparingOrders = await DriverApi().getAllPreparingOrders();
-    loading = false;
-    if (getAllPreparingOrders != null) {
-      dynamic response = Map<String, dynamic>.from(getAllPreparingOrders);
-      if (response["success"]) {
-        orders = response["data"];
-        for (var i = 0; i < orders.length; i++) {
-          orders[i]["accepted"] = false;
-          animationController = AnimationController(
-              vsync: this,
-              duration: Duration(seconds: orders[i]["prepDuration"]));
-          animationController.forward();
-          orders[i]["timer"] = animationController;
-        }
-      } else {}
-    }
-    setState(() {});
-  }
-
-  void showAuthDialog(Map item) {
-    showGeneralDialog(
-      context: context,
-      barrierLabel: "",
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (ctx, a1, a2) {
-        return Container();
-      },
-      transitionBuilder: (ctx, a1, a2, child) {
-        var curve = Curves.bounceInOut.transform(a1.value);
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: Transform.scale(
-            scale: curve,
-            child: Center(
-              child: Container(
-                width: Get.width,
-                margin: EdgeInsets.all(Get.width * .09),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.only(
-                  right: Get.width * .09,
-                  left: Get.width * .09,
-                  top: Get.height * .04,
-                  bottom: Get.height * .03,
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        IconlyBold.lock,
-                        size: Get.width * .15,
-                        color: Colors.amber,
-                      ),
-                      SizedBox(height: Get.height * .02),
-                      const Text(
-                        "Баталгаажуулах",
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: Get.height * .02),
-                      Column(
-                        children: [
-                          const Text(
-                            "Жолоочийн дугаараа оруулж баталгаажуулна уу",
-                            style: TextStyle(color: MyColors.gray),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: Get.height * .03),
-                          SizedBox(
-                            width: Get.width * .3,
-                            child: CustomTextField(
-                              autoFocus: true,
-                              maxLength: 4,
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                          SizedBox(height: Get.height * .04),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                  child: CustomButton(
-                                onPressed: Get.back,
-                                bgColor: Colors.white,
-                                text: "Хаах",
-                                elevation: 0,
-                                textColor: Colors.black,
-                              )),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: CustomButton(
-                                  elevation: 0,
-                                  bgColor: Colors.amber,
-                                  text: "Submit",
-                                  onPressed: () {
-                                    if (!acceptedOrders.contains(item["id"])) {
-                                      acceptedOrders.add(item["id"]);
-                                      int index = acceptedOrders
-                                          .indexWhere((e) => e == item["id"]);
-                                      orders.remove(item);
-                                      item["accepted"] = true;
-                                      orders.insert(index, item);
-                                    }
-                                    setState(() {});
-                                    Get.back();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -193,48 +55,147 @@ class _DriverMainScreenState extends State<DriverMainScreen>
       () => WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
-            appBar: _appbar(),
-            drawer: _drawer(),
-            body: loading && orders.isEmpty
-                ? listShimmerWidget()
-                : !loading && orders.isEmpty
-                    ? customEmptyWidget("Захиалга байхгүй байна")
-                    : ListView.separated(
-                        separatorBuilder: (context, index) {
-                          return Container(
-                            height: 7,
-                            color: MyColors.fadedGrey,
-                          );
-                        },
-                        itemCount: orders.length,
-                        itemBuilder: (context, index) {
-                          var item = orders[index];
-                          return item["accepted"]
-                              ? _accepted1(item)
-                              : _notAccepted(item);
-                        },
-                      )),
+          appBar: _appbar(),
+          drawer: _drawer(),
+          body: !_driverCtx.isOnline.value
+              ? customEmptyWidget("Та идэвхгүй байна")
+              : _driverCtx.fetchingOrders.value && _driverCtx.orders.isEmpty
+                  ? listShimmerWidget()
+                  : !_driverCtx.fetchingOrders.value &&
+                          _driverCtx.orders.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CustomInkWell(
+                                borderRadius: BorderRadius.circular(50),
+                                onTap: _driverCtx.refreshOrders,
+                                child: Material(
+                                  elevation: 2,
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.refresh_rounded,
+                                        color: Colors.white,
+                                      )),
+                                ),
+                              ),
+                              SizedBox(height: Get.width * .04),
+                              const Text(
+                                "Захиалга байхгүй байна",
+                                style: TextStyle(
+                                  color: MyColors.gray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : RefreshIndicator(
+                          color: MyColors.primary,
+                          onRefresh: () async {
+                            await Future.delayed(
+                                const Duration(milliseconds: 600));
+                            _driverCtx.refreshOrders();
+                          },
+                          child: ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) {
+                              return Container(
+                                height: 7,
+                                color: MyColors.fadedGrey,
+                              );
+                            },
+                            itemCount: _driverCtx.orders.length,
+                            itemBuilder: (context, index) {
+                              var item = _driverCtx.orders[index];
+                              return item["accepted"]
+                                  ? CustomInkWell(
+                                      onTap: () =>
+                                          _driverCtx.showOrderBottomSheet(item),
+                                      child: _listItem(item))
+                                  : _listItem(item);
+                            },
+                          ),
+                        ),
+        ),
       ),
     );
   }
 
-  // Widget _bottomViewsHandler(DriverStatus status) {
-  //   if (status == DriverStatus.withoutOrder) {
-  //     return const DriverWithoutOrderView();
-  //   } else if (status == DriverStatus.incoming) {
-  //     return const DriverIncomingOrderView();
-  //   } else if (status == DriverStatus.arrived) {
-  //     return const DriverArrivedView();
-  //   } else if (status == DriverStatus.received) {
-  //     return const DriverReceivedView();
-  //   } else if (status == DriverStatus.delivered) {
-  //     return const DriverDeliveredView();
-  //   } else if (status == DriverStatus.finished) {
-  //     return const DriverFinishedView();
-  //   } else {
-  //     return const DriverWithoutOrderView();
-  //   }
-  // }
+  Widget _listItem(item) {
+    return SizedBox(
+      height: Get.height * .11,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(width: Get.width * .04),
+          Stack(
+            children: [
+              customImage(
+                Get.width * .1,
+                "${URL.AWS}/users/${item["storeId"] ?? 628}/small/1.png",
+                isCircle: true,
+              )
+            ],
+          ),
+          SizedBox(width: Get.width * .04),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(height: Get.width * .01),
+                Text(
+                  item["storeName"] ?? "n/a",
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  item["address"] ?? "n/a",
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(convertToCurrencyFormat(item["deliveryPrice"] ?? 0)),
+                SizedBox(height: Get.width * .01),
+              ],
+            ),
+          ),
+          Expanded(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Countdown(
+                animation: StepTween(
+                  begin: item["prepDuration"],
+                  end: 0,
+                ).animate(item["timer"]),
+              ),
+              item["accepted"]
+                  ? status(item["orderStatus"])
+                  : TextButton(
+                      onPressed: () {
+                        _driverCtx.showPasswordDialog(item);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text('Accept'),
+                    ),
+            ],
+          )),
+          SizedBox(width: Get.width * .04)
+        ],
+      ),
+    );
+  }
 
   AppBar _appbar() {
     return AppBar(
@@ -242,7 +203,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
       elevation: 1,
       iconTheme: const IconThemeData(color: Colors.black),
       centerTitle: true,
-      title: _driverCtx.driverInfo.isNotEmpty && _driverCtx.driverInfo["isOpen"]
+      title: _driverCtx.driverInfo.isNotEmpty && _driverCtx.isOnline.value
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
@@ -268,10 +229,12 @@ class _DriverMainScreenState extends State<DriverMainScreen>
             ),
       actions: [
         CupertinoSwitch(
-          value: true,
-          onChanged: (value) {},
+          value: _driverCtx.isOnline.value,
+          onChanged: (value) {
+            _driverCtx.driverTurOnOff();
+          },
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
       ],
     );
   }
@@ -345,328 +308,6 @@ class _DriverMainScreenState extends State<DriverMainScreen>
           text: title,
           fontSize: 14,
         ),
-      ),
-    );
-  }
-
-  Widget _notAccepted(Map item) {
-    return SizedBox(
-      height: Get.height * .11,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(width: Get.width * .04),
-          Stack(
-            children: [
-              customImage(
-                Get.width * .1,
-                "${URL.AWS}/users/${628}/small/1.png",
-                isCircle: true,
-              )
-            ],
-          ),
-          SizedBox(width: Get.width * .04),
-          SizedBox(
-            width: Get.width * .6,
-            height: Get.height * .11,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "Erdenet24 market",
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  item["address"],
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(convertToCurrencyFormat(3000)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Countdown(
-                  animation: StepTween(
-                    begin:
-                        item["prepDuration"], // THIS IS A USER ENTERED NUMBER
-                    end: 0,
-                  ).animate(item["timer"]),
-                ),
-                TextButton(
-                  onPressed: () {
-                    showAuthDialog(item);
-                  },
-                  style: TextButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green,
-                  ),
-                  child: const Text(
-                    'Accept',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: Get.width * .04)
-        ],
-      ),
-    );
-  }
-
-  Widget _accepted1(Map item) {
-    return CustomInkWell(
-      onTap: () {
-        Get.bottomSheet(
-          StatefulBuilder(
-            builder: ((context, setState) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: _accepted(item),
-              );
-            }),
-          ),
-          backgroundColor: MyColors.white,
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.zero,
-      child: SizedBox(
-        height: Get.height * .11,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(width: Get.width * .04),
-            Stack(
-              children: [
-                customImage(
-                  Get.width * .1,
-                  "${URL.AWS}/users/${628}/small/1.png",
-                  isCircle: true,
-                )
-              ],
-            ),
-            SizedBox(width: Get.width * .04),
-            Expanded(
-              child: SizedBox(
-                height: Get.height * .11,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      "Erdenet24 market",
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      item["address"],
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(convertToCurrencyFormat(3000)),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Countdown(
-                    animation: StepTween(
-                      begin:
-                          item["prepDuration"], // THIS IS A USER ENTERED NUMBER
-                      end: 0,
-                    ).animate(item["timer"]),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.circle_rounded,
-                        size: 8,
-                        color: Colors.amber,
-                      ),
-                      SizedBox(width: Get.width * .02),
-                      Text(
-                        "Бэлдэж байна",
-                        style: TextStyle(fontSize: 12),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: Get.width * .04)
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _accepted(Map item) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Get.width * .04),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(vertical: Get.width * .03),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                customImage(
-                  Get.width * .1,
-                  "${URL.AWS}/users/${628}/small/1.png",
-                  isCircle: true,
-                ),
-                SizedBox(width: Get.width * .04),
-                SizedBox(
-                  width: Get.width * .6,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Erdenet24 market",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        item["address"],
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: MyColors.gray, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CustomInkWell(
-                      onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                            color: Colors.green, shape: BoxShape.circle),
-                        child: const Icon(
-                          Icons.phone_rounded,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: Get.width * .03),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    clipBehavior: Clip.hardEdge,
-                    child: Container(
-                      width: Get.width * .1,
-                      height: Get.width * .1,
-                      color: Colors.amber,
-                      child: Center(
-                        child: Icon(
-                          IconlyLight.profile,
-                          color: MyColors.white,
-                          size: 20,
-                        ),
-                      ),
-                    )),
-                SizedBox(width: Get.width * .04),
-                SizedBox(
-                  width: Get.width * .6,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        item["address"],
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        "Орцны код: ",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: MyColors.gray, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CustomInkWell(
-                      onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                            color: Colors.green, shape: BoxShape.circle),
-                        child: const Icon(
-                          Icons.phone_rounded,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-              ],
-            ),
-          ),
-          Divider(),
-          SizedBox(height: Get.width * .03),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Захиалгын дугаар:"),
-              Text("123456789"),
-            ],
-          ),
-          SizedBox(height: Get.width * .03),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Тоо ширхэг:"),
-              Text("5 ширхэг"),
-            ],
-          ),
-
-          SizedBox(height: Get.width * .08),
-          CustomButton(
-            text: "Хүлээн авсан",
-            onPressed: () {},
-          ),
-          // SizedBox(height: Get.width * .04),
-        ],
       ),
     );
   }

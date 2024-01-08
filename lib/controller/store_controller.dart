@@ -37,10 +37,11 @@ class StoreController extends GetxController {
   }
 
   void handleSentAction(Map payload) {
-    LocalNotification.showIncomingSoundNotification(
+    LocalNotification.showNotificationWithSound(
       id: payload["id"],
       title: "Erdenet24",
       body: "Шинэ захиалга ирлээ",
+      sound: "incoming",
     );
     Get.offNamed(storeMainScreenRoute);
     showDialog(
