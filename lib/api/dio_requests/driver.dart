@@ -47,14 +47,16 @@ class DriverApi {
         .sendRequest('driverArrived?driverId=$driverId', Method.post, [], {});
   }
 
-  Future driverReceived() async {
-    return DioClient()
-        .sendRequest('driverReceived?driverId=$driverId', Method.post, [], {});
+  Future driverReceived(int orderId) async {
+    return DioClient().sendRequest(
+        'driverReceived?driverId=$driverId&orderId=$orderId',
+        Method.post, [], {});
   }
 
-  Future driverDelivered() async {
-    return DioClient()
-        .sendRequest('driverDelivered?driverId=$driverId', Method.post, [], {});
+  Future driverDelivered(int orderId) async {
+    return DioClient().sendRequest(
+        'driverDelivered?driverId=$driverId&orderId=$orderId',
+        Method.post, [], {});
   }
 
   Future driverFinished() async {
@@ -63,7 +65,7 @@ class DriverApi {
   }
 
   Future getAllPreparingOrders() async {
-    return DioClient()
-        .sendRequest('getAllPreparingOrders', Method.post, [], {});
+    return DioClient().sendRequest(
+        'getAllPreparingOrders?driverId=$driverId', Method.post, [], {});
   }
 }

@@ -1,6 +1,7 @@
 // I love you my super dad heart (Ruby)
 import 'dart:async';
 import 'dart:io';
+import 'package:Erdenet24/api/app_config.dart';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
@@ -13,7 +14,6 @@ import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
 import 'package:Erdenet24/screens/store/store_edit_product_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
-import 'package:Erdenet24/screens/store/store_orders_detail_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_add_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_screen.dart';
@@ -61,6 +61,7 @@ final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
+  setEnvironment(Environment.prod);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(
@@ -122,7 +123,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   listenToNotification() {
-    print("Listening to notification");
     LocalNotification.onClickNotification.stream.listen((event) {
       // Navigator.push(context,
       //     MaterialPageRoute(builder: (context) => n));

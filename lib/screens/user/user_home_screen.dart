@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/controller/user_controller_OLD.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
@@ -33,6 +29,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     _loginCtx.listenToTokenChanges("user");
     _userCtx.getUserInfoDetails();
     _loginCtx.checkUserDeviceInfo();
+    _userCtx.checkUserSocketConnection();
   }
 
   @override

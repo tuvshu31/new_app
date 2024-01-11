@@ -1,9 +1,9 @@
 import 'dart:math';
-
+import 'package:Erdenet24/utils/styles.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -98,22 +98,30 @@ String formatedTime({required int timeInSecond}) {
   return "$minute мин $second сек";
 }
 
-Color _handleColor(String status) {
+Color handleOrderStatusColor(String status) {
   if (status == "preparing") {
     return Colors.amber;
-  } else if (status == "delivering") {
+  } else if (status == "waitingForDriver") {
     return Colors.blue;
+  } else if (status == "delivering") {
+    return Colors.brown;
   } else if (status == "delivered") {
     return Colors.green;
   } else if (status == "canceled") {
     return Colors.red;
   } else {
-    return Colors.black;
+    return Colors.amber;
   }
 }
 
-String _handleText(String status) {
-  if (status == "preparing") {
+String handleOrderStatusText(String status) {
+  if (status == "sent") {
+    return "Баталгаажсан";
+  } else if (status == "preparing") {
+    return "Бэлдэж байна";
+  } else if (status == "waitingForDriver") {
+    return "Жолооч хүлээж байна";
+  } else if (status == "driverAccepted") {
     return "Бэлдэж байна";
   } else if (status == "delivering") {
     return "Хүргэж байна";
@@ -126,6 +134,20 @@ String _handleText(String status) {
   }
 }
 
+IconData handleOrderStatusIcon(String orderStatus) {
+  if (orderStatus == "sent") {
+    return IconlyLight.document;
+  } else if (orderStatus == "preparing") {
+    return IconlyLight.time_circle;
+  } else if (orderStatus == "delivering") {
+    return IconlyLight.location;
+  } else if (orderStatus == "delivered") {
+    return IconlyLight.tick_square;
+  } else {
+    return IconlyLight.paper_fail;
+  }
+}
+
 Widget status(String status) {
   return Row(
     mainAxisSize: MainAxisSize.min,
@@ -133,13 +155,105 @@ Widget status(String status) {
       Icon(
         Icons.circle_rounded,
         size: 8,
-        color: _handleColor(status),
+        color: handleOrderStatusColor(status),
       ),
       SizedBox(width: Get.width * .02),
       Text(
-        _handleText(status),
+        handleOrderStatusText(status),
         style: const TextStyle(fontSize: 12),
       )
     ],
+  );
+}
+
+Widget orderStatusLine(String orderStatus) {
+  if (orderStatus == "sent") {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _d(true),
+        _l(false),
+        _d(false),
+        _l(false),
+        _d(false),
+        _l(false),
+        _d(false),
+      ],
+    );
+  } else if (orderStatus == "preparing") {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _d(true),
+        _l(true),
+        _d(true),
+        _l(false),
+        _d(false),
+        _l(false),
+        _d(false),
+      ],
+    );
+  } else if (orderStatus == "delivering") {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _d(true),
+        _l(true),
+        _d(true),
+        _l(true),
+        _d(true),
+        _l(false),
+        _d(false),
+      ],
+    );
+  } else if (orderStatus == "delivered") {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _d(true),
+        _l(true),
+        _d(true),
+        _l(true),
+        _d(true),
+        _l(true),
+        _d(true),
+      ],
+    );
+  } else {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _d(true),
+        _l(false),
+        _d(false),
+        _l(false),
+        _d(false),
+        _l(false),
+        _d(false),
+      ],
+    );
+  }
+}
+
+Widget _d(bool isActive) {
+  return Container(
+    width: 12,
+    height: 12,
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: isActive ? MyColors.primary : Colors.black,
+      shape: BoxShape.circle,
+    ),
+  );
+}
+
+Widget _l(bool isActive) {
+  return Expanded(
+    child: Container(
+      height: 3,
+      decoration: BoxDecoration(
+        color: isActive ? MyColors.primary : Colors.black,
+      ),
+    ),
   );
 }

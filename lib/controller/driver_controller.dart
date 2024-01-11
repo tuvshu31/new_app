@@ -8,6 +8,7 @@ import 'package:Erdenet24/screens/driver/driver_bottom_sheets_body.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ import 'package:Erdenet24/utils/enums.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:iconly/iconly.dart';
 
 class DriverController extends GetxController with GetTickerProviderStateMixin {
   final player = AudioPlayer();
@@ -33,26 +33,51 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
 
   void handleSocketActions(Map payload) async {
     String action = payload["action"];
-    payload["accepted"] = false;
-    animationController = AnimationController(
-        vsync: this, duration: Duration(seconds: payload["prepDuration"] ?? 0));
-    animationController.forward();
-    payload["timer"] = animationController;
-    payload.toString();
-    if (action == "preparing") {
-      int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-      if (index < 0) {
-        LocalNotification.showNotificationWithSound(
-          id: 3,
-          title: payload["store"],
-          body: payload["address"],
-          sound: "notify",
-        );
-        orders.add(payload);
-      } else {
-        log("not included!");
-      }
-    } else if (action == "preparing") {}
+    if (action == "preparing" && isOnline.value) {
+      handlePreparingAction(payload);
+    }
+    if (action == "accepted" && isOnline.value) {
+      handleAcceptAction(payload);
+      log(payload.toString());
+    }
+    if (action == "delivering" && isOnline.value) {
+      // handleDeliveringAction(payload);
+    }
+    if (action == "delivered" && isOnline.value) {
+      handleDeliveredAction(payload);
+    }
+  }
+
+  void handleDeliveredAction(Map item) {
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    if (index > 0) {
+      orders.removeAt(index);
+      orders.refresh();
+    }
+  }
+
+  void handleAcceptAction(Map item) {
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    if (index > 0) {
+      orders[index]["orderStatus"] = "driverAccepted";
+      orders[index]["driverName"] = item["driverName"];
+      orders.refresh();
+    }
+  }
+
+  void handlePreparingAction(payload) {
+    int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+    if (index < 0) {
+      LocalNotification.showNotificationWithSound(
+        id: 3,
+        title: payload["store"],
+        body: payload["address"],
+        sound: "notify",
+      );
+      orders.add(payload);
+    } else {
+      log("not included!");
+    }
   }
 
   void saveUserToken() {
@@ -89,31 +114,59 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
     getAllPreparingOrders();
   }
 
-  void accept(Map item) {
-    if (!acceptedOrders.contains(item["id"])) {
-      acceptedOrders.add(item["id"]);
-      int index = acceptedOrders.indexWhere((e) => e == item["id"]);
-      orders.remove(item);
-      item["accepted"] = true;
-      orders.insert(index, item);
-    }
+  Future<void> driverAcceptOrder(Map item) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic driverAcceptOrder = await DriverApi().driverAcceptOrder(item["id"]);
     Get.back();
+    if (driverAcceptOrder != null) {
+      dynamic response = Map<String, dynamic>.from(driverAcceptOrder);
+      if (response["success"]) {
+        if (!acceptedOrders.contains(item["id"])) {
+          acceptedOrders.add(item["id"]);
+          int index = acceptedOrders.indexWhere((e) => e == item["id"]);
+          orders.remove(item);
+          item["acceptedByMe"] = true;
+          orders.insert(index, item);
+          orders.refresh();
+        }
+      } else {
+        customSnackbar(
+            ActionType.error, response["errorText"] ?? "Алдаа гарлаа", 2);
+      }
+    }
   }
 
-  void received(Map item) async {
-    int index = orders.indexWhere((e) => e["id"] == item["id"]);
-    orders[index]["orderStatus"] = "delivering";
-    orders.refresh();
-    showOrderBottomSheet(item);
+  void driverReceived(Map item) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic driverReceived = await DriverApi().driverReceived(item["id"]);
+    Get.back();
+    if (driverReceived != null) {
+      dynamic response = Map<String, dynamic>.from(driverReceived);
+      if (response["success"]) {
+        int index = orders.indexWhere((e) => e["id"] == item["id"]);
+        orders[index]["orderStatus"] = "delivering";
+        orders.refresh();
+        showOrderBottomSheet(item);
+      }
+    }
   }
 
-  void delivered(Map item) async {
-    int index = orders.indexWhere((e) => e["id"] == item["id"]);
-    orders[index]["orderStatus"] = "delivered";
-    orders.remove(orders[index]);
-    acceptedOrders.removeWhere((element) => element == item["id"]);
-    orders.refresh();
-    acceptedOrders.refresh();
+  void driverDelivered(Map item) async {
+    CustomDialogs().showLoadingDialog();
+    dynamic driverDelivered = await DriverApi().driverDelivered(item["id"]);
+    Get.back();
+    if (driverDelivered != null) {
+      dynamic response = Map<String, dynamic>.from(driverDelivered);
+      if (response["success"]) {
+        int index = orders.indexWhere((e) => e["id"] == item["id"]);
+        orders[index]["orderStatus"] = "delivered";
+        orders.remove(orders[index]);
+        acceptedOrders.removeWhere((element) => element == item["id"]);
+        orders.refresh();
+        acceptedOrders.refresh();
+        customSnackbar(ActionType.success, "Захиалга амжилттай хүргэгдлээ", 3);
+      }
+    }
   }
 
   Future<void> showPasswordDialog(Map item) {
@@ -171,14 +224,13 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       if (response["success"]) {
         orders.value = response["data"];
         for (var i = 0; i < orders.length; i++) {
-          orders[i]["accepted"] = false;
           animationController = AnimationController(
               vsync: this,
-              duration: Duration(seconds: orders[i]["prepDuration"]));
+              duration: Duration(seconds: orders[i]["initialDuration"]));
           animationController.forward();
           orders[i]["timer"] = animationController;
         }
-      } else {}
+      }
     }
   }
 }

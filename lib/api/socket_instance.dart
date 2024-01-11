@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:Erdenet24/api/app_config.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
@@ -15,9 +16,7 @@ final _driverCtx = Get.put(DriverController());
 
 class SocketClient {
   Socket socket = io(
-      "http://192.168.1.191:8000",
-      // "https://www.e24api1215.com",
-      // prodUrl,
+      apiBaseUrl,
       OptionBuilder()
           .setTransports(['websocket'])
           //add this line

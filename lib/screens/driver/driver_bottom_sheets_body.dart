@@ -24,7 +24,8 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
       padding: EdgeInsets.all(Get.width * .04),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: widget.item["orderStatus"] == "preparing"
+        children: widget.item["orderStatus"] == "preparing" ||
+                widget.item["orderStatus"] == "driverAccepted"
             ? _receivedView()
             : _deliveredView(),
       ),
@@ -36,28 +37,28 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
       _listTileWidget(
         customImage(
           Get.width * .1,
-          "${URL.AWS}/users/${628}/small/1.png",
+          "${URL.AWS}/users/${widget.item["storeId"] ?? 628}/small/1.png",
           isCircle: true,
         ),
-        "Erdenet24 market",
-        "Subtitle",
-        "99921312",
+        widget.item["storeName"] ?? "n/a",
+        widget.item["storeAddress"] ?? "n/a",
+        widget.item["storePhone"] ?? "0",
       ),
       const Divider(),
       SizedBox(height: Get.width * .03),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Захиалгын дугаар:"),
-          Text("123456789"),
+          const Text("Захиалгын дугаар:"),
+          Text(widget.item["orderId"]),
         ],
       ),
       SizedBox(height: Get.width * .03),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Тоо ширхэг:"),
-          Text("5 ширхэг"),
+          const Text("Тоо ширхэг:"),
+          Text("${widget.item["products"].length ?? 0} ширхэг"),
         ],
       ),
       SizedBox(height: Get.width * .08),
@@ -65,7 +66,7 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
         text: "Хүлээн авлаа",
         onPressed: () {
           Get.back();
-          _driverCtx.received(widget.item);
+          _driverCtx.driverReceived(widget.item);
         },
       ),
     ];
@@ -81,7 +82,7 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
               width: Get.width * .1,
               height: Get.width * .1,
               color: Colors.amber,
-              child: Center(
+              child: const Center(
                 child: Icon(
                   IconlyLight.profile,
                   color: MyColors.white,
@@ -89,25 +90,25 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
                 ),
               ),
             )),
-        "User address!",
-        "USerSubtitle!",
-        "99921312",
+        widget.item["address"] ?? "n/a",
+        "Орцны код: ${widget.item["entrance"] ?? "n/a"}",
+        widget.item["phone"] ?? "0",
       ),
       const Divider(),
       SizedBox(height: Get.width * .03),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Захиалгын дугаар:"),
-          Text("123456789"),
+          const Text("Захиалгын дугаар:"),
+          Text(widget.item["orderId"] ?? "n/a"),
         ],
       ),
       SizedBox(height: Get.width * .03),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Тоо ширхэг:"),
-          Text("5 ширхэг"),
+          const Text("Тоо ширхэг:"),
+          Text("${widget.item["products"].length ?? 0} ширхэг"),
         ],
       ),
       SizedBox(height: Get.width * .08),

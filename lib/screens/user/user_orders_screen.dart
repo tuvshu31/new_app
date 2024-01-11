@@ -6,13 +6,12 @@ import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserOrdersScreen extends StatefulWidget {
   const UserOrdersScreen({Key? key}) : super(key: key);
@@ -133,19 +132,11 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
     );
   }
 
-  //  var item = _userCtx.filteredOrderList[index];
   Widget listItemWidget(
       Map item, VoidCallback onClicked1, VoidCallback onClicked2) {
     return CustomInkWell(
       onTap: () {
-        Get.bottomSheet(
-          UserOrdersDetailScreen(
-            id: item["id"],
-            orderId: item["orderId"],
-          ),
-          backgroundColor: MyColors.white,
-          isScrollControlled: true,
-        );
+        _userCtx.showOrderDetailsBottomSheet(item);
       },
       child: Container(
         height: Get.height * .08,
@@ -161,8 +152,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
               ],
             ),
             SizedBox(width: Get.width * .04),
-            SizedBox(
-              width: Get.width * .4,
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -180,28 +170,21 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                 ],
               ),
             ),
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                CustomText(
-                  text: item["date"],
-                  fontSize: 13,
-                  color: MyColors.gray,
-                ),
-                const Spacer(),
-                CustomText(
-                  textAlign: TextAlign.end,
-                  text: item["orderStatusMNG"],
-                  fontSize: 12,
-                  color: _userCtx.tab.value == 0
-                      ? Colors.amber
-                      : _userCtx.tab.value == 1
-                          ? Colors.green
-                          : Colors.red,
-                ),
-              ],
-            )),
+            SizedBox(
+              width: Get.width * .3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    item["updatedTime"] ?? "n/a",
+                    style: const TextStyle(fontSize: 13, color: MyColors.gray),
+                    textAlign: TextAlign.end,
+                  ),
+                  const Spacer(),
+                  status(item["orderStatus"])
+                ],
+              ),
+            ),
             SizedBox(width: Get.width * .04),
           ],
         ),
@@ -210,33 +193,33 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   }
 }
 
-Widget customTextButton(VoidCallback onPressed, IconData icon, String text,
-    {bool isActive = true}) {
-  return ElevatedButton(
-    style: ButtonStyle(
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      elevation: const MaterialStatePropertyAll<double>(0),
-      backgroundColor: const MaterialStatePropertyAll<Color>(Colors.white),
-      overlayColor: MaterialStatePropertyAll<Color>(
-        Colors.black.withOpacity(0.1),
-      ),
-      padding: const MaterialStatePropertyAll(EdgeInsets.all(0)),
-    ),
-    onPressed: isActive ? onPressed : null,
-    child: Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: isActive ? MyColors.black : MyColors.background,
-        ),
-        const SizedBox(width: 8),
-        CustomText(
-          text: text,
-          fontSize: 12,
-          color: isActive ? MyColors.black : MyColors.background,
-        ),
-      ],
-    ),
-  );
-}
+// Widget customTextButton(VoidCallback onPressed, IconData icon, String text,
+//     {bool isActive = true}) {
+//   return ElevatedButton(
+//     style: ButtonStyle(
+//       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+//       elevation: const MaterialStatePropertyAll<double>(0),
+//       backgroundColor: const MaterialStatePropertyAll<Color>(Colors.white),
+//       overlayColor: MaterialStatePropertyAll<Color>(
+//         Colors.black.withOpacity(0.1),
+//       ),
+//       padding: const MaterialStatePropertyAll(EdgeInsets.all(0)),
+//     ),
+//     onPressed: isActive ? onPressed : null,
+//     child: Row(
+//       children: [
+//         Icon(
+//           icon,
+//           size: 16,
+//           color: isActive ? MyColors.black : MyColors.background,
+//         ),
+//         const SizedBox(width: 8),
+//         CustomText(
+//           text: text,
+//           fontSize: 12,
+//           color: isActive ? MyColors.black : MyColors.background,
+//         ),
+//       ],
+//     ),
+//   );
+// }

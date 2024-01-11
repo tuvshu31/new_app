@@ -6,6 +6,8 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -33,7 +35,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   final _storeCtx = Get.put(StoreController());
   Map data = {};
   bool loading = false;
-  bool isOpen = false;
   int storeId = RestApiHelper.getUserId();
   String deviceStatus = "";
 
@@ -52,8 +53,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
       dynamic response = Map<String, dynamic>.from(getStoreInfo);
       if (response["success"]) {
         data = response["data"];
-        isOpen = data["isOpen"];
-        if (isOpen) {
+
+        _storeCtx.isOpen.value = data["isOpen"];
+        if (_storeCtx.isOpen.value) {
           SocketClient().connect();
           checkStoreNewOrders();
         } else {
@@ -71,16 +73,16 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
     if (openAndCloseStore != null) {
       dynamic response = Map<String, dynamic>.from(openAndCloseStore);
       if (response["success"]) {
-        isOpen = open == 1;
+        _storeCtx.isOpen.value = open == 1;
         setState(() {});
-        if (isOpen) {
+        if (_storeCtx.isOpen.value) {
           SocketClient().connect();
           checkStoreNewOrders();
         } else {
           SocketClient().disconnect();
         }
         customSnackbar(ActionType.success,
-            "Дэлгүүр ${isOpen ? "нээгдлээ" : "хаагдлаа"}", 2);
+            "Дэлгүүр ${_storeCtx.isOpen.value ? "нээгдлээ" : "хаагдлаа"}", 2);
       }
     }
   }
@@ -89,6 +91,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
     dynamic checkStoreNewOrders = await StoreApi().checkStoreNewOrders();
     if (checkStoreNewOrders != null) {
       dynamic response = Map<String, dynamic>.from(checkStoreNewOrders);
+      log(response.toString());
       if (response["success"]) {
         if (response["data"]) {
           _storeCtx.handleSentAction({"id": 0});
@@ -100,84 +103,83 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: loading
-            ? customLoadingWidget()
-            : Column(
-                children: [
-                  SizedBox(height: Get.height * .075),
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      "${URL.AWS}/users/${data["id"]}/small/1.png",
-                    ),
-                    radius: Get.width * .1,
-                  ),
-                  const SizedBox(height: 8),
-                  CustomText(
-                    text: data["name"] ?? "",
-                    fontSize: 16,
-                  ),
-                  const SizedBox(height: 4),
-                  CustomText(
-                    text: data["phone"] ?? "",
-                    fontSize: 12,
-                    color: MyColors.gray,
-                  ),
-                  SizedBox(height: Get.height * .02),
-                  ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: Get.width * .075),
-                    dense: true,
-                    minLeadingWidth: Get.width * .07,
-                    leading: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isOpen ? IconlyLight.hide : IconlyLight.show,
-                          color: MyColors.black,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                    title: CustomText(
-                      text: isOpen ? "Дэлгүүрээ хаах" : "Дэлгүүрээ нээх",
-                      fontSize: 14,
-                    ),
-                    trailing: CupertinoSwitch(
-                      value: isOpen,
-                      thumbColor: isOpen ? MyColors.primary : MyColors.gray,
-                      trackColor: MyColors.background,
-                      activeColor: MyColors.black,
-                      onChanged: (value) {
-                        showCustomDialog(ActionType.warning,
-                            "Та дэлгүүрээ ${isOpen ? "хаахдаа" : "нээхдээ"} итгэлтэй байна уу?",
-                            () {
-                          Get.back();
-                          openAndCloseStore(isOpen ? 0 : 1);
-                        });
-                      },
-                    ),
-                  ),
-                  _listTile(IconlyLight.plus, "Бараа нэмэх", () {
-                    Get.toNamed(storeProductsAddScreenRoute);
-                  }),
-                  _listTile(IconlyLight.edit, "Бараа засварлах", () {
-                    Get.toNamed(storeProductsEditScreenRoute);
-                  }),
-                  _listTile(IconlyLight.graph, "Захиалгууд", () {
-                    Get.toNamed(storeOrdersScreenRoute);
-                  }),
-                  _listTile(IconlyLight.setting, "Тохиргоо", () {
-                    Get.toNamed(storeSettingsScreenRoute);
-                  }),
-                  _listTile(IconlyLight.info_circle, "Тусламж", () {}),
-                  _listTile(IconlyLight.login, "Аппаас гарах", () {
-                    CustomDialogs().showLogoutDialog(() {
-                      _loginCtx.logout();
-                    });
-                  }),
-                ],
-              ));
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          SizedBox(height: Get.height * .075),
+          customImage(
+            Get.width * .23,
+            "${URL.AWS}/users/${data["id"]}/small/1.png",
+            isCircle: true,
+          ),
+          SizedBox(height: Get.width * .03),
+          loading
+              ? CustomShimmer(width: Get.width * .3, height: 16)
+              : Text(data["name"]),
+          SizedBox(height: Get.width * .02),
+          loading
+              ? CustomShimmer(width: Get.width * .3, height: 16)
+              : Text(
+                  data["phone"],
+                  style: TextStyle(color: MyColors.gray),
+                ),
+          SizedBox(height: Get.height * .02),
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: Get.width * .075),
+            dense: true,
+            minLeadingWidth: Get.width * .07,
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _storeCtx.isOpen.value ? IconlyLight.hide : IconlyLight.show,
+                  color: MyColors.black,
+                  size: 20,
+                ),
+              ],
+            ),
+            title: CustomText(
+              text:
+                  _storeCtx.isOpen.value ? "Дэлгүүрээ хаах" : "Дэлгүүрээ нээх",
+              fontSize: 14,
+            ),
+            trailing: CupertinoSwitch(
+              value: loading ? false : _storeCtx.isOpen.value,
+              thumbColor:
+                  _storeCtx.isOpen.value ? MyColors.primary : MyColors.gray,
+              trackColor: MyColors.background,
+              activeColor: MyColors.black,
+              onChanged: (value) {
+                showCustomDialog(ActionType.warning,
+                    "Та дэлгүүрээ ${_storeCtx.isOpen.value ? "хаахдаа" : "нээхдээ"} итгэлтэй байна уу?",
+                    () {
+                  Get.back();
+                  openAndCloseStore(_storeCtx.isOpen.value ? 0 : 1);
+                });
+              },
+            ),
+          ),
+          _listTile(IconlyLight.plus, "Бараа нэмэх", () {
+            Get.toNamed(storeProductsAddScreenRoute);
+          }),
+          _listTile(IconlyLight.edit, "Бараа засварлах", () {
+            Get.toNamed(storeProductsEditScreenRoute);
+          }),
+          _listTile(IconlyLight.graph, "Захиалгууд", () {
+            Get.toNamed(storeOrdersScreenRoute);
+          }),
+          _listTile(IconlyLight.setting, "Тохиргоо", () {
+            Get.toNamed(storeSettingsScreenRoute);
+          }),
+          _listTile(IconlyLight.info_circle, "Тусламж", () {}),
+          _listTile(IconlyLight.login, "Аппаас гарах", () {
+            CustomDialogs().showLogoutDialog(() {
+              _loginCtx.logout();
+            });
+          }),
+        ],
+      ),
+    );
   }
 
   Widget _listTile(IconData icon, String title, dynamic onTap) {

@@ -87,8 +87,9 @@ class UserApi {
 
   //Хэрэглэгчийн захиалгуудыг авах
   Future getUserOrders(dynamic query) async {
-    return DioClient()
-        .sendRequest('getUserOrders?id=$userId', Method.post, [], query);
+    String url = 'getUserOrders?userId=$userId';
+    log(url.toString());
+    return DioClient().sendRequest(url, Method.post, [], query);
   }
 
   //Сонгосон дэлгүүрийн бараануудыг авах
@@ -219,5 +220,11 @@ class UserApi {
   Future getStoreDetailsInfo(dynamic body) async {
     return DioClient()
         .sendRequest('getStoreDetailsInfo', Method.post, body, {});
+  }
+
+  //Хэрэглэгчийн socketе-нд холбох шаардалгатай эсэхийг шалгах
+  Future checkUserSocketConnection() async {
+    return DioClient().sendRequest(
+        'checkUserSocketConnection?userId=$userId', Method.post, [], {});
   }
 }

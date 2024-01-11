@@ -32,11 +32,11 @@ class _DriverAuthDialogBodyState extends State<DriverAuthDialogBody> {
 
   void onPressed(type) {
     if (type == "auth") {
-      _driverCtx.accept(widget.item);
+      Get.back();
+      _driverCtx.driverAcceptOrder(widget.item);
     } else if (type == "secret") {
       Get.back();
-      _driverCtx.delivered(widget.item);
-      customSnackbar(ActionType.success, "Захиалга амжилттай хүргэгдлээ", 3);
+      _driverCtx.driverDelivered(widget.item);
     } else {}
   }
 

@@ -5,6 +5,7 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
@@ -70,114 +71,108 @@ class _UserPaymentScreenState extends State<UserPaymentScreen> {
       withTabBar: true,
       title: "Төлбөр төлөх",
       customActions: Container(),
-      body: Column(
-        children: [
-          DefaultTabController(
-            length: 2,
-            initialIndex: 0,
-            child: TabBar(
-              onTap: ((value) {
-                pageController.animateToPage(
-                  value,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.bounceInOut,
-                );
-              }),
-              labelColor: MyColors.primary,
-              unselectedLabelColor: MyColors.black,
-              indicatorColor: MyColors.primary,
-              tabs: const [
-                Tab(
-                  text: "Бэлнээр",
-                ),
-                Tab(
-                  text: "Зээлээр",
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: pageController,
+      body: loading
+          ? listShimmerWidget()
+          : Column(
               children: [
-                SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
+                DefaultTabController(
+                  length: 2,
+                  initialIndex: 0,
+                  child: TabBar(
+                    onTap: ((value) {
+                      pageController.animateToPage(
+                        value,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.bounceInOut,
+                      );
+                    }),
+                    labelColor: MyColors.primary,
+                    unselectedLabelColor: MyColors.black,
+                    indicatorColor: MyColors.primary,
+                    tabs: const [
+                      Tab(
+                        text: "Бэлнээр",
+                      ),
+                      Tab(
+                        text: "Зээлээр",
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: pageController,
                     children: [
-                      const SizedBox(height: 12),
-                      loading
-                          ? CustomShimmer(
-                              width: Get.width * .4,
-                              height: Get.width * .4,
-                            )
-                          : Image.memory(
+                      SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 12),
+                            Image.memory(
                               base64Decode(qrImage),
                               width: Get.width * .4,
                               height: Get.width * .4,
                             ),
-                      const SizedBox(height: 12),
-                      ListView.separated(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        padding:
-                            const EdgeInsets.only(top: 12, right: 12, left: 12),
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(height: 14);
-                        },
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: loading ? 8 : bankList.length,
-                        itemBuilder: (context, index) {
-                          if (loading) {
-                            return _shimmerWidget();
-                          } else {
-                            var bank = bankList[index];
-                            return CustomInkWell(
-                              onTap: () {
-                                _launchUrl(bank["link"]);
+                            const SizedBox(height: 12),
+                            ListView.separated(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(
+                                  top: 12, right: 12, left: 12),
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(height: 14);
                               },
-                              child: Card(
-                                elevation: 1,
-                                margin: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ListTile(
-                                  leading: Container(
-                                    width: Get.width * .09,
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: bankList.length,
+                              itemBuilder: (context, index) {
+                                var bank = bankList[index];
+                                return CustomInkWell(
+                                  onTap: () {
+                                    _launchUrl(bank["link"]);
+                                  },
+                                  child: Card(
+                                    elevation: 1,
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Image.network(
-                                      bank["logo"],
+                                    child: ListTile(
+                                      leading: Container(
+                                        width: Get.width * .09,
+                                        clipBehavior: Clip.hardEdge,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Image.network(
+                                          bank["logo"],
+                                        ),
+                                      ),
+                                      title: CustomText(
+                                        text: bank["description"],
+                                        fontSize: 14,
+                                      ),
+                                      trailing: const Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 18,
+                                        color: MyColors.black,
+                                      ),
                                     ),
                                   ),
-                                  title: CustomText(
-                                    text: bank["description"],
-                                    fontSize: 14,
-                                  ),
-                                  trailing: const Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    size: 18,
-                                    color: MyColors.black,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      _loanView(),
                     ],
                   ),
                 ),
-                _loanView(),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -186,47 +181,5 @@ class _UserPaymentScreenState extends State<UserPaymentScreen> {
         child: customEmptyWidget(
       "Тун удахгүй...",
     ));
-  }
-
-  Widget _shimmerWidget() {
-    return SizedBox(
-      height: Get.width * .2 + 16,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(width: Get.width * .04),
-            Stack(
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: Get.width * 0.2,
-                    maxHeight: Get.width * 0.2,
-                  ),
-                  child: CustomShimmer(
-                    width: Get.width * .2,
-                    height: Get.width * .2,
-                    borderRadius: 50,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(width: Get.width * .04),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  CustomShimmer(width: Get.width * .65, height: 16),
-                  CustomShimmer(width: Get.width * .65, height: 16),
-                  CustomShimmer(width: Get.width * .65, height: 16),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

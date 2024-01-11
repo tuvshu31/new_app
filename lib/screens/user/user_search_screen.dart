@@ -185,15 +185,14 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
           return true;
         } else {
           animateToPage(0);
+          isHomePage = true;
+          setState(() {});
           return false;
         }
       },
       child: PageView(
         physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: (value) {
-          isHomePage = value == 1;
-          setState(() {});
-        },
+        onPageChanged: (value) {},
         controller: controller,
         children: [
           _homeScreenMainView(),
@@ -325,6 +324,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
               child: CustomInkWell(
                 onTap: () {
                   title = item["name"];
+                  isHomePage = false;
                   setState(() {});
                   animateToPage(1);
                   if (item["warning"] != "") {
@@ -375,6 +375,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
     return CustomHeader(
       customLeading: CustomInkWell(
         onTap: () {
+          isHomePage = true;
+          setState(() {});
           animateToPage(0);
         },
         child: const Center(

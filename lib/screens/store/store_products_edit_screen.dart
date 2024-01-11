@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/custom_dialogs.dart';
@@ -11,6 +12,7 @@ import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
+import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -173,9 +175,8 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
       dynamic response = Map<String, dynamic>.from(getStoreCategoryList);
       if (response["success"]) {
         categories = response["data"];
-        log(categories.toString());
         setState(() {});
-      } else {}
+      }
     }
   }
 
@@ -808,11 +809,10 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
                               ),
                               child: Stack(
                                 children: [
-                                  CircleAvatar(
-                                    radius: Get.width * 0.15,
-                                    backgroundImage: NetworkImage(
-                                        // item["image"],
-                                        "https://et24-images.s3.ap-northeast-1.amazonaws.com/products/74/small/1.png"),
+                                  customImage(
+                                    Get.width * 0.15,
+                                    "${URL.AWS}/users/${item["id"]}/small/1.png",
+                                    isCircle: true,
                                   ),
                                   item["visibility"] == 0
                                       ? Container(
@@ -880,7 +880,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
             },
           )
         : loading
-            ? customLoadingWidget()
+            ? listShimmerWidget()
             : customEmptyWidget(
                 showSearchBar ? "Хайх үгээ оруулна уу" : "Хайлт илэрцгүй байна",
               );

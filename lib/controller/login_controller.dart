@@ -87,6 +87,7 @@ class LoginController extends GetxController {
         await UserApi().checkUserDeviceInfo(role, device);
     if (checkUserDeviceInfo != null) {
       dynamic response = Map<String, dynamic>.from(checkUserDeviceInfo);
+      log(response.toString());
       if (response["success"]) {
         if (response["status"] == "different") {
           showGeneralDialog(

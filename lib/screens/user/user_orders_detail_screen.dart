@@ -1,4 +1,6 @@
 import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/user/user_order_map_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -10,14 +12,11 @@ import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserOrdersDetailScreen extends StatefulWidget {
-  final int id;
-  final String orderId;
-  const UserOrdersDetailScreen({
-    required this.id,
-    required this.orderId,
+  Map item;
+  UserOrdersDetailScreen({
+    required this.item,
     super.key,
   });
 
@@ -26,12 +25,12 @@ class UserOrdersDetailScreen extends StatefulWidget {
 }
 
 class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
-  bool showUserAndDriverCode = true;
-  int prepDuration = 60;
-  int initialDuration = 0;
-  int step = 1;
   bool loading = false;
-  Map order = {};
+  List products = [];
+  int initialDuration = 0;
+  int prepDuration = 0;
+
+  final _userCtx = Get.put(UserController());
 
   @override
   void initState() {
@@ -42,96 +41,83 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   void getUserOrderDetails() async {
     loading = true;
     dynamic getUserOrderDetails =
-        await UserApi().getUserOrderDetails(widget.id);
+        await UserApi().getUserOrderDetails(widget.item["id"]);
     loading = false;
     if (getUserOrderDetails != null) {
       dynamic response = Map<String, dynamic>.from(getUserOrderDetails);
       if (response["success"]) {
-        order = response["data"];
-        step = order["orderStep"];
+        products = response["data"];
+        initialDuration = response["initialDuration"];
+        prepDuration = response["prepDuration"];
       }
     }
     setState(() {});
   }
 
-  List statusList = [
-    {
-      "text": "Баталгаажсан",
-      "wrappedText": "Баталгаажсан",
-      "icon": Icons.check,
-    },
-    {
-      "text": "Бэлдэж байна",
-      "wrappedText": "Бэлдэж \n байна",
-      "icon": Icons.check,
-    },
-    {
-      "text": "Хүргэж байна",
-      "wrappedText": "Хүргэж \n байна",
-      "icon": Icons.check,
-    },
-    {
-      "text": "Хүргэсэн",
-      "wrappedText": "Хүргэсэн",
-      "icon": Icons.check,
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return MediaQuery(
-      data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
-      child: SafeArea(
-        child: CustomHeader(
-          centerTitle: true,
-          customLeading: Container(),
-          customActions: CustomInkWell(
-            borderRadius: BorderRadius.circular(50),
-            onTap: Get.back,
-            child: Container(
-              decoration: BoxDecoration(
-                color: MyColors.fadedGrey,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(8),
-              child: const Icon(
-                Icons.close_rounded,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          title: "Захиалга",
-          subtitle: Text(
-            widget.orderId,
-            style: const TextStyle(
-              color: MyColors.gray,
-              fontSize: 12,
-            ),
-          ),
-          // body: listShimmerWidget(),
-          body: loading
-              ? listShimmerWidget()
-              : SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 12),
-                      _stepper(),
-                      const SizedBox(height: 12),
-                      _divider(),
-                      const SizedBox(height: 12),
-                      _statusInfo(),
-                      const SizedBox(height: 12),
-                      _divider(),
-                      const SizedBox(height: 12),
-                      _addressInfo(),
-                      const SizedBox(height: 12),
-                      _divider(),
-                      _productsInfoAndMap(),
-                    ],
-                  ),
+    return WillPopScope(
+      onWillPop: () async {
+        _userCtx.bottomSheetOpened.value = false;
+        return true;
+      },
+      child: MediaQuery(
+        data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
+        child: SafeArea(
+          child: CustomHeader(
+            centerTitle: true,
+            customLeading: Container(),
+            customActions: CustomInkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: () {
+                Get.back();
+                _userCtx.bottomSheetOpened.value = false;
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: MyColors.fadedGrey,
+                  shape: BoxShape.circle,
                 ),
+                padding: const EdgeInsets.all(8),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            title: "Захиалга",
+            subtitle: Text(
+              widget.item["orderId"],
+              style: const TextStyle(
+                color: MyColors.gray,
+                fontSize: 12,
+              ),
+            ),
+            // body: listShimmerWidget(),
+            body: loading
+                ? listShimmerWidget()
+                : SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 12),
+                        _stepper(),
+                        const SizedBox(height: 12),
+                        _divider(),
+                        const SizedBox(height: 12),
+                        _statusInfo(),
+                        const SizedBox(height: 12),
+                        _divider(),
+                        const SizedBox(height: 12),
+                        _addressInfo(),
+                        const SizedBox(height: 12),
+                        _divider(),
+                        _productsInfoAndMap(),
+                      ],
+                    ),
+                  ),
+          ),
         ),
       ),
     );
@@ -142,27 +128,16 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _dot(step >= 1),
-              _line(step > 1),
-              _dot(step >= 2),
-              _line(step > 2),
-              _dot(step >= 3),
-              _line(step > 3),
-              _dot(step == 4),
-            ],
-          ),
+          orderStatusLine(widget.item["orderStatus"]),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _text(0),
-              _text(1),
-              _text(2),
-              _text(3),
+              _text("Баталгаажсан"),
+              _text("Бэлдэж байна"),
+              _text("Хүргэж байна"),
+              _text("Хүргэсэн"),
             ],
           )
         ],
@@ -170,32 +145,9 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
     );
   }
 
-  Widget _dot(bool isActive) {
-    return Container(
-      width: 12,
-      height: 12,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isActive ? MyColors.primary : Colors.black,
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-
-  Widget _line(bool isActive) {
-    return Expanded(
-      child: Container(
-        height: 3,
-        decoration: BoxDecoration(
-          color: isActive ? MyColors.primary : Colors.black,
-        ),
-      ),
-    );
-  }
-
-  Widget _text(int index) {
+  Widget _text(String text) {
     return Text(
-      statusList[index]["wrappedText"],
+      text,
       style: const TextStyle(fontSize: 10),
     );
   }
@@ -208,7 +160,6 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   }
 
   Widget _statusInfo() {
-    Map element = statusList[step - 1];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
@@ -217,30 +168,29 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
           Row(
             children: [
               Icon(
-                element["icon"],
-                color: MyColors.primary,
+                handleOrderStatusIcon(widget.item["orderStatus"]),
+                color: Colors.red,
               ),
               const SizedBox(width: 12),
-              Text(
-                element["text"],
-                style: const TextStyle(color: Colors.red, fontSize: 12),
-              )
+              Text(handleOrderStatusText(widget.item["orderStatus"]))
             ],
           ),
-          step == 2
+          widget.item["orderStatus"] == "preparing"
               ? CircularCountDownTimer(
                   width: Get.height * .07,
                   height: Get.height * .07,
-                  duration: order["prepDuration"],
-                  initialDuration: order["initialDuration"],
+                  duration: prepDuration,
+                  initialDuration: initialDuration,
                   fillColor: MyColors.background,
                   isReverse: true,
                   ringColor: Colors.red,
                 )
-              : CustomText(
-                  text: order["updatedAt"],
-                  color: MyColors.gray,
-                  fontSize: 10,
+              : Text(
+                  widget.item["updatedTime"],
+                  style: const TextStyle(
+                    color: MyColors.gray,
+                    fontSize: 12,
+                  ),
                 )
         ],
       ),
@@ -263,7 +213,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                 color: MyColors.gray,
               ),
               CustomText(
-                text: order["address"] ?? "N/a",
+                text: widget.item["address"] ?? "N/a",
                 color: MyColors.gray,
                 fontSize: 12,
               ),
@@ -278,63 +228,40 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                 color: MyColors.gray,
               ),
               CustomText(
-                text: order["phone"] ?? "N/a",
+                text: widget.item["phone"] ?? "N/a",
                 color: MyColors.gray,
                 fontSize: 12,
               ),
             ],
           ),
           const SizedBox(height: 12),
-          showUserAndDriverCode
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const CustomText(
-                      text: "Захиалгаа авах код:",
-                      color: MyColors.gray,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: CustomText(
-                        text: "${order["code"]}",
-                        color: MyColors.white,
-                      ),
-                    ),
-                  ],
-                )
-              : Container(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const CustomText(
+                text: "Захиалгаа авах код:",
+                color: MyColors.gray,
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                    color: Colors.red, borderRadius: BorderRadius.circular(12)),
+                child: CustomText(
+                  text: "${widget.item["code"] ?? "n/a"}",
+                  color: MyColors.white,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
   }
 
   Widget _productsInfoAndMap() {
-    return step == 3
-        ? SizedBox(
-            height: Get.height * .6,
-            child: const GoogleMap(
-              scrollGesturesEnabled: false,
-              zoomControlsEnabled: false,
-              zoomGesturesEnabled: false,
-              mapType: MapType.normal,
-              buildingsEnabled: true,
-              myLocationButtonEnabled: true,
-              // onCameraMove: _userCtx.onCameraMove,
-              rotateGesturesEnabled: true,
-              trafficEnabled: false,
-              compassEnabled: false,
-              // markers: Set<Marker>.of(_userCtx.markers.values),
-              initialCameraPosition: CameraPosition(
-                target: LatLng(37.42796133580664, -122.085749655962),
-                zoom: 14.4746,
-              ),
-              // onMapCreated: _userCtx.onMapCreated,
-            ),
-          )
+    return widget.item["orderStatus"] == "delivering"
+        ? UserOrderMapScreen()
         : Padding(
             padding: const EdgeInsets.only(left: 12, right: 12),
             child: Column(
@@ -345,11 +272,11 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: order["products"].length ?? 0,
+                  itemCount: products.length,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemBuilder: (context, index) {
                     // var product = _userCtx.selectedOrder["products"][index];
-                    var item = order["products"][index];
+                    var item = products[index];
                     return Container(
                         height: Get.height * .09,
                         color: MyColors.white,
@@ -387,7 +314,8 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                       color: MyColors.gray,
                     ),
                     CustomText(
-                      text: convertToCurrencyFormat(order["productsTotal"]),
+                      text: convertToCurrencyFormat(
+                          widget.item["productsTotal"] ?? 0),
                       color: MyColors.gray,
                     )
                   ],
@@ -401,7 +329,8 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                       color: MyColors.gray,
                     ),
                     CustomText(
-                      text: convertToCurrencyFormat(order["deliveryPrice"]),
+                      text: convertToCurrencyFormat(
+                          widget.item["deliveryPrice"] ?? 0),
                       color: MyColors.gray,
                     )
                   ],
@@ -425,7 +354,8 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                   children: [
                     const CustomText(text: "Нийт үнэ:"),
                     CustomText(
-                      text: convertToCurrencyFormat(order["totalAmount"]),
+                      text: convertToCurrencyFormat(
+                          widget.item["totalAmount"] ?? 0),
                       color: MyColors.black,
                     )
                   ],

@@ -1,11 +1,5 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
-import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
-import 'package:Erdenet24/screens/store/store_orders_detail_screen.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:get/get.dart';
@@ -17,8 +11,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:iconly/iconly.dart';
-import 'package:lottie/lottie.dart';
 
 class StoreOrdersScreen extends StatefulWidget {
   const StoreOrdersScreen({Key? key}) : super(key: key);
@@ -85,213 +77,144 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
               ? listShimmerWidget()
               : !_storeCtx.loading.value && _storeCtx.orders.isEmpty
                   ? customEmptyWidget("Захиалга байхгүй байна")
-                  : ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          width: double.infinity,
-                          height: Get.height * .008,
-                          decoration: BoxDecoration(color: MyColors.fadedGrey),
-                        );
+                  : RefreshIndicator(
+                      color: MyColors.primary,
+                      onRefresh: () async {
+                        await Future.delayed(const Duration(milliseconds: 600));
+                        _storeCtx.refreshOrders();
                       },
-                      padding: const EdgeInsets.only(top: 12),
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: _storeCtx.hasMore.value
-                          ? _storeCtx.orders.length + 1
-                          : _storeCtx.orders.length,
-                      controller: scrollController,
-                      itemBuilder: (context, index) {
-                        if (index < _storeCtx.orders.length) {
-                          var item = _storeCtx.orders[index];
-                          String orderStatus =
-                              _storeCtx.orders[index]["orderStatus"];
-                          return CustomInkWell(
-                            borderRadius: BorderRadius.zero,
-                            onTap: () {
-                              Get.bottomSheet(
-                                StoreOrdersDetailScreen(
-                                  id: item["id"],
-                                  orderId: item["orderId"],
-                                ),
-                                backgroundColor: MyColors.white,
-                                isScrollControlled: true,
-                              );
-                            },
-                            child: Container(
-                              height: Get.height * .07,
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  SizedBox(width: Get.width * .04),
-                                  SizedBox(
-                                    width: Get.width * .4,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CustomText(
-                                          text: "ID: ${item["orderId"]}",
-                                          fontSize: 13,
-                                          color: MyColors.gray,
-                                        ),
-                                        Text(convertToCurrencyFormat(
-                                            item["totalAmount"])),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: orderStatus == "sent"
-                                        ? _newOrderActionWidget()
-                                        : orderStatus == "preparing"
-                                            ? _preparingActionWidget(item)
-                                            : orderStatus == "waitingForDriver"
-                                                ? _waitingForDriverActionWidget(
-                                                    item)
-                                                : orderStatus == "delivering"
-                                                    ? _deliveringActionWidget(
-                                                        item)
-                                                    : orderStatus == "delivered"
-                                                        ? _deliveredActionWidget(
-                                                            item)
-                                                        : Container(),
-                                  ),
-                                  SizedBox(width: Get.width * .04),
-                                ],
-                              ),
-                            ),
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            width: double.infinity,
+                            height: Get.height * .008,
+                            decoration:
+                                BoxDecoration(color: MyColors.fadedGrey),
                           );
-                        } else if (_storeCtx.hasMore.value) {
-                          return listItemShimmer();
-                        } else {
-                          return Container();
-                        }
-                      },
+                        },
+                        padding: const EdgeInsets.only(top: 12),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: _storeCtx.hasMore.value
+                            ? _storeCtx.orders.length + 1
+                            : _storeCtx.orders.length,
+                        controller: scrollController,
+                        itemBuilder: (context, index) {
+                          if (index < _storeCtx.orders.length) {
+                            var item = _storeCtx.orders[index];
+                            String orderStatus =
+                                _storeCtx.orders[index]["orderStatus"];
+                            return CustomInkWell(
+                              borderRadius: BorderRadius.zero,
+                              onTap: () {
+                                // Get.bottomSheet(
+                                //   StoreOrdersDetailScreen(
+                                //     id: item["id"],
+                                //     orderId: item["orderId"],
+                                //   ),
+                                //   backgroundColor: MyColors.white,
+                                //   isScrollControlled: true,
+                                // );
+                                _storeCtx.showOrderBottomSheet(item);
+                              },
+                              child: Container(
+                                height: Get.height * .07,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    SizedBox(width: Get.width * .04),
+                                    SizedBox(
+                                      width: Get.width * .4,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: "ID: ${item["orderId"]}",
+                                            fontSize: 13,
+                                            color: MyColors.gray,
+                                          ),
+                                          Text(convertToCurrencyFormat(
+                                              item["totalAmount"])),
+                                        ],
+                                      ),
+                                    ),
+                                    _actions(item),
+                                    SizedBox(width: Get.width * .04),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else if (_storeCtx.hasMore.value) {
+                            return listItemShimmer();
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
                     ),
         ),
       ),
     );
   }
 
-  Widget _newOrderActionWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: const Text(
-            "Шинэ",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _preparingActionWidget(item) {
-    int duration = item["prepDuration"];
-    int initialDuration = item["initialDuration"];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        CircularCountDownTimer(
-          width: Get.height * .07,
-          height: Get.height * .07,
-          duration: duration,
-          initialDuration: initialDuration,
-          fillColor: MyColors.background,
-          isReverse: true,
-          ringColor: Colors.red,
-        ),
-      ],
-    );
-  }
-
-  Widget _waitingForDriverActionWidget(Map item) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        CustomText(
-          text: item["date"],
-          fontSize: 13,
-          color: MyColors.gray,
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Lottie.asset(
-              'assets/json/radiant.json',
-              height: 24,
-              width: 24,
-            ),
-            const SizedBox(width: 8),
-            const CustomText(
-              text: "Жолооч хүлээж байна...",
-              fontSize: 12,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _deliveringActionWidget(Map item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        CustomText(
-          text: item["date"],
-          fontSize: 13,
-          color: MyColors.gray,
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              "assets/images/png/car.png",
-              width: 24,
-              height: 24,
-            ),
-            const SizedBox(width: 8),
-            const CustomText(
-              text: "Хүргэж байгаа",
-              fontSize: 12,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _deliveredActionWidget(Map item) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        CustomText(
-          text: item["date"],
-          fontSize: 13,
-          color: MyColors.gray,
-        ),
-        Text(
-          "Хүргэсэн",
-          style: TextStyle(color: Colors.green),
-        )
-      ],
+  Widget _actions(Map item) {
+    return Expanded(
+      child: item["orderStatus"] == "sent"
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: const Text(
+                    "Шинэ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : item["orderStatus"] == "preparing"
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CircularCountDownTimer(
+                      width: Get.height * .06,
+                      height: Get.height * .06,
+                      duration: item["prepDuration"],
+                      initialDuration: item["initialDuration"],
+                      fillColor: MyColors.background,
+                      isReverse: true,
+                      ringColor: Colors.red,
+                      textStyle: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText(
+                      text: item["updatedTime"],
+                      fontSize: 13,
+                      color: MyColors.gray,
+                    ),
+                    status(item["orderStatus"])
+                  ],
+                ),
     );
   }
 

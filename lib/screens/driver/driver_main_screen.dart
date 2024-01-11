@@ -6,6 +6,7 @@ import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/countdown.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
@@ -13,6 +14,7 @@ import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -113,7 +115,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
                             itemCount: _driverCtx.orders.length,
                             itemBuilder: (context, index) {
                               var item = _driverCtx.orders[index];
-                              return item["accepted"]
+                              return item["acceptedByMe"]
                                   ? CustomInkWell(
                                       onTap: () =>
                                           _driverCtx.showOrderBottomSheet(item),
@@ -153,11 +155,11 @@ class _DriverMainScreenState extends State<DriverMainScreen>
               children: [
                 SizedBox(height: Get.width * .01),
                 Text(
-                  item["storeName"] ?? "n/a",
+                  item["storeName"],
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  item["address"] ?? "n/a",
+                  item["address"],
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(convertToCurrencyFormat(item["deliveryPrice"] ?? 0)),
@@ -165,32 +167,55 @@ class _DriverMainScreenState extends State<DriverMainScreen>
               ],
             ),
           ),
-          Expanded(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Countdown(
-                animation: StepTween(
-                  begin: item["prepDuration"],
-                  end: 0,
-                ).animate(item["timer"]),
-              ),
-              item["accepted"]
-                  ? status(item["orderStatus"])
-                  : TextButton(
-                      onPressed: () {
-                        _driverCtx.showPasswordDialog(item);
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.green,
-                      ),
-                      child: const Text('Accept'),
+          item["acceptedByMe"] == true
+              ? Expanded(
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Countdown(
+                      animation: StepTween(
+                        begin: item["initialDuration"] ?? 0,
+                        end: 0,
+                      ).animate(item["timer"]),
                     ),
-            ],
-          )),
+                    status(item["orderStatus"])
+                  ],
+                ))
+              : Expanded(
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Countdown(
+                      animation: StepTween(
+                        begin: item["initialDuration"] ?? 0,
+                        end: 0,
+                      ).animate(item["timer"]),
+                    ),
+                    item["orderStatus"] == "driverAccepted"
+                        ? TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.blue,
+                            ),
+                            child: Text(item["driverName"]),
+                          )
+                        : TextButton(
+                            onPressed: () {
+                              _driverCtx.showPasswordDialog(item);
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.green,
+                            ),
+                            child: const Text('Accept'),
+                          ),
+                  ],
+                )),
           SizedBox(width: Get.width * .04)
         ],
       ),
@@ -310,21 +335,5 @@ class _DriverMainScreenState extends State<DriverMainScreen>
         ),
       ),
     );
-  }
-}
-
-class Countdown extends AnimatedWidget {
-  Countdown({Key? key, required this.animation})
-      : super(key: key, listenable: animation);
-  Animation<int> animation;
-
-  @override
-  build(BuildContext context) {
-    Duration clockTimer = Duration(seconds: animation.value);
-
-    String timerText =
-        '${clockTimer.inMinutes.remainder(60).toString()}:${clockTimer.inSeconds.remainder(60).toString().padLeft(2, '0')}';
-
-    return Text(timerText);
   }
 }

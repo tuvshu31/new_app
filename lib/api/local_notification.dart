@@ -161,4 +161,8 @@ class LocalNotification {
       await _showNotificationWithSoundDetails(sound),
     );
   }
+
+  static Future cancelLocalNotification({required int id}) async {
+    await _flutterLocalNotificationsPlugin.cancel(id);
+  }
 }
