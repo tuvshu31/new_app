@@ -741,7 +741,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
     return showSearchBar
         ? _search()
         : const Text(
-            "Бараа засварлах",
+            "Барааны мэдээлэл засах",
             style: TextStyle(color: Colors.black, fontSize: 16),
           );
   }

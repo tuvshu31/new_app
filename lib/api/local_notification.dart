@@ -1,6 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:Erdenet24/api/restapi_helper.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
@@ -114,7 +123,7 @@ class LocalNotification {
         priority: Priority.high,
         enableVibration: true,
         playSound: true,
-        sound: RawResourceAndroidNotificationSound(sound),
+        // sound: RawResourceAndroidNotificationSound(sound),
       ),
       iOS: const DarwinNotificationDetails(),
     );
@@ -139,12 +148,14 @@ class LocalNotification {
     required int id,
     required String title,
     required String body,
+    required String payload,
   }) async {
     await _flutterLocalNotificationsPlugin.show(
       id,
       title,
       body,
       await _simpleNotificationDetails(),
+      payload: payload,
     );
   }
 
@@ -164,5 +175,29 @@ class LocalNotification {
 
   static Future cancelLocalNotification({required int id}) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+}
+
+void handleNotifications(data) {
+  var payload = jsonDecode(data["data"]);
+  LocalNotification.showSimpleNotification(
+    id: payload["id"],
+    title: payload["title"],
+    body: payload["body"],
+    payload: payload["role"],
+  );
+}
+
+final _navCtx = Get.put(NavigationController());
+Future<void> onClickNotification(data) async {
+  String role = RestApiHelper.getUserRole();
+  if (data != null && data != "" && data == role) {
+    if (data == "user") {
+      Get.back();
+      Get.offNamed(userHomeScreenRoute);
+      _navCtx.onItemTapped(3);
+    } else if (data == "store") {
+      Get.back();
+    }
   }
 }

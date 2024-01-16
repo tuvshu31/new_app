@@ -20,7 +20,6 @@ import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 class LoginController extends GetxController {
-  final _cartCtx = Get.put(CartController());
   final _navCtx = Get.put(NavigationController());
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
@@ -28,6 +27,7 @@ class LoginController extends GetxController {
   void logout() async {
     Get.back();
     CustomDialogs().showLoadingDialog();
+    deleteToken();
     RestApiHelper.saveUserId(0);
     RestApiHelper.saveUserRole("");
     RestApiHelper.saveOrderId(0);
@@ -49,26 +49,32 @@ class LoginController extends GetxController {
   void saveUserToken() {
     _messaging.getToken().then((token) async {
       if (token != null) {
-        var body = {"mapToken": token};
-        dynamic res =
-            await RestApi().updateUser(RestApiHelper.getUserId(), body);
-        log("saveUserToken: $res");
+        var body = {
+          "id": RestApiHelper.getUserId(),
+          "role": RestApiHelper.getUserRole(),
+          "token": token,
+        };
+        await UserApi().saveUserToken(body);
       }
     });
   }
 
-  void listenToTokenChanges(String role) {
-    _messaging.onTokenRefresh.listen((newToken) async {
-      var body = {"mapToken": newToken};
-      await RestApi().updateUser(RestApiHelper.getUserId(), body);
-      dynamic response = await RestApi().subscribeToFirebase(role, newToken);
-      if (response != null) {
-        dynamic d = Map<String, dynamic>.from(response);
-        if (d["success"]) {
-          RestApiHelper.subscribeToFirebase();
-        }
-      }
-    });
+  // void listenToTokenChanges(String role) {
+  //   _messaging.onTokenRefresh.listen((newToken) async {
+  //     var body = {"mapToken": newToken};
+  //     await RestApi().updateUser(RestApiHelper.getUserId(), body);
+  //     dynamic response = await RestApi().subscribeToFirebase(role, newToken);
+  //     if (response != null) {
+  //       dynamic d = Map<String, dynamic>.from(response);
+  //       if (d["success"]) {
+  //         RestApiHelper.subscribeToFirebase();
+  //       }
+  //     }
+  //   });
+  // }
+
+  void deleteToken() {
+    _messaging.deleteToken();
   }
 
   Future<void> checkUserDeviceInfo() async {

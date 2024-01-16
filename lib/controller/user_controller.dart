@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -48,56 +48,12 @@ class UserController extends GetxController {
     }
   }
 
-  void handleSentAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: payload["storeName"],
-      body: "Таны захиалга баталгаажлаа",
-    );
-    Get.back();
-    Get.back();
-    _navCtx.onItemTapped(3);
-    showOrderDetailsBottomSheet(payload);
-    tab.value = 0;
-    page.value = 1;
+  void refreshOrders() {
     orders.clear();
-    hasMore.value = true;
-    pagination.value = {};
     loading.value = false;
+    pagination.value = {};
+    hasMore.value = false;
     getUserOrders();
-  }
-
-  void handlePreparingAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: payload["store"],
-      body: "Таны захиалгыг бэлдэж эхэллээ",
-    );
-    int index = orders.indexWhere((element) => element["id"] == payload["id"]);
-    orders[index]["orderStatus"] = "preparing";
-    orders[index]["prepDuration"] = payload["prepDuration"];
-    orders[index]["updatedTime"] = payload["updatedTime"];
-    orders.refresh();
-    if (bottomSheetOpened.value) {
-      Get.back();
-      showOrderDetailsBottomSheet(orders[index]);
-    }
-  }
-
-  void handleDeliveringAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: payload["store"],
-      body: "Таны захиалга хүргэлтэнд гарлаа",
-    );
-    int index = orders.indexWhere((element) => element["id"] == payload["id"]);
-    orders[index]["orderStatus"] = "delivering";
-    orders[index]["updatedTime"] = payload["updatedTime"];
-    orders.refresh();
-    if (bottomSheetOpened.value) {
-      Get.back();
-      showOrderDetailsBottomSheet(orders[index]);
-    }
   }
 
   Future<void> handleTrackingAction(Map payload) async {
@@ -117,36 +73,21 @@ class UserController extends GetxController {
     );
   }
 
-  void handleDeliveredAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: "Erdenet24",
-      body: "Таны захиалга амжилттай хүргэгдлээ",
-    );
-    int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-    orders.removeAt(index);
-    if (bottomSheetOpened.value) {
-      Get.back();
-    }
-  }
-
   void handleSocketActions(Map payload) async {
-    String action = payload["action"];
-    if (action == "sent") {
-      handleSentAction(payload);
+    if (Get.currentRoute == userHomeScreenRoute &&
+        _navCtx.currentIndex.value == 3) {
+      if (bottomSheetOpened.value) {
+        Get.back();
+      }
+      refreshOrders();
+      showOrderDetailsBottomSheet(payload);
     }
-    if (action == "preparing") {
-      handlePreparingAction(payload);
-    }
-    if (action == "delivering") {
-      handleDeliveringAction(payload);
-    }
-    if (action == "tracking") {
-      handleTrackingAction(payload);
-    }
-    if (action == "delivered") {
-      handleDeliveredAction(payload);
-    }
+    // else {
+    //   Get.back();
+    //   Get.toNamed(userHomeScreenRoute);
+    //   _navCtx.onItemTapped(3);
+    //   showOrderDetailsBottomSheet(payload);
+    // }
   }
 
   void getMainCategories() async {
@@ -168,20 +109,17 @@ class UserController extends GetxController {
     }
   }
 
-  void checkUserSocketConnection() async {
-    dynamic checkUserSocketConnection =
-        await UserApi().checkUserSocketConnection();
-    if (checkUserSocketConnection != null) {
-      dynamic response = Map<String, dynamic>.from(checkUserSocketConnection);
-      if (response["success"]) {
-        if (response["connect"]) {
-          SocketClient().connect();
-        } else {
-          SocketClient().disconnect();
-        }
-      }
-    }
-  }
+  // void checkUserSocketConnection() async {
+  //   dynamic checkUserSocketConnection =
+  //       await UserApi().checkUserSocketConnection();
+  //   if (checkUserSocketConnection != null) {
+  //     dynamic response = Map<String, dynamic>.from(checkUserSocketConnection);
+  //     if (response["success"]) {
+  //       if (response["connect"]) {
+  //       } else {}
+  //     }
+  //   }
+  // }
 
   Future<void> showOrderDetailsBottomSheet(Map item) {
     bottomSheetOpened.value = true;

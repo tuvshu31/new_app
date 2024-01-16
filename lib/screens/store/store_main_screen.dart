@@ -1,9 +1,5 @@
 import 'dart:developer';
-import 'dart:io';
-
-import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
@@ -21,7 +17,6 @@ import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 
 class StoreMainScreen extends StatefulWidget {
   const StoreMainScreen({Key? key}) : super(key: key);
@@ -41,8 +36,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   void initState() {
     super.initState();
-    getStoreInfo();
+    _loginCtx.saveUserToken();
     _loginCtx.checkUserDeviceInfo();
+    getStoreInfo();
   }
 
   void getStoreInfo() async {
@@ -56,11 +52,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
         _storeCtx.isOpen.value = data["isOpen"];
         if (_storeCtx.isOpen.value) {
-          SocketClient().connect();
           checkStoreNewOrders();
-        } else {
-          SocketClient().disconnect();
-        }
+        } else {}
       }
     }
     setState(() {});
@@ -76,11 +69,8 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         _storeCtx.isOpen.value = open == 1;
         setState(() {});
         if (_storeCtx.isOpen.value) {
-          SocketClient().connect();
           checkStoreNewOrders();
-        } else {
-          SocketClient().disconnect();
-        }
+        } else {}
         customSnackbar(ActionType.success,
             "Дэлгүүр ${_storeCtx.isOpen.value ? "нээгдлээ" : "хаагдлаа"}", 2);
       }
@@ -121,7 +111,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
               ? CustomShimmer(width: Get.width * .3, height: 16)
               : Text(
                   data["phone"],
-                  style: TextStyle(color: MyColors.gray),
+                  style: const TextStyle(
+                    color: MyColors.gray,
+                  ),
                 ),
           SizedBox(height: Get.height * .02),
           ListTile(
@@ -162,7 +154,7 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
           _listTile(IconlyLight.plus, "Бараа нэмэх", () {
             Get.toNamed(storeProductsAddScreenRoute);
           }),
-          _listTile(IconlyLight.edit, "Бараа засварлах", () {
+          _listTile(IconlyLight.edit, "Барааны мэдээлэл засах", () {
             Get.toNamed(storeProductsEditScreenRoute);
           }),
           _listTile(IconlyLight.graph, "Захиалгууд", () {

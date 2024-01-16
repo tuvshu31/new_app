@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 
-int userId = RestApiHelper.getUserId();
-
 class UserApi {
+  int userId = RestApiHelper.getUserId();
   static final UserApi _singleton = UserApi._internal();
   factory UserApi() => _singleton;
   UserApi._internal();
@@ -87,9 +84,8 @@ class UserApi {
 
   //Хэрэглэгчийн захиалгуудыг авах
   Future getUserOrders(dynamic query) async {
-    String url = 'getUserOrders?userId=$userId';
-    log(url.toString());
-    return DioClient().sendRequest(url, Method.post, [], query);
+    return DioClient()
+        .sendRequest('getUserOrders?userId=$userId', Method.post, [], query);
   }
 
   //Сонгосон дэлгүүрийн бараануудыг авах
@@ -226,5 +222,10 @@ class UserApi {
   Future checkUserSocketConnection() async {
     return DioClient().sendRequest(
         'checkUserSocketConnection?userId=$userId', Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн firebase token-г хадгалж авах
+  Future saveUserToken(dynamic body) async {
+    return DioClient().sendRequest('saveUserToken', Method.post, body, {});
   }
 }

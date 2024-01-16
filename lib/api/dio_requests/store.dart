@@ -2,9 +2,8 @@ import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 
-int storeId = RestApiHelper.getUserId();
-
 class StoreApi {
+  int storeId = RestApiHelper.getUserId();
   static final StoreApi _singleton = StoreApi._internal();
   factory StoreApi() => _singleton;
   StoreApi._internal();

@@ -1,18 +1,13 @@
 import 'dart:developer';
-
 import 'package:Erdenet24/api/dio_requests/driver.dart';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/api/socket_instance.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/driver/driver_auth_dialog_body.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_sheets_body.dart';
 import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/widgets/textfield.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -22,7 +17,6 @@ import 'package:Erdenet24/api/restapi_helper.dart';
 class DriverController extends GetxController with GetTickerProviderStateMixin {
   final player = AudioPlayer();
   RxList orders = [].obs;
-  RxList acceptedOrders = [].obs;
   RxBool isOnline = false.obs;
   RxBool fetchingOrders = false.obs;
   RxMap driverInfo = {}.obs;
@@ -30,21 +24,32 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
   Rx<DriverStatus> driverStatus = DriverStatus.withoutOrder.obs;
   late AnimationController animationController;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  Rx<ScrollController> scrollController = ScrollController().obs;
 
   void handleSocketActions(Map payload) async {
     String action = payload["action"];
-    if (action == "preparing" && isOnline.value) {
+    if (action == "preparing") {
       handlePreparingAction(payload);
-    }
-    if (action == "accepted" && isOnline.value) {
+    } else if (action == "accept") {
       handleAcceptAction(payload);
+    } else if (action == "delivering") {
+      // handleDeliveringAction(payload);
+    } else if (action == "delivered") {
+      handleDeliveredAction(payload);
+    } else if (action == "accepted") {
+      handleAcceptedByOthersAction(payload);
+    } else {
       log(payload.toString());
     }
-    if (action == "delivering" && isOnline.value) {
-      // handleDeliveringAction(payload);
-    }
-    if (action == "delivered" && isOnline.value) {
-      handleDeliveredAction(payload);
+  }
+
+  void handleAcceptedByOthersAction(Map item) {
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    if (index > 0) {
+      orders[index]["driverName"] = item["driverName"];
+      orders[index]["orderStatus"] = item["orderStatus"];
+      orders[index]["deliveryStatus"] = item["deliveryStatus"];
+      orders.refresh();
     }
   }
 
@@ -66,15 +71,21 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handlePreparingAction(payload) {
+    log(payload.toString());
     int index = orders.indexWhere((e) => e["id"] == payload["id"]);
     if (index < 0) {
-      LocalNotification.showNotificationWithSound(
-        id: 3,
-        title: payload["store"],
-        body: payload["address"],
-        sound: "notify",
-      );
+      // LocalNotification.showNotificationWithSound(
+      //   id: 3,
+      //   title: payload["store"],
+      //   body: payload["address"],
+      //   sound: "notify",s
+      // );
+      animationController = AnimationController(
+          vsync: this, duration: Duration(seconds: payload["initialDuration"]));
+      animationController.forward();
+      payload["timer"] = animationController;
       orders.add(payload);
+      player.play(AssetSource("sounds/doordash.mp3"));
     } else {
       log("not included!");
     }
@@ -99,10 +110,10 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       if (res["success"]) {
         isOnline.value = !isOnline.value;
         if (isOnline.value) {
-          SocketClient().connect();
+          connectToSocket();
           refreshOrders();
         } else {
-          SocketClient().disconnect();
+          socket.disconnect();
         }
       }
     }
@@ -110,8 +121,12 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
 
   Future<void> refreshOrders() async {
     orders.clear();
-    acceptedOrders.clear();
     getAllPreparingOrders();
+  }
+
+  void scrollToTop() {
+    scrollController.value.animateTo(0,
+        duration: const Duration(seconds: 1), curve: Curves.linear);
   }
 
   Future<void> driverAcceptOrder(Map item) async {
@@ -121,14 +136,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
     if (driverAcceptOrder != null) {
       dynamic response = Map<String, dynamic>.from(driverAcceptOrder);
       if (response["success"]) {
-        if (!acceptedOrders.contains(item["id"])) {
-          acceptedOrders.add(item["id"]);
-          int index = acceptedOrders.indexWhere((e) => e == item["id"]);
-          orders.remove(item);
-          item["acceptedByMe"] = true;
-          orders.insert(index, item);
-          orders.refresh();
-        }
+        refreshOrders();
       } else {
         customSnackbar(
             ActionType.error, response["errorText"] ?? "Алдаа гарлаа", 2);
@@ -161,9 +169,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
         int index = orders.indexWhere((e) => e["id"] == item["id"]);
         orders[index]["orderStatus"] = "delivered";
         orders.remove(orders[index]);
-        acceptedOrders.removeWhere((element) => element == item["id"]);
         orders.refresh();
-        acceptedOrders.refresh();
         customSnackbar(ActionType.success, "Захиалга амжилттай хүргэгдлээ", 3);
       }
     }
@@ -231,6 +237,13 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
           orders[i]["timer"] = animationController;
         }
       }
+    }
+  }
+
+  void connectToSocket() {
+    if (socket.disconnected) {
+      socket.connect();
+      socket.emit("join", "drivers");
     }
   }
 }

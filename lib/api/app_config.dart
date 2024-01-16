@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:Erdenet24/api/local_notification.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+
 const _baseUrl = "baseUrl";
 
 enum Environment { dev, prod }
@@ -21,7 +26,7 @@ dynamic get apiBaseUrl {
 }
 
 Map<String, dynamic> devConstants = {
-  _baseUrl: "http://192.168.1.6:8000",
+  _baseUrl: "http://192.168.1.191:8000",
 };
 
 Map<String, dynamic> prodConstants = {

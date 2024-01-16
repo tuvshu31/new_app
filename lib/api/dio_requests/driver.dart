@@ -2,9 +2,8 @@ import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 
-int driverId = RestApiHelper.getUserId();
-
 class DriverApi {
+  int driverId = RestApiHelper.getUserId();
   static final DriverApi _singleton = DriverApi._internal();
   factory DriverApi() => _singleton;
   DriverApi._internal();

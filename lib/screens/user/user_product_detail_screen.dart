@@ -49,7 +49,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     super.initState();
     getProductDetails();
     getProductAvailableInfo();
-    log(_arguments.toString());
   }
 
   void listClick(GlobalKey widgetKey) async {
@@ -62,6 +61,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     dynamic getProductDetails =
         await UserApi().getProductDetails(_arguments["id"]);
     if (getProductDetails != null) {
+      log("getProductDetails: $getProductDetails");
       dynamic response = Map<String, dynamic>.from(getProductDetails);
       if (response["success"]) {
         data = response["data"];
@@ -76,8 +76,11 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     loadingInfo = true;
     dynamic getProductAvailableInfo = await UserApi()
         .getProductAvailableInfo(_arguments["store"], _arguments["id"]);
+    log(_arguments["store"].toString());
+    log(_arguments["id"].toString());
     loadingInfo = false;
     if (getProductAvailableInfo != null) {
+      log("getProductAvailableInfo: $getProductAvailableInfo");
       dynamic response = Map<String, dynamic>.from(getProductAvailableInfo);
       if (response["success"]) {
         info = response["data"];

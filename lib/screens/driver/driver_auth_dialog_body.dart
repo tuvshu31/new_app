@@ -1,8 +1,6 @@
 import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

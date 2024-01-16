@@ -1,15 +1,11 @@
 import 'dart:convert';
-
+import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/api/socket_instance.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -36,7 +32,6 @@ class _UserPaymentScreenState extends State<UserPaymentScreen> {
   @override
   void initState() {
     super.initState();
-    SocketClient().connect();
     createQpayInvoice();
   }
 
@@ -44,12 +39,14 @@ class _UserPaymentScreenState extends State<UserPaymentScreen> {
     loading = true;
     var body = {
       "orderId": _arguments["orderId"],
-      "amount": _arguments["amount"]
+      "amount": _arguments["amount"],
+      "userId": RestApiHelper.getUserId()
     };
     dynamic createQpayInvoice = await UserApi().createQpayInvoice(body);
     loading = false;
     if (createQpayInvoice != null) {
       dynamic response = Map<String, dynamic>.from(createQpayInvoice);
+      log(response.toString());
       if (response["success"]) {
         var data = jsonDecode(response["data"]);
         qrImage = data["qr_image"];

@@ -1,9 +1,12 @@
 // I love you my super dad heart (Ruby)
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:Erdenet24/api/app_config.dart';
 import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/api/socket_instance.dart';
+import 'package:Erdenet24/api/socket_client.dart';
+import 'package:Erdenet24/controller/lifecycle_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
@@ -45,23 +48,30 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 import 'firebase_options.dart';
+
+Socket socket = io(
+    apiBaseUrl,
+    OptionBuilder()
+        .setTransports(['websocket']) // for Flutter or Dart VM
+        .disableAutoConnect() // disable auto-connection
+        .build());
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  // handleNotifications(message.data);
+  handleNotifications(message.data);
 }
 
 Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
-  // handleNotifications(message.data);
+  handleNotifications(message.data);
 }
 
 final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
-  setEnvironment(Environment.prod);
+  setEnvironment(Environment.dev);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(
@@ -97,6 +107,15 @@ void main() async {
   } else if (Platform.isIOS) {
     GeolocatorApple.registerWith();
   }
+
+  socket.onConnect((data) => SocketClient().onConnect(socket));
+  socket.onDisconnect((data) => SocketClient().onDisconnect(data));
+  socket.on("message", (data) => SocketClient().onMessage(data));
+  socket.on("accept", (data) => SocketClient().onAccept(data));
+  socket.on("accepted", (data) => SocketClient().onAccepted(data));
+
+  Get.put(LifeCycleController());
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then(
@@ -118,16 +137,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    listenToNotification();
+    listenNotification();
     _userCtx.getMainCategories();
   }
 
-  listenToNotification() {
-    LocalNotification.onClickNotification.stream.listen((event) {
-      // Navigator.push(context,
-      //     MaterialPageRoute(builder: (context) => n));
-    });
-  }
+  Future<void> listenNotification() async =>
+      LocalNotification.onClickNotification.stream.listen(onClickNotification);
 
   @override
   Widget build(BuildContext context) {

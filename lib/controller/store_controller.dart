@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/api/local_notification.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -54,19 +55,16 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handleSentAction(Map payload) {
-    LocalNotification.showNotificationWithSound(
-      id: payload["id"],
-      title: "Erdenet24",
-      body: "Шинэ захиалга ирлээ",
-      sound: "incoming",
-    );
     Get.offNamed(storeMainScreenRoute);
+  }
+
+  void showNewOrderAlert(int id) {
     showDialog(
       context: Get.context!,
       barrierDismissible: false,
       builder: (context) {
         return showIncomingOrderDialogBody(() {
-          LocalNotification.cancelLocalNotification(id: payload["id"]);
+          LocalNotification.cancelLocalNotification(id: id);
           Get.back();
           Get.toNamed(storeOrdersScreenRoute);
         });
@@ -75,11 +73,6 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handleDeliveringAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: "Erdenet24",
-      body: "${payload["orderId"]} дугаартай захиалга хүргэлтэнд гарлаа",
-    );
     int index = orders.indexWhere((e) => e["id"] == payload["id"]);
     orders[index]["orderStatus"] = "delivering";
     orders[index]["updatedTime"] = payload["updatedTime"];
@@ -87,11 +80,6 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handleDeliveredAction(Map payload) {
-    LocalNotification.showSimpleNotification(
-      id: payload["id"],
-      title: "Erdenet24",
-      body: "${payload["orderId"]} дугаартай захиалга хүргэгдлээ",
-    );
     int index = orders.indexWhere((e) => e["id"] == payload["id"]);
     orders.removeAt(index);
     orders.refresh();
