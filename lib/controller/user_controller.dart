@@ -6,6 +6,7 @@ import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
@@ -82,12 +83,21 @@ class UserController extends GetxController {
       refreshOrders();
       showOrderDetailsBottomSheet(payload);
     }
-    // else {
-    //   Get.back();
-    //   Get.toNamed(userHomeScreenRoute);
-    //   _navCtx.onItemTapped(3);
-    //   showOrderDetailsBottomSheet(payload);
-    // }
+    if (Get.currentRoute == userPaymentScreenRoute) {
+      CustomDialogs().showLoadingDialog();
+      dynamic checkQpayPayment = await UserApi().checkQpayPayment();
+      Get.back();
+      if (checkQpayPayment != null) {
+        dynamic response = Map<String, dynamic>.from(checkQpayPayment);
+        if (response["success"]) {
+          if (response["isPaid"]) {
+            Get.back();
+            Get.back();
+            _navCtx.onItemTapped(3);
+          }
+        }
+      }
+    }
   }
 
   void getMainCategories() async {
@@ -108,18 +118,6 @@ class UserController extends GetxController {
       }
     }
   }
-
-  // void checkUserSocketConnection() async {
-  //   dynamic checkUserSocketConnection =
-  //       await UserApi().checkUserSocketConnection();
-  //   if (checkUserSocketConnection != null) {
-  //     dynamic response = Map<String, dynamic>.from(checkUserSocketConnection);
-  //     if (response["success"]) {
-  //       if (response["connect"]) {
-  //       } else {}
-  //     }
-  //   }
-  // }
 
   Future<void> showOrderDetailsBottomSheet(Map item) {
     bottomSheetOpened.value = true;

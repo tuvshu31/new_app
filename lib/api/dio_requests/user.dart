@@ -3,7 +3,6 @@ import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 
 class UserApi {
-  int userId = RestApiHelper.getUserId();
   static final UserApi _singleton = UserApi._internal();
   factory UserApi() => _singleton;
   UserApi._internal();
@@ -33,18 +32,24 @@ class UserApi {
 
   //Хэрэглэгчийн хадгалсан бараануудыг авах
   Future getUserSavedProducts(dynamic query) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('getUserSavedProducts?id=$userId', Method.post, [], query);
   }
 
   //Хэрэглэгч бараа хадгалах
   Future addToSaved(int productId) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'addToSaved?id=$userId&productId=$productId', Method.post, [], {});
   }
 
   //Хэрэглэгчийн хадгалсан барааг устгах
   Future deleteUserSavedProduct(int productId) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'deleteUserSavedProduct?id=$userId&productId=$productId',
         Method.post, [], {});
@@ -52,12 +57,16 @@ class UserApi {
 
   //Хэрэглэгчийн сагсан дахь бараануудыг авах
   Future getUserCartProducts() async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('getUserCartProducts?id=$userId', Method.post, [], {});
   }
 
   //Хэрэглэгч сагсандаа бараа нэмэх
   Future addToCart(int productId, int storeId, {int quantity = 1}) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'addToCart?id=$userId&productId=$productId&storeId=$storeId&quantity=$quantity',
         Method.post, [], {});
@@ -65,6 +74,8 @@ class UserApi {
 
   //Хэрэглэгч сагснаасаа бараа хасах
   Future removeFromCart(int productId, {int quantity = 1}) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'removeFromCart?id=$userId&productId=$productId&quantity=$quantity',
         Method.post, [], {});
@@ -72,18 +83,24 @@ class UserApi {
 
   //Хэрэглэгч сагснаасаа бараа устгах
   Future deleteFromCart(int productId) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'deleteFromCart?id=$userId&productId=$productId', Method.post, [], {});
   }
 
   //Хэрэглэгчийн сагсыг хоослох
   Future emptyTheCart() async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('emptyTheCart?id=$userId', Method.post, [], {});
   }
 
   //Хэрэглэгчийн захиалгуудыг авах
   Future getUserOrders(dynamic query) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('getUserOrders?userId=$userId', Method.post, [], query);
   }
@@ -107,6 +124,8 @@ class UserApi {
 
   //Сонгосон барааны авах боломжтой эсэх мэдээллийг авах
   Future getProductAvailableInfo(int storeId, int productId) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'getProductAvailableInfo?storeId=$storeId&productId=$productId&userId=$userId',
         Method.post, [], {});
@@ -120,6 +139,8 @@ class UserApi {
 
   //Хэрэглэгчийн хаягийг авах
   Future getUserAddress() async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('getUserAddress?userId=$userId', Method.post, [], {});
   }
@@ -131,6 +152,8 @@ class UserApi {
 
   //Шинэ захиалга үүсгэх
   Future createNewOrder(dynamic body) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('createNewOrder?userId=$userId', Method.post, body, {});
   }
@@ -160,6 +183,8 @@ class UserApi {
   //Сагсаа хоослоод нэмэх
   Future emptyAndAddToCart(int productId, int storeId,
       {int quantity = 1}) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'emptyAndAddToCart?id=$userId&productId=$productId&storeId=$storeId&quantity=$quantity',
         Method.post, [], {});
@@ -170,6 +195,8 @@ class UserApi {
     String role,
     String device,
   ) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'checkUserDeviceInfo?id=$userId&role=$role&device=$device',
         Method.post, [], {});
@@ -177,12 +204,16 @@ class UserApi {
 
   //Хэрэглэгчийн хувийн мэдээллийг авах
   Future getUserInfoDetails() async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('getUserInfoDetails?userId=$userId', Method.post, [], {});
   }
 
   //Хэрэглэгчийн утасны дугаар өөрчлөх үед утасны дугаар шалгаад баталгаажуулах код явуулах
   Future checkPhoneAndSendOTP(String phone) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'checkPhoneAndSendOTP?userId=$userId&phone=$phone',
         Method.post, [], {});
@@ -196,6 +227,8 @@ class UserApi {
 
   //Хэрэглэгчийн утасны дугаарыг өөрчлөх
   Future updateUserPhoneNumber(String phone) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient().sendRequest(
         'updateUserPhoneNumber?userId=$userId&phone=$phone',
         Method.post, [], {});
@@ -203,6 +236,8 @@ class UserApi {
 
   //Хэрэглэгчийн байршлын мэдээллийг өөрчлөх
   Future updateUserAddress(dynamic body) async {
+    int userId = RestApiHelper.getUserId();
+
     return DioClient()
         .sendRequest('updateUserAddress?userId=$userId', Method.post, body, {});
   }
@@ -218,14 +253,15 @@ class UserApi {
         .sendRequest('getStoreDetailsInfo', Method.post, body, {});
   }
 
-  //Хэрэглэгчийн socketе-нд холбох шаардалгатай эсэхийг шалгах
-  Future checkUserSocketConnection() async {
-    return DioClient().sendRequest(
-        'checkUserSocketConnection?userId=$userId', Method.post, [], {});
-  }
-
   //Хэрэглэгчийн firebase token-г хадгалж авах
   Future saveUserToken(dynamic body) async {
     return DioClient().sendRequest('saveUserToken', Method.post, body, {});
+  }
+
+  //Хэрэглэгчийн төлбөр төлсөн эсэхийг шалгах
+  Future checkQpayPayment() async {
+    int userId = RestApiHelper.getUserId();
+    return DioClient()
+        .sendRequest('checkQpayPayment?userId=$userId', Method.post, [], {});
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
 import 'package:Erdenet24/controller/driver_controller.dart';
@@ -138,9 +139,11 @@ void handleNotificationOnClick(String role) {
   String userRole = RestApiHelper.getUserRole();
   if (role != "" && role == userRole) {
     if (role == "user") {
-      Get.back();
-      Get.offNamed(userHomeScreenRoute);
-      navCtx.onItemTapped(3);
+      if (Get.currentRoute != userPaymentScreenRoute) {
+        Get.back();
+        Get.offNamed(userHomeScreenRoute);
+        navCtx.onItemTapped(3);
+      }
     }
     if (role == "store") {
       storeCtx.tappingNotification.value = true;

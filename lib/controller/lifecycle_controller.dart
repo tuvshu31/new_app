@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
@@ -7,6 +8,7 @@ import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:get/get.dart';
 
 class LifeCycleController extends SuperController {
@@ -33,7 +35,7 @@ class LifeCycleController extends SuperController {
   }
 
   @override
-  void onResumed() {
+  Future<void> onResumed() async {
     if (role == "user") {
       if (socket.disconnected) {
         socket.connect();
@@ -41,6 +43,21 @@ class LifeCycleController extends SuperController {
       if (Get.currentRoute == userHomeScreenRoute &&
           _navCtx.currentIndex.value == 3) {
         _userCtx.refreshOrders();
+      }
+      if (Get.currentRoute == userPaymentScreenRoute) {
+        CustomDialogs().showLoadingDialog();
+        dynamic checkQpayPayment = await UserApi().checkQpayPayment();
+        Get.back();
+        if (checkQpayPayment != null) {
+          dynamic response = Map<String, dynamic>.from(checkQpayPayment);
+          if (response["success"]) {
+            if (response["isPaid"]) {
+              Get.back();
+              Get.back();
+              _navCtx.onItemTapped(3);
+            }
+          }
+        }
       }
     }
     if (role == "store") {
