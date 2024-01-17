@@ -33,9 +33,10 @@ class _DriverMainScreenState extends State<DriverMainScreen>
   @override
   void initState() {
     super.initState();
-    _driverCtx.getAllPreparingOrders();
     getDriverInfo();
     _loginCtx.saveUserToken();
+    _driverCtx.connectToSocket();
+    _driverCtx.getAllPreparingOrders();
   }
 
   void getDriverInfo() async {
@@ -104,6 +105,7 @@ class _DriverMainScreenState extends State<DriverMainScreen>
           IconButton(
             onPressed: () {
               _driverCtx.refreshOrders();
+              _driverCtx.connectToSocket();
             },
             icon: const Icon(
               Icons.refresh_rounded,

@@ -1,18 +1,17 @@
-import 'dart:developer';
-
-import 'package:Erdenet24/api/dio_requests/store.dart';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/main.dart';
-import 'package:Erdenet24/utils/enums.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-import '../screens/store/store_order_details_screen.dart';
+import 'package:Erdenet24/utils/routes.dart';
+import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
+import 'package:Erdenet24/api/dio_requests/store.dart';
+import 'package:Erdenet24/api/local_notification.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
+import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
+import 'package:Erdenet24/screens/store/store_order_details_screen.dart';
 
 class StoreController extends GetxController with GetTickerProviderStateMixin {
   RxInt page = 1.obs;
@@ -24,6 +23,7 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   RxInt tab = 0.obs;
   RxInt selectedTime = 0.obs;
   RxBool bottomSheetOpened = false.obs;
+  RxBool tappingNotification = false.obs;
   late AnimationController animationController;
 
   void getStoreOrders() async {
@@ -54,10 +54,6 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
     getStoreOrders();
   }
 
-  void handleSentAction(Map payload) {
-    Get.offNamed(storeMainScreenRoute);
-  }
-
   void showNewOrderAlert(int id) {
     showDialog(
       context: Get.context!,
@@ -67,39 +63,46 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
           LocalNotification.cancelLocalNotification(id: id);
           Get.back();
           Get.toNamed(storeOrdersScreenRoute);
+          player.stop();
         });
       },
     );
   }
 
-  void handleDeliveringAction(Map payload) {
-    int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-    orders[index]["orderStatus"] = "delivering";
-    orders[index]["updatedTime"] = payload["updatedTime"];
-    orders.refresh();
+  Future<void> checkStoreNewOrders({bool withSound = false}) async {
+    dynamic checkStoreNewOrders = await StoreApi().checkStoreNewOrders();
+    if (checkStoreNewOrders != null) {
+      dynamic response = Map<String, dynamic>.from(checkStoreNewOrders);
+      if (response["success"] && response["data"]) {
+        if (withSound) {
+          player.play(
+            AssetSource("sounds/incoming.wav"),
+          );
+        }
+        tappingNotification.value = false;
+        showNewOrderAlert(0);
+      }
+    }
   }
-
-  void handleDeliveredAction(Map payload) {
-    int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-    orders.removeAt(index);
-    orders.refresh();
-  }
-
-  void handlePreparingAction(Map payload) {}
 
   void handleSocketActions(Map payload) async {
     String action = payload["action"];
-    if (action == "sent" && isOpen.value) {
-      handleSentAction(payload);
-    }
-    if (action == "preparing" && isOpen.value) {
-      handlePreparingAction(payload);
-    }
-    if (action == "delivering" && isOpen.value) {
-      handleDeliveringAction(payload);
-    }
-    if (action == "delivered" && isOpen.value) {
-      handleDeliveredAction(payload);
+    if (action == "delivering") {
+      int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+      if (index > -1) {
+        orders[index]["orderStatus"] = "delivering";
+        orders.refresh();
+      }
+    } else if (action == "delivered") {
+      int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+      if (index > -1) {
+        orders[index]["orderStatus"] = "delivered";
+        orders.removeAt(index);
+        orders.refresh();
+      }
+    } else {
+      refreshOrders();
+      checkStoreNewOrders();
     }
   }
 
@@ -126,11 +129,7 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
     if (startPreparingOrder != null) {
       dynamic response = Map<String, dynamic>.from(startPreparingOrder);
       if (response["success"]) {
-        int index = orders.indexWhere((e) => e["id"] == item["id"]);
-        orders[index]["orderStatus"] = "preparing";
-        orders[index]["prepDuration"] = pickedTime;
-        orders[index]["initialDuration"] = 0;
-        orders.refresh();
+        refreshOrders();
       }
     }
   }
@@ -142,11 +141,7 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
     if (setToDelivery != null) {
       dynamic response = Map<String, dynamic>.from(setToDelivery);
       if (response["success"]) {
-        Map data = response["data"];
-        int index = orders.indexWhere((e) => e["id"] == data["id"]);
-        orders[index]["orderStatus"] = "waitingForDriver";
-        orders[index]["updatedTime"] = data["updatedTime"];
-        orders.refresh();
+        refreshOrders();
       }
     } else {
       customSnackbar(ActionType.error, "Алдаа гарлаа", 3);

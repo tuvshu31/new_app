@@ -1,5 +1,5 @@
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/driver.dart';
+import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/driver/driver_auth_dialog_body.dart';
 import 'package:Erdenet24/screens/driver/driver_bottom_sheets_body.dart';
@@ -25,69 +25,66 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
   late AnimationController animationController;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   Rx<ScrollController> scrollController = ScrollController().obs;
+  final _loginCtx = Get.put(LoginController());
 
   void handleSocketActions(Map payload) async {
     String action = payload["action"];
     if (action == "preparing") {
       handlePreparingAction(payload);
-    } else if (action == "accept") {
+    }
+    if (action == "accepted") {
       handleAcceptAction(payload);
-    } else if (action == "delivering") {
-      // handleDeliveringAction(payload);
-    } else if (action == "delivered") {
+    }
+    if (action == "delivered") {
       handleDeliveredAction(payload);
-    } else if (action == "accepted") {
-      handleAcceptedByOthersAction(payload);
-    } else {
-      log(payload.toString());
     }
-  }
-
-  void handleAcceptedByOthersAction(Map item) {
-    int index = orders.indexWhere((e) => e["id"] == item["id"]);
-    if (index > 0) {
-      orders[index]["driverName"] = item["driverName"];
-      orders[index]["orderStatus"] = item["orderStatus"];
-      orders[index]["deliveryStatus"] = item["deliveryStatus"];
-      orders.refresh();
-    }
-  }
-
-  void handleDeliveredAction(Map item) {
-    int index = orders.indexWhere((e) => e["id"] == item["id"]);
-    if (index > 0) {
-      orders.removeAt(index);
-      orders.refresh();
-    }
-  }
-
-  void handleAcceptAction(Map item) {
-    int index = orders.indexWhere((e) => e["id"] == item["id"]);
-    if (index > 0) {
-      orders[index]["orderStatus"] = "driverAccepted";
-      orders[index]["driverName"] = item["driverName"];
-      orders.refresh();
+    if (action == "waitingForDriver") {
+      handleWaitingForDriverAction(payload);
     }
   }
 
   void handlePreparingAction(payload) {
-    log(payload.toString());
     int index = orders.indexWhere((e) => e["id"] == payload["id"]);
     if (index < 0) {
-      // LocalNotification.showNotificationWithSound(
-      //   id: 3,
-      //   title: payload["store"],
-      //   body: payload["address"],
-      //   sound: "notify",s
-      // );
+      payload["accepted"] = false;
       animationController = AnimationController(
           vsync: this, duration: Duration(seconds: payload["initialDuration"]));
       animationController.forward();
       payload["timer"] = animationController;
       orders.add(payload);
       player.play(AssetSource("sounds/doordash.mp3"));
-    } else {
-      log("not included!");
+    }
+  }
+
+  void handleAcceptAction(Map item) {
+    int driverId = RestApiHelper.getUserId();
+    if (item["driverId"] != driverId) {
+      int index = orders.indexWhere((e) => e["id"] == item["id"]);
+      orders[index] = item;
+      animationController = AnimationController(
+          vsync: this, duration: Duration(seconds: item["initialDuration"]));
+      animationController.forward();
+      item["timer"] = animationController;
+      orders.refresh();
+    }
+  }
+
+  void handleDeliveredAction(Map item) {
+    int driverId = RestApiHelper.getUserId();
+    if (item["driverId"] != driverId) {
+      int index = orders.indexWhere((e) => e["id"] == item["id"]);
+      if (index > -1) {
+        orders.removeAt(index);
+        orders.refresh();
+      }
+    }
+  }
+
+  void handleWaitingForDriverAction(Map item) {
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    if (index > -1) {
+      orders[index]["orderStatus"] = item["orderStatus"];
+      orders.refresh();
     }
   }
 
@@ -102,7 +99,6 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
 
   void driverTurOnOff() async {
     CustomDialogs().showLoadingDialog();
-    // saveUserToken();
     dynamic driverTurOnOff = await DriverApi().driverTurOnOff(!isOnline.value);
     Get.back();
     if (driverTurOnOff != null) {
@@ -110,6 +106,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       if (res["success"]) {
         isOnline.value = !isOnline.value;
         if (isOnline.value) {
+          _loginCtx.saveUserToken();
           connectToSocket();
           refreshOrders();
         } else {
@@ -166,10 +163,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
     if (driverDelivered != null) {
       dynamic response = Map<String, dynamic>.from(driverDelivered);
       if (response["success"]) {
-        int index = orders.indexWhere((e) => e["id"] == item["id"]);
-        orders[index]["orderStatus"] = "delivered";
-        orders.remove(orders[index]);
-        orders.refresh();
+        refreshOrders();
         customSnackbar(ActionType.success, "Захиалга амжилттай хүргэгдлээ", 3);
       }
     }

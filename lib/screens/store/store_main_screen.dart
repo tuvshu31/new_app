@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
@@ -39,6 +41,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
     _loginCtx.saveUserToken();
     _loginCtx.checkUserDeviceInfo();
     getStoreInfo();
+    if (socket.disconnected) {
+      socket.connect();
+    }
   }
 
   void getStoreInfo() async {
@@ -52,7 +57,6 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
 
         _storeCtx.isOpen.value = data["isOpen"];
         if (_storeCtx.isOpen.value) {
-          checkStoreNewOrders();
         } else {}
       }
     }
@@ -69,23 +73,10 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
         _storeCtx.isOpen.value = open == 1;
         setState(() {});
         if (_storeCtx.isOpen.value) {
-          checkStoreNewOrders();
+          _storeCtx.checkStoreNewOrders(withSound: true);
         } else {}
         customSnackbar(ActionType.success,
             "Дэлгүүр ${_storeCtx.isOpen.value ? "нээгдлээ" : "хаагдлаа"}", 2);
-      }
-    }
-  }
-
-  void checkStoreNewOrders() async {
-    dynamic checkStoreNewOrders = await StoreApi().checkStoreNewOrders();
-    if (checkStoreNewOrders != null) {
-      dynamic response = Map<String, dynamic>.from(checkStoreNewOrders);
-      log(response.toString());
-      if (response["success"]) {
-        if (response["data"]) {
-          _storeCtx.handleSentAction({"id": 0});
-        }
       }
     }
   }

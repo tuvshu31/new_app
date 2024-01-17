@@ -1,3 +1,4 @@
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
@@ -8,26 +9,30 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-class DriverOrderItem extends StatefulWidget {
+class DriverOrderItem extends StatelessWidget {
   Map item;
   DriverOrderItem({super.key, required this.item});
 
-  @override
-  State<DriverOrderItem> createState() => _DriverOrderItemState();
-}
-
-class _DriverOrderItemState extends State<DriverOrderItem> {
   final _driverCtx = Get.put(DriverController());
+
   @override
   Widget build(BuildContext context) {
-    return widget.item["deliveryStatus"] == "acceptedByMe"
-        ? CustomInkWell(
-            onTap: () => _driverCtx.showOrderBottomSheet(widget.item),
-            child: _listItem(widget.item))
-        : _listItem(widget.item);
+    bool isAccepted = item["accepted"] ?? false;
+    bool warning = item["orderStatus"] == "waitingForDriver";
+    bool isAcceptedByMe = item["driverId"] == RestApiHelper.getUserId();
+    if (!isAccepted) {
+      return _listItem(item, warning, 0);
+    } else if (isAccepted && !isAcceptedByMe) {
+      return _listItem(item, warning, 1);
+    } else {
+      return CustomInkWell(
+        onTap: () => _driverCtx.showOrderBottomSheet(item),
+        child: _listItem(item, warning, 2),
+      );
+    }
   }
 
-  Widget _listItem(item) {
+  Widget _listItem(item, warning, id) {
     return SizedBox(
       height: Get.height * .11,
       child: Row(
@@ -80,150 +85,25 @@ class _DriverOrderItemState extends State<DriverOrderItem> {
   }
 
   List<Widget> _actionsHandler(Map item) {
-    bool acceptedByMe = item["deliveryStatus"] == "acceptedByMe";
-    bool notAccepted = item["deliveryStatus"] == "notAccepted";
-    bool acceptedByOthers = item["deliveryStatus"] == "acceptedByOthers";
-    bool driverAccepted = item["orderStatus"] == "driverAccepted";
-    bool waitingForDriver = item["orderStatus"] == "waitingForDriver";
-    bool delivering = item["orderStatus"] == "delivering";
-    bool preparing = item["orderStatus"] == "preparing";
-    if (acceptedByMe && driverAccepted) {
-      return _action1(item);
-    } else if (acceptedByMe && waitingForDriver) {
-      return _action2(item);
-    } else if (acceptedByMe && delivering) {
-      return _action3(item);
-    } else if (notAccepted && preparing) {
-      return _action4(item);
-    } else if (notAccepted && waitingForDriver) {
-      return _action5(item);
-    } else if (acceptedByOthers && driverAccepted) {
-      return _action6(item);
-    } else if (acceptedByOthers && waitingForDriver) {
-      return _action7(item);
-    } else if (acceptedByOthers && delivering) {
-      return _action8(item);
-    } else if (acceptedByOthers && preparing) {
-      return _action9(item);
+    bool isAccepted = item["accepted"];
+    bool warning = item["orderStatus"] == "waitingForDriver";
+    bool isAcceptedByMe = item["driverId"] == RestApiHelper.getUserId();
+    if (!isAccepted) {
+      return _notAccepted(item, warning);
+    } else if (isAccepted && !isAcceptedByMe) {
+      return _acceptedByOthers(item, warning);
     } else {
-      return _action3(item);
+      return _acceptedByMe(item, warning);
     }
   }
 
-  List<Widget> _action1(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.circle_rounded,
-            size: 8,
-            color: Colors.amber,
-          ),
-          SizedBox(width: Get.width * .02),
-          const Text(
-            "Бэлдэж байна",
-            style: TextStyle(
-              fontSize: 12,
-              color: MyColors.gray,
-            ),
-          )
-        ],
-      ),
-    ];
+  List<Widget> _acceptedByMe(Map item, bool warning) {
+    return [_timer(item, warning), status(item["orderStatus"])];
   }
 
-  List<Widget> _action2(Map item) {
+  List<Widget> _notAccepted(Map item, bool warning) {
     return [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              IconlyLight.notification,
-              size: 16,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(width: Get.width * .02),
-          Countdown(
-            animation: StepTween(
-              begin: item["initialDuration"] ?? 0,
-              end: 0,
-            ).animate(item["timer"]),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.circle_rounded,
-            size: 8,
-            color: Colors.amber,
-          ),
-          SizedBox(width: Get.width * .02),
-          const Text(
-            "Бэлдэж байна",
-            style: TextStyle(
-              fontSize: 12,
-              color: MyColors.gray,
-            ),
-          )
-        ],
-      ),
-    ];
-  }
-
-  List<Widget> _action3(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.circle_rounded,
-            size: 8,
-            color: Colors.blue,
-          ),
-          SizedBox(width: Get.width * .02),
-          const Text(
-            "Хүргэж байна",
-            style: TextStyle(
-              fontSize: 12,
-              color: MyColors.gray,
-            ),
-          )
-        ],
-      ),
-    ];
-  }
-
-  //Not accepted && preparing
-  List<Widget> _action4(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
+      _timer(item, warning),
       TextButton(
         onPressed: () {
           _driverCtx.showPasswordDialog(item);
@@ -237,43 +117,9 @@ class _DriverOrderItemState extends State<DriverOrderItem> {
     ];
   }
 
-  //Not accepted && waitingForDriver
-  List<Widget> _action5(Map item) {
+  List<Widget> _acceptedByOthers(Map item, bool warning) {
     return [
-      Row(
-        children: [
-          const Icon(IconlyLight.notification),
-          const SizedBox(width: 12),
-          Countdown(
-            animation: StepTween(
-              begin: item["initialDuration"] ?? 0,
-              end: 0,
-            ).animate(item["timer"]),
-          ),
-        ],
-      ),
-      TextButton(
-        onPressed: () {
-          _driverCtx.showPasswordDialog(item);
-        },
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.green,
-        ),
-        child: const Text('Accept'),
-      ),
-    ];
-  }
-
-  //AcceptedByOthers && driverAccepted
-  List<Widget> _action6(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
+      _timer(item, warning),
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -293,54 +139,25 @@ class _DriverOrderItemState extends State<DriverOrderItem> {
     ];
   }
 
-  //AcceptedByOthers && waitingForDriver
-  List<Widget> _action7(Map item) {
-    return [
-      Row(
-        children: [
-          const Icon(IconlyLight.notification),
-          const SizedBox(width: 12),
-          Countdown(
+  Widget _timer(item, warning) {
+    return warning
+        ? Row(
+            children: [
+              const Icon(IconlyLight.notification),
+              const SizedBox(width: 12),
+              Countdown(
+                animation: StepTween(
+                  begin: item["initialDuration"] ?? 0,
+                  end: 0,
+                ).animate(item["timer"]),
+              ),
+            ],
+          )
+        : Countdown(
             animation: StepTween(
               begin: item["initialDuration"] ?? 0,
               end: 0,
             ).animate(item["timer"]),
-          ),
-        ],
-      ),
-      Text(
-        item["driverName"] ?? "n/a",
-      )
-    ];
-  }
-
-  //AcceptedByOthers && delivering
-  List<Widget> _action8(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
-      Text(
-        item["driverName"] ?? "n/a",
-      ),
-    ];
-  }
-
-  //Example
-  List<Widget> _action9(Map item) {
-    return [
-      Countdown(
-        animation: StepTween(
-          begin: item["initialDuration"] ?? 0,
-          end: 0,
-        ).animate(item["timer"]),
-      ),
-      Text(
-        item["driverName"] ?? "n/a",
-      ),
-    ];
+          );
   }
 }

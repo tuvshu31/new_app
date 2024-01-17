@@ -1,4 +1,5 @@
 import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -27,10 +28,7 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
   @override
   void initState() {
     super.initState();
-    _storeCtx.orders.clear();
-    _storeCtx.tab.value = 0;
-    _storeCtx.page.value = 1;
-    _storeCtx.getStoreOrders();
+    _storeCtx.refreshOrders();
     scrollHandler();
   }
 
@@ -82,6 +80,9 @@ class _StoreOrdersScreenState extends State<StoreOrdersScreen> {
                       onRefresh: () async {
                         await Future.delayed(const Duration(milliseconds: 600));
                         _storeCtx.refreshOrders();
+                        if (socket.disconnected) {
+                          socket.connect();
+                        }
                       },
                       child: ListView.separated(
                         separatorBuilder: (context, index) {
