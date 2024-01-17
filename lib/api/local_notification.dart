@@ -139,11 +139,12 @@ void handleNotificationOnClick(String role) {
   String userRole = RestApiHelper.getUserRole();
   if (role != "" && role == userRole) {
     if (role == "user") {
-      if (Get.currentRoute != userPaymentScreenRoute) {
+      if (Get.currentRoute == userPaymentScreenRoute) {
         Get.back();
-        Get.offNamed(userHomeScreenRoute);
-        navCtx.onItemTapped(3);
       }
+      Get.back();
+      Get.offNamed(userHomeScreenRoute);
+      navCtx.onItemTapped(3);
     }
     if (role == "store") {
       storeCtx.tappingNotification.value = true;

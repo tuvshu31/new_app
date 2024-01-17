@@ -147,7 +147,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      navigatorKey: navigatorKey,
       title: "Erdenet24",
       initialRoute: splashMainScreenRoute,
       // defaultTransition: Transition.,
