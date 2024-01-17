@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:Erdenet24/api/app_config.dart';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_client.dart';
-import 'package:Erdenet24/controller/lifecycle_controller.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
@@ -114,8 +116,6 @@ void main() async {
   socket.on("accept", (data) => SocketClient().onAccept(data));
   socket.on("accepted", (data) => SocketClient().onAccepted(data));
 
-  Get.put(LifeCycleController());
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then(
@@ -132,17 +132,65 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _userCtx = Get.put(UserController());
+  final _navCtx = Get.put(NavigationController());
+  final _storeCtx = Get.put(StoreController());
+  final _driverCtx = Get.put(DriverController());
+  String role = RestApiHelper.getUserRole();
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     listenNotification();
     _userCtx.getMainCategories();
   }
 
   Future<void> listenNotification() async =>
       LocalNotification.onClickNotification.stream.listen(onClickNotification);
+  @override
+  void dispose() {
+    // WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      if (role == "user") {
+        if (socket.connected) {
+          socket.disconnect();
+        }
+      }
+    }
+    if (state == AppLifecycleState.resumed) {
+      final routeName = Get.currentRoute;
+      if (role == "user") {
+        if (socket.disconnected) {
+          socket.connect();
+        }
+        if (routeName == userHomeScreenRoute &&
+            _navCtx.currentIndex.value == 3) {
+          _userCtx.refreshOrders();
+        }
+        if (routeName == userPaymentScreenRoute) {
+          _userCtx.checkQpayPayment();
+        }
+      }
+      if (role == "store") {
+        if (socket.disconnected) {
+          socket.connect();
+        }
+        if (!_storeCtx.tappingNotification.value) {
+          _storeCtx.checkStoreNewOrders(withSound: true);
+        }
+      }
+      if (role == "driver") {
+        _driverCtx.connectToSocket();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

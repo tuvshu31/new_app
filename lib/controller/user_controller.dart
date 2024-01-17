@@ -4,6 +4,7 @@ import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -133,5 +134,22 @@ class UserController extends GetxController {
       ),
       enableDrag: false,
     );
+  }
+
+  void checkQpayPayment() async {
+    CustomDialogs().showLoadingDialog();
+    dynamic checkQpayPayment = await UserApi().checkQpayPayment();
+    Get.back();
+    if (checkQpayPayment != null) {
+      dynamic response = Map<String, dynamic>.from(checkQpayPayment);
+      if (response["success"]) {
+        if (response["isPaid"]) {
+          Get.back();
+          Get.back();
+          Get.offNamed(userHomeScreenRoute);
+          _navCtx.onItemTapped(3);
+        }
+      }
+    }
   }
 }
