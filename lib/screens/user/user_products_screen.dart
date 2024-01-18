@@ -656,7 +656,6 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                                 "id": item["id"],
                                 "store": item["store"],
                                 "storeName": _arguments["title"],
-                                "isOpen": _arguments["isOpen"]
                               },
                             ),
                             child: Hero(

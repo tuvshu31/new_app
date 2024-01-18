@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/custom_dialogs.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -222,11 +223,16 @@ class _UserSavedScreenState extends State<UserSavedScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(width: Get.width * .04),
-          Stack(
-            children: [
-              customImage(Get.width * .2, item["image"], isCircle: true)
-            ],
-          ),
+          GestureDetector(
+              onTap: () {
+                Get.toNamed(userProductDetailScreenRoute, arguments: {
+                  "id": item["id"],
+                  "store": item["store"],
+                  "storeName": item["storeName"],
+                });
+              },
+              child:
+                  customImage(Get.width * .2, item["image"], isCircle: true)),
           SizedBox(width: Get.width * .04),
           SizedBox(
             width: Get.width * .6,

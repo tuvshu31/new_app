@@ -27,7 +27,8 @@ class StoreMainScreen extends StatefulWidget {
   State<StoreMainScreen> createState() => _StoreMainScreenState();
 }
 
-class _StoreMainScreenState extends State<StoreMainScreen> {
+class _StoreMainScreenState extends State<StoreMainScreen>
+    with WidgetsBindingObserver {
   final _loginCtx = Get.put(LoginController());
   final _storeCtx = Get.put(StoreController());
   Map data = {};
@@ -38,12 +39,28 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loginCtx.saveUserToken();
     _loginCtx.checkUserDeviceInfo();
     getStoreInfo();
     if (socket.disconnected) {
       socket.connect();
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (!_storeCtx.tappingNotification.value && _storeCtx.isOpen.value) {
+        _storeCtx.checkStoreNewOrders(withSound: true);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void getStoreInfo() async {
@@ -54,9 +71,9 @@ class _StoreMainScreenState extends State<StoreMainScreen> {
       dynamic response = Map<String, dynamic>.from(getStoreInfo);
       if (response["success"]) {
         data = response["data"];
-
         _storeCtx.isOpen.value = data["isOpen"];
         if (_storeCtx.isOpen.value) {
+          _storeCtx.checkStoreNewOrders(withSound: true);
         } else {}
       }
     }

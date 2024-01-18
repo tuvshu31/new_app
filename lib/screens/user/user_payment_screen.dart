@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -22,19 +24,35 @@ class UserPaymentScreen extends StatefulWidget {
   State<UserPaymentScreen> createState() => _UserPaymentScreenState();
 }
 
-class _UserPaymentScreenState extends State<UserPaymentScreen> {
+class _UserPaymentScreenState extends State<UserPaymentScreen>
+    with WidgetsBindingObserver {
   final _arguments = Get.arguments;
   bool loading = true;
   PageController pageController = PageController(initialPage: 0);
   List bankList = [];
   String qrImage = "";
   final _navCtx = Get.put(NavigationController());
+  final _userCtx = Get.put(UserController());
   int userId = RestApiHelper.getUserId();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     createQpayInvoice();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _userCtx.checkQpayPayment();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void createQpayInvoice() async {

@@ -223,7 +223,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
                 const SizedBox(height: 12),
                 CustomTextField(
                   focusNode: focusNode2,
-                  hintText: "Ex: 3-24-р байр, 9 давхарт 1165 тоот",
+                  hintText: "Жишээ нь: 3-24-р байр, 9 давхарт 1165 тоот",
                   controller: address,
                   textInputAction: TextInputAction.next,
                   onEditingComplete: () {

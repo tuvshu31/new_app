@@ -19,7 +19,8 @@ class UserHomeScreen extends StatefulWidget {
   _UserHomeScreenState createState() => _UserHomeScreenState();
 }
 
-class _UserHomeScreenState extends State<UserHomeScreen> {
+class _UserHomeScreenState extends State<UserHomeScreen>
+    with WidgetsBindingObserver {
   final _navCtrl = Get.put(NavigationController());
   final _loginCtx = Get.put(LoginController());
   final _userCtx = Get.put(UserController());
@@ -27,9 +28,30 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loginCtx.saveUserToken();
     _userCtx.getUserInfoDetails();
     _loginCtx.checkUserDeviceInfo();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (socket.disconnected) {
+        socket.connect();
+      }
+    }
+    if (state == AppLifecycleState.paused) {
+      if (socket.connected) {
+        socket.disconnect();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

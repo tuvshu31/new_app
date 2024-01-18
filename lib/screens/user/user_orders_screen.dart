@@ -1,4 +1,3 @@
-import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
@@ -11,7 +10,6 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserOrdersScreen extends StatefulWidget {
   const UserOrdersScreen({Key? key}) : super(key: key);
@@ -20,7 +18,8 @@ class UserOrdersScreen extends StatefulWidget {
   State<UserOrdersScreen> createState() => _UserOrdersScreenState();
 }
 
-class _UserOrdersScreenState extends State<UserOrdersScreen> {
+class _UserOrdersScreenState extends State<UserOrdersScreen>
+    with WidgetsBindingObserver {
   final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
   ScrollController scrollController = ScrollController();
@@ -28,11 +27,25 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _userCtx.tab.value = 0;
     _userCtx.page.value = 1;
     _userCtx.orders.clear();
     _userCtx.getUserOrders();
     scrollHandler();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _userCtx.refreshOrders();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void scrollHandler() {

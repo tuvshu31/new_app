@@ -1,14 +1,9 @@
 // I love you my super dad heart (Ruby)
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
+import 'dart:async';
 import 'package:Erdenet24/api/app_config.dart';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_client.dart';
-import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
@@ -29,15 +24,12 @@ import 'package:Erdenet24/screens/user/user_payment_screen.dart';
 import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/screens/user/user_product_detail_screen.dart';
 import 'package:Erdenet24/screens/user/user_products_screen.dart';
-import 'package:Erdenet24/screens/user/user_products_search_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_address_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_help_screen.dart';
 import 'package:Erdenet24/screens/user/user_profile_phone_edit_screen.dart';
 import 'package:Erdenet24/screens/user/user_qr_scan_screen.dart';
 import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator_android/geolocator_android.dart';
@@ -132,65 +124,18 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> {
   final _userCtx = Get.put(UserController());
-  final _navCtx = Get.put(NavigationController());
-  final _storeCtx = Get.put(StoreController());
-  final _driverCtx = Get.put(DriverController());
-  String role = RestApiHelper.getUserRole();
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     listenNotification();
     _userCtx.getMainCategories();
   }
 
   Future<void> listenNotification() async =>
       LocalNotification.onClickNotification.stream.listen(onClickNotification);
-  @override
-  void dispose() {
-    // WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      if (role == "user") {
-        if (socket.connected) {
-          socket.disconnect();
-        }
-      }
-    }
-    if (state == AppLifecycleState.resumed) {
-      final routeName = Get.currentRoute;
-      if (role == "user") {
-        if (socket.disconnected) {
-          socket.connect();
-        }
-        if (routeName == userHomeScreenRoute &&
-            _navCtx.currentIndex.value == 3) {
-          _userCtx.refreshOrders();
-        }
-        if (routeName == userPaymentScreenRoute) {
-          _userCtx.checkQpayPayment();
-        }
-      }
-      if (role == "store") {
-        if (socket.disconnected) {
-          socket.connect();
-        }
-        if (!_storeCtx.tappingNotification.value) {
-          _storeCtx.checkStoreNewOrders(withSound: true);
-        }
-      }
-      if (role == "driver") {
-        _driverCtx.connectToSocket();
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,9 +173,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         userQrScanScreenRoute: (context) => const UserQRScanScreen(),
         userSavedScreenRoute: (context) => const UserSavedScreen(),
         userSearchBarScreenRoute: (context) => const UserSearchBarScreenRoute(),
-        userProductsSearchScreenRoute: (context) =>
-            const UserProductsSearchScreen(),
-        userProductsScreenRoute: (context) => UserProductsScreen(),
+        userProductsScreenRoute: (context) => const UserProductsScreen(),
         storeMainScreenRoute: (context) => const StoreMainScreen(),
         storeOrdersScreenRoute: (context) => const StoreOrdersScreen(),
         storeProductsAddScreenRoute: (context) =>

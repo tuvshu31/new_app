@@ -32,6 +32,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   bool loading = false;
   bool loadingInfo = false;
   bool addingToCart = false;
+  bool isStoreOpen = false;
   int cartCount = 0;
   Map data = {};
   Map info = {};
@@ -76,8 +77,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
     loadingInfo = true;
     dynamic getProductAvailableInfo = await UserApi()
         .getProductAvailableInfo(_arguments["store"], _arguments["id"]);
-    log(_arguments["store"].toString());
-    log(_arguments["id"].toString());
     loadingInfo = false;
     if (getProductAvailableInfo != null) {
       log("getProductAvailableInfo: $getProductAvailableInfo");
@@ -85,6 +84,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
       if (response["success"]) {
         info = response["data"];
         cartCount = info["inCart"];
+        isStoreOpen = info["isOpen"];
       }
     }
     setState(() {});
@@ -100,6 +100,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
         listClick(widgetKey);
         Future.delayed(const Duration(milliseconds: 1600), () {
           cartCount++;
+          setState(() {});
         });
       } else {
         handleAddCartError(
@@ -141,6 +142,9 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
         okText: "Нэмэх",
         cancelText: "Хаах",
       );
+    }
+    if (errorType == "not_enough") {
+      customSnackbar(ActionType.error, "Барааны үлдэгдэл хүрэлцэхгүй байна", 2);
     }
   }
 
@@ -366,7 +370,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                 child: Center(
                   child: CustomButton(
                     onPressed: () {
-                      if (_arguments["isOpen"]) {
+                      if (isStoreOpen) {
                         addToCart(_arguments["id"], _arguments["store"]);
                       } else {
                         customSnackbar(
@@ -380,7 +384,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                     text: "Сагсанд нэмэх",
                     textColor: MyColors.white,
                     elevation: 0,
-                    bgColor: !loadingInfo && _arguments["isOpen"]
+                    bgColor: !loadingInfo && isStoreOpen
                         ? MyColors.primary
                         : MyColors.background,
                   ),

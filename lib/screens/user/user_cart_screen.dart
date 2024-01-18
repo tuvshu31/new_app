@@ -213,11 +213,16 @@ class _UserCartScreenState extends State<UserCartScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(width: Get.width * .04),
-          Stack(
-            children: [
-              customImage(Get.width * .2, item["image"], isCircle: true)
-            ],
-          ),
+          GestureDetector(
+              onTap: () {
+                Get.toNamed(userProductDetailScreenRoute, arguments: {
+                  "id": item["id"],
+                  "store": item["store"],
+                  "storeName": item["storeName"],
+                });
+              },
+              child:
+                  customImage(Get.width * .2, item["image"], isCircle: true)),
           SizedBox(width: Get.width * .04),
           SizedBox(
             width: Get.width * .5,
