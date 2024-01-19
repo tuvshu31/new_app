@@ -315,7 +315,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                           ),
                           const SizedBox(height: 8),
                           CustomText(
-                            text: convertToCurrencyFormat(12000),
+                            text: convertToCurrencyFormat(data["price"]),
                             fontSize: 14,
                           ),
                           const SizedBox(height: 8),

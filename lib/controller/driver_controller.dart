@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests/driver.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/main.dart';
@@ -8,6 +11,7 @@ import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -151,6 +155,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
         int index = orders.indexWhere((e) => e["id"] == item["id"]);
         orders[index]["orderStatus"] = "delivering";
         orders.refresh();
+        listenDriverLocation();
         showOrderBottomSheet(item);
       }
     }
@@ -239,5 +244,55 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       socket.connect();
       socket.emit("join", "drivers");
     }
+  }
+
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void listenDriverLocation() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      distanceFilter: 10,
+    );
+    StreamSubscription<Position> positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position? position) async {
+      if (position != null) {
+        String latitude = position.latitude.toString();
+        String longitude = position.longitude.toString();
+        String heading = position.heading.toString();
+        var body = {
+          "latitude": latitude,
+          "longitude": longitude,
+          "heading": heading,
+        };
+        dynamic updateDriverLocation =
+            await DriverApi().updateDriverLocation(body);
+        if (updateDriverLocation != null) {
+          dynamic response = Map<String, dynamic>.from(updateDriverLocation);
+          if (response["success"]) {
+            log(response.toString());
+          }
+        }
+      }
+    });
   }
 }

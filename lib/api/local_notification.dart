@@ -83,6 +83,8 @@ class LocalNotification {
         sound: const RawResourceAndroidNotificationSound("incoming"),
       ),
       iOS: const DarwinNotificationDetails(),
+
+      // var iOSPlatformChannelSpecifics = IOSNotificationDetails(sound: 'slow_spring_board.aiff');
     );
   }
 

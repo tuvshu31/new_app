@@ -264,4 +264,12 @@ class UserApi {
     return DioClient()
         .sendRequest('checkQpayPayment?userId=$userId', Method.post, [], {});
   }
+
+  //Жолоочийн байршлыг авах
+  Future getDriverPositionStream(int orderId) async {
+    int userId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'getDriverPositionStream?userId=$userId&orderId=$orderId',
+        Method.post, [], {});
+  }
 }

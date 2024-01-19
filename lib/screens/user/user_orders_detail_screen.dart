@@ -261,7 +261,7 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
 
   Widget _productsInfoAndMap() {
     return widget.item["orderStatus"] == "delivering"
-        ? UserOrderMapScreen()
+        ? UserOrderMapScreen(orderId: widget.item["id"])
         : Padding(
             padding: const EdgeInsets.only(left: 12, right: 12),
             child: Column(

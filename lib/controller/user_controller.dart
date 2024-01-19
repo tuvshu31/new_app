@@ -28,7 +28,7 @@ class UserController extends GetxController {
   RxBool bottomSheetOpened = false.obs;
   RxDouble markerRotation = 0.0.obs;
   Rx<LatLng> markerPosition = LatLng(49.02780344669333, 104.04736389691942).obs;
-  final Completer<GoogleMapController> googleMapController =
+  Completer<GoogleMapController> googleMapController =
       Completer<GoogleMapController>();
 
   void getUserOrders() async {
@@ -58,21 +58,38 @@ class UserController extends GetxController {
     getUserOrders();
   }
 
-  Future<void> handleTrackingAction(Map payload) async {
-    markerRotation.value = payload["heading"] ?? 0;
-    double latitude = payload["latitude"] ?? 49.02780344669333;
-    double longitude = payload["longitude"] ?? 104.04736389691942;
-    markerPosition.value = LatLng(latitude, longitude);
-    final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          bearing: 192.8334901395799,
-          target: markerPosition.value,
-          zoom: 14.4746,
-        ),
-      ),
-    );
+  Future<void> getDriverPositionStream(int orderId) async {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (!bottomSheetOpened.value) {
+        timer.cancel();
+      }
+      dynamic getDriverPositionStream =
+          await UserApi().getDriverPositionStream(orderId);
+      if (getDriverPositionStream != null) {
+        dynamic response = Map<String, dynamic>.from(getDriverPositionStream);
+        if (response["success"]) {
+          String heading = response["data"]["heading"] ?? "0";
+          String latitude =
+              response["data"]["latitude"] ?? "49.02780344669333;";
+          String longitude =
+              response["data"]["longitude"] ?? "104.04736389691942";
+          markerRotation.value = double.parse(heading);
+          markerPosition.value =
+              LatLng(double.parse(latitude), double.parse(longitude));
+          final GoogleMapController controller =
+              await googleMapController.future;
+          await controller.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                bearing: markerRotation.value,
+                target: markerPosition.value,
+                zoom: 14.4746,
+              ),
+            ),
+          );
+        }
+      }
+    });
   }
 
   void handleSocketActions(Map payload) async {

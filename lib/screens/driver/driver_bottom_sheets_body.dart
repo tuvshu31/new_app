@@ -25,7 +25,8 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: widget.item["orderStatus"] == "preparing" ||
-                widget.item["orderStatus"] == "driverAccepted"
+                widget.item["orderStatus"] == "driverAccepted" ||
+                widget.item["orderStatus"] == "waitingForDriver"
             ? _receivedView()
             : _deliveredView(),
       ),

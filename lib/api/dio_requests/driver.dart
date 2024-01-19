@@ -80,8 +80,13 @@ class DriverApi {
 
   Future getAllPreparingOrders() async {
     int driverId = RestApiHelper.getUserId();
-
     return DioClient().sendRequest(
         'getAllPreparingOrders?driverId=$driverId', Method.post, [], {});
+  }
+
+  Future updateDriverLocation(dynamic body) async {
+    int driverId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'updateDriverLocation?driverId=$driverId', Method.post, body, {});
   }
 }

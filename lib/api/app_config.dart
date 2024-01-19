@@ -1,8 +1,3 @@
-import 'dart:convert';
-import 'package:get/get.dart';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
-
 const _baseUrl = "baseUrl";
 
 enum Environment { dev, prod }

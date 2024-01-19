@@ -1,4 +1,3 @@
-import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -70,7 +69,6 @@ class CustomHeader extends StatefulWidget {
 class _CustomHeaderState extends State<CustomHeader>
     with SingleTickerProviderStateMixin {
   final _navCtx = Get.put(NavigationController());
-  final _cartCtx = Get.put(CartController());
 
   @override
   Widget build(BuildContext context) {

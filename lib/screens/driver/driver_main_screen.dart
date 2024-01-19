@@ -25,7 +25,7 @@ class DriverMainScreen extends StatefulWidget {
 }
 
 class _DriverMainScreenState extends State<DriverMainScreen>
-    with TickerProviderStateMixin {
+    with WidgetsBindingObserver {
   bool loading = false;
   final _driverCtx = Get.put(DriverController());
   final _loginCtx = Get.put(LoginController());
@@ -33,10 +33,27 @@ class _DriverMainScreenState extends State<DriverMainScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     getDriverInfo();
     _loginCtx.saveUserToken();
     _driverCtx.connectToSocket();
     _driverCtx.getAllPreparingOrders();
+    _driverCtx.determinePosition();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (socket.disconnected) {
+        _driverCtx.connectToSocket();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void getDriverInfo() async {

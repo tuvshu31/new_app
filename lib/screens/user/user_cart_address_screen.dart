@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/user.dart';
-import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
@@ -10,10 +8,6 @@ import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:intl/intl.dart';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';

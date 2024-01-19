@@ -1,10 +1,14 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserOrderMapScreen extends StatefulWidget {
-  const UserOrderMapScreen({super.key});
+  int orderId;
+  UserOrderMapScreen({required this.orderId, super.key});
 
   @override
   State<UserOrderMapScreen> createState() => _UserOrderMapScreenState();
@@ -18,6 +22,8 @@ class _UserOrderMapScreenState extends State<UserOrderMapScreen> {
   void initState() {
     super.initState();
     addCustomMarker();
+    log(widget.orderId.toString());
+    _userCtx.getDriverPositionStream(widget.orderId);
   }
 
   void addCustomMarker() {
@@ -37,6 +43,12 @@ class _UserOrderMapScreenState extends State<UserOrderMapScreen> {
       markers[markerId] = marker;
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    _userCtx.googleMapController = Completer();
+    super.dispose();
   }
 
   @override

@@ -98,7 +98,16 @@ class DriverOrderItem extends StatelessWidget {
   }
 
   List<Widget> _acceptedByMe(Map item, bool warning) {
-    return [_timer(item, warning), status(item["orderStatus"])];
+    return [
+      item["orderStatus"] == "waitingForDriver"
+          ? const Icon(
+              IconlyBold.notification,
+              size: 16,
+              color: Colors.red,
+            )
+          : _timer(item, warning),
+      status(item["orderStatus"]),
+    ];
   }
 
   List<Widget> _notAccepted(Map item, bool warning) {
@@ -141,17 +150,19 @@ class DriverOrderItem extends StatelessWidget {
 
   Widget _timer(item, warning) {
     return warning
-        ? Row(
-            children: [
-              const Icon(IconlyLight.notification),
-              const SizedBox(width: 12),
-              Countdown(
-                animation: StepTween(
-                  begin: item["initialDuration"] ?? 0,
-                  end: 0,
-                ).animate(item["timer"]),
-              ),
-            ],
+        ? SizedBox(
+            width: Get.width * .1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Countdown(
+                  animation: StepTween(
+                    begin: item["initialDuration"] ?? 0,
+                    end: 0,
+                  ).animate(item["timer"]),
+                ),
+              ],
+            ),
           )
         : Countdown(
             animation: StepTween(

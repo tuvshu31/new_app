@@ -1,11 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:Erdenet24/api/dio_requests.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
-import 'package:Erdenet24/controller/cart_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
