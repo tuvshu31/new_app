@@ -29,7 +29,7 @@ class _UserOrderMapScreenState extends State<UserOrderMapScreen> {
   void addCustomMarker() {
     BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(),
-      "assets/images/png/app/driver.png",
+      "assets/images/png/driver.png",
     ).then((icon) {
       markerIcon = icon;
       MarkerId markerId = const MarkerId("marker");

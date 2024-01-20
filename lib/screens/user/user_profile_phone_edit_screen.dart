@@ -58,7 +58,7 @@ class _UserProfilePhoneEditScreenState
                 decoration: BoxDecoration(
                     color: MyColors.fadedGrey, shape: BoxShape.circle),
                 child: Image(
-                  image: const AssetImage("assets/images/png/app/dial.png"),
+                  image: const AssetImage("assets/images/png/dial.png"),
                   width: Get.width * .1,
                 ),
               ),

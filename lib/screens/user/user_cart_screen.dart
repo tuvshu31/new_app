@@ -1,23 +1,23 @@
-import 'dart:developer';
-import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/screens/user/user_saved_screen.dart';
+import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+import 'package:dotted_line/dotted_line.dart';
+
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:dotted_line/dotted_line.dart';
-import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
-import 'package:flutter/material.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/user/user_saved_screen.dart';
 
 class UserCartScreen extends StatefulWidget {
   const UserCartScreen({Key? key}) : super(key: key);
@@ -41,10 +41,8 @@ class _UserCartScreenState extends State<UserCartScreen> {
 
   void addToCart(int productId, int storeId) async {
     loadingId = productId;
-    setState(() {});
     dynamic addToCart = await UserApi().addToCart(productId, storeId);
     loadingId = 0;
-    setState(() {});
     if (addToCart != null) {
       dynamic response = Map<String, dynamic>.from(addToCart);
       if (response["success"]) {
@@ -54,17 +52,15 @@ class _UserCartScreenState extends State<UserCartScreen> {
         cart[index]["totalPrice"] += cart[index]["price"];
         amount["total"] += cart[index]["price"];
         amount["subTotal"] += cart[index]["price"];
-        setState(() {});
       }
     }
+    setState(() {});
   }
 
   void removeFromCart(int productId) async {
     loadingId = productId;
-    setState(() {});
     dynamic addToCart = await UserApi().removeFromCart(productId);
     loadingId = 0;
-    setState(() {});
     if (addToCart != null) {
       dynamic response = Map<String, dynamic>.from(addToCart);
       if (response["success"]) {
@@ -76,6 +72,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
         amount["subTotal"] -= cart[index]["price"];
       }
     }
+    setState(() {});
   }
 
   void getUserCartProducts() async {
@@ -84,14 +81,14 @@ class _UserCartScreenState extends State<UserCartScreen> {
     loading = false;
     if (getUserCartProducts != null) {
       dynamic response = Map<String, dynamic>.from(getUserCartProducts);
-      log(response.toString());
       if (response["success"]) {
         cart = response["data"];
         amount = response["amount"];
-        log(cart.toString());
       }
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void deleteFromCart(int productId) async {

@@ -116,7 +116,7 @@ class _UserProfilePhoneEditOtpScreenState
               decoration: BoxDecoration(
                   color: MyColors.fadedGrey, shape: BoxShape.circle),
               child: Image(
-                image: const AssetImage("assets/images/png/app/password.png"),
+                image: const AssetImage("assets/images/png/password.png"),
                 width: Get.width * .1,
               ),
             ),
