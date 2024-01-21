@@ -47,7 +47,6 @@ class LocalNotification {
   }
 
   static Future _notificationDetails(
-    bool withSound,
     String largeIcon,
     String bigPicture,
   ) async {
@@ -81,8 +80,6 @@ class LocalNotification {
         priority: Priority.high,
         enableVibration: true,
         styleInformation: styleInformation,
-        playSound: withSound,
-        sound: const RawResourceAndroidNotificationSound("incoming"),
       ),
       iOS: const DarwinNotificationDetails(),
 
@@ -95,14 +92,13 @@ class LocalNotification {
       String title = "",
       String body = "",
       String role = "",
-      bool withSound = false,
       String bigPicture = "",
       String largeIcon = ""}) async {
     await _flutterLocalNotificationsPlugin.show(
       id,
       title,
       body,
-      await _notificationDetails(withSound, largeIcon, bigPicture),
+      await _notificationDetails(largeIcon, bigPicture),
       payload: role,
     );
   }
@@ -119,7 +115,6 @@ void handleNotifications(data) {
     title: payload["title"] ?? "",
     body: payload["body"] ?? "",
     role: payload["role"] ?? "",
-    withSound: payload["withSound"] ?? false,
     bigPicture: payload["bigPicture"] ?? "",
     largeIcon: payload["largeIcon"] ?? "",
   );
