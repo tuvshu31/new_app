@@ -198,7 +198,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   void scrollToTop() {
     scrollController.animateTo(0,
-        duration: const Duration(seconds: 1), curve: Curves.linear);
+        duration: const Duration(milliseconds: 500), curve: Curves.linear);
   }
 
   void showCategoryBottomSheet() {
@@ -635,6 +635,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                   getUserProducts();
                 },
                 child: GridView.builder(
+                  padding: EdgeInsets.only(bottom: Get.height * .1),
                   controller: scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: hasMore ? products.length + 3 : products.length,

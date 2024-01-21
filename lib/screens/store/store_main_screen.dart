@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/main.dart';
@@ -51,8 +52,8 @@ class _StoreMainScreenState extends State<StoreMainScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (!_storeCtx.tappingNotification.value && _storeCtx.isOpen.value) {
-        _storeCtx.checkStoreNewOrders(withSound: true);
+      if (socket.disconnected) {
+        socket.connect();
       }
     }
   }
@@ -73,7 +74,7 @@ class _StoreMainScreenState extends State<StoreMainScreen>
         data = response["data"];
         _storeCtx.isOpen.value = data["isOpen"];
         if (_storeCtx.isOpen.value) {
-          _storeCtx.checkStoreNewOrders(withSound: true);
+          _storeCtx.checkStoreNewOrders();
         } else {}
       }
     }
@@ -90,7 +91,7 @@ class _StoreMainScreenState extends State<StoreMainScreen>
         _storeCtx.isOpen.value = open == 1;
         setState(() {});
         if (_storeCtx.isOpen.value) {
-          _storeCtx.checkStoreNewOrders(withSound: true);
+          _storeCtx.checkStoreNewOrders();
         } else {}
         customSnackbar(ActionType.success,
             "Дэлгүүр ${_storeCtx.isOpen.value ? "нээгдлээ" : "хаагдлаа"}", 2);

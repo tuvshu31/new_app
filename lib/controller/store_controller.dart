@@ -25,6 +25,7 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   RxBool bottomSheetOpened = false.obs;
   RxBool tappingNotification = false.obs;
   late AnimationController animationController;
+  Rx<AudioPlayer> player = AudioPlayer().obs;
 
   void getStoreOrders() async {
     loading.value = true;
@@ -55,6 +56,7 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void showNewOrderAlert(int id) {
+    player.value.play(AssetSource("sounds/incoming.wav"));
     showDialog(
       context: Get.context!,
       barrierDismissible: false,
@@ -63,22 +65,17 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
           LocalNotification.cancelLocalNotification(id: id);
           Get.back();
           Get.toNamed(storeOrdersScreenRoute);
-          player.stop();
+          player.value.stop();
         });
       },
     );
   }
 
-  Future<void> checkStoreNewOrders({bool withSound = false}) async {
+  Future<void> checkStoreNewOrders() async {
     dynamic checkStoreNewOrders = await StoreApi().checkStoreNewOrders();
     if (checkStoreNewOrders != null) {
       dynamic response = Map<String, dynamic>.from(checkStoreNewOrders);
       if (response["success"] && response["data"]) {
-        if (withSound) {
-          player.play(
-            AssetSource("sounds/incoming.wav"),
-          );
-        }
         tappingNotification.value = false;
         showNewOrderAlert(0);
       }

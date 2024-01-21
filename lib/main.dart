@@ -54,6 +54,7 @@ Socket socket = io(
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
   handleNotifications(message.data);
 }
 

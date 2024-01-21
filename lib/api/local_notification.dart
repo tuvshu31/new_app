@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
@@ -141,17 +143,16 @@ void handleNotificationOnClick(String role) {
   String userRole = RestApiHelper.getUserRole();
   if (role != "" && role == userRole) {
     if (role == "user") {
-      if (Get.currentRoute == userPaymentScreenRoute) {
-        Get.back();
-      }
+      Get.back();
       Get.back();
       Get.offNamed(userHomeScreenRoute);
+      storeCtx.orders.clear();
       navCtx.onItemTapped(3);
     }
     if (role == "store") {
       storeCtx.tappingNotification.value = true;
-      storeCtx.checkStoreNewOrders();
-      storeCtx.refreshOrders();
+      // storeCtx.checkStoreNewOrders();
+      // storeCtx.refreshOrders();
     }
     if (role == "driver") {
       Get.back();

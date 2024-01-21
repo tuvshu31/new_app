@@ -79,7 +79,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
         .getProductAvailableInfo(_arguments["store"], _arguments["id"]);
     loadingInfo = false;
     if (getProductAvailableInfo != null) {
-      log("getProductAvailableInfo: $getProductAvailableInfo");
       dynamic response = Map<String, dynamic>.from(getProductAvailableInfo);
       if (response["success"]) {
         info = response["data"];
