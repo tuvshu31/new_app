@@ -21,7 +21,7 @@ dynamic get apiBaseUrl {
 }
 
 Map<String, dynamic> devConstants = {
-  _baseUrl: "http://192.168.43.19:8000",
+  _baseUrl: "http://192.168.1.191:8000",
 };
 
 Map<String, dynamic> prodConstants = {

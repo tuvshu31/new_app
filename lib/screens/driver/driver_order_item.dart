@@ -115,7 +115,7 @@ class DriverOrderItem extends StatelessWidget {
       _timer(item, warning),
       TextButton(
         onPressed: () {
-          _driverCtx.showPasswordDialog(item);
+          _driverCtx.showPasswordDialog(item, 'accept');
         },
         style: TextButton.styleFrom(
           foregroundColor: Colors.white,

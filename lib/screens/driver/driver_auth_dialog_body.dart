@@ -1,6 +1,8 @@
 import 'package:Erdenet24/controller/driver_controller.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,24 +20,37 @@ class _DriverAuthDialogBodyState extends State<DriverAuthDialogBody> {
   bool loading = false;
   String text = "";
   final _driverCtx = Get.put(DriverController());
+  TextEditingController controller = TextEditingController();
   String title(type) {
-    if (type == "auth") {
-      return "Баталгаажуулах кодоо оруулна уу";
-    } else if (type == "secret") {
+    if (type == "delivered") {
       return "Захиалгын код оруулна уу";
     } else {
-      return "";
+      return "Баталгаажуулах кодоо оруулна уу";
     }
   }
 
-  void onPressed(type) {
-    if (type == "auth") {
-      Get.back();
-      _driverCtx.driverAcceptOrder(widget.item);
-    } else if (type == "secret") {
-      Get.back();
-      _driverCtx.driverDelivered(widget.item);
-    } else {}
+  Future<void> onPressed(type) async {
+    Get.back();
+    bool isPassTrue = false;
+    if (type == "delivered") {
+      isPassTrue =
+          await _driverCtx.checkOrder4digitCode(widget.item, controller.text);
+    } else {
+      isPassTrue = await _driverCtx.checkDriverPassword(controller.text);
+    }
+
+    if (isPassTrue) {
+      if (type == "accept") {
+        _driverCtx.driverAcceptOrder(widget.item);
+      } else if (type == "received") {
+        _driverCtx.driverReceived(widget.item);
+        Get.back();
+      } else if (type == "delivered") {
+        _driverCtx.driverDelivered(widget.item);
+      }
+    } else {
+      customSnackbar(ActionType.error, "Нууг үг буруу байна", 2);
+    }
   }
 
   @override
@@ -50,10 +65,11 @@ class _DriverAuthDialogBodyState extends State<DriverAuthDialogBody> {
         textAlign: TextAlign.center,
       ),
       content: TextField(
+        controller: controller,
         keyboardType: TextInputType.number,
         autofocus: true,
         obscureText: true,
-        maxLength: 5,
+        maxLength: 4,
         decoration: InputDecoration(
           errorText: !_validate ? 'Нууц үг буруу байна!' : null,
           hintStyle: const TextStyle(fontSize: 14),

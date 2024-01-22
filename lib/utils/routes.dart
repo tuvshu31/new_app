@@ -46,3 +46,5 @@ const String driverDeliverListScreenRoute = '/driverDeliverListScreenRoute';
 const String driverPaymentsScreenRoute = '/driverPaymentsScreenRoute';
 const String driverSettingsScreenRoute = '/driverSettingsScreenRoute';
 const String userSaleScreenRoute = '/userSaleScreenRoute';
+const String driverProfileScreenRoute = "/driverProfileScreenRoute";
+const String driverHelpScreenRoute = "/driverHelpScreenRoute";

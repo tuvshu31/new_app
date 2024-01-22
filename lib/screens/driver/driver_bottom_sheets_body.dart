@@ -66,8 +66,7 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
       CustomButton(
         text: "Хүлээн авлаа",
         onPressed: () {
-          Get.back();
-          _driverCtx.driverReceived(widget.item);
+          _driverCtx.showPasswordDialog(widget.item, 'received');
         },
       ),
     ];
@@ -117,7 +116,7 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
         text: "Хүлээлгэн өглөө",
         onPressed: () {
           Get.back();
-          _driverCtx.showSecretCodeDialog(widget.item);
+          _driverCtx.showPasswordDialog(widget.item, "delivered");
         },
       ),
     ];

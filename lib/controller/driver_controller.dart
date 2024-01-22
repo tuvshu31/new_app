@@ -174,7 +174,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
-  Future<void> showPasswordDialog(Map item) {
+  Future<void> showPasswordDialog(Map item, String type) {
     return showDialog<void>(
       context: Get.context!,
       barrierDismissible: true,
@@ -183,23 +183,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
           onWillPop: () async => true,
           child: DriverAuthDialogBody(
             item: item,
-            type: "auth",
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> showSecretCodeDialog(Map item) {
-    return showDialog<void>(
-      context: Get.context!,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () async => true,
-          child: DriverAuthDialogBody(
-            item: item,
-            type: "secret",
+            type: type,
           ),
         );
       },
@@ -294,5 +278,30 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
         }
       }
     });
+  }
+
+  void getDriverInfo() async {
+    dynamic getDriverInfo = await DriverApi().getDriverInfo();
+    if (getDriverInfo != null) {
+      dynamic response = Map<String, dynamic>.from(getDriverInfo);
+      if (response["success"]) {
+        driverInfo.value = response["data"];
+        isOnline.value = driverInfo["isOpen"];
+      }
+    }
+  }
+
+  Future<bool> checkDriverPassword(String text) async {
+    dynamic checkDriverPassword = await DriverApi().checkDriverPassword(text);
+    dynamic response = Map<String, dynamic>.from(checkDriverPassword);
+    return response["success"];
+  }
+
+  Future<bool> checkOrder4digitCode(Map item, String text) async {
+    int orderId = item["id"];
+    dynamic checkOrder4digitCode =
+        await DriverApi().checkOrder4digitCode(orderId, text);
+    dynamic response = Map<String, dynamic>.from(checkOrder4digitCode);
+    return response["success"];
   }
 }

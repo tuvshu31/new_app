@@ -5,7 +5,11 @@ import 'package:Erdenet24/api/app_config.dart';
 import 'package:Erdenet24/api/local_notification.dart';
 import 'package:Erdenet24/api/socket_client.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/screens/driver/driver_deliveries_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_help_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_main_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_payments_screen.dart';
+import 'package:Erdenet24/screens/driver/driver_profile_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_settings_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_main_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
@@ -66,7 +70,7 @@ final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
-  setEnvironment(Environment.prod);
+  setEnvironment(Environment.dev);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(
@@ -186,6 +190,11 @@ class _MyAppState extends State<MyApp> {
             const StoreEditProductScreen(),
         driverMainScreenRoute: (context) => const DriverMainScreen(),
         driverSettingsScreenRoute: (context) => const DriverSettingsScreen(),
+        driverPaymentsScreenRoute: (context) => const DriverPaymentsScreen(),
+        driverDeliverListScreenRoute: (context) =>
+            const DriverDeliveriesScreen(),
+        driverProfileScreenRoute: (context) => const DriverProfileScreen(),
+        driverHelpScreenRoute: (context) => const DriverHelpScreen(),
       },
     );
   }

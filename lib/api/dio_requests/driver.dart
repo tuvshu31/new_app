@@ -89,4 +89,43 @@ class DriverApi {
     return DioClient().sendRequest(
         'updateDriverLocation?driverId=$driverId', Method.post, body, {});
   }
+
+  Future getDriverPaymentsByWeeks() async {
+    int driverId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'getDriverPaymentsByWeeks?driverId=$driverId', Method.post, [], {});
+  }
+
+  Future getDriverDeliveries() async {
+    int driverId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'getDriverDeliveries?driverId=$driverId', Method.post, [], {});
+  }
+
+  Future getDriverDeliveryDetails(String date) async {
+    int driverId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'getDriverDeliveryDetails?driverId=$driverId&date=$date',
+        Method.post, [], {});
+  }
+
+  //Жолоочийн тусламж хэсгийн мэдээллүүдийг дуудах
+  Future getDriverHelpContent() async {
+    return DioClient().sendRequest('getDriverHelpContent', Method.post, [], {});
+  }
+
+  //Жолоочийн нууц үгийг шалгах
+  Future checkDriverPassword(String password) async {
+    int driverId = RestApiHelper.getUserId();
+    return DioClient().sendRequest(
+        'checkDriverPassword?driverId=$driverId&password=$password',
+        Method.post, [], {});
+  }
+
+  //Захиалгын нууц кодыг шалгах
+  Future checkOrder4digitCode(int orderId, String text) async {
+    return DioClient().sendRequest(
+        'checkOrder4digitCode?orderId=$orderId&text=$text',
+        Method.post, [], {});
+  }
 }
