@@ -118,7 +118,7 @@ class _UserProfileAddressEditScreenState
         Get.back();
         customSnackbar(
           ActionType.success,
-          "Хүргэлтийн хаяг амжилттай хадгалагдлаа",
+          "Амжилттай хадгалагдлаа",
           2,
         );
       }

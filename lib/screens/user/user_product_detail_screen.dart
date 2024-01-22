@@ -4,6 +4,8 @@ import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/custom_dialogs.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
@@ -31,7 +33,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   final _arguments = Get.arguments;
   bool loading = false;
   bool loadingInfo = false;
-  bool addingToCart = false;
   bool isStoreOpen = false;
   int cartCount = 0;
   Map data = {};
@@ -90,9 +91,9 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
   }
 
   void addToCart(int productId, int storeId) async {
-    addingToCart = true;
+    CustomDialogs().showLoadingDialog();
     dynamic addToCart = await UserApi().addToCart(productId, storeId);
-    addingToCart = false;
+    Get.back();
     if (addToCart != null) {
       dynamic response = Map<String, dynamic>.from(addToCart);
       if (response["success"]) {
@@ -307,15 +308,62 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 12),
-                          CustomText(
-                            text: data["name"],
-                            isUpperCase: true,
-                          ),
-                          const SizedBox(height: 8),
-                          CustomText(
-                            text: convertToCurrencyFormat(data["price"]),
-                            fontSize: 14,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: Get.width * .7,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    CustomText(
+                                      text: data["name"],
+                                      isUpperCase: true,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    CustomText(
+                                      text: convertToCurrencyFormat(
+                                          data["price"]),
+                                      fontSize: 14,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              data["salePercent"] > 0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        const SizedBox(height: 12),
+                                        Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            "- ${data["salePercent"]}%",
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          convertToCurrencyFormat(
+                                              data["oldPrice"]),
+                                          style: const TextStyle(
+                                            color: MyColors.gray,
+                                            fontSize: 13,
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container()
+                            ],
                           ),
                           const SizedBox(height: 8),
                           const Divider(),
@@ -379,7 +427,6 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                         );
                       }
                     },
-                    isLoading: addingToCart,
                     text: "Сагсанд нэмэх",
                     textColor: MyColors.white,
                     elevation: 0,

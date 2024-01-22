@@ -358,7 +358,7 @@ class _UserCartScreenState extends State<UserCartScreen> {
             child: CustomButton(
               onPressed: () {
                 Get.toNamed(userCartAddressScreenRoute,
-                    arguments: {"total": amount["total"]});
+                    arguments: {"total": amount["subTotal"]});
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",

@@ -53,6 +53,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
   ];
   TextEditingController searchController = TextEditingController();
   TextEditingController availableController = TextEditingController();
+  TextEditingController saleController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
   @override
@@ -442,7 +443,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
 
     Get.bottomSheet(
       SizedBox(
-        height: Get.height * .3,
+        height: Get.height * .4,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -481,6 +482,9 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
               _listItem(() {
                 showAvailableDialog(item);
               }, IconlyLight.document, "Үлдэгдэл өөрчлөх"),
+              _listItem(() {
+                showDiscountDialog(item);
+              }, IconlyLight.discount, "Хямдруулах"),
               _listItem(() {
                 showDeleteDialog(item);
               }, IconlyLight.delete, "Устгах")
@@ -646,6 +650,134 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
     );
   }
 
+  void showDiscountDialog(item) {
+    saleController.text = item["salePercent"].toString();
+    setState(() {});
+    showGeneralDialog(
+      context: Get.context!,
+      barrierLabel: "",
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, a1, a2) {
+        return Container();
+      },
+      transitionBuilder: (ctx, a1, a2, child) {
+        var curve = Curves.bounceInOut.transform(a1.value);
+        return WillPopScope(
+          onWillPop: () async => true,
+          child: Transform.scale(
+            scale: curve,
+            child: Center(
+              child: Container(
+                width: Get.width,
+                margin: EdgeInsets.all(Get.width * .09),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.only(
+                  right: Get.width * .09,
+                  left: Get.width * .09,
+                  top: Get.height * .04,
+                  bottom: Get.height * .03,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        IconlyBold.editSquare,
+                        size: Get.width * .15,
+                        color: Colors.amber,
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      Text(
+                        "${item["name"]} барааг хямдруулах",
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: Get.height * .02),
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: Get.width * .4,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: CustomTextField(
+                                    autoFocus: true,
+                                    maxLength: 2,
+                                    keyboardType: TextInputType.number,
+                                    controller: saleController,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(child: Text("%"))
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: Get.height * .04),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                  child: CustomButton(
+                                onPressed: Get.back,
+                                bgColor: Colors.white,
+                                text: "Хаах",
+                                elevation: 0,
+                                textColor: Colors.black,
+                              )),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: CustomButton(
+                                  elevation: 0,
+                                  bgColor: Colors.amber,
+                                  text: "Хямдруулах",
+                                  onPressed: () async {
+                                    Get.back();
+                                    CustomDialogs().showLoadingDialog();
+                                    var body = {
+                                      "salePercent": saleController.text
+                                    };
+                                    dynamic updateProductInfo = await StoreApi()
+                                        .updateProductInfo(item["id"], body);
+                                    Get.back();
+                                    if (updateProductInfo != null) {
+                                      dynamic response =
+                                          Map<String, dynamic>.from(
+                                              updateProductInfo);
+                                      if (response["success"]) {
+                                        int index = products.indexOf(item);
+                                        products[index]["salePercent"] =
+                                            int.parse(saleController.text);
+                                        setState(() {});
+                                        Get.back();
+                                        customSnackbar(ActionType.success,
+                                            "Амжилттай засагдлаа", 2);
+                                      }
+                                    } else {
+                                      customSnackbar(ActionType.success,
+                                          "Алдаа гарлаа", 2);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void showDeleteDialog(item) {
     showMyCustomDialog(true, ActionType.warning,
         "Та ${item["name"]} барааг устгахдаа итгэлтэй байна уу?", () async {
@@ -776,108 +908,118 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
 
   Widget _body() {
     return products.isNotEmpty
-        ? ListView.separated(
-            separatorBuilder: (context, index) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                width: double.infinity,
-                height: Get.height * .008,
-                decoration: BoxDecoration(color: MyColors.fadedGrey),
-              );
+        ? RefreshIndicator(
+            color: MyColors.primary,
+            onRefresh: () async {
+              products.clear();
+              page = 1;
+              await Future.delayed(const Duration(milliseconds: 600));
+              setState(() {});
+              getStoreProducts();
             },
-            padding: const EdgeInsets.only(top: 12),
-            physics: const BouncingScrollPhysics(),
-            itemCount: hasMore ? products.length + 1 : products.length,
-            controller: scrollController,
-            itemBuilder: (context, index) {
-              if (index < products.length) {
-                var item = products[index];
+            child: ListView.separated(
+              separatorBuilder: (context, index) {
                 return Container(
-                  height: Get.height * .08,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(width: Get.width * .04),
-                      Stack(
-                        children: [
-                          ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: Get.width * 0.15,
-                                maxHeight: Get.width * 0.15,
-                              ),
-                              child: Stack(
-                                children: [
-                                  customImage(
-                                    Get.width * 0.15,
-                                    "${URL.AWS}/users/${item["id"]}/small/1.png",
-                                    isCircle: true,
-                                  ),
-                                  item["visibility"] == 0
-                                      ? Container(
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.visibility_off,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        )
-                                      : Container()
-                                ],
-                              )),
-                        ],
-                      ),
-                      SizedBox(width: Get.width * .04),
-                      SizedBox(
-                        width: Get.width * .55,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  width: double.infinity,
+                  height: Get.height * .008,
+                  decoration: BoxDecoration(color: MyColors.fadedGrey),
+                );
+              },
+              padding: const EdgeInsets.only(top: 12),
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: hasMore ? products.length + 1 : products.length,
+              controller: scrollController,
+              itemBuilder: (context, index) {
+                if (index < products.length) {
+                  var item = products[index];
+                  return Container(
+                    height: Get.height * .08,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(width: Get.width * .04),
+                        Stack(
                           children: [
-                            CustomText(
-                              text: item["name"],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              "Үлдэгдэл: ${item["available"]}",
-                              style: const TextStyle(
-                                  color: MyColors.gray, fontSize: 12),
-                            ),
-                            Text(
-                                "Үнэ: ${convertToCurrencyFormat(item["price"])}"),
+                            ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: Get.width * 0.15,
+                                  maxHeight: Get.width * 0.15,
+                                ),
+                                child: Stack(
+                                  children: [
+                                    customImage(
+                                      Get.width * 0.15,
+                                      // "${URL.AWS}/products/${item["id"]}/small/1.png",
+                                      item["image"], isCircle: true,
+                                    ),
+                                    item["visibility"] == 0
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.visibility_off,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          )
+                                        : Container()
+                                  ],
+                                )),
                           ],
                         ),
-                      ),
-                      Expanded(
+                        SizedBox(width: Get.width * .04),
+                        SizedBox(
+                          width: Get.width * .55,
                           child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () => showOptions(item),
-                            icon: const Icon(
-                              IconlyLight.edit_square,
-                              size: 20,
-                            ),
-                          )
-                        ],
-                      )),
-                      SizedBox(width: Get.width * .04),
-                    ],
-                  ),
-                );
-              } else if (hasMore) {
-                return storeProductsEditScreenShimmer();
-              } else {
-                return Container();
-              }
-            },
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(
+                                text: item["name"],
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                "Үлдэгдэл: ${item["available"]}",
+                                style: const TextStyle(
+                                    color: MyColors.gray, fontSize: 12),
+                              ),
+                              Text(
+                                  "Үнэ: ${convertToCurrencyFormat(item["price"])}"),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                            child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: () => showOptions(item),
+                              icon: const Icon(
+                                IconlyLight.edit_square,
+                                size: 20,
+                              ),
+                            )
+                          ],
+                        )),
+                        SizedBox(width: Get.width * .04),
+                      ],
+                    ),
+                  );
+                } else if (hasMore) {
+                  return storeProductsEditScreenShimmer();
+                } else {
+                  return Container();
+                }
+              },
+            ),
           )
         : loading
             ? listShimmerWidget()

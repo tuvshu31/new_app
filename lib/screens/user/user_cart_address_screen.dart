@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/enums.dart';
@@ -51,7 +52,6 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
   @override
   void initState() {
     super.initState();
-    getUserAddress();
     getAllLocations();
     detectFocus();
     setState(() {
@@ -75,25 +75,47 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
     removeFocus(focusNode4);
   }
 
-  void getUserAddress() async {
+  void getAllLocations() async {
     fetchingUserAddress = true;
-    setState(() {});
-    dynamic getUserAddress = await UserApi().getUserAddress();
+    dynamic getAllLocations = await UserApi().getAllLocations();
     fetchingUserAddress = false;
-    setState(() {});
-    dynamic response = Map<String, dynamic>.from(getUserAddress);
-    if (response["success"]) {
-      setState(() {});
+    if (getAllLocations != null) {
+      dynamic response = Map<String, dynamic>.from(getAllLocations);
+      if (response["success"]) {
+        locationList = response["data"];
+        getUserAddress();
+      }
     }
+    setState(() {});
   }
 
-  void getAllLocations() async {
-    dynamic getAllLocations = await UserApi().getAllLocations();
-    dynamic response = Map<String, dynamic>.from(getAllLocations);
+  void getUserAddress() async {
+    CustomDialogs().showLoadingDialog();
+    dynamic getUserAddress = await UserApi().getUserAddress();
+    Get.back();
+    dynamic response = Map<String, dynamic>.from(getUserAddress);
     if (response["success"]) {
-      locationList = response["data"];
-      setState(() {});
+      Map userAddress = response["address"];
+      if (userAddress["district"] != "") {
+        selectedLocation = locationList
+            .firstWhere((a) => a["name"] == userAddress["district"]);
+        deliveryPrice = selectedLocation["price"];
+        totalPrice = deliveryPrice + cartTotalPrice;
+        isLocationOk = true;
+      }
+      if (userAddress["address"] != "") {
+        address.text = userAddress["address"];
+        isAddressOk = true;
+      }
+      if (userAddress["phone"] != "") {
+        phone.text = userAddress["phone"];
+        isPhoneOk = true;
+      }
+      if (userAddress["code"] != "") {
+        kod.text = userAddress["code"];
+      }
     }
+    setState(() {});
   }
 
   void createNewOrder() async {
