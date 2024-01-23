@@ -1,5 +1,6 @@
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
@@ -24,6 +25,7 @@ class _UserHomeScreenState extends State<UserHomeScreen>
   final _navCtrl = Get.put(NavigationController());
   final _loginCtx = Get.put(LoginController());
   final _userCtx = Get.put(UserController());
+  final _storeCtx = Get.put(StoreController());
 
   @override
   void initState() {

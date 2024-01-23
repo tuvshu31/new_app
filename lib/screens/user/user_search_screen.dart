@@ -469,15 +469,14 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                                   vertical: 2,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                    color: Colors.green
-                                                        .withOpacity(0.2),
+                                                    color: Colors.green,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8)),
                                                 child: const Text(
                                                   "Хямдралтай",
                                                   style: TextStyle(
-                                                    color: Colors.green,
+                                                    color: Colors.white,
                                                     fontSize: 12,
                                                   ),
                                                 ),

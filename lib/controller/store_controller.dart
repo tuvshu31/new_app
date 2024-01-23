@@ -84,23 +84,23 @@ class StoreController extends GetxController with GetTickerProviderStateMixin {
 
   void handleSocketActions(Map payload) async {
     String action = payload["action"];
-    if (action == "delivering") {
-      int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-      if (index > -1) {
-        orders[index]["orderStatus"] = "delivering";
-        orders.refresh();
-      }
-    } else if (action == "delivered") {
-      int index = orders.indexWhere((e) => e["id"] == payload["id"]);
-      if (index > -1) {
-        orders[index]["orderStatus"] = "delivered";
-        orders.removeAt(index);
-        orders.refresh();
-      }
-    } else {
-      refreshOrders();
-      checkStoreNewOrders();
-    }
+    // if (action == "delivering") {
+    //   int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+    //   if (index > -1) {
+    //     orders[index]["orderStatus"] = "delivering";
+    //     orders.refresh();
+    //   }
+    // } else if (action == "delivered") {
+    //   int index = orders.indexWhere((e) => e["id"] == payload["id"]);
+    //   if (index > -1) {
+    //     orders[index]["orderStatus"] = "delivered";
+    //     orders.removeAt(index);
+    //     orders.refresh();
+    //   }
+    // } else {
+    refreshOrders();
+    checkStoreNewOrders();
+    // }
   }
 
   Future<void> showOrderBottomSheet(Map item) {

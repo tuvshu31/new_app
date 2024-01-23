@@ -140,9 +140,8 @@ void handleNotificationOnClick(String role) {
     if (role == "user") {
       Get.back();
       Get.back();
+      navCtx.currentIndex.value = 3;
       Get.offNamed(userHomeScreenRoute);
-      storeCtx.orders.clear();
-      navCtx.onItemTapped(3);
     }
     if (role == "store") {
       storeCtx.tappingNotification.value = true;
