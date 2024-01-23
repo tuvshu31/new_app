@@ -1,9 +1,7 @@
 import 'dart:developer';
 
 import 'package:Erdenet24/controller/user_controller.dart';
-import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/button.dart';
-import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +17,6 @@ import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
-
-import '../../widgets/dialogs/dialog_list.dart';
 
 class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
@@ -68,6 +64,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
     dynamic response = Map<String, dynamic>.from(getMainCategories);
     if (response["success"]) {
       storeList = response["data"];
+      log(storeList.toString());
     }
     storeLoading = false;
     setState(() {});
@@ -462,6 +459,30 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                             fontSize: 13,
                                           ),
                                         ),
+                                        const SizedBox(height: 8),
+                                        data["withSale"] != null &&
+                                                data["withSale"] == 1
+                                            ? Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 2,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.green
+                                                        .withOpacity(0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8)),
+                                                child: const Text(
+                                                  "Хямдралтай",
+                                                  style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              )
+                                            : Container()
                                       ],
                                     ),
                                   ),

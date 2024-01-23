@@ -113,10 +113,13 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
           _loginCtx.saveUserToken();
           connectToSocket();
           refreshOrders();
+          determinePosition();
         } else {
           socket.disconnect();
         }
       }
+    } else {
+      customSnackbar(ActionType.error, "Хүргэлттэй үед унтраах боломжгүй", 3);
     }
   }
 

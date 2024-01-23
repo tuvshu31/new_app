@@ -1,22 +1,14 @@
-import 'package:Erdenet24/api/dio_requests/driver.dart';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
 import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/screens/driver/driver_drawer_screen.dart';
 import 'package:Erdenet24/screens/driver/driver_order_item.dart';
-import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
-import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:Erdenet24/widgets/shimmer.dart';
-import 'package:Erdenet24/widgets/text.dart';
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
 
 class DriverMainScreen extends StatefulWidget {
   const DriverMainScreen({super.key});

@@ -18,8 +18,7 @@ class UserOrdersScreen extends StatefulWidget {
   State<UserOrdersScreen> createState() => _UserOrdersScreenState();
 }
 
-class _UserOrdersScreenState extends State<UserOrdersScreen>
-    with WidgetsBindingObserver {
+class _UserOrdersScreenState extends State<UserOrdersScreen> {
   final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
   ScrollController scrollController = ScrollController();
@@ -27,25 +26,11 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _userCtx.tab.value = 0;
     _userCtx.page.value = 1;
     _userCtx.orders.clear();
     _userCtx.getUserOrders();
     scrollHandler();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _userCtx.refreshOrders();
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   void scrollHandler() {

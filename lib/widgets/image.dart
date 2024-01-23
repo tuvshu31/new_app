@@ -93,18 +93,21 @@ Widget customImage(
         ),
       ),
       isFaded
-          ? Container(
-              width: Get.width * .2,
-              height: Get.width * .2,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  fadeText,
-                  style: const TextStyle(
-                    color: Colors.white,
+          ? Center(
+              child: Container(
+                width: width,
+                height: width,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  // shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(isCircle ? 50 : 12),
+                ),
+                child: Center(
+                  child: Text(
+                    fadeText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

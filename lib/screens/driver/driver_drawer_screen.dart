@@ -31,6 +31,9 @@ class _DriverDrawerScreenState extends State<DriverDrawerScreen> {
   @override
   void initState() {
     super.initState();
+    if (_driverCtx.driverInfo.isEmpty) {
+      _driverCtx.getDriverInfo();
+    }
   }
 
   @override

@@ -43,7 +43,11 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   List<Map<dynamic, dynamic>> sortValues = [
     {"name": "Үнэ өсөхөөр", "icon": IconlyLight.arrow_up, "sort": "price"},
     {"name": "Үнэ буурахаар", "icon": IconlyLight.arrow_down, "sort": "-price"},
-    {"name": "Хямдралтай нь эхэндээ", "icon": Icons.tag, "sort": "salePercent"},
+    {
+      "name": "Хямдралтай нь эхэндээ",
+      "icon": Icons.tag,
+      "sort": "-salePercent"
+    },
   ];
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
@@ -664,8 +668,15 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                               tag: item["id"],
                               child: Stack(
                                 children: [
-                                  customImage(Get.width * .3, item["image"]),
-                                  item["salePercent"] > 0
+                                  customImage(
+                                    Get.width * .3,
+                                    item["image"],
+                                    isFaded: item["available"] == 0,
+                                    isCircle: false,
+                                    fadeText: "Дууссан",
+                                  ),
+                                  item["salePercent"] != null &&
+                                          item["salePercent"] > 0
                                       ? Positioned(
                                           right: 10,
                                           top: 5,
@@ -702,7 +713,8 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                                     Text(
                                       convertToCurrencyFormat(item['price']),
                                     ),
-                                    item["salePercent"] > 0
+                                    item["salePercent"] != null &&
+                                            item["salePercent"] > 0
                                         ? Text(
                                             convertToCurrencyFormat(
                                                 item['oldPrice']),

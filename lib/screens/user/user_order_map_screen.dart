@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,23 +28,46 @@ class _UserOrderMapScreenState extends State<UserOrderMapScreen> {
     _userCtx.getDriverPositionStream(widget.orderId);
   }
 
-  void addCustomMarker() {
-    BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(),
-      "assets/images/png/driver.png",
-    ).then((icon) {
-      markerIcon = icon;
-      MarkerId markerId = const MarkerId("marker");
-      LatLng position = _userCtx.markerPosition.value;
-      Marker marker = Marker(
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  Future<void> addCustomMarker() async {
+    // BitmapDescriptor.fromAssetImage(
+    //   const ImageConfiguration(),
+    //   "assets/images/png/driver.png",
+    // ).then((icon) {
+    //   markerIcon = icon;
+    //   LatLng position = _userCtx.markerPosition.value;
+    //   // Marker marker = Marker(
+    //   //   markerId: markerId,
+    //   //   position: position,
+    //   //   draggable: false,
+    //   //   icon: markerIcon,
+    //   // );
+    // });
+    MarkerId markerId = const MarkerId("marker");
+    LatLng position = _userCtx.markerPosition.value;
+    int iconSize = 100;
+    if (Platform.isIOS) {
+      iconSize = 85;
+    }
+    final Uint8List markerIcon =
+        await getBytesFromAsset("assets/images/png/driver.png", iconSize);
+
+    final Marker marker = Marker(
         markerId: markerId,
         position: position,
         draggable: false,
-        icon: markerIcon,
-      );
-      markers[markerId] = marker;
-      setState(() {});
-    });
+        icon: BitmapDescriptor.fromBytes(markerIcon));
+    markers[markerId] = marker;
+    setState(() {});
   }
 
   @override
