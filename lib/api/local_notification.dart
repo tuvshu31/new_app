@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
@@ -135,11 +136,13 @@ void handleNotificationOnClick(String role) {
   final navCtx = Get.put(NavigationController());
   final storeCtx = Get.put(StoreController());
   final driverCtx = Get.put(DriverController());
+  final userCtx = Get.put(UserController());
   String userRole = RestApiHelper.getUserRole();
   if (role != "" && role == userRole) {
     if (role == "user") {
       Get.back();
-      Get.back();
+      // Get.back();
+      userCtx.orders.clear();
       navCtx.currentIndex.value = 3;
       Get.offNamed(userHomeScreenRoute);
     }

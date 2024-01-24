@@ -163,8 +163,9 @@ class UserController extends GetxController {
         if (response["isPaid"]) {
           Get.back();
           Get.back();
+          orders.clear();
+          _navCtx.currentIndex.value = 3;
           Get.offNamed(userHomeScreenRoute);
-          _navCtx.onItemTapped(3);
         }
       }
     }

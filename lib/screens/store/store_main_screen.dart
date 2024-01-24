@@ -55,8 +55,6 @@ class _StoreMainScreenState extends State<StoreMainScreen>
       if (socket.disconnected) {
         socket.connect();
       }
-      _storeCtx.checkStoreNewOrders();
-      _storeCtx.refreshOrders();
     }
   }
 
