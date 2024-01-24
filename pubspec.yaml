@@ -141,6 +141,9 @@ flutter:
     - family: Rubik
       fonts:
         - asset: assets/fonts/Rubik-Regular.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Medium.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

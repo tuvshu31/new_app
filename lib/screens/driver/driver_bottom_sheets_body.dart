@@ -38,7 +38,7 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
       _listTileWidget(
         customImage(
           Get.width * .1,
-          "${URL.AWS}/users/${widget.item["storeId"] ?? 628}/small/1.png",
+          widget.item["image"],
           isCircle: true,
         ),
         widget.item["storeName"] ?? "n/a",

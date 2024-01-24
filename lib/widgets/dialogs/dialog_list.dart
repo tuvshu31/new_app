@@ -194,14 +194,6 @@ class CustomDialogs {
     );
   }
 
-  void showNotAvailableProductsDialog(
-      List availableZeroProducts, dynamic onPressed) {
-    customDialog(
-      ActionType.error,
-      showNotAvailableProductsDialogBody(availableZeroProducts, onPressed),
-    );
-  }
-
   void showNewVersionDialog(dynamic onPressed) {
     customDialog(
       ActionType.warning,

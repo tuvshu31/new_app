@@ -74,7 +74,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
                 "ERDENET24",
                 softWrap: true,
                 style: TextStyle(
-                  fontFamily: "Exo",
+                  fontFamily: "Montserrat",
                   fontSize: 22,
                   color: MyColors.black,
                 ),

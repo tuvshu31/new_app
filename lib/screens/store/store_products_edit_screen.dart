@@ -470,6 +470,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
                 ],
               ),
               _listItem(() {
+                Get.back();
                 Get.toNamed(
                   storeEditProductScreenRoute,
                   arguments: {"id": item["id"]},

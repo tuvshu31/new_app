@@ -40,7 +40,9 @@ class _UserCartScreenState extends State<UserCartScreen> {
   }
 
   void addToCart(int productId, int storeId) async {
-    loadingId = productId;
+    setState(() {
+      loadingId = productId;
+    });
     dynamic addToCart = await UserApi().addToCart(productId, storeId);
     loadingId = 0;
     if (addToCart != null) {
@@ -58,7 +60,9 @@ class _UserCartScreenState extends State<UserCartScreen> {
   }
 
   void removeFromCart(int productId) async {
-    loadingId = productId;
+    setState(() {
+      loadingId = productId;
+    });
     dynamic addToCart = await UserApi().removeFromCart(productId);
     loadingId = 0;
     if (addToCart != null) {

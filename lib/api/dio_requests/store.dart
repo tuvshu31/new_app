@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -60,6 +62,15 @@ class StoreApi {
   Future addProductPhoto(int productId, List images) async {
     return DioClient()
         .sendFile('addProductPhoto?productId=$productId', Method.post, images);
+  }
+
+  //Барааны зураг засах
+  Future updateProductPhoto(
+      int productId, List removedImgs, List images) async {
+    return DioClient().sendFile(
+        'updateProductPhoto?productId=$productId&removedImgs=$removedImgs',
+        Method.post,
+        images);
   }
 
   //Барааны мэдээлэл засах

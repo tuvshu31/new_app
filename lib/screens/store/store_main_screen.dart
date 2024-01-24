@@ -108,7 +108,7 @@ class _StoreMainScreenState extends State<StoreMainScreen>
           SizedBox(height: Get.height * .075),
           customImage(
             Get.width * .23,
-            "${URL.AWS}/users/${data["id"]}/small/1.png",
+            data["image"] ?? "assets/images/png/no_image.png",
             isCircle: true,
           ),
           SizedBox(height: Get.width * .03),

@@ -128,7 +128,7 @@ void showProductDetailDialog(data) {
             CustomImage(
                 width: Get.width * .4,
                 height: Get.width * .4,
-                url: "${URL.AWS}/products/${data["id"]}/small/1.png"),
+                url: data["image"]),
             const SizedBox(height: 12),
             Text(data["name"]),
             const SizedBox(height: 12),

@@ -98,7 +98,7 @@ Widget customImage(
                 width: width,
                 height: width,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withOpacity(0.3),
                   // shape: BoxShape.circle,
                   borderRadius: BorderRadius.circular(isCircle ? 50 : 12),
                 ),

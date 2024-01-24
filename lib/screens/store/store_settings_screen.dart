@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -61,9 +60,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                 children: [
                   SizedBox(height: Get.height * .02),
                   CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      "${URL.AWS}/users/${data["id"]}/small/1.png",
-                    ),
+                    backgroundImage: NetworkImage(data["image"]),
                     radius: Get.width * .1,
                   ),
                   _infoWidget("Дэлгүүрийн нэр", nameController),

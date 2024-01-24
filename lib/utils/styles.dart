@@ -1,6 +1,3 @@
-// import 'package:audioplayers/audioplayers.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class MyColors {
@@ -42,8 +39,6 @@ class MyFonts {
 }
 
 class URL {
-  static const String AWS =
-      "https://et24-images.s3.ap-northeast-1.amazonaws.com";
   static const String data =
       'https://us-central1-erdenet-12083.cloudfunctions.net/app/api/read';
   static const String userInfo =
@@ -88,6 +83,3 @@ String capitalize(String value) {
   }
   return result;
 }
-// final helloWorld = 'hello world'.toCapitalized(); // 'Hello world'
-// final helloWorld = 'hello world'.toUpperCase(); // 'HELLO WORLD'
-// final helloWorldCap = 'hello world'.toTitleCase(); // 'Hello World'

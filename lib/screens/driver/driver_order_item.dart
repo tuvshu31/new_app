@@ -44,7 +44,7 @@ class DriverOrderItem extends StatelessWidget {
             children: [
               customImage(
                 Get.width * .1,
-                "${URL.AWS}/users/${item["storeId"] ?? 628}/small/1.png",
+                item["image"] ?? 'assets/images/png/no_image.png',
                 isCircle: true,
               )
             ],

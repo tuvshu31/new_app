@@ -1,10 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/controller/navigation_controller.dart';
-import 'package:Erdenet24/main.dart';
-import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
-import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
@@ -12,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:Erdenet24/screens/user/user_orders_detail_screen.dart';
 
 final _navCtx = Get.put(NavigationController());
 
@@ -132,7 +128,6 @@ class UserController extends GetxController {
       dynamic response = Map<String, dynamic>.from(getUserInfoDetails);
       if (response["success"]) {
         userInfo.value = response["data"];
-        log(userInfo.toString());
       }
     }
   }

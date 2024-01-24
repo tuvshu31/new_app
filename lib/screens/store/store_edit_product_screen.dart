@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:Erdenet24/utils/shimmers.dart';
+import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -38,6 +40,9 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
   bool availableIsOk = true;
   var controllerList = <TextEditingController>[];
   Map productInfo = {};
+  bool loading = false;
+  int networkImagesCount = 0;
+  List removedNetworkImagesIds = [];
   final _arguments = Get.arguments;
 
   final TextEditingController _nameController = TextEditingController();
@@ -48,8 +53,7 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
   @override
   void initState() {
     super.initState();
-    getStoreCategoryList();
-    getProductInfo();
+    getStoreRelatedCategory();
   }
 
   List generateOtherInfo() {
@@ -70,23 +74,31 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
   }
 
   void getProductInfo() async {
+    loading = true;
     dynamic getProductInfo = await StoreApi().getProductInfo(_arguments["id"]);
+    loading = false;
     if (getProductInfo != null) {
       dynamic response = Map<String, dynamic>.from(getProductInfo);
       if (response["success"]) {
         productInfo = response["data"];
         images = productInfo["images"];
+        networkImagesCount = images.length;
         _nameController.text = productInfo["name"];
         _priceController.text = productInfo["price"].toString();
         _countController.text = productInfo["available"].toString();
-        if (mounted) {
-          setState(() {});
+        int index = categories
+            .indexWhere((element) => element["id"] == productInfo["category"]);
+        if (index > -1) {
+          category = categories[index];
         }
       }
     }
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  void addProduct() async {
+  void updateProductInfo() async {
     CustomDialogs().showLoadingDialog();
     Map<String, dynamic> body = {
       "name": _nameController.text,
@@ -95,22 +107,29 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
       "typeId": category["id"],
       "otherInfo": generateOtherInfo(),
     };
-    dynamic addProduct = await StoreApi().addProduct(body);
-    if (addProduct != null) {
-      dynamic response = Map<String, dynamic>.from(addProduct);
+    dynamic updateProductInfo =
+        await StoreApi().updateProductInfo(_arguments["id"], body);
+    if (updateProductInfo != null) {
+      dynamic response = Map<String, dynamic>.from(updateProductInfo);
       if (response["success"]) {
-        int id = response["id"];
-        dynamic addProductPhoto = await StoreApi().addProductPhoto(id, images);
+        log(images.toString());
+        final index = images.indexWhere((image) => image.contains("https://"));
+        if (index > -1) {
+          images.removeAt(index);
+        }
+        log(images.toString());
+        log(networkImagesCount.toString());
+        dynamic updateProductPhoto = await StoreApi().updateProductPhoto(
+            _arguments["id"], removedNetworkImagesIds, images);
         Get.back();
-        if (addProductPhoto != null) {
-          dynamic response = Map<String, dynamic>.from(addProductPhoto);
+        if (updateProductPhoto != null) {
+          dynamic response = Map<String, dynamic>.from(updateProductPhoto);
           if (response["success"]) {
             refreshInfo();
-            customSnackbar(ActionType.success, "Бараа амжилттай нэмэгдлээ", 2);
+            customSnackbar(ActionType.success, "Бараа амжилттай засагдлаа", 2);
           }
         } else {
-          customSnackbar(
-              ActionType.error, "Барааны зураг нэмэх үед алдаа гарлаа", 2);
+          customSnackbar(ActionType.error, "Бараа засах үед алдаа гарлаа", 2);
         }
       }
     } else {
@@ -119,17 +138,21 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
     }
   }
 
-  void getStoreCategoryList() async {
-    dynamic getStoreCategoryList = await StoreApi().getStoreCategoryList();
-    if (getStoreCategoryList != null) {
-      dynamic response = Map<String, dynamic>.from(getStoreCategoryList);
+  void getStoreRelatedCategory() async {
+    loading = true;
+    dynamic getStoreRelatedCategory =
+        await StoreApi().getStoreRelatedCategory();
+    loading = false;
+    if (getStoreRelatedCategory != null) {
+      dynamic response = Map<String, dynamic>.from(getStoreRelatedCategory);
       if (response["success"]) {
         categories = response["data"];
-        if (mounted) {
-          setState(() {});
-        }
+        getProductInfo();
+      } else {
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
       }
     }
+    setState(() {});
   }
 
   void showImagePicker() {
@@ -241,9 +264,13 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
     }
   }
 
-  void removeImage(int index) {
+  void removeImage(int index, {bool isNetworkImg = false}) {
     images.removeAt(index);
     imageIsOk = images.isNotEmpty;
+    if (isNetworkImg) {
+      networkImagesCount = images.length;
+      removedNetworkImagesIds.add(index);
+    }
     setState(() {});
   }
 
@@ -294,169 +321,198 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
     return CustomHeader(
       title: "Барааны мэдээлэл засах",
       customActions: Container(),
-      body: productInfo.isEmpty
-          ? customLoadingWidget()
-          : SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const SizedBox(height: 12),
-                    GridView.builder(
-                        shrinkWrap: true,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: images.isEmpty
-                            ? 1
-                            : images.length < 4
-                                ? images.length + 1
-                                : images.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                        ),
-                        itemBuilder: (context, index) {
-                          if (images.isEmpty) {
-                            return hasNoImageWidget(() => showImagePicker());
-                          } else if (index < images.length) {
-                            return hasImageFromNetworkWidget(
-                              images[index],
-                              () => removeImage(index),
-                            );
-                          } else {
-                            return hasNoImageWidget(() => showImagePicker());
-                          }
-                        }),
-                    const SizedBox(height: 12),
-                    CustomText(
-                      text: imageIsOk
-                          ? "*Хамгийн ихдээ 4 ширхэг зураг оруулах боломжтой"
-                          : "*Барааны зургаа оруулна уу",
-                      fontSize: 12,
-                      color: imageIsOk ? MyColors.gray : Colors.red,
-                    ),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "Барааны нэр",
-                      controller: _nameController,
-                      textInputAction: TextInputAction.next,
-                      onChanged: ((val) {
-                        nameIsOk = val.isNotEmpty;
-                        setState(() {});
-                      }),
-                    ),
-                    _errorText("Барааны нэр оруулна уу", nameIsOk),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "Барааны үнэ",
-                      controller: _priceController,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (val) {
-                        priceIsOk = val.isNotEmpty;
-                        setState(() {});
-                      },
-                    ),
-                    _errorText("Барааны үнэ оруулна уу", priceIsOk),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      hintText: "Тоо ширхэг",
-                      controller: _countController,
-                      keyboardType: TextInputType.number,
-                      onChanged: (val) {
-                        availableIsOk = val.isNotEmpty;
-                        setState(() {});
-                      },
-                    ),
-                    _errorText("Барааны тоо ширхэг оруулна уу", availableIsOk),
-                    const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: () {
-                        categories.isEmpty
-                            ? null
-                            : showCategoryPicker(categories);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: MyColors.white,
-                            border: Border.all(
-                              width: 0.7,
-                              color: MyColors.grey,
-                            )),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomText(
-                              text: category.isEmpty
-                                  ? "Ангилал сонгох"
-                                  : category["name"],
-                              color: categories.isEmpty
-                                  ? MyColors.grey
-                                  : MyColors.black,
+      body: loading && productInfo.isEmpty
+          ? listShimmerWidget()
+          : !loading && productInfo.isEmpty
+              ? customEmptyWidget("Барааны мэдээлэл байхгүй байна")
+              : SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        GridView.builder(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: images.isEmpty
+                                ? 1
+                                : images.length < 4
+                                    ? images.length + 1
+                                    : images.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 1,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
                             ),
-                            const Icon(
-                              IconlyLight.arrow_down_2,
-                              size: 18,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    category["descriptions"] != null &&
-                            category["descriptions"].isNotEmpty
-                        ? Column(
-                            children: [
-                              ListView.separated(
-                                separatorBuilder: (context, index) {
-                                  return const SizedBox(height: 12);
-                                },
-                                padding: const EdgeInsets.only(top: 8),
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: category["descriptions"].length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var item = category["descriptions"][index];
-                                  return CustomTextField(
-                                    hintText: item,
-                                    controller: _infoControllers[index],
+                            itemBuilder: (context, index) {
+                              if (images.isEmpty) {
+                                return hasNoImageWidget(
+                                    () => showImagePicker());
+                              } else if (index < images.length) {
+                                if (index < networkImagesCount) {
+                                  return hasImageFromNetworkWidget(
+                                    images[index],
+                                    () =>
+                                        removeImage(index, isNetworkImg: true),
                                   );
-                                },
-                              ),
-                              const SizedBox(height: 36),
-                              CustomButton(
-                                text: "Бараа нэмэх",
-                                onPressed: () {
-                                  imageIsOk = images.isNotEmpty;
-                                  nameIsOk = _nameController.text.isNotEmpty;
-                                  priceIsOk = _priceController.text.isNotEmpty;
-                                  availableIsOk =
-                                      _countController.text.isNotEmpty;
-                                  setState(() {});
-                                  if (imageIsOk &&
-                                      nameIsOk &&
-                                      priceIsOk &&
-                                      availableIsOk) {
-                                    addProduct();
-                                  }
-                                  // submit();
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          )
-                        : Container(),
-                  ],
+                                } else {
+                                  return hasImageWidget(
+                                    images[index],
+                                    () => removeImage(index),
+                                  );
+                                }
+                              } else {
+                                return hasNoImageWidget(
+                                    () => showImagePicker());
+                              }
+                            }),
+                        const SizedBox(height: 12),
+                        CustomText(
+                          text: imageIsOk
+                              ? "*Хамгийн ихдээ 4 ширхэг зураг оруулах боломжтой"
+                              : "*Барааны зургаа оруулна уу",
+                          fontSize: 12,
+                          color: imageIsOk ? MyColors.gray : Colors.red,
+                        ),
+                        const SizedBox(height: 12),
+                        Text("Барааны нэр",
+                            style: TextStyle(color: MyColors.gray)),
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          hintText: "Барааны нэр",
+                          controller: _nameController,
+                          textInputAction: TextInputAction.next,
+                          onChanged: ((val) {
+                            nameIsOk = val.isNotEmpty;
+                            setState(() {});
+                          }),
+                        ),
+                        _errorText("Барааны нэр оруулна уу", nameIsOk),
+                        const SizedBox(height: 12),
+                        Text("Барааны үнэ",
+                            style: TextStyle(color: MyColors.gray)),
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          hintText: "Барааны үнэ",
+                          controller: _priceController,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          onChanged: (val) {
+                            priceIsOk = val.isNotEmpty;
+                            setState(() {});
+                          },
+                        ),
+                        _errorText("Барааны үнэ оруулна уу", priceIsOk),
+                        const SizedBox(height: 12),
+                        Text("Барааны үлдэгдэл",
+                            style: TextStyle(color: MyColors.gray)),
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          hintText: "Тоо ширхэг",
+                          controller: _countController,
+                          keyboardType: TextInputType.number,
+                          onChanged: (val) {
+                            availableIsOk = val.isNotEmpty;
+                            setState(() {});
+                          },
+                        ),
+                        _errorText(
+                            "Барааны тоо ширхэг оруулна уу", availableIsOk),
+                        const SizedBox(height: 12),
+                        Text("Ангилал", style: TextStyle(color: MyColors.gray)),
+                        const SizedBox(height: 12),
+                        GestureDetector(
+                          onTap: () {
+                            categories.isEmpty
+                                ? null
+                                : showCategoryPicker(categories);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: MyColors.white,
+                                border: Border.all(
+                                  width: 0.7,
+                                  color: MyColors.grey,
+                                )),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomText(
+                                  text: category.isEmpty
+                                      ? "Ангилал сонгох"
+                                      : category["name"],
+                                  color: categories.isEmpty
+                                      ? MyColors.grey
+                                      : MyColors.black,
+                                ),
+                                const Icon(
+                                  IconlyLight.arrow_down_2,
+                                  size: 18,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        category["descriptions"] != null &&
+                                category["descriptions"].isNotEmpty
+                            ? Column(
+                                children: [
+                                  ListView.separated(
+                                    separatorBuilder: (context, index) {
+                                      return const SizedBox(height: 12);
+                                    },
+                                    padding: const EdgeInsets.only(top: 8),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: category["descriptions"].length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      var item =
+                                          category["descriptions"][index];
+                                      return CustomTextField(
+                                        hintText: item,
+                                        controller: _infoControllers[index],
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 36),
+                                  CustomButton(
+                                    text: "Бараа засах",
+                                    onPressed: () {
+                                      imageIsOk = images.isNotEmpty;
+                                      nameIsOk =
+                                          _nameController.text.isNotEmpty;
+                                      priceIsOk =
+                                          _priceController.text.isNotEmpty;
+                                      availableIsOk =
+                                          _countController.text.isNotEmpty;
+                                      setState(() {});
+                                      if (imageIsOk &&
+                                          nameIsOk &&
+                                          priceIsOk &&
+                                          availableIsOk) {
+                                        updateProductInfo();
+                                      }
+                                      // submit();
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
     );
   }
 

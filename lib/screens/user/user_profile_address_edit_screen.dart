@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -358,7 +359,7 @@ class _UserProfileAddressEditScreenState
         title: "Байршил сонгох",
         customLeading: Container(),
         body: locationList.isEmpty
-            ? customLoadingWidget()
+            ? listShimmerWidget()
             : ListView.separated(
                 separatorBuilder: (context, index) {
                   return Container(

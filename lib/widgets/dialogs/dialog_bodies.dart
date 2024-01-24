@@ -1,6 +1,3 @@
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/image.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:Erdenet24/widgets/button.dart';
@@ -141,72 +138,6 @@ Widget showNewVersionDialogBody(dynamic onPressed) {
         bgColor: Colors.amber,
         text: "Шинэчлэх",
         onPressed: onPressed,
-      ),
-    ],
-  );
-}
-
-Widget showNotAvailableProductsDialogBody(
-    List availableZeroProducts, dynamic onPressed) {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(
-        "${availableZeroProducts.length == 1 ? "Энэ бараа" : "Эдгээр бараанууд"} дууссан тул одоогоор худалдан авах боломжгүй байна",
-        textAlign: TextAlign.center,
-      ),
-      SizedBox(height: Get.height * .02),
-      ListView.separated(
-        separatorBuilder: (context, index) {
-          return Container(height: 7);
-        },
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: availableZeroProducts.length,
-        itemBuilder: (context, index) {
-          var item = availableZeroProducts[index];
-          return ListTile(
-            leading: CustomImage(
-              width: Get.width * .2,
-              height: Get.width * .2,
-              url: "${URL.AWS}/products/${item["id"]}/small/1.png",
-            ),
-            title: Text(
-              item["name"],
-              style: const TextStyle(fontSize: 12),
-            ),
-            subtitle: Text(
-              convertToCurrencyFormat(int.parse(item["price"] ?? 0)),
-              style: const TextStyle(
-                fontSize: 12,
-              ),
-            ),
-          );
-        },
-      ),
-      SizedBox(height: Get.height * .04),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CustomButton(
-            isFullWidth: false,
-            onPressed: Get.back,
-            bgColor: Colors.white,
-            text: "Хаах",
-            elevation: 0,
-            textColor: Colors.black,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: CustomButton(
-              elevation: 0,
-              bgColor: Colors.red,
-              text: "Сагснаас хасах",
-              onPressed: onPressed,
-            ),
-          ),
-        ],
       ),
     ],
   );

@@ -215,6 +215,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       dynamic response = Map<String, dynamic>.from(getAllPreparingOrders);
       if (response["success"]) {
         orders.value = response["data"];
+        log(orders.value.toString());
         for (var i = 0; i < orders.length; i++) {
           animationController = AnimationController(
               vsync: this,

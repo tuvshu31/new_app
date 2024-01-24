@@ -128,17 +128,20 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
       "kod": kod.text,
       "total": totalPrice,
     };
-    log(body.toString());
     dynamic createNewOrder = await UserApi().createNewOrder(body);
     Get.back();
     if (createNewOrder != null) {
       dynamic response = Map<String, dynamic>.from(createNewOrder);
       if (response["success"]) {
-        var orderId = response["data"];
-        Get.toNamed(userPaymentScreenRoute, arguments: {
-          "orderId": orderId,
-          "amount": totalPrice,
-        });
+        if (response["error"] == "") {
+          var orderId = response["data"];
+          Get.toNamed(userPaymentScreenRoute, arguments: {
+            "orderId": orderId,
+            "amount": totalPrice,
+          });
+        } else {
+          customSnackbar(ActionType.error, response["error"], 5);
+        }
       } else {
         customSnackbar(ActionType.error,
             "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу", 2);

@@ -70,7 +70,7 @@ final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
-  setEnvironment(Environment.prod);
+  setEnvironment(Environment.dev);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(

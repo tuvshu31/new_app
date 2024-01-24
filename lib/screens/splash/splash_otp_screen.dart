@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +76,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
       dynamic response = Map<String, dynamic>.from(checkUserRole);
       if (response["success"]) {
         var data = response["data"];
+        log(data.toString());
         switch (data["role"]) {
           case "user":
             handleUserLogin(data);
@@ -187,9 +191,10 @@ void saveUserInfo(int id, String role) {
 }
 
 void handleUserLogin(data) {
+  final loginCtx = Get.put(LoginController());
   var userId = data["userId"];
   saveUserInfo(userId, "user");
-  Get.offAllNamed(userHomeScreenRoute);
+  loginCtx.navigateToScreen(userHomeScreenRoute);
 }
 
 void handleStoreLogin(data) {
@@ -211,7 +216,7 @@ void handleStoreLogin(data) {
             _content(
               data["storeId"],
               "store",
-              NetworkImage("${URL.AWS}/users/${data["storeId"]}/small/1.png"),
+              NetworkImage(data["image"]),
               data["storeName"],
               storeMainScreenRoute,
             ),
@@ -277,10 +282,11 @@ Widget _content(
   String title,
   String route,
 ) {
+  final loginCtx = Get.put(LoginController());
   return GestureDetector(
     onTap: () {
       saveUserInfo(id, role);
-      Get.offAllNamed(route);
+      loginCtx.navigateToScreen(route);
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
