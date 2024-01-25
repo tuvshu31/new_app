@@ -41,7 +41,6 @@ class _UserHomeScreenState extends State<UserHomeScreen>
     if (state == AppLifecycleState.resumed) {
       if (socket.disconnected) {
         socket.connect();
-        _userCtx.refreshOrders();
       }
     }
     if (state == AppLifecycleState.paused) {

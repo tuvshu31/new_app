@@ -149,6 +149,7 @@ class UserController extends GetxController {
   }
 
   void checkQpayPayment() async {
+    final navCtx = Get.put(NavigationController());
     CustomDialogs().showLoadingDialog();
     dynamic checkQpayPayment = await UserApi().checkQpayPayment();
     Get.back();
@@ -158,8 +159,7 @@ class UserController extends GetxController {
         if (response["isPaid"]) {
           Get.back();
           Get.back();
-          orders.clear();
-          _navCtx.currentIndex.value = 3;
+          navCtx.currentIndex.value = 3;
           Get.offNamed(userHomeScreenRoute);
         }
       }

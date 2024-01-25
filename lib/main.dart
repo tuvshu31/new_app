@@ -66,9 +66,6 @@ Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
   handleNotifications(message.data);
 }
 
-final GlobalKey<NavigatorState> navigatorKey =
-    GlobalKey(debugLabel: "Main Navigator");
-
 void main() async {
   setEnvironment(Environment.prod);
   WidgetsFlutterBinding.ensureInitialized();

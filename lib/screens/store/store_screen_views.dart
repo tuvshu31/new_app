@@ -18,17 +18,10 @@ Widget imagePickerOptionsWidget(VoidCallback onPress1, VoidCallback onPress2) {
             CustomInkWell(
               borderRadius: BorderRadius.circular(50),
               onTap: onPress1,
-              child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: MyColors.fadedGrey,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Icon(
-                      IconlyLight.camera,
-                    ),
-                  )),
+              child: Image.asset(
+                "assets/images/png/camera.jpg",
+                width: Get.width * .1,
+              ),
             ),
             const SizedBox(height: 12),
             const CustomText(
@@ -43,15 +36,10 @@ Widget imagePickerOptionsWidget(VoidCallback onPress1, VoidCallback onPress2) {
             CustomInkWell(
               borderRadius: BorderRadius.circular(300),
               onTap: onPress2,
-              child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: MyColors.fadedGrey,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Icon(IconlyLight.image),
-                  )),
+              child: Image.asset(
+                "assets/images/png/images.jpg",
+                width: Get.width * .1,
+              ),
             ),
             const SizedBox(height: 12),
             const CustomText(text: "Зургийн цомог")

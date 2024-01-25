@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:Erdenet24/controller/driver_controller.dart';
 import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/main.dart';
+import 'package:Erdenet24/screens/user/user_orders_screen.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
@@ -141,8 +144,7 @@ void handleNotificationOnClick(String role) {
   if (role != "" && role == userRole) {
     if (role == "user") {
       Get.back();
-      // Get.back();
-      userCtx.orders.clear();
+      Get.back();
       navCtx.currentIndex.value = 3;
       Get.offNamed(userHomeScreenRoute);
     }

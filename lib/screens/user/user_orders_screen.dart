@@ -1,5 +1,6 @@
 import 'package:Erdenet24/controller/navigation_controller.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
+import 'package:Erdenet24/main.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -41,6 +42,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
       if (_userCtx.bottomSheetOpened.value) {
         Get.back();
       }
+      _userCtx.refreshOrders();
     }
   }
 
@@ -73,6 +75,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
 
   @override
   Widget build(BuildContext context) {
+    setState(() {});
     return Obx(
       () => WillPopScope(
         onWillPop: () async {
