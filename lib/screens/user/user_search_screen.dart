@@ -375,7 +375,6 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               spanBaselineShift: 4,
                               badgeSize: const Size(56, 56),
                               badgeCornerRadius: const Radius.circular(12),
-                              badgePosition: BadgePosition.topEnd,
                               textSpan: TextSpan(
                                 text: item["ribbon"],
                                 style: const TextStyle(
