@@ -70,13 +70,12 @@ final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey(debugLabel: "Main Navigator");
 
 void main() async {
-  setEnvironment(Environment.dev);
+  setEnvironment(Environment.prod);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   await Hive.initFlutter();
   RestApiHelper.authBox = await Hive.openBox('myBox');
   if (Platform.isIOS) {

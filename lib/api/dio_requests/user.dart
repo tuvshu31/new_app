@@ -273,4 +273,11 @@ class UserApi {
         'getDriverPositionStream?userId=$userId&orderId=$orderId',
         Method.post, [], {});
   }
+
+  //Хэрэглэгч бүртгэлээ устгах
+  Future deleteUserAccount() async {
+    int userId = RestApiHelper.getUserId();
+    return DioClient()
+        .sendRequest('deleteUserAccount?userId$userId', Method.post, [], {});
+  }
 }

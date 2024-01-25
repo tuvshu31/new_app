@@ -129,7 +129,7 @@ Widget showNewVersionDialogBody(dynamic onPressed) {
   return Column(
     children: [
       const Text(
-        "Аппликейшнд нэмэлт өөрчлөлт орсон тул шинэчлэлт хийх шаардлагатай. Хэрэв шинэчлэлт хийгээгүй тохиолдолд аппликейшнийг бүрэн ашиглах боломжгүйг анхаарна уу.",
+        "Аппликейшнд нэмэлт өөрчлөлт орсон тул шинэчлэлт хийнэ үү",
         textAlign: TextAlign.center,
       ),
       SizedBox(height: Get.height * .04),

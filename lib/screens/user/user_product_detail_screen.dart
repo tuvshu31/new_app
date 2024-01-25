@@ -87,7 +87,9 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
         isStoreOpen = info["isOpen"];
       }
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void addToCart(int productId, int storeId) async {

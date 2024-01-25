@@ -935,7 +935,7 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
                 if (index < products.length) {
                   var item = products[index];
                   return Container(
-                    height: Get.height * .08,
+                    height: Get.height * .1,
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -953,8 +953,8 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
                                   children: [
                                     customImage(
                                       Get.width * 0.15,
-                                      // "${URL.AWS}/products/${item["id"]}/small/1.png",
-                                      item["image"], isCircle: true,
+                                      item["image"],
+                                      isCircle: true,
                                     ),
                                     item["visibility"] == 0
                                         ? Container(
@@ -988,6 +988,11 @@ class _StoreProductsEditScreenState extends State<StoreProductsEditScreen> {
                               ),
                               Text(
                                 "Үлдэгдэл: ${item["available"]}",
+                                style: const TextStyle(
+                                    color: MyColors.gray, fontSize: 12),
+                              ),
+                              Text(
+                                "Хямдрал: ${item["salePercent"]} %",
                                 style: const TextStyle(
                                     color: MyColors.gray, fontSize: 12),
                               ),

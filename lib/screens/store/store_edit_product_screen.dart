@@ -41,8 +41,6 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
   var controllerList = <TextEditingController>[];
   Map productInfo = {};
   bool loading = false;
-  int networkImagesCount = 0;
-  List removedNetworkImagesIds = [];
   final _arguments = Get.arguments;
 
   final TextEditingController _nameController = TextEditingController();
@@ -81,8 +79,20 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
       dynamic response = Map<String, dynamic>.from(getProductInfo);
       if (response["success"]) {
         productInfo = response["data"];
-        images = productInfo["images"];
-        networkImagesCount = images.length;
+        if (productInfo["images"] != null && productInfo["images"].isNotEmpty) {
+          images = productInfo["images"];
+          for (var i = 0; i < images.length; i++) {
+            var element = images[i];
+            var obj = {
+              "id": i,
+              "url": element,
+              "network": true,
+            };
+            images[i] = obj;
+          }
+          log(images.toString());
+        }
+
         _nameController.text = productInfo["name"];
         _priceController.text = productInfo["price"].toString();
         _countController.text = productInfo["available"].toString();
@@ -112,20 +122,24 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
     if (updateProductInfo != null) {
       dynamic response = Map<String, dynamic>.from(updateProductInfo);
       if (response["success"]) {
-        log(images.toString());
-        final index = images.indexWhere((image) => image.contains("https://"));
-        if (index > -1) {
-          images.removeAt(index);
+        List newImages = [];
+        List oldImages = [];
+        for (var i = 0; i < images.length; i++) {
+          var element = images[i];
+          if (element["network"]) {
+            oldImages.add(element["id"]);
+          } else {
+            newImages.add(element["url"]);
+          }
         }
-        log(images.toString());
-        log(networkImagesCount.toString());
-        dynamic updateProductPhoto = await StoreApi().updateProductPhoto(
-            _arguments["id"], removedNetworkImagesIds, images);
+        dynamic updateProductPhoto = await StoreApi()
+            .updateProductPhoto(_arguments["id"], oldImages, newImages);
         Get.back();
         if (updateProductPhoto != null) {
           dynamic response = Map<String, dynamic>.from(updateProductPhoto);
           if (response["success"]) {
-            refreshInfo();
+            // refreshInfo();
+            Get.back();
             customSnackbar(ActionType.success, "Бараа амжилттай засагдлаа", 2);
           }
         } else {
@@ -264,13 +278,9 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
     }
   }
 
-  void removeImage(int index, {bool isNetworkImg = false}) {
+  void removeImage(int index) {
     images.removeAt(index);
     imageIsOk = images.isNotEmpty;
-    if (isNetworkImg) {
-      networkImagesCount = images.length;
-      removedNetworkImagesIds.add(index);
-    }
     setState(() {});
   }
 
@@ -310,7 +320,12 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
       ],
     );
     if (croppedFile != null) {
-      images.add(croppedFile.path);
+      var obj = {
+        "id": images.length,
+        "url": croppedFile.path,
+        "network": false,
+      };
+      images.add(obj);
       imageIsOk = images.isNotEmpty;
       setState(() {});
     }
@@ -353,15 +368,14 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
                                 return hasNoImageWidget(
                                     () => showImagePicker());
                               } else if (index < images.length) {
-                                if (index < networkImagesCount) {
+                                if (images[index]["network"]) {
                                   return hasImageFromNetworkWidget(
-                                    images[index],
-                                    () =>
-                                        removeImage(index, isNetworkImg: true),
+                                    images[index]["url"],
+                                    () => removeImage(index),
                                   );
                                 } else {
                                   return hasImageWidget(
-                                    images[index],
+                                    images[index]["url"],
                                     () => removeImage(index),
                                   );
                                 }
@@ -379,8 +393,10 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
                           color: imageIsOk ? MyColors.gray : Colors.red,
                         ),
                         const SizedBox(height: 12),
-                        Text("Барааны нэр",
-                            style: TextStyle(color: MyColors.gray)),
+                        const Text(
+                          "Барааны нэр",
+                          style: TextStyle(color: MyColors.gray),
+                        ),
                         const SizedBox(height: 12),
                         CustomTextField(
                           hintText: "Барааны нэр",
@@ -393,8 +409,10 @@ class _StoreEditProductScreenState extends State<StoreEditProductScreen> {
                         ),
                         _errorText("Барааны нэр оруулна уу", nameIsOk),
                         const SizedBox(height: 12),
-                        Text("Барааны үнэ",
-                            style: TextStyle(color: MyColors.gray)),
+                        const Text(
+                          "Барааны үнэ",
+                          style: TextStyle(color: MyColors.gray),
+                        ),
                         const SizedBox(height: 12),
                         CustomTextField(
                           hintText: "Барааны үнэ",

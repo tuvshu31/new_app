@@ -17,6 +17,7 @@ import 'package:Erdenet24/widgets/custom_empty_widget.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/navigation_controller.dart';
+import 'package:rotated_corner_decoration/rotated_corner_decoration.dart';
 
 class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
@@ -337,31 +338,62 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     getStoreList();
                   }
                 },
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      customImage(
-                        Get.width * .16,
-                        item["image"],
-                        isCircle: true,
+                child: Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
                       ),
-                      SizedBox(height: Get.height * .04),
-                      Text(
-                        item["name"] ?? "",
-                        style: TextStyle(
-                          color:
-                              !item["empty"] ? MyColors.black : MyColors.grey,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          customImage(
+                            Get.width * .16,
+                            item["image"],
+                            isCircle: true,
+                          ),
+                          SizedBox(height: Get.height * .04),
+                          Text(
+                            item["name"] ?? "",
+                            style: TextStyle(
+                              color: !item["empty"]
+                                  ? MyColors.black
+                                  : MyColors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    item["ribbon"] != ""
+                        ? Container(
+                            foregroundDecoration:
+                                RotatedCornerDecoration.withColor(
+                              color: Colors.red,
+                              spanBaselineShift: 4,
+                              badgeSize: const Size(56, 56),
+                              badgeCornerRadius: const Radius.circular(12),
+                              badgePosition: BadgePosition.topEnd,
+                              textSpan: TextSpan(
+                                text: item["ribbon"],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    BoxShadow(
+                                        color: Colors.yellowAccent,
+                                        blurRadius: 8),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
+                  ],
                 ),
               ),
             ),

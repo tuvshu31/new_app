@@ -66,11 +66,11 @@ class StoreApi {
 
   //Барааны зураг засах
   Future updateProductPhoto(
-      int productId, List removedImgs, List images) async {
+      int productId, List oldImages, List newImages) async {
     return DioClient().sendFile(
-        'updateProductPhoto?productId=$productId&removedImgs=$removedImgs',
+        'updateProductPhoto?productId=$productId&oldImages=$oldImages',
         Method.post,
-        images);
+        newImages);
   }
 
   //Барааны мэдээлэл засах

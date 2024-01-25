@@ -96,18 +96,21 @@ class _UserNavigationDrawerScreenState
                   _listTile(IconlyLight.delete, "Бүртгэлээ устгах", () {
                     CustomDialogs().showAccountDeleteDialog(() async {
                       CustomDialogs().showLoadingDialog();
-                      dynamic response =
-                          await RestApi().deleteUser(RestApiHelper.getUserId());
-                      dynamic d = Map<String, dynamic>.from(response);
-                      Get.back();
-                      if (d["success"]) {
-                        _loginCtx.logout();
-                      } else {
-                        customSnackbar(
-                          ActionType.error,
-                          "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
-                          3,
-                        );
+                      dynamic deleteUserAccount =
+                          await UserApi().deleteUserAccount();
+                      if (deleteUserAccount != null) {
+                        dynamic response =
+                            Map<String, dynamic>.from(deleteUserAccount);
+                        if (response["success"]) {
+                          Get.back();
+                          _loginCtx.logout();
+                        } else {
+                          customSnackbar(
+                            ActionType.error,
+                            "Алдаа гарлаа, түр хүлээгээд дахин оролдоно уу",
+                            3,
+                          );
+                        }
                       }
                     });
                   }),

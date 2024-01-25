@@ -1,16 +1,20 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/button.dart';
 import 'package:Erdenet24/widgets/custom_empty_widget.dart';
+import 'package:Erdenet24/widgets/custom_loading_widget.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,9 +58,9 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
   @override
   void initState() {
     super.initState();
-    scrollHandler();
-    getUserProducts();
     getUserStoreCategories();
+    getUserProducts();
+    scrollHandler();
   }
 
   void getUserProducts() async {
@@ -98,9 +102,13 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   void handleCategoryTitle() {
     int wordLength = 10;
-    List filteredList = categories
-        .where((e) => selectedIndex.contains(categories.indexOf(e)))
-        .toList();
+    List filteredList = [];
+    for (var i = 0; i < categories.length; i++) {
+      var element = categories[i];
+      if (selectedIndex.contains(element["sub"])) {
+        filteredList.add(element);
+      }
+    }
     bool isAllSelected = filteredList.any((element) => element["sub"] == 0);
     if (isAllSelected) {
       categoryTitle = "Ангилал";
@@ -257,10 +265,13 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                         } else {
                           selectedIndex.add(sub);
                         }
-                        List filteredList = categories
-                            .where((e) =>
-                                selectedIndex.contains(categories.indexOf(e)))
-                            .toList();
+                        List filteredList = [];
+                        for (var i = 0; i < categories.length; i++) {
+                          var element = categories[i];
+                          if (selectedIndex.contains(element["sub"])) {
+                            filteredList.add(element);
+                          }
+                        }
                         totalCount = 0;
                         for (var element in filteredList) {
                           String count = element["count"].toString();
@@ -500,8 +511,10 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                 children: [
                   SizedBox(width: Get.width * .04),
                   _button(categoryTitle, () {
-                    showCategoryBottomSheet();
-                  }, IconlyLight.category),
+                    if (!catLoading) {
+                      showCategoryBottomSheet();
+                    }
+                  }, IconlyLight.category, loading: catLoading),
                   SizedBox(width: Get.width * .02),
                   _button(sortTitle, () {
                     showSortBottomSheet();
@@ -799,7 +812,8 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     );
   }
 
-  Widget _button(String text, VoidCallback onPressed, IconData icon) {
+  Widget _button(String text, VoidCallback onPressed, IconData icon,
+      {bool loading = false}) {
     return Expanded(
       child: CustomInkWell(
         onTap: onPressed,
@@ -819,9 +833,15 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
               Icon(
                 icon,
                 size: 16,
+                color: loading ? MyColors.gray : MyColors.black,
               ),
               const SizedBox(width: 8),
-              Text(text),
+              Text(
+                text,
+                style: TextStyle(
+                  color: loading ? MyColors.gray : MyColors.black,
+                ),
+              ),
             ],
           ),
         ),
