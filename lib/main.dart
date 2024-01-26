@@ -46,7 +46,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:new_version/new_version.dart';
 import 'package:socket_io_client/socket_io_client.dart';
+import 'package:upgrader/upgrader.dart';
 import 'firebase_options.dart';
 
 Socket socket = io(
