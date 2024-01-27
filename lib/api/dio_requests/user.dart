@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
@@ -8,6 +6,11 @@ class UserApi {
   static final UserApi _singleton = UserApi._internal();
   factory UserApi() => _singleton;
   UserApi._internal();
+
+  //Аппликейшны хувилбар шалгах
+  Future checkAppVersion(dynamic body) async {
+    return DioClient().sendRequest('checkAppVersion', Method.post, body, {});
+  }
 
   //Нэг удаагийн код үүсгэх
   Future sendAuthCode(String phone) async {
