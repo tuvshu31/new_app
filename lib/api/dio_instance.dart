@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:Erdenet24/api/app_config.dart';
+import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:dio/dio.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -41,15 +42,12 @@ class DioClient {
     if (!hasInternet) {
       CustomDialogs().showNetworkErrorDialog(() {});
     }
-
+    dio.options.headers["authorization"] = RestApiHelper.getToken();
     try {
       Response<String> response = await dio.request(
         path,
         data: body,
-        options: Options(
-          method: _getMethodName(method),
-          // headers: {"content-Type": 'application/x-www-form-urlencoded'},
-        ),
+        options: Options(method: _getMethodName(method)),
         queryParameters: queryParam,
       );
 

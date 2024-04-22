@@ -27,20 +27,20 @@ class _DriverSettingsScreenState extends State<DriverSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    getDriverInfo();
+    // getDriverInfo();
   }
 
-  Future<void> getDriverInfo() async {
-    loading = true;
-    dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
-    if (res != null) {
-      dynamic response = Map<String, dynamic>.from(res);
-      driverInfo = [response["data"]];
-      log(response["data"].toString());
-    }
-    loading = false;
-    setState(() {});
-  }
+  // Future<void> getDriverInfo() async {
+  //   loading = true;
+  //   dynamic res = await RestApi().getUser(RestApiHelper.getUserId());
+  //   if (res != null) {
+  //     dynamic response = Map<String, dynamic>.from(res);
+  //     driverInfo = [response["data"]];
+  //     log(response["data"].toString());
+  //   }
+  //   loading = false;
+  //   setState(() {});
+  // }
 
   String generateDriverName(driverInfo) {
     var first = driverInfo["firstName"] ?? "";

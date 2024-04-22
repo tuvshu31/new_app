@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:Erdenet24/api/dio_requests/login.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/utils/routes.dart';
 import 'package:get/get.dart';
@@ -52,7 +53,7 @@ class _UserProfilePhoneEditOtpScreenState
 
   void sendOTP() async {
     CustomDialogs().showLoadingDialog();
-    dynamic generateCode = await UserApi().sendAuthCode(arguments["phone"]);
+    dynamic generateCode = await LoginAPi().sendAuthCode(arguments["phone"]);
     dynamic response = Map<String, dynamic>.from(generateCode);
     Get.back();
     myDuration = const Duration(minutes: 1);

@@ -1,3 +1,5 @@
+import 'package:Erdenet24/api/restapi_helper.dart';
+
 const _baseUrl = "baseUrl";
 
 enum Environment { dev, prod }
@@ -21,7 +23,7 @@ dynamic get apiBaseUrl {
 }
 
 Map<String, dynamic> devConstants = {
-  _baseUrl: "http://192.168.43.19:8000",
+  _baseUrl: "http://192.168.150.179:8000",
 };
 
 Map<String, dynamic> prodConstants = {

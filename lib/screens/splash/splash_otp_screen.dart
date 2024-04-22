@@ -1,9 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
-import 'package:Erdenet24/controller/login_controller.dart';
-import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:get/get.dart';
-import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -13,8 +9,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/api/dio_requests/login.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class SplashOtpScreen extends StatefulWidget {
@@ -52,7 +47,7 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
 
   void sendOTP() async {
     CustomDialogs().showLoadingDialog();
-    dynamic generateCode = await UserApi().sendAuthCode(arguments["phone"]);
+    dynamic generateCode = await LoginAPi().sendAuthCode(arguments["phone"]);
     dynamic response = Map<String, dynamic>.from(generateCode);
     Get.back();
     myDuration = const Duration(minutes: 1);
@@ -69,29 +64,11 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
   }
 
   Future<void> onCompleted(String value) async {
-    CustomDialogs().showLoadingDialog();
     if (arguments["code"] == value) {
-      dynamic checkUserRole = await UserApi().checkUserRole(arguments["phone"]);
-      Get.back();
-      dynamic response = Map<String, dynamic>.from(checkUserRole);
-      if (response["success"]) {
-        var data = response["data"];
-        log(data.toString());
-        switch (data["role"]) {
-          case "user":
-            handleUserLogin(data);
-            break;
-          case "store":
-            handleStoreLogin(data);
-            break;
-          case "driver":
-            handleDriverLogin(data);
-            break;
-          default:
-            handleUserLogin(data);
-            break;
-        }
-      }
+      Get.toNamed(
+        splashProvinceSelectScreenRoute,
+        arguments: arguments,
+      );
     } else {
       Get.back();
       customSnackbar(ActionType.error, "Баталгаажуулах код буруу байна", 3);
@@ -183,129 +160,4 @@ class _SplashOtpScreenState extends State<SplashOtpScreen> {
       ),
     );
   }
-}
-
-void saveUserInfo(int id, String role) {
-  RestApiHelper.saveUserId(id);
-  RestApiHelper.saveUserRole(role);
-}
-
-void handleUserLogin(data) {
-  final loginCtx = Get.put(LoginController());
-  var userId = data["userId"];
-  saveUserInfo(userId, "user");
-  loginCtx.navigateToScreen(userHomeScreenRoute);
-}
-
-void handleStoreLogin(data) {
-  Get.bottomSheet(
-      backgroundColor: MyColors.white,
-      isDismissible: false,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
-      )), StatefulBuilder(
-    builder: ((context, setState) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _content(
-              data["storeId"],
-              "store",
-              NetworkImage(data["image"]),
-              data["storeName"],
-              storeMainScreenRoute,
-            ),
-            const Divider(),
-            _content(
-              data["userId"],
-              "user",
-              const AssetImage("assets/images/png/user.png"),
-              "Хэрэглэгч",
-              userHomeScreenRoute,
-            ),
-          ],
-        ),
-      );
-    }),
-  ));
-}
-
-void handleDriverLogin(data) {
-  Get.bottomSheet(
-    StatefulBuilder(
-      builder: ((context, setState) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _content(
-                data["driverId"],
-                "driver",
-                const AssetImage("assets/images/png/car.png"),
-                "Жолооч",
-                driverMainScreenRoute,
-              ),
-              const Divider(),
-              _content(
-                data["userId"],
-                "user",
-                const AssetImage("assets/images/png/user.png"),
-                "Хэрэглэгч",
-                userHomeScreenRoute,
-              ),
-            ],
-          ),
-        );
-      }),
-    ),
-    backgroundColor: MyColors.white,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
-      ),
-    ),
-  );
-}
-
-Widget _content(
-  int id,
-  String role,
-  ImageProvider image,
-  String title,
-  String route,
-) {
-  final loginCtx = Get.put(LoginController());
-  return GestureDetector(
-    onTap: () {
-      saveUserInfo(id, role);
-      loginCtx.navigateToScreen(route);
-    },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: SizedBox(
-          width: Get.width * .1,
-          height: Get.width * .1,
-          child: CircleAvatar(
-            backgroundImage: image,
-          ),
-        ),
-        title: Text(title),
-        trailing: const Icon(
-          IconlyLight.arrow_right_2,
-          color: Colors.black,
-          size: 20,
-        ),
-      ),
-    ),
-  );
 }

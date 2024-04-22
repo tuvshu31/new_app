@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -361,8 +363,9 @@ class _UserCartScreenState extends State<UserCartScreen> {
           Expanded(
             child: CustomButton(
               onPressed: () {
+                int store = cart[0]["store"];
                 Get.toNamed(userCartAddressScreenRoute,
-                    arguments: {"total": amount["subTotal"]});
+                    arguments: {"total": amount["subTotal"], "store": store});
               },
               isFullWidth: false,
               text: "Төлбөр төлөх",

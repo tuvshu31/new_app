@@ -1,5 +1,3 @@
-const String prodURL = "https://www.e24api1215.com/e24/";
-const String localURL = "http://192.168.1.191:8000";
 //Splash screen routes
 const String splashMainScreenRoute = '/splashMainScreenRoute';
 const String splashOtpScreenRoute = '/splashOtpScreenRoute';
@@ -7,6 +5,8 @@ const String splashPrivacyPolicyRoute = "/splashPrivacyPolicyRoute";
 const String splashPhoneRegisterScreenRoute = '/splashPhoneRegisterScreenRoute';
 const String splashProminentDisclosureScreenRoute =
     '/splashProminentDisclosureScreenRoute';
+const String splashProvinceSelectScreenRoute =
+    "/splashProvinceSelectScreenRoute";
 //User screen routes
 const String userCartAddressScreenRoute = '/userCartAddressScreenRoute';
 const String userCartScreenRoute = '/userCartScreen';
@@ -39,6 +39,8 @@ const String storeProductsPreviewScreenRoute =
 const String storeSettingsScreenRoute = '/storeSettingsScreenRoute';
 const String storeIncomingCallScreenRoute = "/storeIncomingCallScreenRoute";
 const String storeEditProductScreenRoute = "/storeEditProductScreenRoute";
+const String storeCallDriverScreenRoute = "/storeCallDriverScreenRoute";
+
 //Driver screen routes
 const String driverMainScreenRoute = '/driverMainScreenRoute';
 const String driverDrawerScreenRoute = '/driverDrawerScreenRoute';

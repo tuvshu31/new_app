@@ -144,7 +144,7 @@ Widget status(String status) {
       SizedBox(width: Get.width * .02),
       Text(
         handleOrderStatusText(status),
-        style: const TextStyle(fontSize: 12),
+        style: const TextStyle(fontSize: 8),
       )
     ],
   );

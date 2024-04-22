@@ -33,7 +33,6 @@ class _UserPaymentScreenState extends State<UserPaymentScreen>
   String qrImage = "";
   final _navCtx = Get.put(NavigationController());
   final _userCtx = Get.put(UserController());
-  int userId = RestApiHelper.getUserId();
 
   @override
   void initState() {
@@ -60,7 +59,6 @@ class _UserPaymentScreenState extends State<UserPaymentScreen>
     var body = {
       "orderId": _arguments["orderId"],
       "amount": _arguments["amount"],
-      "userId": RestApiHelper.getUserId()
     };
     dynamic createQpayInvoice = await UserApi().createQpayInvoice(body);
     loading = false;

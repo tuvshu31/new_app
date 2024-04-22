@@ -2,6 +2,7 @@ import 'package:Erdenet24/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class CustomSearchField extends StatefulWidget {
@@ -148,6 +149,7 @@ class CustomTextField extends StatefulWidget {
   final dynamic onSubmitted;
   final String errorText;
   final dynamic onEditingComplete;
+  final bool formatThousands;
 
   const CustomTextField(
       {Key? key,
@@ -167,6 +169,7 @@ class CustomTextField extends StatefulWidget {
       this.iconColor = MyColors.black,
       this.leadingIcon = IconlyLight.search,
       this.errorText = "",
+      this.formatThousands = false,
       this.autoFocus = false});
 
   @override
@@ -190,7 +193,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         onSubmitted: widget.onSubmitted,
         textInputAction: widget.textInputAction,
         focusNode: widget.focusNode,
-        inputFormatters: [LengthLimitingTextInputFormatter(widget.maxLength)],
+        inputFormatters: [
+          widget.formatThousands
+              ? ThousandsFormatter()
+              : LengthLimitingTextInputFormatter(widget.maxLength),
+        ],
         keyboardType: widget.keyboardType,
         autofocus: widget.autoFocus,
         controller: widget.controller,
@@ -223,6 +230,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           ),
         ),
+        scrollPadding: EdgeInsets.only(bottom: 30),
         style: const TextStyle(
           fontSize: MyFontSizes.large,
           color: MyColors.black,
@@ -234,6 +242,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
           setState(() {});
         },
       ),
+    );
+  }
+}
+
+class ThousandsFormatter extends TextInputFormatter {
+  final NumberFormat _formatter = NumberFormat('#,###');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final formattedValue = _formatter
+        .format(double.tryParse(newValue.text.replaceAll(',', '')) ?? 0);
+
+    final selectionOffset = newValue.selection.baseOffset +
+        (formattedValue.length - newValue.text.length);
+
+    return TextEditingValue(
+      text: formattedValue,
+      selection: TextSelection.collapsed(offset: selectionOffset),
     );
   }
 }

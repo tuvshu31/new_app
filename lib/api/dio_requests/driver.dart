@@ -1,6 +1,5 @@
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 
 class DriverApi {
   static final DriverApi _singleton = DriverApi._internal();
@@ -9,104 +8,72 @@ class DriverApi {
 
   //Жолоочийн мэдээллийг дуудах
   Future getDriverInfo() async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient()
-        .sendRequest('getDriverInfo?driverId=$driverId', Method.post, [], {});
+    return DioClient().sendRequest('getDriverInfo', Method.post, [], {});
   }
 
   //Жолооч оnline-offline болох
   Future driverTurOnOff(bool isOpen) async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient().sendRequest(
-        'driverTurOnOff?driverId=$driverId&isOpen=$isOpen',
-        Method.post, [], {});
+    return DioClient()
+        .sendRequest('driverTurOnOff?isOpen=$isOpen', Method.post, [], {});
   }
 
   //Жолоочийн байршлыг хадгалах
   Future updateDriverLoc(dynamic body) async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'updateDriverLoc?driverId=$driverId', Method.post, body, {});
+    return DioClient().sendRequest('updateDriverLoc', Method.post, body, {});
   }
 
   //Жолооч дуудлагыг зөвшөөрөх
   Future driverAcceptOrder(int orderId) async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'driverAcceptOrder?driverId=$driverId&orderId=$orderId',
-        Method.post, [], {});
+    return DioClient()
+        .sendRequest('driverAcceptOrder?orderId=$orderId', Method.post, [], {});
   }
 
   //Жолоочийн хүргэж байгаа захиалгын мэдээллийг авах
   Future getCurrentOrderInfo() async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'getCurrentOrderInfo?driverId=$driverId', Method.post, [], {});
+    return DioClient().sendRequest('getCurrentOrderInfo', Method.post, [], {});
   }
 
   //
   Future driverArrived() async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('driverArrived?driverId=$driverId', Method.post, [], {});
+    return DioClient().sendRequest('driverArrived', Method.post, [], {});
   }
 
   Future driverReceived(int orderId) async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'driverReceived?driverId=$driverId&orderId=$orderId',
-        Method.post, [], {});
+    return DioClient()
+        .sendRequest('driverReceived?orderId=$orderId', Method.post, [], {});
   }
 
   Future driverDelivered(int orderId) async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'driverDelivered?driverId=$driverId&orderId=$orderId',
-        Method.post, [], {});
+    return DioClient()
+        .sendRequest('driverDelivered?orderId=$orderId', Method.post, [], {});
   }
 
   Future driverFinished() async {
-    int driverId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('driverFinished?driverId=$driverId', Method.post, [], {});
+    return DioClient().sendRequest('driverFinished', Method.post, [], {});
   }
 
   Future getAllPreparingOrders() async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient().sendRequest(
-        'getAllPreparingOrders?driverId=$driverId', Method.post, [], {});
+    return DioClient()
+        .sendRequest('getAllPreparingOrders', Method.post, [], {});
   }
 
   Future updateDriverLocation(dynamic body) async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient().sendRequest(
-        'updateDriverLocation?driverId=$driverId', Method.post, body, {});
+    return DioClient()
+        .sendRequest('updateDriverLocation', Method.post, body, {});
   }
 
   Future getDriverPaymentsByWeeks() async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient().sendRequest(
-        'getDriverPaymentsByWeeks?driverId=$driverId', Method.post, [], {});
+    return DioClient()
+        .sendRequest('getDriverPaymentsByWeeks', Method.post, [], {});
   }
 
   Future getDriverDeliveries() async {
-    int driverId = RestApiHelper.getUserId();
-    return DioClient().sendRequest(
-        'getDriverDeliveries?driverId=$driverId', Method.post, [], {});
+    return DioClient().sendRequest('getDriverDeliveries', Method.post, [], {});
   }
 
   Future getDriverDeliveryDetails(String date) async {
-    int driverId = RestApiHelper.getUserId();
     return DioClient().sendRequest(
-        'getDriverDeliveryDetails?driverId=$driverId&date=$date',
-        Method.post, [], {});
+        'getDriverDeliveryDetails?date=$date', Method.post, [], {});
   }
 
   //Жолоочийн тусламж хэсгийн мэдээллүүдийг дуудах
@@ -116,10 +83,8 @@ class DriverApi {
 
   //Жолоочийн нууц үгийг шалгах
   Future checkDriverPassword(String password) async {
-    int driverId = RestApiHelper.getUserId();
     return DioClient().sendRequest(
-        'checkDriverPassword?driverId=$driverId&password=$password',
-        Method.post, [], {});
+        'checkDriverPassword?password=$password', Method.post, [], {});
   }
 
   //Захиалгын нууц кодыг шалгах
@@ -127,5 +92,11 @@ class DriverApi {
     return DioClient().sendRequest(
         'checkOrder4digitCode?orderId=$orderId&text=$text',
         Method.post, [], {});
+  }
+
+  //Жолоочийн firebase token-г хадгалах
+  Future saveDriverToken(String token) async {
+    var body = {"token": token};
+    return DioClient().sendRequest('saveDriverToken', Method.post, body, {});
   }
 }

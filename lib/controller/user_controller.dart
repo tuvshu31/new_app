@@ -19,8 +19,8 @@ class UserController extends GetxController {
   RxMap pagination = {}.obs;
   RxBool loading = false.obs;
   RxMap userInfo = {}.obs;
-  List categories = [].obs;
   Map selectedOrder = {}.obs;
+  RxList categories = [].obs;
   RxBool bottomSheetOpened = false.obs;
   RxDouble markerRotation = 0.0.obs;
   Rx<LatLng> markerPosition = LatLng(49.02780344669333, 104.04736389691942).obs;
@@ -52,6 +52,14 @@ class UserController extends GetxController {
     pagination.value = {};
     hasMore.value = false;
     getUserOrders();
+  }
+
+  void getMainCategories() async {
+    dynamic getMainCategories = await UserApi().getMainCategories();
+    dynamic response = Map<String, dynamic>.from(getMainCategories);
+    if (response["success"]) {
+      categories = response["data"];
+    }
   }
 
   Future<void> getDriverPositionStream(int orderId) async {
@@ -111,14 +119,6 @@ class UserController extends GetxController {
           }
         }
       }
-    }
-  }
-
-  void getMainCategories() async {
-    dynamic getMainCategories = await UserApi().getMainCategories();
-    dynamic response = Map<String, dynamic>.from(getMainCategories);
-    if (response["success"]) {
-      categories = response["data"];
     }
   }
 

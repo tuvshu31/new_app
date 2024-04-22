@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/widgets/button.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
     dynamic response = Map<String, dynamic>.from(getMainCategories);
     if (response["success"]) {
       storeList = response["data"];
-      log(storeList.toString());
+      log("storeList: $storeList");
     }
     storeLoading = false;
     setState(() {});
@@ -432,7 +433,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
-                      return Container();
+                      return Divider();
                     },
                     shrinkWrap: true,
                     itemCount: storeList.isEmpty ? 6 : storeList.length,
@@ -456,8 +457,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   customImage(
                                     Get.width * .2,
@@ -491,39 +491,50 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 8),
-                                        data["withSale"] != null &&
-                                                data["withSale"] == 1
-                                            ? Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 2,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.green,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8)),
-                                                child: const Text(
-                                                  "Хямдралтай",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              )
-                                            : Container()
+                                        RatingBar.builder(
+                                          itemSize: 20,
+                                          initialRating: double.parse(
+                                              data["rating"] ?? "0"),
+                                          minRating: 0,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          unratedColor: MyColors.background,
+                                          itemPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 2),
+                                          itemBuilder: (context, _) =>
+                                              const Icon(
+                                            IconlyBold.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) {},
+                                        ),
                                       ],
                                     ),
                                   ),
-                                  const Expanded(
-                                    child: Center(
-                                      child: Icon(
-                                        IconlyLight.arrow_right_2,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
+                                  Expanded(
+                                      child: data["withSale"] != null &&
+                                              data["withSale"] == 1
+                                          ? Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8)),
+                                              child: const Text(
+                                                "Хямдралтай",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            )
+                                          : Container()),
                                 ],
                               ),
                             ),

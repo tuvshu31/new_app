@@ -16,12 +16,15 @@ import 'package:Erdenet24/screens/splash/splash_otp_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_phone_register_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_privacy_policy_screen.dart';
 import 'package:Erdenet24/screens/splash/splash_prominent_disclosure_screen.dart';
+import 'package:Erdenet24/screens/splash/splash_province_select_screen.dart';
+import 'package:Erdenet24/screens/store/store_call_driver_screen.dart';
 import 'package:Erdenet24/screens/store/store_edit_product_screen.dart';
 import 'package:Erdenet24/screens/store/store_main_screen.dart';
 import 'package:Erdenet24/screens/store/store_orders_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_add_screen.dart';
 import 'package:Erdenet24/screens/store/store_products_edit_screen.dart';
 import 'package:Erdenet24/screens/store/store_settings_screen.dart';
+import 'package:Erdenet24/screens/user/user_cart_address_screen.dart';
 import 'package:Erdenet24/screens/user/user_home_screen.dart';
 import 'package:Erdenet24/screens/user/user_navigation_drawer_screen.dart';
 import 'package:Erdenet24/screens/user/user_payment_screen.dart';
@@ -41,7 +44,6 @@ import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:Erdenet24/api/restapi_helper.dart';
 import 'package:Erdenet24/screens/user/user_cart_screen.dart';
 import 'package:Erdenet24/screens/user/user_search_bar_screen.dart';
-import 'package:Erdenet24/screens/user/user_cart_address_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -132,7 +134,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     listenNotification();
-    _userCtx.getMainCategories();
   }
 
   Future<void> listenNotification() async =>
@@ -155,13 +156,15 @@ class _MyAppState extends State<MyApp> {
             const SplashPrivacyPolicyScreen(),
         splashProminentDisclosureScreenRoute: (context) =>
             const SplashProminentDisclosure(),
+        splashProvinceSelectScreenRoute: (context) =>
+            const SplashProvinceSelectScreen(),
         splashPhoneRegisterScreenRoute: (context) =>
             const SplashPhoneRegisterScreen(),
         userHomeScreenRoute: (context) => const UserHomeScreen(),
         userCartScreenRoute: (context) => const UserCartScreen(),
         userNavigationDrawerScreenRoute: (context) =>
             const UserNavigationDrawerScreen(),
-        userCartAddressScreenRoute: (context) => const UserCartAddressScreen(),
+        userCartAddressScreenRoute: (context) => UserCartAddressScreen(),
         userPaymentScreenRoute: (context) => const UserPaymentScreen(),
         userProductDetailScreenRoute: (context) =>
             const UserProductDetailScreen(),
@@ -184,6 +187,7 @@ class _MyAppState extends State<MyApp> {
         storeSettingsScreenRoute: (context) => const StoreSettingsScreen(),
         storeEditProductScreenRoute: (context) =>
             const StoreEditProductScreen(),
+        storeCallDriverScreenRoute: (context) => const StoreCallDriverScreen(),
         driverMainScreenRoute: (context) => const DriverMainScreen(),
         driverSettingsScreenRoute: (context) => const DriverSettingsScreen(),
         driverPaymentsScreenRoute: (context) => const DriverPaymentsScreen(),

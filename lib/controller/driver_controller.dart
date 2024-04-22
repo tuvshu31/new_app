@@ -61,26 +61,20 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handleAcceptAction(Map item) {
-    int driverId = RestApiHelper.getUserId();
-    if (item["driverId"] != driverId) {
-      int index = orders.indexWhere((e) => e["id"] == item["id"]);
-      orders[index] = item;
-      animationController = AnimationController(
-          vsync: this, duration: Duration(seconds: item["initialDuration"]));
-      animationController.forward();
-      item["timer"] = animationController;
-      orders.refresh();
-    }
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    orders[index] = item;
+    animationController = AnimationController(
+        vsync: this, duration: Duration(seconds: item["initialDuration"]));
+    animationController.forward();
+    item["timer"] = animationController;
+    orders.refresh();
   }
 
   void handleDeliveredAction(Map item) {
-    int driverId = RestApiHelper.getUserId();
-    if (item["driverId"] != driverId) {
-      int index = orders.indexWhere((e) => e["id"] == item["id"]);
-      if (index > -1) {
-        orders.removeAt(index);
-        orders.refresh();
-      }
+    int index = orders.indexWhere((e) => e["id"] == item["id"]);
+    if (index > -1) {
+      orders.removeAt(index);
+      orders.refresh();
     }
   }
 
@@ -95,8 +89,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
   void saveUserToken() {
     _messaging.getToken().then((token) async {
       if (token != null) {
-        var body = {"mapToken": token};
-        await RestApi().updateUser(RestApiHelper.getUserId(), body);
+        await DriverApi().saveDriverToken(token);
       }
     });
   }
@@ -215,7 +208,6 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       dynamic response = Map<String, dynamic>.from(getAllPreparingOrders);
       if (response["success"]) {
         orders.value = response["data"];
-        log(orders.value.toString());
         for (var i = 0; i < orders.length; i++) {
           animationController = AnimationController(
               vsync: this,

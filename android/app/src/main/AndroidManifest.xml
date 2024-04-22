@@ -8,7 +8,7 @@
     <!-- Provide required visibility configuration for API level 30 and above -->
 
    <application
-        android:label="Erdenet24"
+        android:label="E24"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">

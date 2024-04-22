@@ -67,17 +67,28 @@ Widget customImage(
     alignment: Alignment.center,
     children: [
       ClipRRect(
-        borderRadius: BorderRadius.circular(isCircle ? 50 : 12),
-        clipBehavior: Clip.hardEdge,
-        child: CachedNetworkImage(
-          width: width,
-          height: width,
-          fit: BoxFit.cover,
-          imageUrl: url,
-          placeholder: (context, url) =>
-              const CupertinoActivityIndicator(color: MyColors.gray),
-          errorWidget: (context, url, error) {
-            return Container(
+          borderRadius: BorderRadius.circular(isCircle ? 50 : 12),
+          clipBehavior: Clip.hardEdge,
+          child: Image.network(
+            url,
+            width: width,
+            height: width,
+            fit: BoxFit.cover,
+            // loadingBuilder: (context, child, loadingProgress) {
+            //   if (loadingProgress == null) {
+            //     return child;
+            //   } else {
+            //     return const CupertinoActivityIndicator(color: MyColors.gray);
+            //   }
+            // },
+            loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(
+                child: CupertinoActivityIndicator(color: MyColors.gray),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
               width: width,
               height: width,
               color: MyColors.fadedGrey,
@@ -88,10 +99,8 @@ Widget customImage(
                   size: Get.width * .075,
                 ),
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          )),
       isFaded
           ? Center(
               child: Container(

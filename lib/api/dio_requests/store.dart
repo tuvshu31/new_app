@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/api/dio_instance.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 
 class StoreApi {
   static final StoreApi _singleton = StoreApi._internal();
@@ -11,51 +8,34 @@ class StoreApi {
 
   //Дэлгүүрийн товч мэдээллийг авах
   Future getStoreInfo() async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('getStoreInfo?id=$storeId', Method.post, [], {});
+    return DioClient().sendRequest('getStoreInfo', Method.post, [], {});
   }
 
   //Дэлгүүрийн ангиллуудыг авах
   Future getStoreCategoryList() async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'getStoreCategoryList?storeId=$storeId', Method.post, [], {});
+    return DioClient().sendRequest('getStoreCategoryList', Method.post, [], {});
   }
 
   //Дэлгүүрийн бүх бараануудыг авах
   Future getStoreProducts(dynamic query) async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('getStoreProducts?store=$storeId', Method.post, [], query);
+    return DioClient().sendRequest('getStoreProducts', Method.post, [], query);
   }
 
   //Дэлгүүрийн бараа хайх
   Future searchStoreProducts(dynamic query) async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'searchStoreProducts?store=$storeId', Method.post, [], query);
+    return DioClient()
+        .sendRequest('searchStoreProducts', Method.post, [], query);
   }
 
   //Дэлгүүрээ нээх, хаах
   Future openAndCloseStore(int isOpen) async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'openAndCloseStore?storeId=$storeId&isOpen=$isOpen',
-        Method.post, [], {});
+    return DioClient()
+        .sendRequest('openAndCloseStore?isOpen=$isOpen', Method.post, [], {});
   }
 
   //Шинэ бараа нэмэх
   Future addProduct(dynamic body) async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('addProduct?storeId=$storeId', Method.post, body, {});
+    return DioClient().sendRequest('addProduct', Method.post, body, {});
   }
 
   //Шинэ барааны зураг нэмэх
@@ -93,10 +73,7 @@ class StoreApi {
 
   //Тухайн дэлгүүрийн захиалгуудыг авах
   Future getStoreOrders(dynamic query) async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient()
-        .sendRequest('getStoreOrders?storeId=$storeId', Method.post, [], query);
+    return DioClient().sendRequest('getStoreOrders', Method.post, [], query);
   }
 
   //Захиалгын барааны дэлгэрэнгүй мэдээллүүдийг авах
@@ -113,10 +90,8 @@ class StoreApi {
 
   //Тухайн дэлгүүрийн ангилал дах дэд ангиллуудыг авах
   Future getStoreRelatedCategory() async {
-    int storeId = RestApiHelper.getUserId();
-
-    return DioClient().sendRequest(
-        'getStoreRelatedCategory?storeId=$storeId', Method.post, [], {});
+    return DioClient()
+        .sendRequest('getStoreRelatedCategory', Method.post, [], {});
   }
 
   //Тухайн захиалгыг бэлдэж эхлэх
@@ -134,9 +109,12 @@ class StoreApi {
 
   //Шинэ захиалга ирсэн үгүйг шалгах
   Future checkStoreNewOrders() async {
-    int storeId = RestApiHelper.getUserId();
+    return DioClient().sendRequest('checkStoreNewOrders', Method.post, [], {});
+  }
 
-    return DioClient().sendRequest(
-        'checkStoreNewOrders?storeId=$storeId', Method.post, [], {});
+  //Дэлгүүр өөртөө захиалга үүсгэх
+  Future storeCreateNewOrder(dynamic body) async {
+    return DioClient()
+        .sendRequest('storeCreateNewOrder', Method.post, body, {});
   }
 }

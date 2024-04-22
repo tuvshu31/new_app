@@ -18,12 +18,10 @@ class SocketClient {
 
   Future<void> onConnect(Socket socket) async {
     var body = {
-      "id": RestApiHelper.getUserId(),
-      "role": RestApiHelper.getUserRole(),
       "socketId": socket.id.toString(),
+      "role": RestApiHelper.getUserRole()
     };
-    await UserApi().saveSocketId(body);
-    log("Socket connected!");
+    var response = await UserApi().saveSocketIdNew(body);
   }
 
   Future<void> onDisconnect(data) async {

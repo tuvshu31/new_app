@@ -1,6 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:async';
-import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/api/dio_requests/login.dart';
 import 'package:get/get.dart';
 import "package:flutter/material.dart";
 import 'package:url_launcher/url_launcher.dart';
@@ -38,7 +39,7 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
       "buildNumber": buildNumber,
       "platform": platform
     };
-    dynamic checkAppVersion = await UserApi().checkAppVersion(body);
+    dynamic checkAppVersion = await LoginAPi().checkAppVersion(body);
     loading = false;
     if (checkAppVersion != null) {
       dynamic response = Map<String, dynamic>.from(checkAppVersion);
@@ -53,16 +54,18 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
           );
         });
       }
+    } else {
+      log("Error!");
     }
     setState(() {});
   }
 
   Future<void> handleInitialRoute() async {
-    if (RestApiHelper.getUserId() != 0) {
+    if (RestApiHelper.getToken() == "") {
+      Get.offAllNamed(splashPhoneRegisterScreenRoute);
+    } else {
       String route = _initialRoute(RestApiHelper.getUserRole());
       Get.offAllNamed(route);
-    } else {
-      Get.offAllNamed(splashPhoneRegisterScreenRoute);
     }
   }
 
@@ -72,44 +75,31 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: MyColors.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(),
-          Column(
-            children: [
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(18)),
-                child: Image(
-                  image: const AssetImage("assets/images/png/android.png"),
-                  width: width * .22,
-                ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              clipBehavior: Clip.hardEdge,
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(18)),
+              child: Image(
+                image: const AssetImage("assets/images/png/android.png"),
+                width: width * .23,
               ),
-              const SizedBox(height: 24),
-              const Text(
-                "ERDENET24",
-                softWrap: true,
-                style: TextStyle(
-                  fontFamily: "Montserrat",
-                  fontSize: 22,
-                  color: MyColors.black,
-                ),
-              )
-            ],
-          ),
-          loading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: MyColors.primary,
-                    strokeWidth: 2,
-                  ),
-                )
-              : Container()
-        ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "E24",
+              softWrap: true,
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 22,
+                color: MyColors.black,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

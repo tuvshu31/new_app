@@ -1,3 +1,4 @@
+import 'package:Erdenet24/api/dio_requests/login.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,6 @@ import 'package:Erdenet24/widgets/text.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/textfield.dart';
-import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 
 class SplashPhoneRegisterScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _SplashPhoneRegisterScreenState extends State<SplashPhoneRegisterScreen> {
 
   void sendOTP() async {
     CustomDialogs().showLoadingDialog();
-    dynamic generateCode = await UserApi().sendAuthCode(controller.text);
+    dynamic generateCode = await LoginAPi().sendAuthCode(controller.text);
     dynamic codeResponse = Map<String, dynamic>.from(generateCode);
     Get.back();
     if (codeResponse["success"]) {

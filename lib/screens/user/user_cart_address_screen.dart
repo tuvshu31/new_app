@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'dart:developer';
+
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/routes.dart';
-import 'package:Erdenet24/widgets/custom_loading_widget.dart';
+import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
 import 'package:Erdenet24/widgets/snackbar.dart';
@@ -31,9 +31,10 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
   bool isPhoneOk = false;
   bool isAddressOk = false;
   bool isLocationOk = false;
+  bool isSectionOk = false;
   bool isApartment = false;
   bool showPriceDetails = false;
-  bool fetchingUserAddress = false;
+  bool loading = false;
   String phoneErrorText = "";
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
@@ -41,10 +42,14 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
   FocusNode focusNode4 = FocusNode();
   TextEditingController kod = TextEditingController();
   TextEditingController phone = TextEditingController();
-  TextEditingController address = TextEditingController();
-  List locationList = [];
+  TextEditingController addressCTRL = TextEditingController();
+  List location = [];
+  List section = [];
+  List address = [];
+  List priceList = [];
+  List filteredLocation = [];
   Map selectedLocation = {};
-  int cartTotalPrice = 0;
+  Map selectedSection = {};
   int deliveryPrice = 0;
   int totalPrice = 0;
   final _arguments = Get.arguments;
@@ -52,11 +57,9 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
   @override
   void initState() {
     super.initState();
-    getAllLocations();
+    // getLocationList();
+    checkUserAddress();
     detectFocus();
-    setState(() {
-      cartTotalPrice = _arguments["total"];
-    });
   }
 
   void removeFocus(FocusNode focusNode) {
@@ -75,61 +78,185 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
     removeFocus(focusNode4);
   }
 
-  void getAllLocations() async {
-    fetchingUserAddress = true;
-    dynamic getAllLocations = await UserApi().getAllLocations();
-    fetchingUserAddress = false;
-    if (getAllLocations != null) {
-      dynamic response = Map<String, dynamic>.from(getAllLocations);
+  void checkUserAddress() async {
+    loading = true;
+    dynamic checkUserAddress =
+        await UserApi().checkUserAddress(_arguments["store"]);
+    loading = false;
+    if (checkUserAddress != null) {
+      dynamic response = Map<String, dynamic>.from(checkUserAddress);
       if (response["success"]) {
-        locationList = response["data"];
-        getUserAddress();
+        List userAddress = response["address"] ?? [];
+        List userSection = response["section"] ?? [];
+        List userLocation = response["location"] ?? [];
+        section = userSection;
+        location = userLocation;
+        filteredLocation = location;
       }
     }
     setState(() {});
   }
 
-  void getUserAddress() async {
+  Future<void> calculateDeliveryPrice() async {
     CustomDialogs().showLoadingDialog();
-    dynamic getUserAddress = await UserApi().getUserAddress();
+    var body = {
+      "storeId": _arguments["store"],
+      "sectionId": selectedSection["id"],
+      "locationId": selectedLocation["id"]
+    };
+    dynamic calculateDeliveryPrice =
+        await UserApi().calculateDeliveryPrice(body);
     Get.back();
-    dynamic response = Map<String, dynamic>.from(getUserAddress);
-    if (response["success"]) {
-      Map userAddress = response["address"];
-      if (userAddress["district"] != "") {
-        selectedLocation = locationList
-            .firstWhere((a) => a["name"] == userAddress["district"]);
-        deliveryPrice = selectedLocation["price"];
-        totalPrice = deliveryPrice + cartTotalPrice;
-        isLocationOk = true;
-      }
-      if (userAddress["address"] != "") {
-        address.text = userAddress["address"];
-        isAddressOk = true;
-      }
-      if (userAddress["phone"] != "") {
-        phone.text = userAddress["phone"];
-        isPhoneOk = true;
-      }
-      if (userAddress["code"] != "") {
-        kod.text = userAddress["code"];
+    if (calculateDeliveryPrice != null) {
+      dynamic response = Map<String, dynamic>.from(calculateDeliveryPrice);
+      if (response["success"]) {
+        totalPrice = 0;
+        deliveryPrice = 0;
+        priceList = response["price"];
+        deliveryPrice = response["deliveryPrice"];
+        for (var i = 0; i < priceList.length; i++) {
+          Map element = priceList[i];
+          int price = element["price"];
+          totalPrice += price;
+        }
+        int productPrice = _arguments["total"];
+        totalPrice += productPrice;
+        priceList.insert(0, {"name": "Барааны үнэ", "price": productPrice});
+        priceList.add({"name": "Нийт үнэ", "price": totalPrice});
       }
     }
     setState(() {});
+  }
+
+  // void getUserAddress() async {
+  //   CustomDialogs().showLoadingDialog();
+  //   dynamic getUserAddress = await UserApi().getUserAddress();
+  //   Get.back();
+  //   dynamic response = Map<String, dynamic>.from(getUserAddress);
+  //   if (response["success"]) {
+  //     Map userAddress = response["address"];
+  //     if (userAddress["district"] != "") {
+  //       selectedLocation =
+  //           locations.firstWhere((a) => a["name"] == userAddress["district"]);
+  //       deliveryPrice = selectedLocation["price"];
+  //       totalPrice = deliveryPrice + cartTotalPrice;
+  //       isLocationOk = true;
+  //     }
+  //     if (userAddress["address"] != "") {
+  //       addressCTRL.text = userAddress["address"];
+  //       isAddressOk = true;
+  //     }
+  //     if (userAddress["phone"] != "") {
+  //       phone.text = userAddress["phone"];
+  //       isPhoneOk = true;
+  //     }
+  //     if (userAddress["code"] != "") {
+  //       kod.text = userAddress["code"];
+  //     }
+  //   }
+  //   setState(() {});
+  // }
+
+  void saveUserAddress() async {
+    CustomDialogs().showLoadingDialog();
+    var body = {
+      "sectionId": selectedSection["id"],
+      "locationId": selectedLocation["id"],
+      "address": addressCTRL.text,
+      "phone": phone.text,
+      "entrance": kod.text,
+    };
+    dynamic saveUserAddress = await UserApi().saveUserAddress(body);
+    Get.back();
+    if (saveUserAddress != null) {
+      dynamic response = Map<String, dynamic>.from(saveUserAddress);
+      if (response["success"]) {
+        log(response.toString());
+      }
+    }
+    setState(() {});
+  }
+
+  void showUserAddressSaveDialog() {
+    Get.bottomSheet(
+        backgroundColor: MyColors.white,
+        isDismissible: false,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        )), StatefulBuilder(
+      builder: ((context, setState) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.amber,
+                ),
+                child: const Icon(
+                  IconlyBold.bookmark,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: Get.height * .03),
+              const Text(
+                "Хүргэлтийн хаягаа хадгалах уу?",
+                style: TextStyle(fontSize: 15),
+              ),
+              SizedBox(height: Get.height * .03 + 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      bgColor: Colors.white,
+                      text: "Үгүй",
+                      textColor: MyColors.black,
+                      onPressed: Get.back,
+                      hasBorder: true,
+                      borderColor: Colors.grey,
+                      elevation: 0,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: CustomButton(
+                      bgColor: Colors.amber,
+                      text: "Тийм",
+                      onPressed: () {
+                        saveUserAddress();
+                        // Get.back();
+                        // createNewOrder();
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      }),
+    ));
   }
 
   void createNewOrder() async {
     CustomDialogs().showLoadingDialog();
     var body = {
+      "section": selectedSection["name"],
       "location": selectedLocation["name"],
-      "deliveryPrice": selectedLocation["price"],
-      "address": address.text,
+      "deliveryPrice": deliveryPrice,
+      "address": addressCTRL.text,
       "phone": phone.text,
       "kod": kod.text,
       "total": totalPrice,
     };
-    dynamic createNewOrder = await UserApi().createNewOrder(body);
     Get.back();
+    dynamic createNewOrder = await UserApi().createNewOrder(body);
     if (createNewOrder != null) {
       dynamic response = Map<String, dynamic>.from(createNewOrder);
       if (response["success"]) {
@@ -155,7 +282,257 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
       customActions: Container(),
       title: "Захиалгын мэдээлэл",
       bottomSheet: _bottomSheet(),
-      body: _body(),
+      body: loading
+          ? _shimmer()
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    section.length > 1
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const CustomText(
+                                text: "Байршил",
+                                color: MyColors.gray,
+                              ),
+                              const SizedBox(height: 12),
+                              CustomInkWell(
+                                borderRadius: BorderRadius.circular(50),
+                                onTap: () {
+                                  Get.bottomSheet(
+                                    _locationListBody("Байршил сонгох", section,
+                                        (item) {
+                                      selectedSection = item;
+                                      selectedLocation.clear();
+                                      isSectionOk = true;
+                                      filteredLocation = location
+                                          .where((el) =>
+                                              el["sectionId"] ==
+                                              selectedSection["id"])
+                                          .toList();
+                                      setState(() {});
+                                      Get.back();
+                                    }),
+                                    ignoreSafeArea: false,
+                                    backgroundColor: MyColors.white,
+                                    isScrollControlled: true,
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border.all(
+                                      color: MyColors.background,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                      child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(selectedSection.isNotEmpty
+                                          ? selectedSection["name"]
+                                          : "Сонгох"),
+                                      const Icon(IconlyLight.arrow_down_2)
+                                    ],
+                                  )),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                          )
+                        : Container(),
+                    const CustomText(
+                      text: "Хаяг",
+                      color: MyColors.gray,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomInkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () {
+                        Get.bottomSheet(
+                          _locationListBody("Хаяг сонгох", filteredLocation,
+                              (item) {
+                            selectedLocation = item;
+                            isLocationOk = true;
+                            Get.back();
+                            calculateDeliveryPrice();
+                            setState(() {});
+                          }),
+                          ignoreSafeArea: false,
+                          backgroundColor: MyColors.white,
+                          isScrollControlled: true,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        height: 42,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: MyColors.background,
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(selectedLocation.isNotEmpty
+                                  ? selectedLocation["name"]
+                                  : "Сонгох"),
+                            ),
+                            const Icon(IconlyLight.arrow_down_2)
+                          ],
+                        )),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const CustomText(
+                      text: "Дэлгэрэнгүй хаяг",
+                      color: MyColors.gray,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      focusNode: focusNode2,
+                      hintText: "Жишээ нь: 3-24-р байр, 9 давхарт 1165 тоот",
+                      controller: addressCTRL,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      onChanged: (val) {
+                        setState(() {
+                          isAddressOk = val.isNotEmpty;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    const CustomText(
+                      text: "Утас",
+                      color: MyColors.gray,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      focusNode: focusNode1,
+                      hintText: "9935*****",
+                      errorText: phoneErrorText,
+                      controller: phone,
+                      maxLength: 8,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      onChanged: (val) {
+                        if (val.isEmpty) {
+                          phoneErrorText = "";
+                          isPhoneOk = false;
+                        } else if (val.length < 8) {
+                          phoneErrorText = "Утасны дугаар буруу байна";
+                          isPhoneOk = false;
+                        } else {
+                          phoneErrorText = "";
+                          isPhoneOk = true;
+                        }
+                        setState(() {});
+                      },
+                    ),
+                    _errorText(phoneErrorText),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: const [
+                        CustomText(
+                          text: "Орцны код",
+                          color: MyColors.gray,
+                        ),
+                        CustomText(
+                          text: " /Заавал биш/",
+                          fontSize: 12,
+                          color: MyColors.gray,
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      focusNode: focusNode3,
+                      hintText: "#1234",
+                      controller: kod,
+                      textInputAction: TextInputAction.done,
+                    ),
+                    showPriceDetails
+                        ? Animate(
+                            effects: const [
+                              SlideEffect(duration: Duration(milliseconds: 900))
+                            ],
+                            child: Column(
+                              children: [
+                                SizedBox(height: Get.height * .1),
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  separatorBuilder: (context, index) {
+                                    if (index == priceList.length - 2) {
+                                      return Column(
+                                        children: const [
+                                          SizedBox(height: 12),
+                                          DottedLine(
+                                            direction: Axis.horizontal,
+                                            alignment: WrapAlignment.center,
+                                            lineLength: double.infinity,
+                                            lineThickness: 1.0,
+                                            dashLength: 4.0,
+                                            dashColor: MyColors.grey,
+                                            dashRadius: 0.0,
+                                            dashGapLength: 4.0,
+                                            dashGapColor: Colors.transparent,
+                                            dashGapRadius: 0.0,
+                                          ),
+                                          SizedBox(height: 12)
+                                        ],
+                                      );
+                                    } else {
+                                      return const SizedBox(height: 12);
+                                    }
+                                  },
+                                  itemCount: priceList.length,
+                                  itemBuilder: (context, index) {
+                                    var item = priceList[index];
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomText(
+                                          text: item["name"],
+                                          color: MyColors.gray,
+                                        ),
+                                        CustomText(
+                                          text: convertToCurrencyFormat(
+                                            item["price"],
+                                          ),
+                                          color: MyColors.gray,
+                                        )
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        : Container(),
+                    SizedBox(height: Get.height * .15)
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -179,6 +556,11 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
               });
             } else {
               createNewOrder();
+              // if (address.isEmpty) {
+              //   showUserAddressSaveDialog();
+              // } else {
+              //   createNewOrder();
+              // }
             }
           },
           text: showPriceDetails ? "Төлбөр төлөх" : "Үргэлжлүүлэх",
@@ -187,135 +569,6 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
         ),
       ),
     );
-  }
-
-  Widget _body() {
-    return fetchingUserAddress
-        ? _shimmer()
-        : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CustomText(
-                  text: "Байршил",
-                  color: MyColors.gray,
-                ),
-                const SizedBox(height: 12),
-                CustomInkWell(
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {
-                    Get.bottomSheet(
-                      _locationListBody(),
-                      ignoreSafeArea: false,
-                      backgroundColor: MyColors.white,
-                      isScrollControlled: true,
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    height: 42,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: MyColors.background,
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(selectedLocation.isNotEmpty
-                            ? selectedLocation["name"]
-                            : "Байршил сонгох"),
-                        const Icon(IconlyLight.arrow_down_2)
-                      ],
-                    )),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const CustomText(
-                  text: "Дэлгэрэнгүй хаяг",
-                  color: MyColors.gray,
-                ),
-                const SizedBox(height: 12),
-                CustomTextField(
-                  focusNode: focusNode2,
-                  hintText: "Жишээ нь: 3-24-р байр, 9 давхарт 1165 тоот",
-                  controller: address,
-                  textInputAction: TextInputAction.next,
-                  onEditingComplete: () {
-                    FocusScope.of(context).nextFocus();
-                  },
-                  onChanged: (val) {
-                    setState(() {
-                      isAddressOk = val.isNotEmpty;
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                const CustomText(
-                  text: "Утас",
-                  color: MyColors.gray,
-                ),
-                const SizedBox(height: 12),
-                CustomTextField(
-                  focusNode: focusNode1,
-                  hintText: "9935*****",
-                  errorText: phoneErrorText,
-                  controller: phone,
-                  maxLength: 8,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  onEditingComplete: () {
-                    FocusScope.of(context).nextFocus();
-                  },
-                  onChanged: (val) {
-                    if (val.isEmpty) {
-                      phoneErrorText = "";
-                      isPhoneOk = false;
-                    } else if (val.length < 8) {
-                      phoneErrorText = "Утасны дугаар буруу байна";
-                      isPhoneOk = false;
-                    } else {
-                      phoneErrorText = "";
-                      isPhoneOk = true;
-                    }
-                    setState(() {});
-                  },
-                ),
-                _errorText(phoneErrorText),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 12),
-                    Row(
-                      children: const [
-                        CustomText(
-                          text: "Орцны код",
-                          color: MyColors.gray,
-                        ),
-                        CustomText(
-                          text: " /Заавал биш/",
-                          fontSize: 12,
-                          color: MyColors.gray,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      focusNode: focusNode3,
-                      hintText: "#1234",
-                      controller: kod,
-                      textInputAction: TextInputAction.done,
-                    ),
-                  ],
-                ),
-                _priceDetails()
-              ],
-            ),
-          );
   }
 
   Widget _shimmer() {
@@ -372,7 +625,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
     );
   }
 
-  Widget _locationListBody() {
+  Widget _locationListBody(String title, List list, dynamic onpressed) {
     return CustomHeader(
         customActions: CustomInkWell(
           onTap: Get.back,
@@ -389,10 +642,14 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
           ),
         ),
         leadingWidth: 20,
-        title: "Байршил сонгох",
+        centerTitle: true,
+        customTitle: Text(
+          title,
+          style: const TextStyle(color: Colors.black, fontSize: 16),
+        ),
         customLeading: Container(),
-        body: locationList.isEmpty
-            ? customLoadingWidget()
+        body: list.isEmpty
+            ? listShimmerWidget()
             : ListView.separated(
                 separatorBuilder: (context, index) {
                   return Container(
@@ -404,18 +661,11 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
                 },
                 physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: locationList.length,
+                itemCount: list.length,
                 itemBuilder: (context, index) {
-                  var item = locationList[index];
+                  var item = list[index];
                   return CustomInkWell(
-                    onTap: () {
-                      selectedLocation = item;
-                      isLocationOk = true;
-                      deliveryPrice = selectedLocation["price"];
-                      totalPrice = deliveryPrice + cartTotalPrice;
-                      setState(() {});
-                      Get.back();
-                    },
+                    onTap: () => onpressed(item),
                     borderRadius: BorderRadius.circular(0),
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -423,7 +673,12 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(text: item["name"]),
+                          Expanded(
+                            child: Text(
+                              item["name"],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           const Icon(
                             IconlyLight.arrow_right_2,
                             size: 18,
@@ -449,79 +704,5 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
               ),
             ),
           );
-  }
-
-  Widget _priceDetails() {
-    return showPriceDetails
-        ? Expanded(
-            child: Animate(
-              effects: const [
-                SlideEffect(duration: Duration(milliseconds: 900))
-              ],
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const CustomText(
-                          text: "Барааны үнэ:",
-                          color: MyColors.gray,
-                        ),
-                        CustomText(
-                          text: convertToCurrencyFormat(cartTotalPrice),
-                          color: MyColors.gray,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const CustomText(
-                          text: "Хүргэлтийн төлбөр:",
-                          color: MyColors.gray,
-                        ),
-                        CustomText(
-                          text: convertToCurrencyFormat(
-                            selectedLocation["price"],
-                          ),
-                          color: MyColors.gray,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const DottedLine(
-                      direction: Axis.horizontal,
-                      alignment: WrapAlignment.center,
-                      lineLength: double.infinity,
-                      lineThickness: 1.0,
-                      dashLength: 4.0,
-                      dashColor: MyColors.grey,
-                      dashRadius: 0.0,
-                      dashGapLength: 4.0,
-                      dashGapColor: Colors.transparent,
-                      dashGapRadius: 0.0,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const CustomText(text: "Нийт үнэ:"),
-                        CustomText(
-                          text: convertToCurrencyFormat(totalPrice),
-                          color: MyColors.black,
-                        )
-                      ],
-                    ),
-                    SizedBox(height: Get.height * .1),
-                  ],
-                ),
-              ),
-            ),
-          )
-        : Container();
   }
 }

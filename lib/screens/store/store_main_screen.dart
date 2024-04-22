@@ -1,9 +1,4 @@
-import 'dart:developer';
-import 'package:Erdenet24/api/local_notification.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/store_controller.dart';
 import 'package:Erdenet24/main.dart';
-import 'package:Erdenet24/screens/store/store_bottom_sheet_views.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/shimmer.dart';
@@ -20,6 +15,7 @@ import 'package:Erdenet24/widgets/inkwell.dart';
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/controller/login_controller.dart';
+import 'package:Erdenet24/controller/store_controller.dart';
 
 class StoreMainScreen extends StatefulWidget {
   const StoreMainScreen({Key? key}) : super(key: key);
@@ -34,7 +30,6 @@ class _StoreMainScreenState extends State<StoreMainScreen>
   final _storeCtx = Get.put(StoreController());
   Map data = {};
   bool loading = false;
-  int storeId = RestApiHelper.getUserId();
   String deviceStatus = "";
 
   @override
@@ -168,6 +163,9 @@ class _StoreMainScreenState extends State<StoreMainScreen>
           }),
           _listTile(IconlyLight.graph, "Захиалгууд", () {
             Get.toNamed(storeOrdersScreenRoute);
+          }),
+          _listTile(IconlyLight.calling, "Жолооч дуудах", () {
+            Get.toNamed(storeCallDriverScreenRoute);
           }),
           _listTile(IconlyLight.setting, "Тохиргоо", () {
             Get.toNamed(storeSettingsScreenRoute);

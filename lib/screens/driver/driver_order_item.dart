@@ -1,13 +1,11 @@
-import 'package:Erdenet24/api/restapi_helper.dart';
-import 'package:Erdenet24/controller/driver_controller.dart';
-import 'package:Erdenet24/utils/helpers.dart';
-import 'package:Erdenet24/utils/styles.dart';
-import 'package:Erdenet24/widgets/countdown.dart';
-import 'package:Erdenet24/widgets/image.dart';
-import 'package:Erdenet24/widgets/inkwell.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart';
+import 'package:Erdenet24/widgets/image.dart';
+import 'package:Erdenet24/utils/helpers.dart';
+import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/countdown.dart';
+import 'package:Erdenet24/controller/driver_controller.dart';
 
 class DriverOrderItem extends StatelessWidget {
   Map item;
@@ -19,17 +17,11 @@ class DriverOrderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isAccepted = item["accepted"] ?? false;
     bool warning = item["orderStatus"] == "waitingForDriver";
-    bool isAcceptedByMe = item["driverId"] == RestApiHelper.getUserId();
-    if (!isAccepted) {
-      return _listItem(item, warning, 0);
-    } else if (isAccepted && !isAcceptedByMe) {
-      return _listItem(item, warning, 1);
-    } else {
-      return CustomInkWell(
-        onTap: () => _driverCtx.showOrderBottomSheet(item),
-        child: _listItem(item, warning, 2),
-      );
-    }
+    return CustomInkWell(
+      onTap: () =>
+          item["acceptedByMe"] ? _driverCtx.showOrderBottomSheet(item) : null,
+      child: _listItem(item, warning, 2),
+    );
   }
 
   Widget _listItem(item, warning, id) {
@@ -75,7 +67,11 @@ class DriverOrderItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.max,
-              children: _actionsHandler(item),
+              children: !item["accepted"]
+                  ? _notAccepted(item)
+                  : !item["acceptedByMe"]
+                      ? _acceptedByOthers(item)
+                      : _acceptedByMe(item),
             ),
           ),
           SizedBox(width: Get.width * .04)
@@ -84,20 +80,7 @@ class DriverOrderItem extends StatelessWidget {
     );
   }
 
-  List<Widget> _actionsHandler(Map item) {
-    bool isAccepted = item["accepted"];
-    bool warning = item["orderStatus"] == "waitingForDriver";
-    bool isAcceptedByMe = item["driverId"] == RestApiHelper.getUserId();
-    if (!isAccepted) {
-      return _notAccepted(item, warning);
-    } else if (isAccepted && !isAcceptedByMe) {
-      return _acceptedByOthers(item, warning);
-    } else {
-      return _acceptedByMe(item, warning);
-    }
-  }
-
-  List<Widget> _acceptedByMe(Map item, bool warning) {
+  List<Widget> _acceptedByMe(Map item) {
     return [
       item["orderStatus"] == "waitingForDriver"
           ? const Icon(
@@ -105,14 +88,14 @@ class DriverOrderItem extends StatelessWidget {
               size: 16,
               color: Colors.red,
             )
-          : _timer(item, warning),
+          : _timer(item),
       status(item["orderStatus"]),
     ];
   }
 
-  List<Widget> _notAccepted(Map item, bool warning) {
+  List<Widget> _notAccepted(Map item) {
     return [
-      _timer(item, warning),
+      _timer(item),
       TextButton(
         onPressed: () {
           _driverCtx.showPasswordDialog(item, 'accept');
@@ -126,9 +109,9 @@ class DriverOrderItem extends StatelessWidget {
     ];
   }
 
-  List<Widget> _acceptedByOthers(Map item, bool warning) {
+  List<Widget> _acceptedByOthers(Map item) {
     return [
-      _timer(item, warning),
+      _timer(item),
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -148,8 +131,8 @@ class DriverOrderItem extends StatelessWidget {
     ];
   }
 
-  Widget _timer(item, warning) {
-    return warning
+  Widget _timer(item) {
+    return item["orderStatus"] == "waitingForDriver"
         ? SizedBox(
             width: Get.width * .1,
             child: Row(

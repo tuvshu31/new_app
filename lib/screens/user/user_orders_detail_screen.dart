@@ -1,17 +1,27 @@
+import 'dart:developer';
+import 'dart:ffi';
+
 import 'package:Erdenet24/api/dio_requests/user.dart';
 import 'package:Erdenet24/controller/user_controller.dart';
 import 'package:Erdenet24/screens/user/user_order_map_screen.dart';
+import 'package:Erdenet24/utils/enums.dart';
 import 'package:Erdenet24/utils/helpers.dart';
 import 'package:Erdenet24/utils/shimmers.dart';
 import 'package:Erdenet24/utils/styles.dart';
+import 'package:Erdenet24/widgets/button.dart';
+import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/header.dart';
 import 'package:Erdenet24/widgets/image.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
+import 'package:Erdenet24/widgets/shimmer.dart';
+import 'package:Erdenet24/widgets/snackbar.dart';
 import 'package:Erdenet24/widgets/text.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 
 class UserOrdersDetailScreen extends StatefulWidget {
   Map item;
@@ -29,6 +39,9 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   List products = [];
   int initialDuration = 0;
   int prepDuration = 0;
+  int storeRating = 0;
+  int driverRating = 0;
+  bool fetchingRating = false;
 
   final _userCtx = Get.put(UserController());
 
@@ -36,6 +49,150 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
   void initState() {
     super.initState();
     getUserOrderDetails();
+    getOrderRating();
+  }
+
+  Future<void> getOrderRating() async {
+    if (widget.item["orderStatus"] == "delivered") {
+      fetchingRating = true;
+      var body = {"orderId": widget.item["id"]};
+      dynamic getOrderRating = await UserApi().getOrderRating(body);
+      fetchingRating = false;
+      if (getOrderRating != null) {
+        dynamic response = Map<String, dynamic>.from(getOrderRating);
+        if (response["success"]) {
+          storeRating = response["storeRating"];
+          driverRating = response["driverRating"];
+        } else {
+          showRating();
+        }
+      }
+      setState(() {});
+    }
+  }
+
+  Future<void> userRateDelivery() async {
+    CustomDialogs().showLoadingDialog();
+    var body = {
+      "orderId": widget.item["id"],
+      "storeId": widget.item["storeId"],
+      "driverId": widget.item["driverId"],
+      "storeRating": storeRating,
+      "driverRating": driverRating
+    };
+    dynamic userRateDelivery = await UserApi().userRateDelivery(body);
+    Get.back();
+    if (userRateDelivery != null) {
+      dynamic response = Map<String, dynamic>.from(userRateDelivery);
+      if (response["success"]) {
+        customSnackbar(ActionType.success, "Үнэлгээ амжилттай илгээгдлээ", 2);
+        getOrderRating();
+      } else {
+        customSnackbar(ActionType.error, "Алдаа гарлаа", 2);
+      }
+    }
+    setState(() {});
+  }
+
+  void showRating() {
+    Get.bottomSheet(
+      backgroundColor: MyColors.white,
+      isDismissible: false,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      )),
+      StatefulBuilder(
+        builder: ((context, setState) {
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Хүргэлтэнд үнэлгээ өгөх",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    CustomInkWell(
+                      onTap: Get.back,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.fadedGrey,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Divider(),
+                SizedBox(height: Get.height * .03),
+                const Text("Байгууллагын үнэлгээ"),
+                const SizedBox(height: 12),
+                RatingBar.builder(
+                  initialRating: 0,
+                  minRating: 0,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  unratedColor: MyColors.background,
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) => const Icon(
+                    IconlyBold.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (rating) {
+                    setState(() {
+                      storeRating = rating.toInt();
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                const Text("Жолоочийн үнэлгээ"),
+                const SizedBox(height: 12),
+                RatingBar.builder(
+                  initialRating: 0,
+                  minRating: 0,
+                  direction: Axis.horizontal,
+                  allowHalfRating: false,
+                  itemCount: 5,
+                  unratedColor: MyColors.background,
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) => const Icon(
+                    IconlyBold.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (rating) {
+                    setState(() {
+                      driverRating = rating.toInt();
+                    });
+                  },
+                ),
+                SizedBox(height: Get.height * .05),
+                CustomButton(
+                  text: "Баталгаажуулах",
+                  isActive: storeRating != 0 && driverRating != 0,
+                  onPressed: () {
+                    Get.back();
+                    userRateDelivery();
+                  },
+                )
+              ],
+            ),
+          );
+        }),
+      ),
+    );
   }
 
   void getUserOrderDetails() async {
@@ -114,6 +271,11 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                         const SizedBox(height: 12),
                         _divider(),
                         _productsInfoAndMap(),
+                        const SizedBox(height: 12),
+                        _divider(),
+                        const SizedBox(height: 12),
+                        _rating(),
+                        SizedBox(height: Get.height * .1)
                       ],
                     ),
                   ),
@@ -360,9 +522,80 @@ class _UserOrdersDetailScreenState extends State<UserOrdersDetailScreen> {
                     )
                   ],
                 ),
-                const SizedBox(height: 12),
               ],
             ),
           );
+  }
+
+  Widget _rating() {
+    return widget.item["orderStatus"] == "delivered"
+        ? Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Хүргэлтийн үнэлгээ"),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Байгууллагын үнэлгээ",
+                      style: TextStyle(color: MyColors.gray),
+                    ),
+                    fetchingRating
+                        ? CustomShimmer(width: Get.width * .1, height: 16)
+                        : RatingBar.builder(
+                            initialRating: storeRating.toDouble(),
+                            minRating: 0,
+                            direction: Axis.horizontal,
+                            allowHalfRating: false,
+                            itemCount: 5,
+                            itemSize: 18,
+                            unratedColor: MyColors.background,
+                            itemPadding:
+                                const EdgeInsets.symmetric(horizontal: 2.0),
+                            itemBuilder: (context, _) => const Icon(
+                              IconlyBold.star,
+                              color: Colors.amber,
+                            ),
+                            onRatingUpdate: (rating) {},
+                          ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Жолоочийн үнэлгээ",
+                      style: TextStyle(
+                        color: MyColors.gray,
+                      ),
+                    ),
+                    fetchingRating
+                        ? CustomShimmer(width: Get.width * .1, height: 16)
+                        : RatingBar.builder(
+                            initialRating: driverRating.toDouble(),
+                            minRating: 0,
+                            direction: Axis.horizontal,
+                            allowHalfRating: false,
+                            itemCount: 5,
+                            itemSize: 18,
+                            unratedColor: MyColors.background,
+                            itemPadding:
+                                const EdgeInsets.symmetric(horizontal: 2.0),
+                            itemBuilder: (context, _) => const Icon(
+                              IconlyBold.star,
+                              color: Colors.amber,
+                            ),
+                            onRatingUpdate: (rating) {},
+                          ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        : Container();
   }
 }

@@ -25,9 +25,8 @@ class LoginController extends GetxController {
     Get.back();
     CustomDialogs().showLoadingDialog();
     deleteToken();
-    RestApiHelper.saveUserId(0);
     RestApiHelper.saveUserRole("");
-    RestApiHelper.saveOrderId(0);
+    RestApiHelper.saveToken("");
     _navCtx.onItemTapped(0);
     Get.back();
     Get.offAll(() => const SplashPhoneRegisterScreen());
@@ -47,11 +46,10 @@ class LoginController extends GetxController {
     _messaging.getToken().then((token) async {
       if (token != null) {
         var body = {
-          "id": RestApiHelper.getUserId(),
           "role": RestApiHelper.getUserRole(),
           "token": token,
         };
-        await UserApi().saveUserToken(body);
+        await UserApi().saveUserTokenNew(body);
       }
     });
   }
