@@ -190,20 +190,7 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                           child: Hero(
                             transitionOnUserGestures: true,
                             tag: _arguments["id"],
-                            child: CarouselSlider(
-                              options: CarouselOptions(
-                                enableInfiniteScroll: false,
-                                initialPage: 0,
-                                aspectRatio: 1,
-                                viewportFraction: 1,
-                                scrollPhysics: const BouncingScrollPhysics(),
-                                onPageChanged: (index, reason) {
-                                  scrolledImage = index + 1;
-                                  setState(() {});
-                                },
-                              ),
-                              items: [customImage(Get.width, data["image"])],
-                            ),
+                            child: customImage(Get.width, data["image"]),
                           ),
                         ),
                         Positioned(
