@@ -43,7 +43,6 @@ dependencies:
   url_launcher:
   rename:
   iconly:
-  carousel_slider:
   pin_code_fields:
   hive:
   hive_flutter:
