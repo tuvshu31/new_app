@@ -77,7 +77,7 @@ dependencies:
   flutter_local_notifications:
   socket_io_client:
   dotted_line:
-  webview_flutter:
+  webview_flutter: ^4.7.0
   slide_countdown:
   expandable:
   animated_digit:
