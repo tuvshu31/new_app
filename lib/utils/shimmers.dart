@@ -212,3 +212,57 @@ Widget productsLoadingWidget() {
     },
   );
 }
+
+Widget addressShimmer() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Байршил",
+          style: TextStyle(color: MyColors.gray),
+        ),
+        const SizedBox(height: 12),
+        CustomShimmer(
+          width: Get.width,
+          height: 42,
+          borderRadius: 25,
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          "Дэлгэрэнгүй хаяг",
+          style: TextStyle(color: MyColors.gray),
+        ),
+        const SizedBox(height: 12),
+        CustomShimmer(
+          width: Get.width,
+          height: 42,
+          borderRadius: 25,
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          "Утас",
+          style: TextStyle(color: MyColors.gray),
+        ),
+        const SizedBox(height: 12),
+        CustomShimmer(
+          width: Get.width,
+          height: 42,
+          borderRadius: 25,
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          "Орцны код",
+          style: TextStyle(color: MyColors.gray),
+        ),
+        const SizedBox(height: 12),
+        CustomShimmer(
+          width: Get.width,
+          height: 42,
+          borderRadius: 25,
+        ),
+      ],
+    ),
+  );
+}

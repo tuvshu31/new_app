@@ -15,8 +15,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:Erdenet24/utils/enums.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:Erdenet24/api/dio_requests.dart';
-import 'package:Erdenet24/api/restapi_helper.dart';
 
 class DriverController extends GetxController with GetTickerProviderStateMixin {
   final player = AudioPlayer();
