@@ -664,96 +664,134 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                   itemBuilder: (context, index) {
                     if (index < products.length) {
                       var item = products[index];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CustomInkWell(
-                            onTap: () => Get.toNamed(
-                              userProductDetailScreenRoute,
-                              arguments: {
-                                "id": item["id"],
-                                "store": item["store"],
-                                "storeName": _arguments["title"],
-                              },
-                            ),
-                            child: Hero(
-                              transitionOnUserGestures: true,
-                              tag: item["id"],
+                      return Container(
+                        margin: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            width: 1,
+                            color: MyColors.background,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CustomInkWell(
+                              onTap: () => Get.toNamed(
+                                userProductDetailScreenRoute,
+                                arguments: {
+                                  "id": item["id"],
+                                  "store": item["store"],
+                                  "storeName": _arguments["title"],
+                                },
+                              ),
                               child: Stack(
                                 children: [
-                                  customImage(
-                                    Get.width * .3,
-                                    item["image"],
-                                    isFaded: item["available"] == 0,
-                                    isCircle: false,
-                                    fadeText: "Дууссан",
+                                  Hero(
+                                    transitionOnUserGestures: true,
+                                    tag: item["id"],
+                                    child: Stack(
+                                      children: [
+                                        customImage(
+                                          Get.width * .3,
+                                          item["image"],
+                                          isCircle: false,
+                                          fadeText: "Дууссан",
+                                        ),
+                                        item["salePercent"] != null &&
+                                                item["salePercent"] > 0
+                                            ? Positioned(
+                                                right: 10,
+                                                top: 5,
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: Text(
+                                                    "-${item["salePercent"]}%",
+                                                    style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12),
+                                                  ),
+                                                ),
+                                              )
+                                            : Container()
+                                      ],
+                                    ),
                                   ),
-                                  item["salePercent"] != null &&
-                                          item["salePercent"] > 0
-                                      ? Positioned(
-                                          right: 10,
-                                          top: 5,
+                                  item["available"] == 0
+                                      ? Center(
                                           child: Container(
-                                            padding: const EdgeInsets.all(4),
+                                            width: Get.width * .3,
+                                            height: Get.width * .3,
                                             decoration: BoxDecoration(
-                                              color: Colors.red,
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              // shape: BoxShape.circle,
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(12),
                                             ),
-                                            child: Text(
-                                              "-${item["salePercent"]}%",
-                                              style: const TextStyle(
+                                            child: const Center(
+                                              child: Text(
+                                                "Дууссан",
+                                                style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         )
-                                      : Container()
+                                      : Container(),
                                 ],
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            width: Get.width * .3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      convertToCurrencyFormat(item['price']),
-                                    ),
-                                    item["salePercent"] != null &&
-                                            item["salePercent"] > 0
-                                        ? Text(
-                                            convertToCurrencyFormat(
-                                                item['oldPrice']),
-                                            style: const TextStyle(
-                                              color: MyColors.gray,
-                                              fontSize: 10,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                          )
-                                        : Container(),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  item["name"] ?? "",
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 12,
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: Get.width * .3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        convertToCurrencyFormat(item['price']),
+                                      ),
+                                      item["salePercent"] != null &&
+                                              item["salePercent"] > 0
+                                          ? Text(
+                                              convertToCurrencyFormat(
+                                                  item['oldPrice']),
+                                              style: const TextStyle(
+                                                color: MyColors.gray,
+                                                fontSize: 10,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                              ),
+                                            )
+                                          : Container(),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item["name"] ?? "",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     } else if (hasMore) {
                       return Column(

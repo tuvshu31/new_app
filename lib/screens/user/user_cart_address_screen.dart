@@ -31,6 +31,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
   List section = [];
   Map address = {};
   List priceDetals = [];
+  bool showSection = false;
   int totalPrice = 0;
   int deliveryPrice = 0;
   final _arguments = Get.arguments;
@@ -53,6 +54,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
         section = response["section"];
         location = response["location"];
         address = response["address"] ?? {};
+        showSection = response["showSection"];
       }
     }
     setState(() {});
@@ -131,6 +133,7 @@ class _UserCartAddressScreenState extends State<UserCartAddressScreen> {
                         address: address,
                         location: location,
                         section: section,
+                        showSection: showSection,
                         onpressed: () {
                           calculateDeliveryPrice();
                         },

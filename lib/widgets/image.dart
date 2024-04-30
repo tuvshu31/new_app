@@ -60,13 +60,16 @@ Widget customImage(
   String url, {
   bool isCircle = false,
   bool isFaded = false,
+  bool isSquare = false,
   String fadeText = "",
 }) {
   return Stack(
     alignment: Alignment.center,
     children: [
       ClipRRect(
-          borderRadius: BorderRadius.circular(isCircle ? 50 : 12),
+          borderRadius: isSquare
+              ? BorderRadius.zero
+              : BorderRadius.circular(isCircle ? 50 : 12),
           clipBehavior: Clip.hardEdge,
           child: SizedBox(
             width: width,

@@ -233,6 +233,18 @@ class UserApi {
         .sendRequest('checkUserAddress?storeId=$storeId', Method.post, [], {});
   }
 
+  //Хэрэглэгчийн хаягийн мэдээллийг авах
+  Future getUserAddressDetails() async {
+    return DioClient()
+        .sendRequest('getUserAddressDetails', Method.post, [], {});
+  }
+
+  //Хэрэглэгчийн хаягийн мэдээллийг хадгалах
+  Future saveUserAddressInfo(dynamic body) async {
+    return DioClient()
+        .sendRequest('saveUserAddressInfo', Method.post, body, {});
+  }
+
   //Бүх байршилуудыг датаг авах
   Future calculateDeliveryPrice(dynamic body) async {
     return DioClient()

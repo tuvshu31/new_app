@@ -54,7 +54,7 @@ class LocalNotification {
     String largeIcon,
     String bigPicture,
   ) async {
-    dynamic styleInformation = const DefaultStyleInformation(false, false);
+    dynamic styleInformation = const BigTextStyleInformation("");
     if (largeIcon != "" && bigPicture != "") {
       Future<String> downloadAndSaveFile(String url, String fileName) async {
         final Directory directory = await getApplicationDocumentsDirectory();

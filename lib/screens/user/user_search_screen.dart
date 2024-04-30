@@ -433,7 +433,10 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
-                      return Divider();
+                      return Container(
+                        height: 7,
+                        color: MyColors.fadedGrey,
+                      );
                     },
                     shrinkWrap: true,
                     itemCount: storeList.isEmpty ? 6 : storeList.length,
@@ -467,8 +470,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                     fadeText: "Хаалттай",
                                   ),
                                   SizedBox(width: Get.width * .05),
-                                  SizedBox(
-                                    width: Get.width * .6,
+                                  Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -480,6 +482,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                           style: const TextStyle(
                                             color: MyColors.black,
                                             fontSize: 15,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -488,6 +491,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                           style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 13,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -513,28 +517,32 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                                       ],
                                     ),
                                   ),
-                                  Expanded(
-                                      child: data["withSale"] != null &&
-                                              data["withSale"] == 1
-                                          ? Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.green,
+                                  SizedBox(
+                                    width: Get.width * .1,
+                                    child: data["withSale"] != null &&
+                                            data["withSale"] == 1
+                                        ? Column(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
                                                   borderRadius:
-                                                      BorderRadius.circular(8)),
-                                              child: const Text(
-                                                "Хямдралтай",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: const Text(
+                                                  "SALE",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10,
+                                                  ),
                                                 ),
                                               ),
-                                            )
-                                          : Container()),
+                                            ],
+                                          )
+                                        : Container(),
+                                  ),
                                 ],
                               ),
                             ),

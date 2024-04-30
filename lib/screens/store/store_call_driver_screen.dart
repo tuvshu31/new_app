@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:Erdenet24/api/dio_requests/store.dart';
 import 'package:Erdenet24/api/dio_requests/user.dart';
+import 'package:Erdenet24/controller/address_controller.dart';
 import 'package:Erdenet24/utils/enums.dart';
+import 'package:Erdenet24/widgets/address.dart';
 import 'package:Erdenet24/widgets/custom_loading_widget.dart';
 import 'package:Erdenet24/widgets/dialogs/dialog_list.dart';
 import 'package:Erdenet24/widgets/inkwell.dart';
@@ -29,45 +31,68 @@ class _StoreCallDriverScreenState extends State<StoreCallDriverScreen> {
   String locationTitle = "Хүлээн авагчийн байршил";
   String locationPickerText = "";
   bool fetchingUserAddress = false;
-  List locationList = [];
-  Map selectedLocation = {};
   TextEditingController totalAmountCTRL = TextEditingController();
-  TextEditingController addressCTRL = TextEditingController();
-  TextEditingController phoneCTRL = TextEditingController();
-  TextEditingController entranceKodCTRL = TextEditingController();
+  List location = [];
+  List section = [];
+  Map address = {};
+  bool showSection = false;
+  int deliveryPrice = 0;
+  final _addressCtx = Get.put(AddressController());
 
   @override
   void initState() {
     super.initState();
     locationPickerText = locationTitle;
     setState(() {});
-    getAllLocations();
+    storeCheckUserLocation();
   }
 
-  void getAllLocations() async {
+  void storeCheckUserLocation() async {
     fetchingUserAddress = true;
-    dynamic getAllLocations = await UserApi().getAllLocations();
+    dynamic storeCheckUserLocation = await StoreApi().storeCheckUserLocation();
     fetchingUserAddress = false;
-    if (getAllLocations != null) {
-      dynamic response = Map<String, dynamic>.from(getAllLocations);
+    if (storeCheckUserLocation != null) {
+      dynamic response = Map<String, dynamic>.from(storeCheckUserLocation);
       if (response["success"]) {
-        locationList = response["data"];
+        section = response["section"];
+        location = response["location"];
+        showSection = response["showSection"];
       }
     }
     setState(() {});
   }
 
+  void storeCalculateDeliveryPrice() async {
+    CustomDialogs().showLoadingDialog();
+    var body = {
+      "sectionId": _addressCtx.selectedSection["id"],
+      "locationId": _addressCtx.selectedLocation["id"]
+    };
+    dynamic storeCalculateDeliveryPrice =
+        await StoreApi().storeCalculateDeliveryPrice(body);
+    Get.back();
+    if (storeCalculateDeliveryPrice != null) {
+      dynamic response = Map<String, dynamic>.from(storeCalculateDeliveryPrice);
+      log(response.toString());
+      if (response["success"]) {
+        deliveryPrice = response["deliveryPrice"];
+      }
+    }
+  }
+
   void storeCreateNewOrder() async {
     CustomDialogs().showLoadingDialog();
     var body = {
-      "location": selectedLocation["name"],
-      "deliveryPrice": selectedLocation["price"],
-      "address": addressCTRL.text,
-      "phone": phoneCTRL.text,
-      "entrance": entranceKodCTRL.text,
+      "section": _addressCtx.selectedSection["name"],
+      "location": _addressCtx.selectedLocation["name"],
+      "deliveryPrice": deliveryPrice,
+      "address": _addressCtx.addressController.value.text,
+      "phone": _addressCtx.phoneController.value.text,
+      "entrance": _addressCtx.entranceController.value.text,
       "totalAmount": totalAmountCTRL.text,
       "prepDuration": pickedTime,
     };
+    log(body.toString());
     dynamic storeCreateNewOrder = await StoreApi().storeCreateNewOrder(body);
     Get.back();
     if (storeCreateNewOrder != null) {
@@ -154,70 +179,60 @@ class _StoreCallDriverScreenState extends State<StoreCallDriverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomHeader(
-      title: "Жолооч дуудах",
-      customActions: Container(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomTextField(
-              hintText: "Захиалгын үнийн дүн",
-              controller: totalAmountCTRL,
-              keyboardType: TextInputType.number,
-              onChanged: (val) {},
-              formatThousands: true,
+    return Obx(
+      () => CustomHeader(
+        title: "Жолооч дуудах",
+        customActions: Container(),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextField(
+                  hintText: "Захиалгын үнийн дүн",
+                  controller: totalAmountCTRL,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) {},
+                  formatThousands: true,
+                ),
+                const SizedBox(height: 12),
+                _dropDownWidget(
+                    () => showStoreDurationPicker(setState), timePickerText),
+                const SizedBox(height: 12),
+                CustomAddressWidget(
+                  location: location,
+                  address: address,
+                  section: section,
+                  onpressed: storeCalculateDeliveryPrice,
+                  showSection: true,
+                )
+              ],
             ),
-            const SizedBox(height: 12),
-            _dropDownWidget(
-                () => showStoreDurationPicker(setState), timePickerText),
-            const SizedBox(height: 12),
-            _dropDownWidget(
-              () {
-                Get.bottomSheet(
-                  _locationListBody(),
-                  ignoreSafeArea: false,
-                  backgroundColor: MyColors.white,
-                  isScrollControlled: true,
-                );
-              },
-              locationPickerText,
+          ),
+        ),
+        bottomSheet: Container(
+          width: Get.width,
+          height: Get.height * .1,
+          color: MyColors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Center(
+            child: CustomButton(
+              isActive: _addressCtx.isLocationOk.value &&
+                  _addressCtx.isPhoneOk.value &&
+                  _addressCtx.isAddressOk.value &&
+                  totalAmountCTRL.text.isNotEmpty &&
+                  totalAmountCTRL.text != "0" &&
+                  pickedTime != 0,
+              onPressed: storeCreateNewOrder,
+              text: "Жолооч дуудах",
+              textColor: MyColors.white,
+              elevation: 0,
             ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: "Хүлээн авагчийн хаяг",
-              controller: addressCTRL,
-              textInputAction: TextInputAction.next,
-              onChanged: (val) {
-                setState(() {});
-              },
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: "Хүлээн авагчийн утасны дугаар",
-              controller: phoneCTRL,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.number,
-              maxLength: 8,
-              onChanged: (val) {
-                setState(() {});
-              },
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: "Хүлээн авагчийн орцны код",
-              controller: entranceKodCTRL,
-              textInputAction: TextInputAction.done,
-              keyboardType: TextInputType.text,
-              onChanged: (val) {
-                setState(() {});
-              },
-            ),
-          ],
+          ),
         ),
       ),
-      bottomSheet: _bottomSheet(),
     );
   }
 
@@ -246,92 +261,6 @@ class _StoreCallDriverScreenState extends State<StoreCallDriverScreen> {
               size: 18,
             )
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _locationListBody() {
-    return CustomHeader(
-        customActions: CustomInkWell(
-          onTap: Get.back,
-          child: Container(
-            decoration: BoxDecoration(
-              color: MyColors.fadedGrey,
-              shape: BoxShape.circle,
-            ),
-            padding: const EdgeInsets.all(8),
-            child: const Icon(
-              Icons.close_rounded,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        leadingWidth: 20,
-        title: "Байршил сонгох",
-        customLeading: Container(),
-        body: locationList.isEmpty
-            ? customLoadingWidget()
-            : ListView.separated(
-                separatorBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    width: double.infinity,
-                    height: Get.height * .008,
-                    decoration: BoxDecoration(color: MyColors.fadedGrey),
-                  );
-                },
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: locationList.length,
-                itemBuilder: (context, index) {
-                  var item = locationList[index];
-                  return CustomInkWell(
-                    onTap: () {
-                      locationPickerText = item["name"];
-                      selectedLocation = item;
-                      setState(() {});
-                      Get.back();
-                    },
-                    borderRadius: BorderRadius.circular(0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20, vertical: Get.width * .04),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(text: item["name"]),
-                          const Icon(
-                            IconlyLight.arrow_right_2,
-                            size: 18,
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ));
-  }
-
-  Widget _bottomSheet() {
-    return Container(
-      width: Get.width,
-      height: Get.height * .1,
-      color: MyColors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Center(
-        child: CustomButton(
-          isActive: totalAmountCTRL.text.isNotEmpty &&
-              totalAmountCTRL.text != "0" &&
-              addressCTRL.text.isNotEmpty &&
-              phoneCTRL.text.isNotEmpty &&
-              phoneCTRL.text.length == 8 &&
-              locationPickerText != locationTitle &&
-              pickedTime != 0,
-          onPressed: storeCreateNewOrder,
-          text: "Жолооч дуудах",
-          textColor: MyColors.white,
-          elevation: 0,
         ),
       ),
     );

@@ -107,7 +107,7 @@ class _UserHomeScreenState extends State<UserHomeScreen>
           ),
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.bag_2),
-            label: 'Захиалгууд',
+            label: 'Захиалга',
           ),
         ],
         currentIndex: _navCtrl.currentIndex.value,

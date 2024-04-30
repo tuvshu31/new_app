@@ -7,8 +7,8 @@ class LoginAPi {
   LoginAPi._internal();
 
   //Аппликейшны хувилбар шалгах
-  Future checkAppVersion(dynamic body) async {
-    return DioClient().sendRequest('checkAppVersion', Method.post, body, {});
+  Future checkAppVersionNew(dynamic body) async {
+    return DioClient().sendRequest('checkAppVersionNew', Method.post, body, {});
   }
 
   //Нэг удаагийн код үүсгэх

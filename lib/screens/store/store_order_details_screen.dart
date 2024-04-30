@@ -305,15 +305,22 @@ class _StoreOrdersDetailScreenState extends State<StoreOrdersDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Хаяг",
-                style: TextStyle(
-                  color: MyColors.gray,
+              const Expanded(
+                child: Text(
+                  "Хаяг:",
+                  style: TextStyle(
+                    color: MyColors.gray,
+                  ),
                 ),
               ),
-              Text(
-                widget.item["address"] ?? "N/a",
-                style: const TextStyle(color: MyColors.gray),
+              Expanded(
+                child: Text(
+                  widget.item["address"] ?? "N/a",
+                  style: const TextStyle(
+                    color: MyColors.gray,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
               )
             ],
           ),

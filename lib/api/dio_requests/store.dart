@@ -117,4 +117,16 @@ class StoreApi {
     return DioClient()
         .sendRequest('storeCreateNewOrder', Method.post, body, {});
   }
+
+  //Дэлгүүр жолооч дуудахын тулд хэрэглэгчийн байршлыг шалгах
+  Future storeCheckUserLocation() async {
+    return DioClient()
+        .sendRequest('storeCheckUserLocation', Method.post, [], {});
+  }
+
+  //Дэлгүүр хүргэлтийн төлбөрийг тооцоолох
+  Future storeCalculateDeliveryPrice(dynamic body) async {
+    return DioClient()
+        .sendRequest('storeCalculateDeliveryPrice', Method.post, body, {});
+  }
 }

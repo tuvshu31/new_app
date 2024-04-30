@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +13,13 @@ class CustomAddressWidget extends StatefulWidget {
   final List location;
   final Map address;
   final VoidCallback onpressed;
+  final bool showSection;
   const CustomAddressWidget({
     required this.location,
     required this.address,
     required this.section,
     required this.onpressed,
+    required this.showSection,
     super.key,
   });
 
@@ -28,8 +28,6 @@ class CustomAddressWidget extends StatefulWidget {
 }
 
 class _CustomAddressWidgetState extends State<CustomAddressWidget> {
-  List section = [];
-  List location = [];
   List fdLocation = [];
   String phoneErrorText = "";
   String sectionTitle = "Сонгох";
@@ -46,8 +44,6 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
   }
 
   void replaceUserAddress() {
-    section = widget.section;
-    location = widget.location;
     if (widget.address.isNotEmpty) {
       addressCtx.selectedSection.value = widget.address["selectedSection"];
       sectionTitle = addressCtx.selectedSection["name"];
@@ -73,7 +69,8 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
     }
     addressCtx.selectedSection.value = item;
     sectionTitle = item["name"];
-    fdLocation = location.where((el) => el["sectionId"] == item["id"]).toList();
+    fdLocation =
+        widget.location.where((el) => el["sectionId"] == item["id"]).toList();
     addressCtx.isSectionOk.value = true;
     setState(() {});
     Get.back();
@@ -107,7 +104,7 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
       () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          section.length > 1
+          widget.showSection
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -118,7 +115,7 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
                       borderRadius: BorderRadius.circular(50),
                       onTap: () => showCustomBottomSheet(
                         "Байршил сонгох",
-                        section,
+                        widget.section,
                         selectSection,
                       ),
                       child: Container(
@@ -156,7 +153,7 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
             borderRadius: BorderRadius.circular(50),
             onTap: () => showCustomBottomSheet(
               "Хаяг сонгох",
-              location,
+              widget.location,
               selectLocation,
             ),
             child: Container(

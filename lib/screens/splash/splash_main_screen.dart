@@ -25,10 +25,10 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
   @override
   void initState() {
     super.initState();
-    checkAppVersion();
+    checkAppVersionNew();
   }
 
-  void checkAppVersion() async {
+  void checkAppVersionNew() async {
     loading = true;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String version = packageInfo.version;
@@ -39,10 +39,10 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
       "buildNumber": buildNumber,
       "platform": platform
     };
-    dynamic checkAppVersion = await LoginAPi().checkAppVersion(body);
+    dynamic checkAppVersionNew = await LoginAPi().checkAppVersionNew(body);
     loading = false;
-    if (checkAppVersion != null) {
-      dynamic response = Map<String, dynamic>.from(checkAppVersion);
+    if (checkAppVersionNew != null) {
+      dynamic response = Map<String, dynamic>.from(checkAppVersionNew);
       if (response["success"]) {
         handleInitialRoute();
       } else {
@@ -99,6 +99,22 @@ class _SplashMainScreenState extends State<SplashMainScreen> {
               ),
             )
           ],
+        ),
+      ),
+      bottomSheet: Container(
+        color: Colors.white,
+        height: height * .1,
+        child: Center(
+          child: loading
+              ? SizedBox(
+                  width: width * .05,
+                  height: width * .05,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: MyColors.primary,
+                  ),
+                )
+              : Container(),
         ),
       ),
     );

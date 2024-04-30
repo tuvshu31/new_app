@@ -188,7 +188,8 @@ class _UserProductDetailScreenState extends State<UserProductDetailScreen> {
                           child: Hero(
                             transitionOnUserGestures: true,
                             tag: _arguments["id"],
-                            child: customImage(Get.width, data["image"]),
+                            child: customImage(Get.width, data["image"],
+                                isSquare: true),
                           ),
                         ),
                         Positioned(
