@@ -69,7 +69,7 @@ Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  setEnvironment(Environment.dev);
+  setEnvironment(Environment.prod);
   WidgetsFlutterBinding.ensureInitialized();
   await LocalNotification.init();
   await Firebase.initializeApp(
