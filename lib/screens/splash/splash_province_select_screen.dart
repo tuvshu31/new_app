@@ -213,7 +213,7 @@ class _SplashProvinceSelectScreenState
                     return CustomInkWell(
                       borderRadius: BorderRadius.zero,
                       onTap: () {
-                        handleRole(item);
+                        item["active"] ? handleRole(item) : null;
                       },
                       child: ListTile(
                         contentPadding:

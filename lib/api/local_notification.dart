@@ -150,8 +150,8 @@ void handleNotificationOnClick(String role) {
     }
     if (role == "store") {
       storeCtx.tappingNotification.value = true;
-      // storeCtx.checkStoreNewOrders();
-      // storeCtx.refreshOrders();
+      storeCtx.checkStoreNewOrders();
+      storeCtx.refreshOrders();
     }
     if (role == "driver") {
       Get.back();

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +47,9 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
 
   void replaceUserAddress() {
     if (widget.address.isNotEmpty) {
-      addressCtx.selectedSection.value = widget.address["selectedSection"];
-      sectionTitle = addressCtx.selectedSection["name"];
+      addressCtx.selectedSection.value =
+          widget.address["selectedSection"] ?? {};
+      sectionTitle = addressCtx.selectedSection["name"] ?? "";
       addressCtx.selectedLocation.value = widget.address["selectedLocation"];
       locationTitle = addressCtx.selectedLocation["name"];
       addressCtx.addressController.value.text = widget.address["address"];
@@ -64,6 +67,8 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
   void selectSection(Map item) {
     if (addressCtx.selectedSection != item) {
       locationTitle = "Сонгох";
+      fdLocation =
+          widget.location.where((el) => el["sectionId"] == item["id"]).toList();
       addressCtx.selectedLocation.value = {};
       addressCtx.isLocationOk.value = false;
     }
@@ -153,7 +158,7 @@ class _CustomAddressWidgetState extends State<CustomAddressWidget> {
             borderRadius: BorderRadius.circular(50),
             onTap: () => showCustomBottomSheet(
               "Хаяг сонгох",
-              widget.location,
+              fdLocation,
               selectLocation,
             ),
             child: Container(

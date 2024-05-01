@@ -49,6 +49,7 @@ class _UserProfileAddressEditScreenState
     if (getUserAddressDetails != null) {
       dynamic response = Map<String, dynamic>.from(getUserAddressDetails);
       if (response["success"]) {
+        log(response.toString());
         section = response["section"];
         location = response["location"];
         address = response["address"] ?? {};

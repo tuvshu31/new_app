@@ -55,6 +55,7 @@ class DriverController extends GetxController with GetTickerProviderStateMixin {
       payload["timer"] = animationController;
       orders.add(payload);
       player.play(AssetSource("sounds/doordash.mp3"));
+      payload["accetptedByMe"] = payload["accetptedByMe"] ?? false;
     }
   }
 

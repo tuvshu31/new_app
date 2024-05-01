@@ -143,13 +143,11 @@ class _DriverBottomSheetsBodyState extends State<DriverBottomSheetsBody> {
               children: [
                 Text(
                   title,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: MyColors.gray, fontSize: 14),
                 ),
               ],

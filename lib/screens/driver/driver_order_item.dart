@@ -17,11 +17,16 @@ class DriverOrderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isAccepted = item["accepted"] ?? false;
     bool warning = item["orderStatus"] == "waitingForDriver";
-    return CustomInkWell(
-      onTap: () =>
-          item["acceptedByMe"] ? _driverCtx.showOrderBottomSheet(item) : null,
-      child: _listItem(item, warning, 2),
-    );
+    if (!isAccepted) {
+      return _listItem(item, warning, 0);
+    } else if (isAccepted && !item["acceptedByMe"]) {
+      return _listItem(item, warning, 1);
+    } else {
+      return CustomInkWell(
+        onTap: () => _driverCtx.showOrderBottomSheet(item),
+        child: _listItem(item, warning, 2),
+      );
+    }
   }
 
   Widget _listItem(item, warning, id) {
